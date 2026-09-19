@@ -1,0 +1,168 @@
+{
+  "node_class": "Branch",
+  "note": "Branches compose operators. `order_status` is the OperatorOrder status from the report's contradiction matrix: only RESOLVED branches may return one deterministic number.",
+  "branches": [
+    {
+      "branch": "PARTIAL_DAMAGE",
+      "domain": "BODY",
+      "label_fa": "خسارت جزئی",
+      "governed_by": ["REG53_ART19B_PARTIAL_LOSS_BASE", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "REG53_ART5_ENDORSABLE_EXCLUSIONS", "REG53_ART6_NON_COMPENSABLE", "REG53_POLICY_DEFINED_FRANCHISE", "REG53_RESCUE_TRANSPORT_CAP"],
+      "base_rule": "REG53_ART19B_PARTIAL_LOSS_BASE",
+      "operators": [
+        "OP_SPECIAL_PART_CAP",
+        "OP_DEPRECIATION_REPLACEMENT_PART",
+        "OP_UNDERINSURANCE_RATIO",
+        "OP_FRANCHISE",
+        "OP_RESCUE_CAP"
+      ],
+      "order_status": "UNRESOLVED",
+      "order_status_reason": "Regulation 53 states partial loss is based on repair/labour/replacement-part prices after depreciation and franchise, with rescue added, but its underinsurance provision appears separately and does not state its position relative to franchise.",
+      "controlled_by": ["REG53_ART19B_PARTIAL_LOSS_BASE", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"],
+      "resolved_by": "insurer_claims_worksheet_or_official_clarification",
+      "scenarios": [
+        {
+          "scenario_id": "A",
+          "name": "AFTER_DEPRECIATION_BEFORE_FRANCHISE",
+          "sequence": ["OP_SPECIAL_PART_CAP", "OP_DEPRECIATION_REPLACEMENT_PART", "OP_UNDERINSURANCE_RATIO", "OP_FRANCHISE", "OP_RESCUE_CAP"],
+          "expression": "(loss - depreciation) * ratio - franchise + rescue"
+        },
+        {
+          "scenario_id": "B",
+          "name": "AFTER_DEPRECIATION_AND_FRANCHISE",
+          "sequence": ["OP_SPECIAL_PART_CAP", "OP_DEPRECIATION_REPLACEMENT_PART", "OP_FRANCHISE", "OP_UNDERINSURANCE_RATIO", "OP_RESCUE_CAP"],
+          "expression": "(loss - depreciation - franchise) * ratio + rescue"
+        }
+      ],
+      "blocking_uncertainties": ["U01_ARTICLE10_PARTIAL_ORDER", "U02_FRANCHISE_BASE_SCHEDULES", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION", "U05_RESCUE_DENOMINATOR"],
+      "required_evidence": ["expert_assessment", "market_value_evidence", "policy_terms"],
+      "note": "When ratio == 1 both scenarios coincide and the engine returns one number even though the order is unresolved."
+    },
+    {
+      "branch": "TOTAL_LOSS",
+      "domain": "BODY",
+      "label_fa": "خسارت کلی",
+      "governed_by": ["REG53_ART19_TOTAL_LOSS_THRESHOLD", "REG53_ART19_TOTAL_LOSS_VALUATION", "REG53_ART19_INSURER_TAKES_TITLE", "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE", "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE"],
+      "base_rule": "REG53_ART19_TOTAL_LOSS_VALUATION",
+      "base_expression": "settlement_base = min(market_value_on_loss_date, insured_sum)",
+      "operators": [
+        "OP_SALVAGE_DEDUCTION",
+        "OP_FRANCHISE",
+        "OP_RESCUE_CAP",
+        "OP_LIABILITY_CAP_INSURED_SUM"
+      ],
+      "order_status": "RESOLVED",
+      "order_status_reason": "Central Insurance circular 1400/401/146850 places the total-loss franchise after probable salvage is deducted.",
+      "controlled_by": ["CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE", "REG53_ART19_TOTAL_LOSS_VALUATION"],
+      "scenarios": [],
+      "guardrails": ["G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS", "G_SALVAGE_XOR_TITLE_TRANSFER", "G_INSURED_SUM_CEILING"],
+      "blocking_uncertainties": ["U05_RESCUE_DENOMINATOR", "U12_SALVAGE_DISPOSITION"],
+      "note": "The 75% test is strictly greater-than. Where salvage ownership transfers to the insurer, salvage must not also be subtracted."
+    },
+    {
+      "branch": "GLASS_ONLY",
+      "domain": "BODY",
+      "label_fa": "شکست شیشه به تنهایی",
+      "governed_by": ["REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_POLICY_DEFINED_FRANCHISE", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"],
+      "base_rule": "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+      "operators": [
+        "OP_FRANCHISE",
+        "OP_UNDERINSURANCE_RATIO",
+        "OP_RESCUE_CAP"
+      ],
+      "order_status": "INSURER_SPECIFIC",
+      "order_status_reason": "Standalone glass requires an endorsement. The regulation supplies no universal glass franchise rate and does not state whether the general underinsurance provision applies to an endorsement-based glass payment.",
+      "controlled_by": ["REG53_POLICY_DEFINED_FRANCHISE", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION"],
+      "resolved_by": "glass_only_endorsement_wording",
+      "scenarios": [
+        {
+          "scenario_id": "A",
+          "name": "RATIO_BEFORE_FRANCHISE",
+          "expression": "gross * ratio - franchise"
+        },
+        {
+          "scenario_id": "B",
+          "name": "FRANCHISE_BEFORE_RATIO",
+          "expression": "(gross - franchise) * ratio"
+        }
+      ],
+      "blocking_uncertainties": ["U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION"],
+      "note": "Depreciation is 0 for GLASS and LAMP_GLASS: this is the only universal calculation fact established. If the glass damage was caused by a base body peril, the claim is routed to PARTIAL_DAMAGE instead."
+    },
+    {
+      "branch": "THEFT",
+      "domain": "BODY",
+      "label_fa": "سرقت",
+      "governed_by": ["REG53_ART19_THEFT_TOTAL_LOSS_60D", "REG53_ART19_TOTAL_LOSS_VALUATION", "REG53_ART19_INSURER_TAKES_TITLE", "REG53_ART19_THEFT_RECOVERY_WITHIN_1Y", "REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "base_rule": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "operators": [
+        "OP_FRANCHISE",
+        "OP_LIABILITY_CAP_INSURED_SUM"
+      ],
+      "order_status": "RESOLVED",
+      "order_status_reason": "Whole-vehicle theft routes to its own settlement branch after 60 days with title transfer; attempted-theft damage routes to PARTIAL_DAMAGE; partial parts theft depends on its endorsement.",
+      "controlled_by": ["REG53_ART19_THEFT_TOTAL_LOSS_60D"],
+      "scenarios": [],
+      "blocking_uncertainties": ["U02_FRANCHISE_BASE_SCHEDULES"],
+      "note": "Whole-vehicle theft is not a partial-loss formula with a different deductible."
+    },
+    {
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "domain": "THIRD_PARTY_FINANCIAL",
+      "label_fa": "ثالث مالی",
+      "governed_by": ["TPL_LAW_1395_ART8_MIN_FINANCIAL_COMMITMENT", "HIC_ARTICLE8_CONVENTIONAL_DEFINITION"],
+      "base_rule": "TPL_LAW_1395_ART8_MIN_FINANCIAL_COMMITMENT",
+      "base_expression": "min(legally_assessed_financial_loss, policy_financial_limit)",
+      "operators": ["OP_LIABILITY_CAP_FINANCIAL_LIMIT"],
+      "order_status": "RESOLVED",
+      "order_status_reason": "Ordinary and conventional-vehicle cases are a single financial cap. Article 8 only activates for a non-conventional passenger car.",
+      "controlled_by": ["TPL_LAW_1395_ART8_MIN_FINANCIAL_COMMITMENT", "HIC_ARTICLE8_CONVENTIONAL_DEFINITION"],
+      "scenarios": [],
+      "blocking_uncertainties": [],
+      "note": "No body-policy depreciation or franchise stack is imported into this branch automatically."
+    },
+    {
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "domain": "THIRD_PARTY_FINANCIAL",
+      "label_fa": "ماده ۸ خودروی نامتعارف",
+      "governed_by": ["HIC_ARTICLE8_CORRESPONDING_DAMAGE", "HIC_ARTICLE8_CONVENTIONAL_DEFINITION", "HIC_ARTICLE8_EXACT_PART_ABSENT_USE_SIMILAR", "TPL_LAW_1395_ART8_NON_CONVENTIONAL_LIMIT", "TPL_LAW_1395_ART8_AT_FAULT_CAP", "CIC_CIRC_1404_06_10_ARTICLE8_EXCESS_OWN_BODY", "CIC_CIRC_1404_06_10_NO_MANDATORY_FRANCHISE_ON_ART8_EXCESS"],
+      "base_rule": "HIC_ARTICLE8_CORRESPONDING_DAMAGE",
+      "base_expression": "tp_payable = min(corresponding_damage, policy_financial_limit)",
+      "operators": [
+        "OP_CORRESPONDING_DAMAGE",
+        "OP_LIABILITY_CAP_FINANCIAL_LIMIT"
+      ],
+      "order_status": "RESOLVED",
+      "order_status_reason": "Component correspondence first, policy financial cap second. The 1398/06/13 amendment replaced the whole-vehicle proportional method.",
+      "controlled_by": ["HIC_ARTICLE8_CORRESPONDING_DAMAGE"],
+      "scenarios": [],
+      "blocking_uncertainties": ["U06_ARTICLE8_COMPONENT_CATALOGUE", "U07_ANNUAL_CONVENTIONAL_REFERENCE_SET"],
+      "guardrails": ["G_ARTICLE8_NO_WHOLE_CAR_RATIO", "G_DUAL_LIABILITY_CAP", "G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE"],
+      "note": "The non-corresponding excess is a body-insurance candidate, not automatically a debt of the at-fault driver."
+    },
+    {
+      "branch": "LEGAL_RECOVERY",
+      "domain": "LEGAL_RECOVERY",
+      "label_fa": "محاسبه حقوقی / جانشینی",
+      "governed_by": ["REG53_ART14_SUBROGATION", "TPL_LAW_1395_ART8_STATUTORY_RECOURSE", "TPL_LAW_1395_ART8_AT_FAULT_CAP", "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION"],
+      "base_rule": "REG53_ART14_SUBROGATION",
+      "base_expression": "remaining = max(0, min(legal_loss, statutory_cap) - prior_compensation)",
+      "operators": [
+        "OP_LIABILITY_CAP_STATUTORY_CORRESPONDING"
+      ],
+      "order_status": "RESOLVED",
+      "order_status_reason": "Legal entitlement first; insurance contribution and subrogation second.",
+      "controlled_by": ["REG53_ART14_SUBROGATION"],
+      "scenarios": [],
+      "blocking_uncertainties": ["U09_DIMINUTION_OF_VALUE_TP"],
+      "note": "For an Article 8 vehicle, direct liability stays subject to the corresponding-damage cap. Impairing insurer recourse can trigger denial or recovery."
+    }
+  ],
+  "pseudo_branch_mapping": {
+    "note": "Documented aliases so the branch vocabulary stays closed. Each maps to a canonical branch plus a variant.",
+    "TOTAL_LOSS_TEST": { "branch": "TOTAL_LOSS", "variant": "THRESHOLD_TEST" },
+    "TOTAL_THEFT": { "branch": "THEFT", "variant": "TOTAL_SETTLEMENT" },
+    "ARTICLE_8_DUAL_COVERAGE": { "branch": "ARTICLE_8_NON_CONVENTIONAL", "variant": "DUAL_COVERAGE" },
+    "ORDINARY_FINANCIAL": { "branch": "THIRD_PARTY_FINANCIAL", "variant": "ORDINARY_FINANCIAL" },
+    "THEFT_PARTIAL_DAMAGE": { "branch": "THEFT", "variant": "ATTEMPTED_THEFT" }
+  }
+}

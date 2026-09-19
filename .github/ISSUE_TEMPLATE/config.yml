@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sensitive security, claimant-data, or payment-integrity report
+    url: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/security/advisories/new
+    about: Do not disclose personal data or exploitable payment defects in a public issue.

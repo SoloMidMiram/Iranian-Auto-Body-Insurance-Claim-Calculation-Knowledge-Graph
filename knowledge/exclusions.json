@@ -1,0 +1,193 @@
+{
+  "node_class": "Exclusion",
+  "note": "Two distinct failure states, never collapsed into a single coverage=false boolean. EXCLUDED_BUT_ENDORSABLE can be restored by an endorsement; NON_COMPENSABLE cannot. `cause_predicate` is matched against the event's peril, cause or theft_type, so causation stays a predicate and never becomes a multiplier (see U10).",
+  "exclusions": [
+    {
+      "node_id": "EX_FLOOD_EARTHQUAKE_VOLCANO",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["FLOOD", "EARTHQUAKE", "VOLCANO", "SIL", "FLOOD_DAMAGE"] },
+      "restorable_by": ["FLOOD", "NATURAL_DISASTER", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["rate", "minimum", "covered_causes", "valuation_base"],
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS",
+      "exercised_by": ["P13", "P14"]
+    },
+    {
+      "node_id": "EX_RACING_SPEED_TESTING",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["RACING", "SPEED_TEST", "SPEED_TESTING"] },
+      "restorable_by": ["RACING", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["rate", "minimum"],
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS"
+    },
+    {
+      "node_id": "EX_HAZARDOUS_CARGO",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["HAZARDOUS_CARGO", "DANGEROUS_CARGO"] },
+      "restorable_by": ["HAZARDOUS_CARGO", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["rate", "minimum"],
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS"
+    },
+    {
+      "node_id": "EX_CHEMICAL_PAINT_DAMAGE",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["CHEMICAL", "PAINT_DAMAGE"] },
+      "restorable_by": ["CHEMICAL", "PAINT", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["rate", "minimum"],
+      "condition": "unless caused by an insured peril",
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS"
+    },
+    {
+      "node_id": "EX_SCRATCHING",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["SCRATCHING"] },
+      "restorable_by": ["SCRATCHING", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["rate", "minimum"],
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS"
+    },
+    {
+      "node_id": "EX_LOSS_OF_USE",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["LOSS_OF_USE"] },
+      "restorable_by": ["LOSS_OF_USE", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["daily_rate", "maximum_days"],
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS"
+    },
+    {
+      "node_id": "EX_DIMINUTION_OF_VALUE_BODY",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
+      "cause_predicate": { "cause_keywords": ["DIMINUTION_OF_VALUE", "افت_قیمت"] },
+      "restorable_by": ["DIMINUTION_OF_VALUE", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED" },
+      "endorsement_terms_needed": ["valuation_method"],
+      "scope": "BODY_POLICY_ONLY",
+      "note": "Excluded from the base body policy. This does not by itself settle the third-party context (see U09)."
+    },
+    {
+      "node_id": "EX_PARTIAL_PARTS_THEFT",
+      "type": "EXCLUDED_BUT_ENDORSABLE",
+      "article": "5",
+      "sourced_from": ["REG53_ART5_ENDORSABLE_EXCLUSIONS", "REG53_ART19_THEFT_TOTAL_LOSS_60D"],
+      "cause_predicate": { "theft_type_in": ["PARTIAL_PARTS_THEFT", "PARTS_STOLEN_AFTER_ACCIDENT"] },
+      "restorable_by": ["PARTIAL_THEFT", "*"],
+      "uninsured_outcome": { "payable": 0, "reason": "BASE_POLICY_EXCLUSION" },
+      "insured_outcome": { "payable": null, "status": "ENDORSEMENT_LIMIT_AND_FRANCHISE_REQUIRED" },
+      "endorsement_terms_needed": ["limit", "franchise"],
+      "guardrail": "G_NO_GUESSED_ENDORSEMENT_TERMS",
+      "exercised_by": ["TH32", "TH33"]
+    },
+    {
+      "node_id": "EX_WAR",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["WAR", "BELLIGERENCY"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_NUCLEAR",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["NUCLEAR", "RADIOACTIVE"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_INTENTIONAL_DAMAGE",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["INTENTIONAL", "WILFUL", "VANDALISM_BY_INSURED"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_POLICE_FLIGHT",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["POLICE_FLIGHT", "FLIGHT_FROM_POLICE"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_LICENCE",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "field": "valid_licence", "equals": false },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_INTOXICATION",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": {
+        "cause_keywords": ["INTOXICATION", "INTOXICANT", "ALCOHOL", "DRUG", "مستی"],
+        "field": "intoxication_causally_confirmed",
+        "equals": true,
+        "causation_required": true
+      },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" },
+      "exercised_by": ["P15"]
+    },
+    {
+      "node_id": "EX_UNAUTHORIZED_TOWING",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["UNAUTHORIZED_TOWING"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_ELECTRICAL_MALFUNCTION",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["INHERENT_ELECTRICAL", "ELECTRONIC_MALFUNCTION"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    },
+    {
+      "node_id": "EX_OVERLOAD",
+      "type": "NON_COMPENSABLE",
+      "article": "6",
+      "sourced_from": ["REG53_ART6_NON_COMPENSABLE"],
+      "cause_predicate": { "cause_keywords": ["OVERLOAD"] },
+      "restorable_by": [],
+      "uninsured_outcome": { "payable": 0, "reason": "NON_COMPENSABLE" }
+    }
+  ]
+}

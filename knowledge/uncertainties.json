@@ -1,0 +1,253 @@
+{
+  "node_class": "Uncertainty",
+  "note": "Uncertainty is queryable data, not a missing value. `blocking: true` means the engine must return a scenario set (or a refusal) instead of one number whenever the uncertainty is live for the case.",
+  "uncertainties": [
+    {
+      "node_id": "U01_ARTICLE10_PARTIAL_ORDER",
+      "topic": "ARTICLE_10_PARTIAL_ORDER",
+      "question": "Where does the underinsurance ratio run in a partial-loss pipeline relative to the franchise?",
+      "blocking": true,
+      "engine_status": "CONFIGURABLE_VIA_CALCULATION_CONFIG",
+      "config_field": "calculation_config.article10_partial_order",
+      "blocks": ["OP_UNDERINSURANCE_RATIO", "OP_FRANCHISE"],
+      "affects_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+      "scenarios": [
+        "(loss - depreciation) * ratio - franchise + rescue",
+        "(loss - depreciation - franchise) * ratio + rescue"
+      ],
+      "known": "Both operators are explicitly mandated; only their relative sequence is unstated.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "A current claims calculation worksheet or claims circular showing one underinsured partial-loss example with gross parts/labour, depreciation, franchise and final payment.",
+      "confidence_of_single_interpretation": 0.55,
+      "affected_outputs": ["payable"],
+      "release_effect": "changes the payable amount"
+    },
+    {
+      "node_id": "U02_FRANCHISE_BASE_SCHEDULES",
+      "topic": "FRANCHISE_BASE_SCHEDULES",
+      "question": "What is the franchise base by product, coverage and policy version?",
+      "blocking": true,
+      "engine_status": "POLICY_CONFIGURED",
+      "config_field": "policy.franchise",
+      "blocks": ["OP_FRANCHISE"],
+      "affects_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
+      "scenarios": [
+        "ABSOLUTE amount specified in the policy",
+        "PERCENT of a calculation base",
+        "PERCENT_WITH_MINIMUM"
+      ],
+      "known": "Regulation 53 defines franchise as the insured's share whose amount is specified in the policy. There is no universal statutory rate.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "The actual schedule per product/version covering first/second/subsequent claims, minimum deductible, theft, partial theft, glass, natural disaster, and deductible-removal endorsements.",
+      "confidence_of_single_interpretation": 0.35,
+      "affected_outputs": ["payable"],
+      "release_effect": "changes the payable amount"
+    },
+    {
+      "node_id": "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+      "topic": "GLASS_ONLY_ENDORSEMENT_WORDING",
+      "question": "What does the standalone-glass endorsement actually cover and how is its franchise computed?",
+      "blocking": true,
+      "engine_status": "AWAITING_ENDORSEMENT_TEXT",
+      "config_field": "policy.endorsements",
+      "blocks": ["OP_FRANCHISE", "OP_UNDERINSURANCE_RATIO"],
+      "affects_branches": ["GLASS_ONLY"],
+      "scenarios": [
+        "Endorsement covers parts and installation with a rate/minimum franchise",
+        "Endorsement covers parts only",
+        "Endorsement has a valuation ceiling"
+      ],
+      "known": "Glass and lamp glass are exempt from depreciation. Nothing else about standalone glass is universal.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "Each insurer's شکست شیشه به تنهایی endorsement wording: covered causes, installation inclusion, rate/minimum, underinsurance treatment, claim-history treatment, valuation ceiling.",
+      "confidence_of_single_interpretation": 0.1,
+      "affected_outputs": ["payable"],
+      "release_effect": "changes the payable amount"
+    },
+    {
+      "node_id": "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION",
+      "topic": "BATTERY_TIRE_CAP_VS_DEPRECIATION",
+      "question": "Do the 50%-of-new-price battery/tire cap and the Article 19 aging depreciation stack, and in which order?",
+      "blocking": true,
+      "engine_status": "CONFIGURABLE_VIA_CALCULATION_CONFIG",
+      "config_field": "calculation_config.battery_tire_depreciation_interaction",
+      "blocks": ["OP_SPECIAL_PART_CAP", "OP_DEPRECIATION_REPLACEMENT_PART"],
+      "affects_branches": ["PARTIAL_DAMAGE"],
+      "scenarios": [
+        "CAP_THEN_DEPRECIATE",
+        "DEPRECIATE_THEN_CAP",
+        "CAP_ONLY"
+      ],
+      "known": "Both rules exist in the text: the cap in Article 3, the aging schedule in Article 19. Their interaction is not expressly described.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "Claims-department statement covering an old vehicle with damaged battery and tires.",
+      "confidence_of_single_interpretation": 0.4,
+      "affected_outputs": ["payable"],
+      "release_effect": "changes the payable amount for battery/tire claims on older vehicles",
+      "live_only_when": "part.category in (BATTERY, TIRE) and (claim_year - production_year + 1) >= 5"
+    },
+    {
+      "node_id": "U05_RESCUE_DENOMINATOR",
+      "topic": "RESCUE_DENOMINATOR",
+      "question": "What is the denominator of the 20% rescue/transport ceiling when depreciation, underinsurance or total-loss classification is also in play?",
+      "blocking": false,
+      "engine_status": "CONFIGURABLE_VIA_CALCULATION_CONFIG",
+      "config_field": "calculation_config.rescue_cap_base",
+      "blocks": ["OP_RESCUE_CAP"],
+      "affects_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
+      "scenarios": [
+        "ASSESSED_GROSS",
+        "ELIGIBLE_GROSS",
+        "SETTLEMENT_BASE"
+      ],
+      "known": "The ceiling is stated as 20% of total damage but the denominator is not defined.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "Claims-department statement of the computational denominator actually used.",
+      "confidence_of_single_interpretation": 0.6,
+      "affected_outputs": ["allowable_rescue_transport"],
+      "release_effect": "changes the payable amount only when the rescue claim exceeds the smallest candidate cap",
+      "blocking_condition": "becomes blocking when the candidate denominators produce different capped rescue amounts"
+    },
+    {
+      "node_id": "U06_ARTICLE8_COMPONENT_CATALOGUE",
+      "topic": "ARTICLE8_COMPONENT_CATALOGUE",
+      "question": "What is the valuation map from a non-conventional vehicle's damaged components to their corresponding or similar conventional-vehicle components?",
+      "blocking": true,
+      "engine_status": "REQUIRES_EXTERNAL_ASSESSMENT_INPUT",
+      "config_field": "damage.article8_corresponding_damage_irr",
+      "blocks": ["OP_CORRESPONDING_DAMAGE"],
+      "affects_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "scenarios": [
+        "Exact counterpart part exists in the most expensive conventional car",
+        "No exact counterpart; a similar part is used",
+        "Multiple qualifying conventional models differ; the highest qualifying part value is used"
+      ],
+      "known": "The amended instruction delegates this to adjusters or official experts. It is the largest practical missing dataset, not a legal formula.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "Insurer valuation tables or a human-assessor input.",
+      "confidence_of_single_interpretation": 0.2,
+      "affected_outputs": ["corresponding_damage", "payable"],
+      "release_effect": "changes the payable amount; the engine refuses to manufacture the number"
+    },
+    {
+      "node_id": "U07_ANNUAL_CONVENTIONAL_REFERENCE_SET",
+      "topic": "ANNUAL_CONVENTIONAL_REFERENCE_SET",
+      "question": "Which conventional models qualify as the reference set in a given year?",
+      "blocking": false,
+      "engine_status": "DERIVED_FROM_ANNUAL_PARAMETER",
+      "config_field": "regulatory_snapshot.conventional_vehicle_threshold_irr",
+      "blocks": ["OP_CORRESPONDING_DAMAGE"],
+      "affects_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "scenarios": [
+        "Threshold-only identification",
+        "Named annual reference model list"
+      ],
+      "known": "The law gives a value threshold, not a permanently named model. The instruction directs assessors to the highest relevant part price where qualifying conventional cars differ.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "Annual or continuous market valuation capable of identifying the qualifying conventional reference vehicle(s).",
+      "confidence_of_single_interpretation": 0.5,
+      "affected_outputs": ["corresponding_damage"],
+      "release_effect": "refines the corresponding-damage assessment"
+    },
+    {
+      "node_id": "U08_DIYAH_1405_PRIMARY",
+      "topic": "1405_PRIMARY_ANNUAL_DATA",
+      "question": "Is the 1405 diyah figure 2.8bn tomans per a primary Judiciary announcement?",
+      "blocking": false,
+      "engine_status": "SECONDARY_SOURCE_PROVISIONAL",
+      "config_field": "regulatory_snapshot.bodily_limit_irr",
+      "blocks": ["OP_LIABILITY_CAP_FINANCIAL_LIMIT"],
+      "affects_branches": ["THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL"],
+      "scenarios": [
+        "Primary announcement matches the secondary figure",
+        "Primary announcement differs; annual parameter nodes are replaced"
+      ],
+      "known": "Current secondary sources agree on 2.8bn tomans; no primary Judiciary-hosted announcement was retrieved.",
+      "resolved_by": ["SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "resolution_artefact": "The Judiciary's primary announcement or an official Central Insurance annual third-party schedule.",
+      "confidence_of_single_interpretation": 0.86,
+      "affected_outputs": ["conventional_threshold", "minimum_financial_commitment", "financial_limit"],
+      "release_effect": "shifts the Article 8 boundary and the financial floor"
+    },
+    {
+      "node_id": "U09_DIMINUTION_OF_VALUE_TP",
+      "topic": "DIMINUTION_OF_VALUE_IN_THIRD_PARTY_CONTEXT",
+      "question": "How is افت قیمت treated in the third-party/legal recovery context?",
+      "blocking": false,
+      "engine_status": "SEPARATE_MODULE_REQUIRED",
+      "config_field": null,
+      "blocks": [],
+      "affects_branches": ["LEGAL_RECOVERY"],
+      "scenarios": [
+        "Recoverable as part of the victim's legal loss",
+        "Not recoverable"
+      ],
+      "known": "Regulation 53 expressly excludes reduction in the insured vehicle's value from the base body policy. That does not justify reusing the same exclusion automatically in third-party/legal recovery.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "A current-law module for third-party diminution, which has its own regulatory history.",
+      "confidence_of_single_interpretation": 0.5,
+      "affected_outputs": ["legal_loss"],
+      "release_effect": "changes the legally recoverable amount"
+    },
+    {
+      "node_id": "U10_IMMEDIATE_CAUSE_TERMINOLOGY",
+      "topic": "IMMEDIATE_CAUSE_TERMINOLOGY",
+      "question": "How should عامل بلافصل حادثه be represented?",
+      "blocking": false,
+      "engine_status": "MODELLED_AS_A_PREDICATE_NOT_A_MULTIPLIER",
+      "config_field": null,
+      "blocks": [],
+      "affects_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "THEFT"],
+      "scenarios": [
+        "Causation predicate on coverage and exclusions",
+        "Valuation concept (value immediately before and after the event)"
+      ],
+      "known": "Regulation 53 repeatedly requires causal relationships between a peril/exclusion and the damage, but the term is not a numerical multiplier. The legally significant بلافاصله wording instead concerns valuation under Article 19 of the Insurance Law.",
+      "resolved_by": [],
+      "resolution_artefact": "No multiplier is to be created. Store causation as a predicate and store the before/after valuation concept separately.",
+      "confidence_of_single_interpretation": 0.9,
+      "affected_outputs": [],
+      "release_effect": "prevents an invented multiplier entering the calculation"
+    },
+    {
+      "node_id": "U11_GLASS_ARTICLE10_EXEMPTION",
+      "topic": "GLASS_EXEMPTION_FROM_UNDERINSURANCE",
+      "question": "Is standalone glass exempt from the underinsurance ratio?",
+      "blocking": true,
+      "engine_status": "UNPROVEN_DO_NOT_HARDCODE",
+      "config_field": "calculation_config.glass_article10_order_resolved_by_endorsement",
+      "blocks": ["OP_UNDERINSURANCE_RATIO"],
+      "affects_branches": ["GLASS_ONLY"],
+      "scenarios": [
+        "The general underinsurance provision applies to the glass payment",
+        "The endorsement displaces it"
+      ],
+      "known": "Regulation 53 expressly exempts glass from depreciation, not from the general underinsurance rule. No authoritative blanket exemption was found.",
+      "resolved_by": ["SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "Actual endorsement wording.",
+      "confidence_of_single_interpretation": 0.2,
+      "affected_outputs": ["payable"],
+      "release_effect": "changes the payable amount for standalone glass on an underinsured vehicle"
+    },
+    {
+      "node_id": "U12_SALVAGE_DISPOSITION",
+      "topic": "SALVAGE_DISPOSITION",
+      "question": "Does the insured keep the wreck or does the insurer take title?",
+      "blocking": true,
+      "engine_status": "REQUIRES_CASE_INPUT",
+      "config_field": "vehicle.salvage_disposition",
+      "blocks": ["OP_SALVAGE_DEDUCTION"],
+      "affects_branches": ["TOTAL_LOSS", "THEFT"],
+      "scenarios": [
+        "INSURED_RETAINS: subtract probable salvage, then franchise",
+        "INSURER_TAKES_TITLE: no salvage deduction"
+      ],
+      "known": "Regulation 53 provides for insurer ownership transfer on disagreement over salvage value, and circular 1400/401/146850 places franchise after the salvage deduction for the retained route.",
+      "resolved_by": ["SRC_REG53_MIRROR", "SRC_CIC_CIRCULAR_1400_401_146850"],
+      "resolution_artefact": "The settlement agreement recording which party keeps the wreck.",
+      "confidence_of_single_interpretation": 0.7,
+      "affected_outputs": ["payable"],
+      "release_effect": "changes the payable amount by the salvage value"
+    }
+  ]
+}

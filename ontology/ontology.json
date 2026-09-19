@@ -1,0 +1,299 @@
+{
+  "ontology_id": "iran-auto-claim-kg",
+  "version": "1.0.0",
+  "as_of": "2026-09-18",
+  "namespace": "iran-auto-claim#",
+  "id_property": "node_id",
+  "design_principles": [
+    "Every node carries provenance: source_class, authority, instrument, article, effective_version, effective_date, confidence.",
+    "Uncertainty is a first-class node, not a missing value.",
+    "Contradictions are edges plus nodes, not prose.",
+    "Operators are separate from branches; branches compose operators.",
+    "Order is data: OperatorOrder is a configurable node, never hardcoded in a branch.",
+    "Annual parameters are versioned nodes; changing a year does not invalidate a rule."
+  ],
+
+  "source_class_hierarchy": [
+    {
+      "id": "STATUTE",
+      "label_en": "Statute",
+      "label_fa": "قانون",
+      "rank": 1,
+      "engine_treatment": "Mandatory. Overrides policy and insurer-manual inconsistency."
+    },
+    {
+      "id": "REGULATION",
+      "label_en": "Regulation / High Insurance Council resolution",
+      "label_fa": "آیین‌نامه / مصوبه شورای عالی بیمه",
+      "rank": 2,
+      "engine_treatment": "Mandatory within delegated scope."
+    },
+    {
+      "id": "CIRCULAR",
+      "label_en": "Central Insurance circular / instruction",
+      "label_fa": "بخشنامه / دستورالعمل بیمه مرکزی",
+      "rank": 3,
+      "engine_treatment": "Operational/regulatory interpretation; respect effective date."
+    },
+    {
+      "id": "POLICY",
+      "label_en": "Policy, private conditions, endorsement",
+      "label_fa": "بیمه‌نامه، شرایط خصوصی، الحاقیه",
+      "rank": 4,
+      "engine_treatment": "Governs configurable items where regulation leaves them to the contract."
+    },
+    {
+      "id": "INSURER_PROCEDURE",
+      "label_en": "Insurer procedure / claims manual",
+      "label_fa": "رویه / manual شرکت بیمه",
+      "rank": 5,
+      "engine_treatment": "Useful only when consistent with higher authority and the applicable policy version."
+    },
+    {
+      "id": "EDUCATIONAL",
+      "label_en": "Educational article / expert experience",
+      "label_fa": "مقاله آموزشی / تجربه کارشناسی",
+      "rank": 6,
+      "engine_treatment": "Never a formula authority. Useful only for contradiction discovery."
+    }
+  ],
+
+  "classes": [
+    {
+      "id": "Claim",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "event_date", "type": "date", "required": true },
+        { "name": "fault_status", "type": "enum", "required": false },
+        { "name": "cause", "type": "string", "required": false }
+      ]
+    },
+    {
+      "id": "Branch",
+      "enumerable": true,
+      "id_property": "branch",
+      "values": [
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+        "GLASS_ONLY",
+        "THEFT",
+        "THIRD_PARTY_FINANCIAL",
+        "ARTICLE_8_NON_CONVENTIONAL",
+        "LEGAL_RECOVERY"
+      ]
+    },
+    {
+      "id": "Vehicle",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "market_value_at_event", "type": "money", "required": true },
+        { "name": "insured_sum", "type": "money", "required": false },
+        { "name": "production_year", "type": "integer", "required": false },
+        { "name": "is_passenger_car", "type": "boolean", "required": false },
+        { "name": "salvage_value", "type": "money", "required": false },
+        { "name": "salvage_disposition", "type": "enum", "required": true }
+      ]
+    },
+    {
+      "id": "DamageComponent",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "category", "type": "enum", "required": true },
+        { "name": "assessed_loss", "type": "money", "required": true },
+        { "name": "new_price", "type": "money", "required": false }
+      ]
+    },
+    {
+      "id": "Policy",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "insurer", "type": "string", "required": false },
+        { "name": "policy_version", "type": "string", "required": false },
+        { "name": "third_party_financial_limit", "type": "money", "required": false }
+      ]
+    },
+    {
+      "id": "Endorsement",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "type", "type": "enum", "required": true },
+        { "name": "restores", "type": "ref", "required": false }
+      ]
+    },
+    {
+      "id": "LegalRule",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "source_class", "type": "enum", "required": true },
+        { "name": "authority", "type": "string", "required": true },
+        { "name": "instrument", "type": "string", "required": true },
+        { "name": "article", "type": "string", "required": true },
+        { "name": "effective_version", "type": "string", "required": true },
+        { "name": "effective_date", "type": "string", "required": true },
+        { "name": "rule_payload", "type": "object", "required": true },
+        { "name": "confidence", "type": "number", "required": true },
+        { "name": "topic", "type": "string", "required": false },
+        { "name": "last_validated", "type": "date", "required": true },
+        { "name": "next_revalidation", "type": "date", "required": true }
+      ]
+    },
+    {
+      "id": "Operator",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "type", "type": "enum", "required": true },
+        { "name": "formula", "type": "string", "required": true },
+        { "name": "inputs", "type": "array", "required": true },
+        { "name": "outputs", "type": "array", "required": true },
+        { "name": "sourced_from", "type": "array", "required": true },
+        { "name": "confidence", "type": "number", "required": true }
+      ]
+    },
+    {
+      "id": "OperatorOrder",
+      "properties": [
+        { "name": "branch", "type": "ref", "required": true },
+        { "name": "operators", "type": "array", "required": true },
+        { "name": "order_status", "type": "enum", "required": true },
+        { "name": "scenarios", "type": "array", "required": false }
+      ]
+    },
+    {
+      "id": "Exclusion",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "type", "type": "enum", "required": true },
+        { "name": "cause_predicate", "type": "object", "required": true },
+        { "name": "restorable_by", "type": "array", "required": false }
+      ]
+    },
+    {
+      "id": "AnnualParameter",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "year", "type": "integer", "required": true },
+        { "name": "name", "type": "enum", "required": true },
+        { "name": "value", "type": "money", "required": true },
+        { "name": "source_tier", "type": "enum", "required": true },
+        { "name": "confidence", "type": "number", "required": true }
+      ]
+    },
+    {
+      "id": "Uncertainty",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "topic", "type": "string", "required": true },
+        { "name": "blocking", "type": "boolean", "required": true },
+        { "name": "scenarios", "type": "array", "required": false }
+      ]
+    },
+    {
+      "id": "Contradiction",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "topic", "type": "string", "required": true },
+        { "name": "candidate_rule", "type": "string", "required": true },
+        { "name": "candidate_source_class", "type": "enum", "required": true },
+        { "name": "controlling_rule", "type": "string", "required": true },
+        { "name": "controlling_source_class", "type": "enum", "required": true },
+        { "name": "resolution", "type": "enum", "required": true },
+        { "name": "confidence", "type": "number", "required": true }
+      ]
+    },
+    {
+      "id": "SubrogationRight",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "holder", "type": "enum", "required": true },
+        { "name": "amount", "type": "money", "required": true }
+      ]
+    },
+    {
+      "id": "Guardrail",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "prevents", "type": "string", "required": true },
+        { "name": "enforced_in", "type": "string", "required": true },
+        { "name": "triggered_label", "type": "string", "required": true },
+        { "name": "related_rules", "type": "array", "required": false },
+        { "name": "related_operators", "type": "array", "required": false },
+        { "name": "related_uncertainties", "type": "array", "required": false }
+      ]
+    },
+    {
+      "id": "Source",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "source_class", "type": "enum", "required": true },
+        { "name": "url", "type": "string", "required": true },
+        { "name": "retrieved_on", "type": "date", "required": true }
+      ]
+    },
+    {
+      "id": "Payment",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "amount", "type": "money", "required": true },
+        { "name": "basis_branch", "type": "ref", "required": true }
+      ]
+    }
+  ],
+
+  "edges": [
+    { "id": "classified_as", "from": "Claim", "to": "Branch", "cardinality": "many-to-one" },
+    { "id": "governed_by", "from": "Branch", "to": "LegalRule", "cardinality": "many-to-many" },
+    { "id": "composes", "from": "Branch", "to": "Operator", "cardinality": "many-to-many", "ordered": true },
+    { "id": "requires", "from": "Claim", "to": "Evidence", "cardinality": "many-to-many" },
+    { "id": "subject_to", "from": "Claim", "to": "Operator", "cardinality": "many-to-many" },
+    { "id": "has_component", "from": "Vehicle", "to": "DamageComponent", "cardinality": "one-to-many" },
+    { "id": "subject_to", "from": "DamageComponent", "to": "Operator", "cardinality": "many-to-many" },
+    { "id": "mapped_to", "from": "DamageComponent", "to": "DamageComponent", "cardinality": "many-to-one", "note": "Article 8 correspondence into the most expensive conventional car" },
+    { "id": "configures", "from": "Policy", "to": "Operator", "cardinality": "many-to-many" },
+    { "id": "restores", "from": "Endorsement", "to": "Exclusion", "cardinality": "many-to-many" },
+    { "id": "ordered_by", "from": "Operator", "to": "OperatorOrder", "cardinality": "many-to-many" },
+    { "id": "sourced_from", "from": "Operator", "to": "LegalRule", "cardinality": "many-to-many" },
+    { "id": "belongs_to", "from": "LegalRule", "to": "Source", "cardinality": "many-to-many" },
+    { "id": "used_by", "from": "AnnualParameter", "to": "Operator", "cardinality": "many-to-many" },
+    { "id": "derived_from", "from": "LegalRule", "to": "LegalRule", "cardinality": "many-to-many", "note": "Also used AnnualParameter -> AnnualParameter for a parameter derived from another parameter." },
+    { "id": "blocks", "from": "Uncertainty", "to": "Operator", "cardinality": "many-to-many" },
+    { "id": "affects", "from": "Uncertainty", "to": "Branch", "cardinality": "many-to-many" },
+    { "id": "implied_by", "from": "Operator", "to": "Uncertainty", "cardinality": "many-to-many", "reverse_of": "blocks" },
+    { "id": "blocked_by", "from": "Branch", "to": "Uncertainty", "cardinality": "many-to-many", "reverse_of": "blocks" },
+    { "id": "guarded_by", "from": "Branch", "to": "Guardrail", "cardinality": "many-to-many", "reverse_of": "guards" },
+    { "id": "uses", "from": "Contradiction", "to": "Operator | Uncertainty | Exclusion | LegalRule", "cardinality": "many-to-many", "note": "The artefact the engine actually applies after resolving the contradiction; the target class is polymorphic by design." },
+    { "id": "resolved_by", "from": "Uncertainty", "to": "Source", "cardinality": "many-to-many" },
+    { "id": "about", "from": "Contradiction", "to": "LegalRule", "cardinality": "many-to-many" },
+    { "id": "rejects", "from": "Contradiction", "to": "LegalRule", "cardinality": "many-to-many" },
+    { "id": "creates", "from": "Payment", "to": "SubrogationRight", "cardinality": "one-to-one" },
+    { "id": "guards", "from": "Guardrail", "to": "Operator", "cardinality": "many-to-many" }
+  ],
+
+  "branch_aliases": {
+    "description": "Test-variant and outcome labels that map onto a canonical Branch. These are NOT additional ontology branches; they select a sub-mode inside one branch. Documented here so the vocabulary stays closed.",
+    "aliases": {
+      "TOTAL_LOSS_TEST": { "branch": "TOTAL_LOSS", "variant": "THRESHOLD_TEST" },
+      "TOTAL_THEFT": { "branch": "THEFT", "variant": "TOTAL_SETTLEMENT" },
+      "ARTICLE_8_DUAL_COVERAGE": { "branch": "ARTICLE_8_NON_CONVENTIONAL", "variant": "DUAL_COVERAGE" },
+      "ORDINARY_FINANCIAL": { "branch": "THIRD_PARTY_FINANCIAL", "variant": "ORDINARY_FINANCIAL" },
+      "THEFT_PARTIAL_DAMAGE": { "branch": "THEFT", "variant": "ATTEMPTED_THEFT" }
+    }
+  },
+
+  "domains": {
+    "BODY": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
+    "THIRD_PARTY_FINANCIAL": ["THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL"],
+    "LEGAL_RECOVERY": ["LEGAL_RECOVERY"]
+  },
+
+  "node_files": {
+    "knowledge/sources.json": "Source",
+    "knowledge/rules.json": "LegalRule",
+    "knowledge/operators.json": "Operator",
+    "knowledge/branches.json": "Branch + OperatorOrder",
+    "knowledge/annual_parameters.json": "AnnualParameter",
+    "knowledge/uncertainties.json": "Uncertainty",
+    "knowledge/contradictions.json": "Contradiction",
+    "knowledge/exclusions.json": "Exclusion",
+    "knowledge/guards.json": "Guardrail"
+  }
+}

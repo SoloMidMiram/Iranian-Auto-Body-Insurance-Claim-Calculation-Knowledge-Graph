@@ -1,0 +1,462 @@
+{
+  "repository": "SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph",
+  "labels": [
+    {"name": "priority:P0", "color": "b60205", "description": "Release-blocking correctness or integrity risk"},
+    {"name": "priority:P1", "color": "d93f0b", "description": "Phase-blocking provenance or operational risk"},
+    {"name": "priority:P2", "color": "fbca04", "description": "Important scoped capability or validation gap"},
+    {"name": "priority:P3", "color": "0e8a16", "description": "Lower-risk improvement"},
+    {"name": "segment:authority", "color": "5319e7", "description": "Legal, regulatory, policy, and provenance work"},
+    {"name": "segment:model", "color": "1d76db", "description": "Claim, evidence, ontology, and classification work"},
+    {"name": "segment:calculation", "color": "0052cc", "description": "Money, operators, caps, and calculation work"},
+    {"name": "segment:calibration", "color": "006b75", "description": "Insurer and assessor calibration"},
+    {"name": "segment:validation", "color": "c2e0c6", "description": "Cases, tests, gates, and external validation"},
+    {"name": "segment:governance", "color": "bfdadc", "description": "Ingestion, audit, release, and repository controls"},
+    {"name": "segment:product", "color": "d4c5f9", "description": "API, human review, pilot, and retrieval"}
+  ],
+  "milestones": [
+    {"title": "Phase 0 - Safety baseline", "description": "Reproducible repository and immediate fail-closed correctness."},
+    {"title": "Phase 1 - Authority and provenance", "description": "Effective-dated authorities and complete provenance."},
+    {"title": "Phase 2 - Graph-driven engine", "description": "Closed claim taxonomy and executable graph parity."},
+    {"title": "Phase 3 - Insurer calibration", "description": "Versioned insurer and assessor procedures."},
+    {"title": "Phase 4 - Independent validation", "description": "Golden cases and governed knowledge expansion."},
+    {"title": "Phase 5 - Private shadow pilot", "description": "Human-reviewed, observable, non-payment-controlling pilot."},
+    {"title": "Phase 6 - Controlled release", "description": "Certification, supported scope, rollback, and release."}
+  ],
+  "issues": [
+    {
+      "id": "P0-01",
+      "title": "Enforce the claim JSON Schema at every runtime entry point",
+      "milestone": "Phase 0 - Safety baseline",
+      "labels": ["priority:P0", "segment:model", "segment:calculation"],
+      "dependencies": [],
+      "objective": "Reject malformed or incomplete claims before classification or calculation and make the schema the actual runtime contract.",
+      "acceptance": [
+        "calc, json, classify, and direct public compute entry points use one validator",
+        "The schema is closed where appropriate and has branch-specific conditional requirements",
+        "Boolean, enum, unknown-field, and missing-field failures have stable machine-readable codes",
+        "All schema-shaped examples and fixtures are validated in tests"
+      ],
+      "validation": ["Input and money cases in docs/VALIDATION_GATES.md", "Full repository gate"]
+    },
+    {
+      "id": "P0-02",
+      "title": "Define IRR-only persistence, numeric invariants, and rounding",
+      "milestone": "Phase 0 - Safety baseline",
+      "labels": ["priority:P0", "segment:calculation"],
+      "dependencies": ["P0-01"],
+      "objective": "Prevent negative, non-finite, ambiguous-unit, fractional-IRR, and overflow-like monetary behavior.",
+      "acceptance": [
+        "Persistence and API boundaries use non-negative integer IRR",
+        "Display-unit conversion is explicit and cannot contradict an _irr field",
+        "One documented rounding rule is applied at the defined calculation boundary",
+        "Decimal results are serialized without conversion through float"
+      ],
+      "validation": ["Negative, NaN, infinity, zero, precision, unit-conflict, and large-value tests"]
+    },
+    {
+      "id": "P0-03",
+      "title": "Block body settlement when franchise economics are missing",
+      "milestone": "Phase 0 - Safety baseline",
+      "labels": ["priority:P0", "segment:calculation"],
+      "dependencies": ["P0-01"],
+      "objective": "Make U02 genuinely blocking instead of silently substituting a zero franchise.",
+      "acceptance": [
+        "Applicable body branches return no single payable when required franchise terms are absent",
+        "The result identifies U02 and the policy/product/version artifact needed",
+        "Explicit no-franchise coverage requires sourced policy evidence rather than omission",
+        "Existing happy-path cases provide traceable franchise terms"
+      ],
+      "validation": ["Partial, total loss, glass, and theft missing-franchise regressions"]
+    },
+    {
+      "id": "P0-04",
+      "title": "Correct Article 8 actual-loss ceilings and zero handling",
+      "milestone": "Phase 0 - Safety baseline",
+      "labels": ["priority:P0", "segment:calculation"],
+      "dependencies": ["P0-02"],
+      "objective": "Ensure Article 8 never pays above actual proven loss and never treats zero as missing.",
+      "acceptance": [
+        "TP payable is bounded by actual loss, corresponding damage, and the financial limit",
+        "Zero is preserved as a supplied amount; None alone means missing",
+        "Dual-coverage fields reconcile to the same actual loss without double recovery",
+        "Legal-recovery caps use explicit None checks"
+      ],
+      "validation": ["All Article 8 min(actual, corresponding, limit) permutations", "Zero and below-correspondence regression cases"]
+    },
+    {
+      "id": "P0-05",
+      "title": "Require total-loss evidence and reconcile declared classification",
+      "milestone": "Phase 0 - Safety baseline",
+      "labels": ["priority:P0", "segment:model", "segment:calculation"],
+      "dependencies": ["P0-01"],
+      "objective": "Prevent a declared branch from bypassing the total-loss threshold or other classification evidence.",
+      "acceptance": [
+        "A total-loss settlement requires the threshold evidence or an authorized documented override",
+        "Below and exactly 75 percent cannot settle through the total-loss branch",
+        "Declared branch conflicts return a review/refusal state",
+        "Classification confidence and basis enter the audit trace"
+      ],
+      "validation": ["75 percent minus/equal/plus one IRR", "Missing-repair and contradictory-declared-branch cases"]
+    },
+    {
+      "id": "P0-06",
+      "title": "Establish reproducible CI, repository governance, and safety posture",
+      "milestone": "Phase 0 - Safety baseline",
+      "labels": ["priority:P0", "segment:governance", "segment:validation"],
+      "dependencies": [],
+      "objective": "Make the complete repository and its decision-support limitations reproducible and reviewable.",
+      "acceptance": [
+        "A clean environment can install test dependencies and run the full gate",
+        "CI runs graph validation, fixtures, pytest, compilation, and planning-manifest validation",
+        "Roadmap, validation gates, contribution policy, security policy, and issue templates are committed",
+        "README reports the actual test count and links project controls"
+      ],
+      "validation": ["Clean-clone CI run", "planning issue sync dry run"]
+    },
+    {
+      "id": "P1-01",
+      "title": "Audit and reclassify every legal and regulatory source",
+      "milestone": "Phase 1 - Authority and provenance",
+      "labels": ["priority:P1", "segment:authority"],
+      "dependencies": ["P0-06"],
+      "objective": "Confirm publishing authority, source tier, current status, and applicability for every amount-affecting rule.",
+      "acceptance": [
+        "Official source is preferred and mirrors are marked as mirrors",
+        "Every rule has clause-level locator, retrieval date, and reviewer",
+        "Superseded or uncertain material is explicitly represented",
+        "Two-person authority review is recorded"
+      ],
+      "validation": ["Authority register completeness report", "Manual sample verification against official texts"]
+    },
+    {
+      "id": "P1-02",
+      "title": "Implement effective-dated regulatory and policy snapshots",
+      "milestone": "Phase 1 - Authority and provenance",
+      "labels": ["priority:P1", "segment:authority", "segment:model"],
+      "dependencies": ["P1-01"],
+      "objective": "Select law, annual parameters, policy, endorsement, and insurer procedure by event and policy dates.",
+      "acceptance": [
+        "Event date and policy inception/version are mandatory where relevant",
+        "Rule and parameter selection uses explicit effective intervals",
+        "No implicit current-year fallback is used for historical claims",
+        "Snapshot identity is stored in every result"
+      ],
+      "validation": ["Cross-year threshold cases", "Pre/post amendment and policy-renewal cases"]
+    },
+    {
+      "id": "P1-03",
+      "title": "Replace annual parameters with primary official evidence and refresh workflow",
+      "milestone": "Phase 1 - Authority and provenance",
+      "labels": ["priority:P1", "segment:authority", "segment:governance"],
+      "dependencies": ["P1-01"],
+      "objective": "Make annual diyah, conventional threshold, and minimum financial values primary-sourced and reproducibly derived.",
+      "acceptance": [
+        "Primary Judiciary or official Central Insurance evidence is recorded",
+        "Derived values are recalculated and independently checked",
+        "Missing next-year parameters fail closed for affected classification",
+        "Refresh and revalidation instructions are automated"
+      ],
+      "validation": ["Known-year derivation tests", "Missing and expired annual-parameter tests"]
+    },
+    {
+      "id": "P1-04",
+      "title": "Complete provenance and confidence across every executable dependency",
+      "milestone": "Phase 1 - Authority and provenance",
+      "labels": ["priority:P1", "segment:authority", "segment:calculation"],
+      "dependencies": ["P1-02", "P1-03"],
+      "objective": "Include rules, operators, parameters, policy terms, classifier decisions, evidence, and uncertainties in the audit model.",
+      "acceptance": [
+        "Every executable node has a validated envelope or derived dependency chain",
+        "Result confidence includes every amount-affecting dependency",
+        "Formula confidence and evidence confidence are separately named",
+        "Missing provenance blocks certification of the result"
+      ],
+      "validation": ["Provenance completeness mutation tests", "Annual-parameter and classifier confidence regressions"]
+    },
+    {
+      "id": "P1-05",
+      "title": "Add source integrity hashes, locators, and revalidation enforcement",
+      "milestone": "Phase 1 - Authority and provenance",
+      "labels": ["priority:P1", "segment:authority", "segment:governance"],
+      "dependencies": ["P1-01"],
+      "objective": "Detect source drift and make clause-level evidence reproducible.",
+      "acceptance": [
+        "Source records contain stable locator and content hash where lawful",
+        "Retrieval and revalidation dates are machine-validated",
+        "Overdue release-critical sources fail the release gate",
+        "Changed source content creates a review event"
+      ],
+      "validation": ["Hash-change and expired-revalidation tests"]
+    },
+    {
+      "id": "P2-01",
+      "title": "Finalize the closed claim, evidence, and override taxonomy",
+      "milestone": "Phase 2 - Graph-driven engine",
+      "labels": ["priority:P1", "segment:model"],
+      "dependencies": ["P1-02"],
+      "objective": "Replace ambiguous free-text signals with controlled evidence and explicit reviewed overrides.",
+      "acceptance": [
+        "Every branch has required evidence, predicates, allowed statuses, and override rules",
+        "Coverage and exclusion predicates have a closed executable vocabulary",
+        "Keyword matching cannot by itself deny or grant coverage",
+        "Override actor, reason, time, and source are audited"
+      ],
+      "validation": ["Seven-branch decision table", "Negated/ambiguous cause text tests"]
+    },
+    {
+      "id": "P2-02",
+      "title": "Make graph branch and operator configuration authoritative",
+      "milestone": "Phase 2 - Graph-driven engine",
+      "labels": ["priority:P1", "segment:model", "segment:calculation"],
+      "dependencies": ["P2-01"],
+      "objective": "Execute or compile branch plans from graph data so graph and code cannot silently diverge.",
+      "acceptance": [
+        "Branch operators and order are loaded from validated graph plans",
+        "Unsupported implementations prevent plan activation",
+        "Graph-plan version is attached to the result",
+        "Changing an isolated graph order changes scenarios without editing branch code"
+      ],
+      "validation": ["Graph mutation and plan snapshot tests"]
+    },
+    {
+      "id": "P2-03",
+      "title": "Prove every configured guard is invoked on every applicable path",
+      "milestone": "Phase 2 - Graph-driven engine",
+      "labels": ["priority:P1", "segment:calculation", "segment:validation"],
+      "dependencies": ["P2-02"],
+      "objective": "Replace callable-exists validation with actual guard-to-path enforcement evidence.",
+      "acceptance": [
+        "Guard applicability is part of the execution plan",
+        "Removing or bypassing a required guard fails CI",
+        "Guard outcomes are stable and machine-readable",
+        "All 13 current guards have positive and negative tests"
+      ],
+      "validation": ["Guard coverage matrix", "Mutation test for each guard"]
+    },
+    {
+      "id": "P2-04",
+      "title": "Add property, metamorphic, mutation, and model-parity tests",
+      "milestone": "Phase 2 - Graph-driven engine",
+      "labels": ["priority:P1", "segment:validation"],
+      "dependencies": ["P2-02", "P2-03"],
+      "objective": "Test invariants beyond the authored fixture outputs and detect tests that pass after meaningful rule breakage.",
+      "acceptance": [
+        "Core monetary invariants have generated tests",
+        "Monotonic and cap metamorphic properties are documented",
+        "Mutation score threshold is defined for calculation modules",
+        "Graph formulas and Python results are cross-checked"
+      ],
+      "validation": ["Property suite", "Mutation report", "Parity report"]
+    },
+    {
+      "id": "P3-01",
+      "title": "Define insurer document acquisition and approval protocol",
+      "milestone": "Phase 3 - Insurer calibration",
+      "labels": ["priority:P1", "segment:calibration", "segment:governance"],
+      "dependencies": ["P1-04", "P2-01"],
+      "objective": "Acquire authentic product/version documents with custody, scope, redaction, and reviewer records.",
+      "acceptance": [
+        "Document request checklist covers franchise, endorsements, worksheets, and Article 8 inputs",
+        "Authenticity and effective scope are reviewed",
+        "Personal data is redacted before repository use",
+        "Rejected or ambiguous documents cannot activate an adapter"
+      ],
+      "validation": ["One complete dry-run acquisition package"]
+    },
+    {
+      "id": "P3-02",
+      "title": "Implement versioned insurer franchise adapters",
+      "milestone": "Phase 3 - Insurer calibration",
+      "labels": ["priority:P1", "segment:calibration", "segment:calculation"],
+      "dependencies": ["P3-01", "P0-03"],
+      "objective": "Resolve U02 by product, coverage, claim sequence, and policy version without overriding law.",
+      "acceptance": [
+        "Adapter schema captures rate/amount, minimum, base, sequence, surcharge, waiver, and source",
+        "Out-of-scope policy versions refuse",
+        "At least five approved worksheets reconcile for the first adapter",
+        "Explicit zero-franchise cover is source-backed"
+      ],
+      "validation": ["Five worksheet reconciliations", "Missing/out-of-version policy cases"]
+    },
+    {
+      "id": "P3-03",
+      "title": "Resolve Article 10 and franchise operator order from insurer worksheets",
+      "milestone": "Phase 3 - Insurer calibration",
+      "labels": ["priority:P1", "segment:calibration", "segment:calculation"],
+      "dependencies": ["P3-01", "P3-02"],
+      "objective": "Resolve U01 only for insurer/product/version scopes proven by real underinsured partial-loss examples.",
+      "acceptance": [
+        "Each resolution cites a complete calculation worksheet or authoritative procedure",
+        "Order is scoped by insurer/product/version and effective interval",
+        "Unproven scopes continue returning scenarios",
+        "At least two amount-sensitive examples validate each resolved order"
+      ],
+      "validation": ["Ratio-first, franchise-first, and unresolved controls"]
+    },
+    {
+      "id": "P3-04",
+      "title": "Calibrate standalone-glass endorsement behavior",
+      "milestone": "Phase 3 - Insurer calibration",
+      "labels": ["priority:P2", "segment:calibration", "segment:calculation"],
+      "dependencies": ["P3-01", "P3-02"],
+      "objective": "Resolve U03 and U11 from actual endorsement wording, including installation, limits, franchise, underinsurance, and history treatment.",
+      "acceptance": [
+        "Standalone and base-peril glass paths remain distinct",
+        "All economic terms are versioned and sourced",
+        "Unknown underinsurance treatment remains blocking",
+        "Five representative glass cases reconcile"
+      ],
+      "validation": ["Glass-only matrix in docs/VALIDATION_GATES.md"]
+    },
+    {
+      "id": "P3-05",
+      "title": "Integrate governed Article 8 assessor correspondence inputs",
+      "milestone": "Phase 3 - Insurer calibration",
+      "labels": ["priority:P1", "segment:calibration", "segment:calculation"],
+      "dependencies": ["P3-01", "P0-04", "P1-03"],
+      "objective": "Resolve U06/U07 through assessor-signed component mappings and annual reference sets, never a whole-car ratio.",
+      "acceptance": [
+        "Each mapping records damaged component, matched/similar reference, valuation date, source, and assessor",
+        "Annual qualifying reference set is effective-dated",
+        "Missing mappings continue refusing",
+        "Actual-loss and policy caps remain enforced after mapping"
+      ],
+      "validation": ["Exact-part, similar-part, multiple-reference, missing-map, and cap cases"]
+    },
+    {
+      "id": "P3-06",
+      "title": "Resolve battery/tire interaction and rescue denominator",
+      "milestone": "Phase 3 - Insurer calibration",
+      "labels": ["priority:P2", "segment:calibration", "segment:calculation"],
+      "dependencies": ["P3-01"],
+      "objective": "Obtain authoritative operational evidence for U04 and U05 or retain explicit scoped uncertainty.",
+      "acceptance": [
+        "Evidence distinguishes universal legal rule from insurer procedure",
+        "Resolution is scoped and versioned",
+        "All candidate modes remain testable for historical snapshots",
+        "Unsupported scopes never inherit another insurer's setting"
+      ],
+      "validation": ["Old battery/tire scenarios", "Rescue cap-base scenarios"]
+    },
+    {
+      "id": "P4-01",
+      "title": "Build an independently reviewed anonymized golden-case corpus",
+      "milestone": "Phase 4 - Independent validation",
+      "labels": ["priority:P1", "segment:validation"],
+      "dependencies": ["P2-04", "P3-02"],
+      "objective": "Validate against qualified human decisions rather than only examples authored from the same report.",
+      "acceptance": [
+        "Every supported branch has positive, boundary, uncertainty, and refusal cases",
+        "Expected outcomes are independently approved and provenance-linked",
+        "Cases are anonymized and checked for re-identification risk",
+        "Disagreements remain visible and block the affected scope"
+      ],
+      "validation": ["Minimum boundary corpus", "Reviewer sign-off record"]
+    },
+    {
+      "id": "P4-02",
+      "title": "Create immutable calculation snapshots and deterministic audit output",
+      "milestone": "Phase 4 - Independent validation",
+      "labels": ["priority:P1", "segment:governance", "segment:calculation"],
+      "dependencies": ["P0-02", "P1-04", "P2-02"],
+      "objective": "Reproduce every result from pinned input, code, graph, source, adapter, and parameter versions.",
+      "acceptance": [
+        "Canonical serialization and calculation identifier are defined",
+        "Repeated runs are byte-stable for the same snapshot",
+        "Audit trace includes all inputs, operations, caps, uncertainties, and overrides",
+        "Snapshot verification detects altered dependencies"
+      ],
+      "validation": ["Repeatability and tamper-detection tests"]
+    },
+    {
+      "id": "P4-03",
+      "title": "Make knowledge ingestion atomic, recursive, and concurrency-safe",
+      "milestone": "Phase 4 - Independent validation",
+      "labels": ["priority:P1", "segment:governance", "segment:authority"],
+      "dependencies": ["P1-05", "P2-02"],
+      "objective": "Prevent partial graph writes, missed nested contradictions, duplicate IDs, and concurrent lost updates.",
+      "acceptance": [
+        "Ingestion validates a staged complete graph before atomic replacement",
+        "Nested values, lists, dates, scopes, and references participate in conflict analysis",
+        "Duplicate IDs within/across classes are refused",
+        "Failed and concurrent writes preserve the prior valid graph"
+      ],
+      "validation": ["Failure injection after every write stage", "Concurrent ingestion test", "Nested contradiction tests"]
+    },
+    {
+      "id": "P4-04",
+      "title": "Complete privacy, security, and abuse threat model",
+      "milestone": "Phase 4 - Independent validation",
+      "labels": ["priority:P1", "segment:governance"],
+      "dependencies": ["P4-02"],
+      "objective": "Protect claimant data, source integrity, calculation authority, and audit history before a real-data pilot.",
+      "acceptance": [
+        "Data classification, retention, redaction, access, and deletion policies are approved",
+        "Threat model covers malicious inputs, rule poisoning, privilege escalation, and audit tampering",
+        "Secrets are externalized and scanned",
+        "Incident response and affected-scope disable procedures are tested"
+      ],
+      "validation": ["Threat-model review", "Secret scan", "Incident tabletop"]
+    },
+    {
+      "id": "P5-01",
+      "title": "Build authenticated API and mandatory adjuster review workflow",
+      "milestone": "Phase 5 - Private shadow pilot",
+      "labels": ["priority:P1", "segment:product", "segment:governance"],
+      "dependencies": ["P4-01", "P4-02", "P4-04"],
+      "objective": "Expose the deterministic engine with visible evidence and required human decisions, without autonomous payment.",
+      "acceptance": [
+        "Authentication, authorization, rate limits, idempotency, and audit events are implemented",
+        "Reviewer sees inputs, formulas, sources, confidence components, and uncertainties",
+        "Overrides require role, reason, and second review for amount-affecting decisions",
+        "No endpoint can mark payment authorized"
+      ],
+      "validation": ["API contract tests", "Authorization matrix", "Review workflow scenarios"]
+    },
+    {
+      "id": "P5-02",
+      "title": "Run and evaluate a 100-claim private shadow pilot",
+      "milestone": "Phase 5 - Private shadow pilot",
+      "labels": ["priority:P1", "segment:product", "segment:validation"],
+      "dependencies": ["P5-01"],
+      "objective": "Measure agreement, refusal quality, operational usability, and safety on representative real claims without controlling payment.",
+      "acceptance": [
+        "At least 100 representative claims receive dual review",
+        "Zero hidden blocking uncertainties and zero unexplained material variances remain",
+        "Disagreements are categorized into model, source, evidence, adapter, or workflow causes",
+        "Rollback, backup/restore, and incident exercises pass"
+      ],
+      "validation": ["Pilot report and discrepancy register", "Operational exercise evidence"]
+    },
+    {
+      "id": "P6-01",
+      "title": "Assemble certification dossier and controlled release scope",
+      "milestone": "Phase 6 - Controlled release",
+      "labels": ["priority:P1", "segment:governance", "segment:validation"],
+      "dependencies": ["P5-02"],
+      "objective": "Authorize only the branches, insurers, products, dates, and procedures supported by complete evidence.",
+      "acceptance": [
+        "Supported/unsupported scope is machine-readable and user-visible",
+        "Release pins code, graph, sources, parameters, adapters, and validation dossier",
+        "Legal, claims, engineering, security, and product owners sign off",
+        "Rollback and emergency rule-disable procedures are demonstrated"
+      ],
+      "validation": ["Certification checklist", "Release rehearsal", "Rollback rehearsal"]
+    },
+    {
+      "id": "P6-02",
+      "title": "Add provenance-aware retrieval only after deterministic certification",
+      "milestone": "Phase 6 - Controlled release",
+      "labels": ["priority:P3", "segment:product", "segment:authority"],
+      "dependencies": ["P6-01"],
+      "objective": "Add GraphRAG for explanation and discovery while keeping all amounts inside the certified deterministic engine.",
+      "acceptance": [
+        "Retrieval only uses approved versioned nodes and returns source locators",
+        "Generated text cannot invoke unapproved formulas or alter payable results",
+        "Unsupported questions produce a scoped refusal or human route",
+        "Retrieval quality and citation correctness are evaluated separately from calculation"
+      ],
+      "validation": ["Citation-grounding set", "Prompt-injection tests", "No-calculation-outside-engine tests"]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+name: Knowledge or authority change
+description: Propose a sourced legal, regulatory, policy, or procedure change.
+title: "[KNOWLEDGE] "
+labels: ["segment:authority"]
+body:
+  - type: input
+    id: authority
+    attributes:
+      label: Publishing authority
+    validations:
+      required: true
+  - type: input
+    id: instrument
+    attributes:
+      label: Instrument, article, and version
+    validations:
+      required: true
+  - type: input
+    id: effective
+    attributes:
+      label: Effective interval
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Official source locator
+    validations:
+      required: true
+  - type: textarea
+    id: structured
+    attributes:
+      label: Proposed structured rule or parameter
+    validations:
+      required: true
+  - type: textarea
+    id: conflicts
+    attributes:
+      label: Existing rules, contradictions, and migration impact
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Positive, boundary, and refusal cases
+    validations:
+      required: true

@@ -1,0 +1,19 @@
+{
+  "node_id": "STATUTE_ARTICLE8_CONVENTIONAL_DEFINITION_AMENDMENT",
+  "topic": "ARTICLE_8_CONVENTIONAL_DEFINITION",
+  "source_class": "STATUTE",
+  "authority": "Islamic Consultative Assembly",
+  "instrument": "Amending act to the Compulsory Third-Party Insurance Law",
+  "article": "8",
+  "effective_version": "amending act",
+  "effective_date": "1405/02/01",
+  "derivation": "PRIMARY_TEXT",
+  "confidence": 0.99,
+  "evidence_url": "https://example.invalid/official-gazette/amending-act-article-8",
+  "submitted_by": "legal-affairs",
+  "applies_to_branches": ["THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL"],
+  "rule_payload": {
+    "conventional_vehicle_test": "market_value < 0.4 * annual_bodily_liability_ceiling",
+    "non_conventional_vehicle_test": "market_value >= 0.4 * annual_bodily_liability_ceiling"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "claim_id": "EXAMPLE-PARTIAL-RESOLVED",
+  "unit": "million_toman",
+  "regulatory_snapshot": {
+    "as_of_date": "2026-09-18",
+    "iranian_year": 1405,
+    "annual_parameter_source": "AP_1405_*",
+    "annual_parameter_confidence": 0.86
+  },
+  "classification": {
+    "domain": "BODY",
+    "branch": "PARTIAL_DAMAGE"
+  },
+  "vehicle": {
+    "vehicle_type": "passenger car",
+    "is_passenger_car": true,
+    "production_year_shamsi": 1392,
+    "market_value_at_event_irr": 6000,
+    "insured_sum_irr": 4500,
+    "salvage_disposition": "NOT_APPLICABLE"
+  },
+  "event": {
+    "event_date": "2026-08-02",
+    "cause": "COLLISION",
+    "fault_status": "INSURED_FAULT"
+  },
+  "damage": {
+    "labor_irr": 40,
+    "rescue_transport_actual_irr": 15,
+    "parts": [
+      { "name": "front bumper", "category": "OTHER_REPLACEMENT_PART", "assessed_loss_irr": 120, "requires_replacement": true },
+      { "name": "head lamp glass", "category": "LAMP_GLASS", "assessed_loss_irr": 25, "requires_replacement": true },
+      { "name": "battery", "category": "BATTERY", "assessed_loss_irr": 30, "new_price_irr": 55, "requires_replacement": true },
+      { "name": "tires", "category": "TIRE", "assessed_loss_irr": 20, "new_price_irr": 40, "requires_replacement": true }
+    ]
+  },
+  "policy": {
+    "insurer": "IRAN_INSURANCE",
+    "policy_version": "1404",
+    "endorsements": [],
+    "franchise": {
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "calculation_base": "AFTER_DEPRECIATION",
+      "claim_sequence_rule": "first claim",
+      "source": "POLICY",
+      "source_reference": "policy schedule 1404, clause 4",
+      "source_version": "1404"
+    }
+  },
+  "evidence": {
+    "policy_terms_available": true,
+    "expert_assessment_available": true,
+    "market_value_evidence_available": true,
+    "photos_available": true
+  },
+  "calculation_config": {
+    "article10_partial_order": "AFTER_DEPRECIATION_BEFORE_FRANCHISE",
+    "battery_tire_depreciation_interaction": "CAP_THEN_DEPRECIATE",
+    "rescue_cap_base": "ASSESSED_GROSS"
+  }
+}

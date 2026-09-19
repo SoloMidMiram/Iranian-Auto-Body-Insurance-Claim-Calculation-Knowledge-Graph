@@ -1,0 +1,36 @@
+name: Calculation defect
+description: Report a wrong amount, cap, branch, hidden uncertainty, or refusal.
+title: "[DEFECT] "
+labels: ["segment:calculation"]
+body:
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Suspected severity
+      options: ["P0 - wrong eligibility/payment or hidden uncertainty", "P1 - broad audit/versioning risk", "P2 - scoped calculation gap", "P3 - low-risk improvement"]
+    validations:
+      required: true
+  - type: textarea
+    id: case
+    attributes:
+      label: Minimal synthetic case
+      description: Never include claimant personal data.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result and authority
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Affected branches, products, and dates

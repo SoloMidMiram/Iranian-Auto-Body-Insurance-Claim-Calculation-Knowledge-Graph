@@ -1,0 +1,695 @@
+{
+  "node_class": "LegalRule",
+  "note": "Every executable rule carries a provenance envelope. `derivation` distinguishes primary text from an inference the engine author made: PRIMARY_TEXT (the instrument states it), IMPLEMENTATION_INFERENCE (a conclusion drawn from two or more clauses), IMPLEMENTATION_INTERPRETATION (a conversion of text into arithmetic). Anything with derivation != PRIMARY_TEXT must not be presented to a user as settled law.",
+  "validation_cycle_months": 12,
+  "rules": [
+    {
+      "node_id": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["TOTAL_LOSS"],
+      "rule_payload": {
+        "test": "physical_total_loss",
+        "comparison": "STRICTLY_GREATER_THAN",
+        "ratio": 0.75,
+        "numerator": "covered_repair_and_replacement_cost + rescue_cost",
+        "denominator": "vehicle_market_value_on_accident_date",
+        "exactly_at_threshold_is_total_loss": false,
+        "note": "75% is not sufficient; the cost must exceed 75%. Equality stays in partial damage."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["THEFT"],
+      "rule_payload": {
+        "trigger": "whole_vehicle_unrecovered",
+        "days_missing_required": 60,
+        "comparison": "GREATER_THAN_OR_EQUAL",
+        "routes_to": "TOTAL_LOSS",
+        "requires_title_transfer_before_payment": true
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_TOTAL_LOSS_VALUATION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["TOTAL_LOSS", "THEFT"],
+      "rule_payload": {
+        "settlement_base": "min(market_value_on_loss_date, insured_sum)",
+        "deductions": ["probable_salvage", "prescribed_deductions", "franchise"],
+        "additions": ["allowable_rescue_and_transport"],
+        "ceiling": "insured_sum",
+        "note": "Market/transaction value on the loss date, never above the insured sum; the settlement is capped at the insured sum."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_INSURER_TAKES_TITLE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["TOTAL_LOSS"],
+      "rule_payload": {
+        "trigger": "disagreement_over_salvage_value",
+        "effect": "ownership_of_salvage_transfers_to_insurer",
+        "interaction": "when title transfers, salvage value must NOT also be subtracted from the settlement"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_THEFT_RECOVERY_WITHIN_1Y",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.95,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["THEFT"],
+      "rule_payload": {
+        "trigger": "vehicle_recovered_within_one_year_after_settlement_or_title_transfer",
+        "effect": "recovery_or_sale_proceeds_sharing_mechanism"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19B_PARTIAL_LOSS_BASE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19(b)",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+      "rule_payload": {
+        "base": "fair_repair_labour + current_replacement_part_prices",
+        "mandatory_operations": ["depreciation", "franchise"],
+        "additions": ["allowable_rescue_and_transport"],
+        "order_of_operations_stated_in_text": false,
+        "note": "The clause names depreciation and franchise but does not fix their sequence relative to the underinsurance ratio."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
+      "rule_payload": {
+        "scope": "all_replaced_parts",
+        "scope_is_consumables_only": false,
+        "depreciation_start_production_year_index": 5,
+        "annual_rate": 0.05,
+        "maximum_rate": 0.25,
+        "excluded_part_categories": ["GLASS", "LAMP_GLASS"],
+        "note": "Applies to replacement parts generally, not only consumables such as battery, tires and plastics."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY", "TOTAL_LOSS"],
+      "rule_payload": {
+        "exempt_categories": ["GLASS", "LAMP_GLASS"],
+        "depreciation_rate": 0,
+        "scope_of_exemption": "depreciation_only",
+        "note": "The exemption is from depreciation. The text does not exempt glass from the general underinsurance provision."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "3",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.98,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["PARTIAL_DAMAGE"],
+      "rule_payload": {
+        "covered_categories": ["BATTERY", "TIRE"],
+        "cap_ratio_of_new_price": 0.5,
+        "operator": "SPECIAL_PART_CAP",
+        "interaction_with_aging_depreciation": "UNSTATED_IN_TEXT",
+        "note": "Covered damage to these components is limited to 50% of new price when damaged by an insured peril."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_RESCUE_TRANSPORT_CAP",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "rescue/mitigation provision (article number not unambiguously identified in the reviewed compilation)",
+      "article_number_certainty": "UNCERTAIN",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.95,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
+      "rule_payload": {
+        "operator": "RESCUE_CAP",
+        "covered": "reasonable_rescue_mitigation_and_transport_to_nearest_suitable_repair_location",
+        "cap_ratio": 0.2,
+        "cap_base": "total_damage",
+        "cap_base_definition_unresolved": true,
+        "note": "The ceiling is stated as 20% of total damage. The compilation does not define the denominator when depreciation, underinsurance or total-loss classification is also in play."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "20 note 2",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
+      "rule_payload": {
+        "operator": "UNDERINSURANCE_RATIO",
+        "canonical_name": "UNDERINSURANCE_RATIO",
+        "aliases": ["ARTICLE_10", "QAEDE_NESBI", "ماده_10", "قاعده_نسبی"],
+        "formula": "min(1, insured_sum / actual_market_value_at_event_date)",
+        "is_a_deduction": false,
+        "capped_at": 1,
+        "insertion_point_vs_franchise": "NOT_STATED",
+        "note": "Where the insured amount is below the real value on the event date, liability is proportional to insured/real value. This is a ratio, not a fixed deduction."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "21",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "THEFT"],
+      "rule_payload": {
+        "trigger": "same_vehicle_or_risk_insured_by_multiple_contracts_without_fraudulent_intent",
+        "effect": "body_insurer_pays_per_rule_then_pursues_contribution_from_other_insurers",
+        "double_recovery_by_insured": false
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART14_SUBROGATION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "14",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["LEGAL_RECOVERY", "PARTIAL_DAMAGE", "TOTAL_LOSS"],
+      "rule_payload": {
+        "effect": "insured's_rights_against_the_responsible_person_transfer_to_the_insurer_to_the_extent_accepted_or_paid",
+        "impairment_consequence": "insurer_may_refuse_payment_or_recover_an_already_paid_amount",
+        "ceiling": "min(amount_accepted_or_paid, legally_recoverable_amount)"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART5_ENDORSABLE_EXCLUSIONS",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "5",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY", "THEFT"],
+      "rule_payload": {
+        "exclusion_state": "EXCLUDED_BUT_ENDORSABLE",
+        "effects": "collapsed_into_coverage_false"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART6_NON_COMPENSABLE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "6",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "THEFT"],
+      "rule_payload": {
+        "exclusion_state": "NON_COMPENSABLE",
+        "endorsable": false,
+        "causes": [
+          "war",
+          "nuclear_events",
+          "intentional_damage",
+          "certain_police_flight_losses",
+          "inappropriate_or_absent_valid_licence",
+          "causally_established_alcohol_or_drug_use",
+          "unauthorized_towing",
+          "inherent_electrical_or_electronic_malfunction",
+          "overload"
+        ]
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_POLICY_DEFINED_FRANCHISE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "franchise definition",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
+      "rule_payload": {
+        "operator": "FRANCHISE",
+        "franchise_is": "the_insured_share_of_the_loss_whose_amount_is_specified_in_the_policy",
+        "statutory_universal_rate": null,
+        "universal_glass_rate": null,
+        "configurable_by": "POLICY",
+        "required_configuration_fields": [
+          "mode",
+          "rate_or_absolute",
+          "minimum",
+          "calculation_base",
+          "claim_sequence_rule",
+          "coverage_specific_rule",
+          "source_version"
+        ]
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_NOTICE_AND_DUTIES",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "policyholder duties",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.98,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "THEFT", "GLASS_ONLY"],
+      "rule_payload": {
+        "notice_period_working_days": 5,
+        "notice_clock_starts": "awareness_of_loss",
+        "excuse": "unavoidable_cause_preventing_compliance",
+        "duties": [
+          "mitigate_damage",
+          "refrain_from_unauthorized_movement_or_repair",
+          "provide_requested_evidence",
+          "avoid_acts_destroying_insurer_recourse"
+        ]
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19 + 20 note 2",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.9,
+      "derivation": "IMPLEMENTATION_INFERENCE",
+      "derived_from": ["REG53_ART19_TOTAL_LOSS_VALUATION", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"],
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["TOTAL_LOSS", "THEFT"],
+      "rule_payload": {
+        "prohibition": "applying the underinsurance ratio after the settlement base has already been capped at the insured sum",
+        "reason": "for a complete loss, the ratio applied to a full market-value loss already yields the insured sum; applying it again double-reduces the claim",
+        "guard": "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "status": "NO_DOUBLE_APPLICATION"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.9,
+      "derivation": "IMPLEMENTATION_INTERPRETATION",
+      "derived_from": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION"],
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE"],
+      "rule_payload": {
+        "formula": "production_year_index = claim_year - production_year + 1; rate = 0 if index < 5 else min(0.25, 0.05 * (index - 4))",
+        "conversion_of": "'beginning of the fifth production year, 5% per year'",
+        "caveat": "Exact treatment of manufacture dates crossing the Iranian calendar year must be confirmed against claims-department practice before production use."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+      "source_class": "CIRCULAR",
+      "authority": "Central Insurance of Iran",
+      "instrument": "Circular 1400/401/146850",
+      "article": "n/a",
+      "effective_version": "1400/09/13",
+      "effective_date": "1400/09/13",
+      "confidence": 0.96,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_CIC_CIRCULAR_1400_401_146850", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["TOTAL_LOSS", "THEFT"],
+      "rule_payload": {
+        "ordering": ["SALVAGE_DEDUCTION", "FRANCHISE"],
+        "reason": "salvage is not itself damage",
+        "applies_to": "ordinary_settlement_where_salvage_remains_with_the_insured"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "CIC_CIRC_1404_06_10_ARTICLE8_EXCESS_OWN_BODY",
+      "topic": "ARTICLE_8_EXCESS_OWN_BODY",
+      "source_class": "CIRCULAR",
+      "authority": "Central Insurance of Iran",
+      "instrument": "Circular",
+      "article": "n/a",
+      "effective_version": "1404/06/10",
+      "effective_date": "1404/06/10",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_CIC_CIRCULAR_1404_06_10"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "recognises": "payment_of_the_non_corresponding_excess_from_the_damaged_owner's_body_policy",
+        "no_regulatory_requirement": [
+          "treating_that_body_payment_as_a_claims_history_event",
+          "deducting_a_franchise_from_that_body_payment"
+        ],
+        "disclosure_requirement": "an_insurer_intending_either_must_disclose_transparently_at_issuance",
+        "ambiguity_interpretation": "favours_the_insured_or_beneficiary"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "CIC_CIRC_1404_06_10_NO_MANDATORY_FRANCHISE_ON_ART8_EXCESS",
+      "topic": "ARTICLE_8_BODY_EXCESS_FRANCHISE",
+      "source_class": "CIRCULAR",
+      "authority": "Central Insurance of Iran",
+      "instrument": "Circular",
+      "article": "n/a",
+      "effective_version": "1404/06/10",
+      "effective_date": "1404/06/10",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_CIC_CIRCULAR_1404_06_10"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "regulatory_mandatory_franchise_on_art8_body_excess": 0,
+        "contractual_treatment_allowed": "only_if_validly_disclosed"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "REG71_AMBIGUITY_FAVOURS_INSURED",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 71",
+      "article": "71",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.9,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_CIC_CIRCULAR_1404_06_10"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL", "PARTIAL_DAMAGE", "GLASS_ONLY"],
+      "rule_payload": {
+        "principle": "ambiguity_is_interpreted_in_favour_of_the_insured_or_beneficiary",
+        "access_note": "Referenced through the 1404/06/10 circular; the Regulation 71 text itself was not separately retrieved."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "HIC_ARTICLE8_CONVENTIONAL_DEFINITION",
+      "topic": "ARTICLE_8_CONVENTIONAL_DEFINITION",
+      "source_class": "CIRCULAR",
+      "authority": "High Insurance Council / Central Insurance",
+      "instrument": "Article 8 implementation instruction",
+      "article": "definitions",
+      "effective_version": "amended 1398/06/13",
+      "effective_date": "1396/05/29",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_HIC_ARTICLE8_INSTRUCTION"],
+      "applies_to_branches": ["THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "conventional_vehicle_test": "market_value < 0.5 * annual_bodily_liability_ceiling",
+        "non_conventional_vehicle_test": "market_value >= 0.5 * annual_bodily_liability_ceiling",
+        "boundary_behaviour": "a car at exactly the threshold is NON_CONVENTIONAL"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "HIC_ARTICLE8_CORRESPONDING_DAMAGE",
+      "source_class": "CIRCULAR",
+      "authority": "High Insurance Council / Central Insurance",
+      "instrument": "Article 8 implementation instruction",
+      "article": "calculation provisions",
+      "effective_version": "amended 1398/06/13",
+      "effective_date": "1396/05/29",
+      "confidence": 0.98,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_HIC_ARTICLE8_INSTRUCTION"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "method": "component_wise_corresponding_damage",
+        "reference_vehicle": "most_expensive_conventional_car",
+        "whole_car_value_ratio_is_primary_method": false,
+        "operator": "CORRESPONDING_DAMAGE",
+        "ordering": ["CORRESPONDING_DAMAGE", "LIABILITY_CAP"],
+        "note": "Corresponding damage is an assessment result produced by component comparison, not a number the engine may manufacture from a luxury/conventional value ratio."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "HIC_ARTICLE8_EXACT_PART_ABSENT_USE_SIMILAR",
+      "source_class": "CIRCULAR",
+      "authority": "High Insurance Council / Central Insurance",
+      "instrument": "Article 8 implementation instruction",
+      "article": "calculation provisions",
+      "effective_version": "amended 1398/06/13",
+      "effective_date": "1396/05/29",
+      "confidence": 0.98,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_HIC_ARTICLE8_INSTRUCTION"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "if_exact_part_absent": "use_a_similar_part",
+        "if_multiple_qualifying_conventional_models_differ": "use_the_highest_qualifying_part_value"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "TPL_LAW_1395_ART8_MIN_FINANCIAL_COMMITMENT",
+      "source_class": "STATUTE",
+      "authority": "Islamic Consultative Assembly",
+      "instrument": "Compulsory Third-Party Insurance Law 1395",
+      "article": "8",
+      "effective_version": "1395",
+      "effective_date": "1395",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_TPL_LAW_1395", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "minimum_financial_commitment_ratio_of_bodily": 0.025,
+        "note": "The 2.5% ratio is primary law. The resulting 1405 toman figure is a derived annual parameter."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "TPL_LAW_1395_ART8_NON_CONVENTIONAL_LIMIT",
+      "source_class": "STATUTE",
+      "authority": "Islamic Consultative Assembly",
+      "instrument": "Compulsory Third-Party Insurance Law 1395",
+      "article": "8",
+      "effective_version": "1395",
+      "effective_date": "1395",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_TPL_LAW_1395", "SRC_HIC_ARTICLE8_INSTRUCTION"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL"],
+      "rule_payload": {
+        "effect": "limitation_on_financial_compensation_for_non_conventional_passenger_vehicles",
+        "operator": "CORRESPONDING_DAMAGE",
+        "cap": "corresponding_damage_to_the_most_expensive_conventional_car"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "TPL_LAW_1395_ART8_AT_FAULT_CAP",
+      "source_class": "STATUTE",
+      "authority": "Islamic Consultative Assembly",
+      "instrument": "Compulsory Third-Party Insurance Law 1395",
+      "article": "8",
+      "effective_version": "1395",
+      "effective_date": "1395",
+      "confidence": 0.98,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_TPL_LAW_1395", "SRC_HIC_ARTICLE8_INSTRUCTION", "SRC_CIC_CIRCULAR_1404_06_10"],
+      "applies_to_branches": ["ARTICLE_8_NON_CONVENTIONAL", "LEGAL_RECOVERY"],
+      "rule_payload": {
+        "cap_applies_to": ["third_party_insurer", "at_fault_person"],
+        "effect": "the_excess_above_corresponding_conventional_damage_is_not_automatically_recoverable_from_the_at_fault_party",
+        "alternative_route": "victim's_own_body_policy_where_coverage_exists"
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "TPL_LAW_1395_ART8_STATUTORY_RECOURSE",
+      "source_class": "STATUTE",
+      "authority": "Islamic Consultative Assembly",
+      "instrument": "Compulsory Third-Party Insurance Law 1395",
+      "article": "statutory recourse provisions",
+      "effective_version": "1395",
+      "effective_date": "1395",
+      "confidence": 0.97,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_TPL_LAW_1395", "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"],
+      "applies_to_branches": ["LEGAL_RECOVERY"],
+      "rule_payload": {
+        "effect": "insurer_protects_the_victim_first_then_may_recover_from_the_at_fault_party_in_specified_statutory_cases",
+        "cases": [
+          "serious_traffic_violations",
+          "intentional_conduct",
+          "intoxication_or_drug_use",
+          "licensing_defects",
+          "knowingly_using_a_stolen_vehicle"
+        ],
+        "module": "TP_INSURER_REGRESS",
+        "note": "This recourse is not a deduction from the victim's claim and must not be merged with it."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "20 note 2",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": ["SRC_REG53_MIRROR"],
+      "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
+      "rule_payload": {
+        "canonical_operator_name": "UNDERINSURANCE_RATIO",
+        "aliases": ["ARTICLE_10", "QAEDE_NESBI", "قاعده_نسبی", "ماده_10"],
+        "rejected_interpretation": "article_10_as_a_fixed_deduction",
+        "note": "Engine naming decision: the code and the graph use UNDERINSURANCE_RATIO; ARTICLE_10 is an alias only."
+      },
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    }
+  ]
+}

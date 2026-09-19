@@ -1,0 +1,75 @@
+{
+  "node_class": "AnnualParameter",
+  "note": "Annual parameters are versioned nodes separate from rules. When the Judiciary announces a new year only these nodes change; every rule referencing them stays intact. Values are stored in IRR (1 toman = 10 IRR).",
+  "current_year": 1405,
+  "currency": "IRR",
+  "derivation_rules": {
+    "conventional_vehicle_threshold": "0.5 * bodily_liability_ceiling",
+    "minimum_financial_commitment": "0.025 * bodily_liability_ceiling",
+    "sourced_from": ["HIC_ARTICLE8_CONVENTIONAL_DEFINITION", "TPL_LAW_1395_ART8_MIN_FINANCIAL_COMMITMENT"]
+  },
+  "parameters": [
+    {
+      "node_id": "AP_1405_DIYAH",
+      "year": 1405,
+      "name": "DIYAH",
+      "description": "Sacred-month full diyah, the annual bodily-liability reference",
+      "value": 28000000000,
+      "value_toman_display": 2800000000,
+      "currency": "IRR",
+      "source_tier": "SECONDARY_CURRENT",
+      "confidence": 0.86,
+      "requires_primary_revalidation": true,
+      "used_by": ["OP_LIABILITY_CAP_FINANCIAL_LIMIT", "OP_CORRESPONDING_DAMAGE"],
+      "sources": ["SRC_1405_DIYAH_SECONDARY"],
+      "note": "Secondary sources agree on 2.8bn tomans, but no primary Judiciary-hosted 1405 announcement was retrieved. Replace before certification.",
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "AP_1405_CONVENTIONAL_THRESHOLD",
+      "year": 1405,
+      "name": "CONVENTIONAL_THRESHOLD",
+      "description": "Market value below which a passenger car is conventional",
+      "value": 14000000000,
+      "value_toman_display": 1400000000,
+      "currency": "IRR",
+      "source_tier": "DERIVED",
+      "derived_from": "AP_1405_DIYAH",
+      "derivation": "0.5 * AP_1405_DIYAH",
+      "confidence": 0.86,
+      "requires_primary_revalidation": true,
+      "used_by": ["OP_CORRESPONDING_DAMAGE", "OP_LIABILITY_CAP_FINANCIAL_LIMIT"],
+      "sources": ["SRC_1405_DIYAH_SECONDARY", "SRC_HIC_ARTICLE8_INSTRUCTION"],
+      "note": "A calculated result, not a separately legislated figure. The 50% rule itself is primary law.",
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    },
+    {
+      "node_id": "AP_1405_MIN_FINANCIAL",
+      "year": 1405,
+      "name": "MIN_FINANCIAL",
+      "description": "Minimum third-party financial commitment",
+      "value": 700000000,
+      "value_toman_display": 70000000,
+      "currency": "IRR",
+      "source_tier": "DERIVED",
+      "derived_from": "AP_1405_DIYAH",
+      "derivation": "0.025 * AP_1405_DIYAH",
+      "confidence": 0.86,
+      "requires_primary_revalidation": true,
+      "used_by": ["OP_LIABILITY_CAP_FINANCIAL_LIMIT"],
+      "sources": ["SRC_1405_DIYAH_SECONDARY", "SRC_TPL_LAW_1395"],
+      "note": "A calculated result; the 2.5% rule is primary law.",
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18"
+    }
+  ],
+  "pending_years": [
+    {
+      "year": 1406,
+      "status": "AWAITING_PRIMARY_ANNOUNCEMENT",
+      "action": "Add three AnnualParameter nodes for 1406; no rule change is required."
+    }
+  ]
+}

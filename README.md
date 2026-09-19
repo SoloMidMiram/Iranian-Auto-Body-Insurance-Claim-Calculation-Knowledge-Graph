@@ -48,13 +48,39 @@ python claim.py params --year 1405
 python claim.py ingest submissions/example_conflicting_educational.json
 ```
 
-Tests: `python -m pytest` (220 tests). Or `pip install -e .` for the `iran-claim`
-console script.
+Tests: `python -m pytest` (258 parametrized cases). Install development/test
+dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
+the dependency-free runtime and the `iran-claim` console script.
 
 The two worked examples are the same claim under two configurations. With the
 operator order resolved you get one payable and confidence 0.95; with it
 unresolved you get two scenarios and confidence 0.55, plus an escalation prompt.
 That contrast is the whole point of the model.
+
+## Project delivery and safety status
+
+The current repository is a **research and adjuster decision-support system**.
+It is not approved for unattended production payment. The ordered completion
+plan, phase gates, and import-ready GitHub backlog are maintained in:
+
+* [`docs/ROADMAP.md`](docs/ROADMAP.md) — investigation, implementation, phase
+  ordering, preparation for the next phase, and release discipline.
+* [`docs/VALIDATION_GATES.md`](docs/VALIDATION_GATES.md) — universal invariants,
+  branch-specific boundary cases, and phase acceptance evidence.
+* [`planning/issues.json`](planning/issues.json) — stable roadmap issue IDs,
+  milestones, labels, dependencies, acceptance criteria, and validation.
+* [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md) — source,
+  review, privacy, and high-impact defect controls.
+
+Preview the planned milestones and issues without changing GitHub:
+
+```bash
+python scripts/sync_github_issues.py \
+  --repo SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph
+```
+
+Creating missing milestones, labels, and issues requires an explicitly supplied
+repo-scoped `GITHUB_TOKEN` and the additional `--apply` flag.
 
 ## Layout
 
@@ -245,4 +271,3 @@ insurer documents. In priority order:
 `claim.py ingest` is the supported path for all of them: schema-validated,
 hierarchy-checked, contradiction-flagged, and human-authorised before it changes
 what the engine does.
-# Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph

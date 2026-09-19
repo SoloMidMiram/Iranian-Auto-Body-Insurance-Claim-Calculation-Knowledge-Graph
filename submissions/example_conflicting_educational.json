@@ -1,0 +1,18 @@
+{
+  "node_id": "EDU_DEPRECIATION_CONSUMABLES_ONLY",
+  "source_class": "EDUCATIONAL",
+  "authority": "Popular internet template",
+  "instrument": "Regulation 53",
+  "article": "19",
+  "effective_version": "undated",
+  "effective_date": "1390/01/01",
+  "confidence": 0.4,
+  "evidence_url": "https://example.invalid/blog/depreciation-only-for-consumables",
+  "submitted_by": "claims-operations",
+  "topic": "DEPRECIATION_SCOPE",
+  "applies_to_branches": ["PARTIAL_DAMAGE"],
+  "rule_payload": {
+    "scope": "consumables_only",
+    "scope_is_consumables_only": true
+  }
+}

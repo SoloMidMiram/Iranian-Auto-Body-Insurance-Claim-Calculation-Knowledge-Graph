@@ -1,0 +1,371 @@
+{
+  "corpus": "Iranian motor claim synthetic validation corpus",
+  "source_ids": ["P01-P15", "T16-T23", "G24-G28", "TH29-TH33", "TP34-TP39", "A40-A48", "L49-L50"],
+  "unit": "million_toman",
+  "note": "Synthetic fixtures, not customer records. Money is in million tomans for readability; production code passes integer IRR with unit=IRR. Several cases intentionally expect payable=null: P10/P11/G27 because the primary text does not settle operator order, P14/TH33 because the endorsement supplies the missing economics, TP37 because the engine refuses to manufacture an Article 8 correspondence assessment.",
+  "corrections_applied": [
+    {
+      "fixture": "L49",
+      "change": "INSURER_MAY_PURSUUE_RESPONSIBLE_PARTY -> INSURER_MAY_PURSUE_RESPONSIBLE_PARTY",
+      "reason": "Transcription typo in the report text; the status token is corrected here and the engine emits the corrected form."
+    }
+  ],
+  "cases": [
+    {
+      "id": "P01",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"market": 3000, "insured": 3000, "gross": 100, "depreciation": 0, "franchise": 10, "rescue": 0},
+      "expected": {"payable": 90}
+    },
+    {
+      "id": "P02",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 200, "depreciable_parts": 120, "depreciation_rate": 0.05, "franchise": 20, "rescue": 10},
+      "expected": {"depreciation": 6, "payable": 184}
+    },
+    {
+      "id": "P03",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 300, "depreciable_parts": 180, "depreciation_rate": 0.10, "franchise": 30, "rescue": 20},
+      "expected": {"depreciation": 18, "payable": 272}
+    },
+    {
+      "id": "P04",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 400, "depreciable_parts": 250, "depreciation_rate": 0.15, "franchise": 40, "rescue": 20},
+      "expected": {"depreciation": 37.5, "payable": 342.5}
+    },
+    {
+      "id": "P05",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 500, "depreciable_parts": 300, "depreciation_rate": 0.20, "franchise": 50, "rescue": 30},
+      "expected": {"depreciation": 60, "payable": 420}
+    },
+    {
+      "id": "P06",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 600, "depreciable_parts": 400, "depreciation_rate": 0.25, "franchise": 60, "rescue": 40},
+      "expected": {"depreciation": 100, "payable": 480}
+    },
+    {
+      "id": "P07",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 80, "replacement_parts": [{"type": "GLASS", "loss": 80}], "franchise": 16},
+      "expected": {"depreciation": 0, "payable": 64}
+    },
+    {
+      "id": "P08",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"battery_new_price": 40, "battery_loss": 40, "franchise": 2},
+      "expected": {"eligible_before_other_terms": 20, "payable_if_no_further_deduction": 18, "flag": "BATTERY_50_PERCENT_CAP"}
+    },
+    {
+      "id": "P09",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"tires_new_price": 100, "tire_loss": 100, "franchise": 5},
+      "expected": {"eligible_before_other_terms": 50, "payable_if_no_further_deduction": 45, "flag": "TIRE_50_PERCENT_CAP"}
+    },
+    {
+      "id": "P10",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"market": 4000, "insured": 3000, "gross": 400, "depreciation": 20, "franchise": 40},
+      "expected": {"article10_ratio": 0.75, "scenario_ratio_then_franchise": 245, "scenario_franchise_then_ratio": 255, "status": "ORDER_UNRESOLVED"}
+    },
+    {
+      "id": "P11",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"market": 4000, "insured": 2000, "gross": 500, "depreciation": 50, "franchise": 50, "rescue": 20},
+      "expected": {"article10_ratio": 0.5, "scenario_ratio_then_franchise": 195, "scenario_franchise_then_ratio": 220, "status": "ORDER_UNRESOLVED"}
+    },
+    {
+      "id": "P12",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"gross": 200, "franchise": 20, "actual_rescue": 60},
+      "expected": {"rescue_cap": 40, "payable": 220}
+    },
+    {
+      "id": "P13",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"peril": "FLOOD", "endorsement": false, "gross": 300},
+      "expected": {"payable": 0, "reason": "EXCLUDED_WITHOUT_ENDORSEMENT"}
+    },
+    {
+      "id": "P14",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"peril": "FLOOD", "endorsement": true, "gross": 300},
+      "expected": {"payable": null, "status": "ENDORSEMENT_TERMS_REQUIRED"}
+    },
+    {
+      "id": "P15",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"cause": "DRIVER_INTOXICATION_CAUSALLY_CONFIRMED", "gross": 250},
+      "expected": {"payable": 0, "reason": "NON_COMPENSABLE"}
+    },
+
+    {
+      "id": "T16",
+      "branch": "TOTAL_LOSS",
+      "unit": "million_toman",
+      "inputs": {"market": 2000, "insured": 2000, "repair": 1600, "rescue_for_threshold": 50, "salvage": 300, "franchise": 100, "rescue_payable": 50},
+      "expected": {"is_total": true, "payable": 1650}
+    },
+    {
+      "id": "T17",
+      "branch": "TOTAL_LOSS_TEST",
+      "unit": "million_toman",
+      "inputs": {"market": 2000, "repair": 1500, "rescue_for_threshold": 0},
+      "expected": {"is_total": false, "reason": "EXACTLY_75_PERCENT_IS_NOT_MORE_THAN_75_PERCENT"}
+    },
+    {
+      "id": "T18",
+      "branch": "TOTAL_LOSS",
+      "unit": "million_toman",
+      "inputs": {"market": 2000, "insured": 2000, "repair": 1480, "rescue_for_threshold": 30, "salvage": 300, "franchise": 100, "rescue_payable": 30},
+      "expected": {"is_total": true, "payable": 1630}
+    },
+    {
+      "id": "T19",
+      "branch": "TOTAL_LOSS",
+      "unit": "million_toman",
+      "inputs": {"market": 3000, "insured": 2400, "salvage": 400, "franchise": 120, "rescue_payable": 50},
+      "expected": {"underinsurance_ratio_equivalent": 0.8, "settlement_base": 2400, "payable": 1930, "guard": "DO_NOT_APPLY_RATIO_TWICE"}
+    },
+    {
+      "id": "T20",
+      "branch": "TOTAL_LOSS",
+      "unit": "million_toman",
+      "inputs": {"market": 2000, "insured": 2500, "salvage": 300, "franchise": 100, "rescue_payable": 20},
+      "expected": {"settlement_base": 2000, "payable": 1620}
+    },
+    {
+      "id": "T21",
+      "branch": "TOTAL_LOSS",
+      "unit": "million_toman",
+      "inputs": {"market": 2000, "insured": 2000, "salvage_disposition": "INSURER_TAKES_TITLE", "franchise": 100, "rescue_payable": 20},
+      "expected": {"payable_if_no_other_deductions": 1920, "guard": "DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT"}
+    },
+    {
+      "id": "T22",
+      "branch": "TOTAL_THEFT",
+      "unit": "million_toman",
+      "inputs": {"days_missing": 59, "market": 1800, "insured": 1800},
+      "expected": {"payable": null, "status": "60_DAY_TOTAL_LOSS_CRITERION_NOT_MET"}
+    },
+    {
+      "id": "T23",
+      "branch": "TOTAL_THEFT",
+      "unit": "million_toman",
+      "inputs": {"days_missing": 60, "market": 1800, "insured": 1800, "franchise": 180, "title_transferred": true},
+      "expected": {"total_loss_criterion": true, "payable_if_no_other_deductions": 1620}
+    },
+
+    {
+      "id": "G24",
+      "branch": "GLASS_ONLY",
+      "unit": "million_toman",
+      "inputs": {"glass_endorsement": true, "market": 2500, "insured": 2500, "gross": 50, "franchise_from_policy": 10},
+      "expected": {"depreciation": 0, "payable": 40}
+    },
+    {
+      "id": "G25",
+      "branch": "GLASS_ONLY",
+      "unit": "million_toman",
+      "inputs": {"glass_endorsement": false, "cause": "INDEPENDENT_BREAKAGE", "gross": 50},
+      "expected": {"payable": 0, "reason": "NO_STANDALONE_COVER"}
+    },
+    {
+      "id": "G26",
+      "branch": "GLASS_ONLY",
+      "unit": "million_toman",
+      "inputs": {"cause": "COLLISION", "gross": 50, "franchise": 5},
+      "expected": {"route": "PARTIAL_DAMAGE", "depreciation": 0, "payable": 45}
+    },
+    {
+      "id": "G27",
+      "branch": "GLASS_ONLY",
+      "unit": "million_toman",
+      "inputs": {"glass_endorsement": true, "market": 3000, "insured": 2400, "gross": 100, "franchise": 20},
+      "expected": {"article10_ratio": 0.8, "scenario_ratio_then_franchise": 60, "scenario_franchise_then_ratio": 64, "status": "ENDORSEMENT_AND_ORDER_REQUIRED"}
+    },
+    {
+      "id": "G28",
+      "branch": "PARTIAL_DAMAGE",
+      "unit": "million_toman",
+      "inputs": {"lamp_glass": 20, "other_replacement_part": 40, "other_part_depreciation_rate": 0.05, "franchise": 6},
+      "expected": {"glass_depreciation": 0, "other_depreciation": 2, "payable": 52}
+    },
+
+    {
+      "id": "TH29",
+      "branch": "THEFT",
+      "unit": "million_toman",
+      "inputs": {"theft_type": "WHOLE_VEHICLE", "days_missing": 30},
+      "expected": {"status": "PENDING_60_DAY_CRITERION"}
+    },
+    {
+      "id": "TH30",
+      "branch": "THEFT",
+      "unit": "million_toman",
+      "inputs": {"theft_type": "WHOLE_VEHICLE", "days_missing": 65, "market": 2200, "insured": 2200, "franchise": 220, "title_transferred": true},
+      "expected": {"route": "THEFT_TOTAL_SETTLEMENT", "payable_if_no_other_deductions": 1980}
+    },
+    {
+      "id": "TH31",
+      "branch": "THEFT",
+      "unit": "million_toman",
+      "inputs": {"theft_type": "ATTEMPTED_VEHICLE_THEFT_DAMAGE", "gross": 50, "franchise": 5},
+      "expected": {"route": "THEFT_PARTIAL_DAMAGE", "payable_if_fully_insured": 45}
+    },
+    {
+      "id": "TH32",
+      "branch": "THEFT",
+      "unit": "million_toman",
+      "inputs": {"theft_type": "PARTS_STOLEN_AFTER_ACCIDENT", "gross": 80, "endorsement": false},
+      "expected": {"payable": 0, "reason": "BASE_POLICY_EXCLUSION"}
+    },
+    {
+      "id": "TH33",
+      "branch": "THEFT",
+      "unit": "million_toman",
+      "inputs": {"theft_type": "PARTIAL_PARTS_THEFT", "gross": 100, "partial_theft_endorsement": true},
+      "expected": {"payable": null, "status": "ENDORSEMENT_LIMIT_AND_FRANCHISE_REQUIRED"}
+    },
+
+    {
+      "id": "TP34",
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "unit": "million_toman",
+      "inputs": {"victim_vehicle_value": 1000, "actual_damage": 60, "policy_financial_limit": 70, "conventional_threshold": 1400},
+      "expected": {"vehicle_class": "CONVENTIONAL", "insurer_payable": 60}
+    },
+    {
+      "id": "TP35",
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "unit": "million_toman",
+      "inputs": {"victim_vehicle_value": 1000, "actual_damage": 100, "policy_financial_limit": 70, "conventional_threshold": 1400},
+      "expected": {"vehicle_class": "CONVENTIONAL", "insurer_payable": 70, "remaining_legal_claim_candidate": 30}
+    },
+    {
+      "id": "TP36",
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "unit": "million_toman",
+      "inputs": {"victim_vehicle_value": 1399, "actual_damage": 70, "policy_financial_limit": 70, "conventional_threshold": 1400},
+      "expected": {"vehicle_class": "CONVENTIONAL", "insurer_payable": 70}
+    },
+    {
+      "id": "TP37",
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "unit": "million_toman",
+      "inputs": {"victim_vehicle_value": 1400, "actual_damage": 70, "policy_financial_limit": 70, "conventional_threshold": 1400},
+      "expected": {"vehicle_class": "NON_CONVENTIONAL", "route": "ARTICLE_8"}
+    },
+    {
+      "id": "TP38",
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "unit": "million_toman",
+      "inputs": {"victim_vehicle_value": 900, "actual_damage": 30, "policy_financial_limit": 200, "conventional_threshold": 1400},
+      "expected": {"vehicle_class": "CONVENTIONAL", "insurer_payable": 30}
+    },
+    {
+      "id": "TP39",
+      "branch": "THIRD_PARTY_FINANCIAL",
+      "unit": "million_toman",
+      "inputs": {"property_type": "NON_VEHICLE_PROPERTY", "actual_damage": 50, "policy_financial_limit": 70},
+      "expected": {"insurer_payable": 50, "article8_vehicle_cap": "NOT_APPLICABLE"}
+    },
+
+    {
+      "id": "A40",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 1400, "actual_damage": 120, "corresponding_damage": 80, "policy_financial_limit": 200, "threshold": 1400},
+      "expected": {"insurer_payable": 80, "own_body_excess_candidate": 40}
+    },
+    {
+      "id": "A41",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 2500, "actual_damage": 300, "corresponding_damage": 180, "policy_financial_limit": 200, "threshold": 1400},
+      "expected": {"insurer_payable": 180, "own_body_excess_candidate": 120}
+    },
+    {
+      "id": "A42",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 2500, "actual_damage": 300, "corresponding_damage": 180, "policy_financial_limit": 100, "threshold": 1400},
+      "expected": {"insurer_payable": 100, "remaining_inside_article8_cap": 80, "own_body_non_corresponding_excess_candidate": 120}
+    },
+    {
+      "id": "A43",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 3000, "actual_damage": 200, "similar_part_corresponding_damage": 90, "policy_financial_limit": 200},
+      "expected": {"insurer_payable": 90, "own_body_excess_candidate": 110}
+    },
+    {
+      "id": "A44",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 3500, "actual_damage": 400, "corresponding_damage": 250, "policy_financial_limit": 200},
+      "expected": {"insurer_payable": 200, "remaining_inside_article8_cap": 50, "own_body_non_corresponding_excess_candidate": 150}
+    },
+    {
+      "id": "A45",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 3500, "actual_damage": 400, "corresponding_damage": 250, "policy_financial_limit": 500},
+      "expected": {"insurer_payable": 250, "own_body_excess_candidate": 150}
+    },
+    {
+      "id": "A46",
+      "branch": "ARTICLE_8_NON_CONVENTIONAL",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 3500, "actual_damage": 400, "corresponding_damage": 250, "policy_financial_limit": 500, "has_body_policy": false},
+      "expected": {"tp_or_at_fault_statutory_cap": 250, "non_corresponding_residual": 150}
+    },
+    {
+      "id": "A47",
+      "branch": "ARTICLE_8_DUAL_COVERAGE",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 2500, "actual_damage": 300, "corresponding_damage": 180, "tp_limit": 200, "has_body_policy": true, "body_franchise_for_excess_disclosed": false},
+      "expected": {"third_party": 180, "body_candidate_before_other_body_terms": 120, "regulatory_mandatory_franchise_on_this_excess": 0}
+    },
+    {
+      "id": "A48",
+      "branch": "ARTICLE_8_DUAL_COVERAGE",
+      "unit": "million_toman",
+      "inputs": {"vehicle_value": 2500, "actual_damage": 300, "corresponding_damage": 180, "tp_limit": 200, "has_body_policy": true, "body_franchise_for_excess_disclosed": true},
+      "expected": {"third_party": 180, "body_candidate_before_disclosed_terms": 120, "franchise": "APPLY_VALID_DISCLOSED_POLICY_TERM"}
+    },
+
+    {
+      "id": "L49",
+      "branch": "LEGAL_RECOVERY",
+      "unit": "million_toman",
+      "inputs": {"body_insurer_paid": 150, "responsible_third_party_identified": true, "insured_preserved_recovery_rights": true},
+      "expected": {"insurer_subrogation_ceiling": 150, "status": "INSURER_MAY_PURSUE_RESPONSIBLE_PARTY"}
+    },
+    {
+      "id": "L50",
+      "branch": "LEGAL_RECOVERY",
+      "unit": "million_toman",
+      "inputs": {"body_insurer_paid": 150, "insured_released_responsible_party": true, "recovery_right_impaired": true},
+      "expected": {"payable_or_recovery_amount": null, "status": "ARTICLE_14_SUBROGATION_IMPAIRMENT_REVIEW"}
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iran-auto-claim.schema.json",
+  "title": "Iran Auto Claim Calculation Case",
+  "description": "Input contract for the Iranian motor claim rule engine. Money is carried in the case's declared `unit`; production callers should supply integer IRR and set unit=IRR. Where a regulation leaves an operation unresolved the case must say so explicitly rather than omit the field, because the engine refuses to invent a sequence.",
+  "type": "object",
+  "required": ["claim_id", "classification", "vehicle", "event", "policy", "calculation_config"],
+  "properties": {
+    "claim_id": { "type": "string" },
+    "unit": {
+      "enum": ["IRR", "toman", "million_toman", "billion_toman"],
+      "default": "million_toman"
+    },
+
+    "regulatory_snapshot": {
+      "type": "object",
+      "required": ["as_of_date"],
+      "description": "Annual parameters frozen at the case's assessment date. Values here override the knowledge base's AnnualParameter nodes for that Iranian year.",
+      "properties": {
+        "as_of_date": { "type": "string", "format": "date" },
+        "iranian_year": { "type": "integer" },
+        "bodily_limit_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "conventional_vehicle_threshold_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "minimum_financial_limit_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "annual_parameter_source": { "type": ["string", "null"] },
+        "annual_parameter_confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "classification": {
+      "type": "object",
+      "required": ["domain", "branch"],
+      "properties": {
+        "domain": {
+          "enum": ["BODY", "THIRD_PARTY_FINANCIAL", "LEGAL_RECOVERY"]
+        },
+        "branch": {
+          "description": "One of the seven ontology Branch values, or a documented test-variant alias (see ontology.json branch_aliases).",
+          "enum": [
+            "PARTIAL_DAMAGE",
+            "TOTAL_LOSS",
+            "GLASS_ONLY",
+            "THEFT",
+            "THIRD_PARTY_FINANCIAL",
+            "ARTICLE_8_NON_CONVENTIONAL",
+            "LEGAL_RECOVERY",
+            "TOTAL_LOSS_TEST",
+            "TOTAL_THEFT",
+            "ARTICLE_8_DUAL_COVERAGE",
+            "ORDINARY_FINANCIAL",
+            "THEFT_PARTIAL_DAMAGE"
+          ]
+        },
+        "variant": {
+          "description": "Sub-mode selected within a branch. Usually derived from the branch alias.",
+          "type": ["string", "null"],
+          "enum": [
+            null,
+            "THRESHOLD_TEST",
+            "TOTAL_SETTLEMENT",
+            "PENDING",
+            "DUAL_COVERAGE",
+            "ATTEMPTED_THEFT",
+            "PARTS_THEFT",
+            "ORDINARY_FINANCIAL"
+          ]
+        },
+        "classification_confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "vehicle": {
+      "type": "object",
+      "required": ["market_value_at_event_irr"],
+      "properties": {
+        "vehicle_type": { "type": "string" },
+        "is_passenger_car": { "type": "boolean" },
+        "production_year_shamsi": { "type": ["integer", "null"] },
+        "market_value_at_event_irr": { "type": "integer", "minimum": 0 },
+        "insured_sum_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "salvage_value_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "salvage_disposition": {
+          "enum": ["NOT_APPLICABLE", "INSURED_RETAINS", "INSURER_TAKES_TITLE", "UNRESOLVED"],
+          "default": "NOT_APPLICABLE"
+        },
+        "title_transferred_to_insurer": { "type": ["boolean", "null"] }
+      }
+    },
+
+    "event": {
+      "type": "object",
+      "properties": {
+        "event_date": { "type": "string", "format": "date" },
+        "cause": { "type": "string" },
+        "peril": { "type": "string" },
+        "theft_type": {
+          "enum": [
+            "WHOLE_VEHICLE",
+            "ATTEMPTED_VEHICLE_THEFT_DAMAGE",
+            "PARTIAL_PARTS_THEFT",
+            "PARTS_STOLEN_AFTER_ACCIDENT"
+          ]
+        },
+        "days_vehicle_missing": { "type": ["integer", "null"], "minimum": 0 },
+        "fault_status": {
+          "enum": ["INSURED_FAULT", "THIRD_PARTY_FAULT", "SHARED", "UNKNOWN", "NOT_APPLICABLE"]
+        },
+        "intoxication_causally_confirmed": { "type": "boolean" },
+        "valid_licence": { "type": ["boolean", "null"] },
+        "damaged_property_type": {
+          "enum": ["PASSENGER_VEHICLE", "NON_VEHICLE_PROPERTY", "NON_PASSENGER_VEHICLE"]
+        }
+      }
+    },
+
+    "damage": {
+      "type": "object",
+      "description": "Assessed damage. Either itemise `parts` + `labor`, or supply an aggregate `gross_damage_irr`. The scalar shorthand keys are accepted for assessment-estimator integration and fixture readability; they normalise into the same Part records.",
+      "properties": {
+        "labor_irr": { "type": "integer", "minimum": 0 },
+        "gross_damage_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "repair_total_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "repair_and_replacement_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "rescue_transport_actual_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "rescue_for_total_loss_test_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "assessed_depreciation_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "depreciable_parts_base_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "depreciation_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "actual_financial_loss_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "article8_corresponding_damage_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["category", "assessed_loss_irr"],
+            "properties": {
+              "name": { "type": "string" },
+              "category": {
+                "enum": [
+                  "GLASS",
+                  "LAMP_GLASS",
+                  "BATTERY",
+                  "TIRE",
+                  "OTHER_REPLACEMENT_PART",
+                  "REPAIR_ONLY"
+                ]
+              },
+              "new_price_irr": { "type": ["integer", "null"], "minimum": 0 },
+              "assessed_loss_irr": { "type": "integer", "minimum": 0 },
+              "requires_replacement": { "type": "boolean" },
+              "article8_corresponding_part_irr": { "type": ["integer", "null"], "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+
+    "policy": {
+      "type": "object",
+      "properties": {
+        "insurer": { "type": ["string", "null"] },
+        "policy_version": { "type": ["string", "null"] },
+        "third_party_financial_limit_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "endorsements": { "type": "array", "items": { "type": "string" } },
+        "has_body_policy": { "type": ["boolean", "null"] },
+        "franchise": {
+          "type": ["object", "null"],
+          "required": ["mode", "source"],
+          "properties": {
+            "mode": { "enum": ["ABSOLUTE", "PERCENT", "PERCENT_WITH_MINIMUM"] },
+            "absolute_irr": { "type": ["integer", "null"] },
+            "rate": { "type": ["number", "null"] },
+            "minimum_irr": { "type": ["integer", "null"] },
+            "calculation_base": { "type": ["string", "null"] },
+            "claim_sequence_rule": { "type": ["string", "null"] },
+            "coverage_specific_rule": { "type": ["string", "null"] },
+            "source": { "enum": ["POLICY", "ENDORSEMENT", "INSURER_MANUAL", "UNKNOWN"] },
+            "source_reference": { "type": ["string", "null"] },
+            "source_version": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+
+    "coverage_gate": {
+      "type": "object",
+      "properties": {
+        "base_peril": { "type": "boolean" },
+        "endorsement_restores_excluded_peril": { "type": "boolean" },
+        "non_compensable_exclusion": { "type": "boolean" },
+        "subrogation_impaired": { "type": "boolean" },
+        "late_notice_issue": { "type": "boolean" }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "policy_terms_available": { "type": "boolean" },
+        "expert_assessment_available": { "type": "boolean" },
+        "market_value_evidence_available": { "type": "boolean" },
+        "police_or_authority_record_available": { "type": "boolean" },
+        "photos_available": { "type": "boolean" },
+        "ownership_evidence_available": { "type": "boolean" },
+        "article8_component_mapping_available": { "type": "boolean" }
+      }
+    },
+
+    "calculation_config": {
+      "type": "object",
+      "description": "Explicit carriers for the operations primary sources do not settle. Defaults are UNRESOLVED, which makes the engine return a scenario set rather than one fabricated number.",
+      "properties": {
+        "article10_partial_order": {
+          "enum": [
+            "AFTER_DEPRECIATION_BEFORE_FRANCHISE",
+            "AFTER_DEPRECIATION_AND_FRANCHISE",
+            "INSURER_SPECIFIC",
+            "UNRESOLVED"
+          ],
+          "default": "UNRESOLVED"
+        },
+        "battery_tire_depreciation_interaction": {
+          "enum": [
+            "CAP_THEN_DEPRECIATE",
+            "DEPRECIATE_THEN_CAP",
+            "CAP_ONLY",
+            "INSURER_SPECIFIC",
+            "UNRESOLVED"
+          ],
+          "default": "UNRESOLVED"
+        },
+        "glass_article10_order_resolved_by_endorsement": { "type": "boolean", "default": false },
+        "rescue_cap_base": {
+          "enum": ["ASSESSED_GROSS", "ELIGIBLE_GROSS", "SETTLEMENT_BASE"],
+          "default": "ASSESSED_GROSS"
+        },
+        "franchise_rate": { "type": ["number", "null"] }
+      }
+    },
+
+    "result": {
+      "type": "object",
+      "description": "Engine output. Present only in persisted/annotated cases; the engine writes it.",
+      "properties": {
+        "payable_irr": { "type": ["integer", "null"] },
+        "payable_scenarios_irr": { "type": "array", "items": { "type": "integer" } },
+        "status": { "type": ["string", "null"] },
+        "formula_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "blocking_uncertainties": { "type": "array", "items": { "type": "string" } },
+        "rule_trace": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
