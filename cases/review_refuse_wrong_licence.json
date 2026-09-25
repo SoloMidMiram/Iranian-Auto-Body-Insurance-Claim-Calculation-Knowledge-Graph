@@ -1,0 +1,67 @@
+{
+  "claim_id": "REVIEW-REFUSE-LICENCE",
+  "unit": "million_toman",
+  "note": "A refusal that must be reached before arithmetic, not after it. The driver held no licence for the vehicle class, which the general conditions place outside compensation altogether: no depreciation, franchise or ratio is ever computed. Expired would have been a different answer, and this file records which one it is.",
+  "evidence_present": [
+    "EVT_CLAIM_FORM",
+    "EVT_POLICY_COPY",
+    "EVT_LICENCE",
+    "EVT_ASSESSMENT_REPORT",
+    "EVT_PHOTOS"
+  ],
+  "answers": {
+    "Q-S0-01": "IRAN_INSURANCE / بيمه بدنه 1404",
+    "Q-S0-02": "1404-02-09",
+    "Q-S0-03": "1404-02-09",
+    "Q-S0-04": "ONTIME",
+    "Q-S0-07": "1404-02-11",
+    "Q-S0-05": "EMPLOYEE",
+    "Q-S0-06": "IN_FORCE",
+
+    "Q-S1-01": "TRUCK",
+    "Q-S1-02": "LISTED",
+    "Q-S1-03": "INSIDE_IRAN",
+
+    "Q-S2-01": "COLLISION",
+    "Q-S2-02": "ESTABLISHED",
+    "Q-S2-04": "INSURED_AT_FAULT",
+    "Q-S2-09": "CONSISTENT",
+
+    "Q-S3-01": "WRONG_CLASS",
+    "Q-S3-02": "NO",
+    "Q-S3-03": "NO",
+    "Q-S3-05": "NONE",
+    "Q-S3-06": "NO",
+    "Q-S3-07": "NO",
+    "Q-S3-08": "NO",
+
+    "Q-S4-01": "AGGREGATE_ONLY",
+    "Q-S4-11": 300,
+    "Q-S4-07": 5,
+    "Q-S4-09": "NOT_APPLICABLE",
+    "Q-S4-10": "REPAIRABLE",
+
+    "Q-S5-01": 1200,
+    "Q-S5-02": 1200,
+    "Q-S5-03": 1395,
+    "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
+
+    "Q-S6-01": "PERCENT",
+    "Q-S6-02": {
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "calculation_base": "AFTER_DEPRECIATION",
+      "source": "POLICY",
+      "source_version": "1404"
+    },
+    "Q-S6-05": "NO",
+
+    "Q-S7-01": "NO_BODY_ONLY",
+
+    "Q-S9-01": "NO",
+    "Q-S9-02": "NO_THIRD_PARTY",
+    "Q-S9-03": 0,
+
+    "Q-S10-01": "adjuster: reviewer-05, refusal notified to the insured 1404-02-28"
+  }
+}

@@ -14,6 +14,11 @@
     python claim.py operators
     python claim.py sources
     python claim.py ingest submissions/new_rule.json [--write]
+    python claim.py review cases/review_t1_fullcover_partial.json [--emit-case out.json] [--calc]
+    python claim.py questionnaire [--stage S2_EVENT_CAUSATION] [--format markdown]
+    python claim.py parameters [--branch PARTIAL_DAMAGE] [--format markdown]
+    python claim.py ladder [--format markdown]
+    python claim.py flowchart
 """
 
 from __future__ import annotations
@@ -32,6 +37,14 @@ from .fixtures import run_all
 from .ingest import apply_ingest, load_submission, plan_ingest
 from .knowledge import DEFAULT_ROOT, Knowledge, Node
 from .render import render_claim
+from .review import (
+    Review,
+    ReviewInputError,
+    ladder_markdown,
+    mermaid_flowchart,
+    parameters_markdown,
+    questionnaire_markdown,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -82,6 +95,25 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="commit even though the submission contradicts existing rules (records the human decision)",
     )
+
+    p = sub.add_parser("review", help="run the case-review questionnaire over an answers file")
+    p.add_argument("answers", help="path to a review answers JSON file")
+    p.add_argument("--json", action="store_true", help="print the machine-readable review")
+    p.add_argument("--emit-case", default=None, metavar="PATH", help="write the derived claim case")
+    p.add_argument("--calc", action="store_true", help="also run the engine when the file is ready")
+
+    p = sub.add_parser("questionnaire", help="print the investigation procedure")
+    p.add_argument("--stage", default=None, help="limit to one stage, e.g. S2_EVENT_CAUSATION")
+    p.add_argument("--format", default="text", choices=("text", "markdown"))
+
+    p = sub.add_parser("parameters", help="print the parameter-selection matrix")
+    p.add_argument("--branch", default=None, help="limit to one branch")
+    p.add_argument("--format", default="text", choices=("text", "markdown"))
+
+    p = sub.add_parser("ladder", help="print the iterative completion tiers")
+    p.add_argument("--format", default="text", choices=("text", "markdown"))
+
+    sub.add_parser("flowchart", help="print the review-and-calculation flowchart as mermaid")
 
     return parser
 
@@ -414,6 +446,164 @@ def _cmd_ingest(args: argparse.Namespace, kb: Knowledge) -> int:
     return 0 if plan["ok"] else 1
 
 
+def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
+    try:
+        review = Review.from_file(args.answers, kb)
+    except ReviewInputError as error:
+        print(f"review refused: {error}")
+        return 1
+
+    if args.emit_case:
+        payload = review.case_payload()
+        Path(args.emit_case).write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(f"wrote derived case to {args.emit_case}")
+
+    if args.json:
+        document = review.to_json()
+        if not args.calc:
+            document["calculation"] = None
+        print(json.dumps(document, ensure_ascii=False, indent=2))
+        return 0
+
+    print(review.report())
+    if args.calc and review.classification().get("branch"):
+        result = review.calculate()
+        if result is not None:
+            print()
+            print(render_claim(result, kb, review.unit))
+    return 0
+
+
+def _cmd_questionnaire(args: argparse.Namespace, kb: Knowledge) -> int:
+    if args.format == "markdown" and not args.stage:
+        print(questionnaire_markdown(kb))
+        return 0
+
+    stages = [args.stage] if args.stage else [s["node_id"] for s in kb.ordered_stages()]
+    for stage_id in stages:
+        stage = kb.stage(stage_id)
+        if stage is None:
+            print(f"unknown stage {stage_id!r}")
+            return 1
+        if args.format == "markdown":
+            print(f"### {stage['node_id']} - {stage['name']}")
+            print(f"*Closes when:* {stage['closes_when']}")
+            print()
+            print("| # | Ask | Admissible answers | Binds | Evidence | Blocking | Rung |")
+            print("|---|---|---|---|---|---|---|")
+        else:
+            print(f"{stage['node_id']}  {stage['name']}")
+            print(f"  closes when: {stage['closes_when']}")
+            print(f"  why this gate: {stage['gate']}")
+        for question in kb.questions_for_stage(stage_id):
+            bindings = ", ".join(
+                str(binding.get("slot"))
+                for binding in question.get("sets") or []
+                if isinstance(binding, dict)
+            ) or "-"
+            evidence = ", ".join(str(item) for item in question.get("requires_evidence") or []) or "-"
+            answers = ", ".join(str(item) for item in question.get("answers") or []) or question.get(
+                "answer_format", ""
+            )
+            when = ""
+            if question.get("when"):
+                when = f" [asked when: {json.dumps(question['when'], ensure_ascii=False)}]"
+            if args.format == "markdown":
+                print(
+                    f"| {question['node_id']} | {question['ask']}{when} | {answers} | {bindings} | "
+                    f"{evidence} | {question['blocking']} | {question['tier']} |"
+                )
+            else:
+                print(f"  {question['node_id']}  ({question['blocking']}, rung {question['tier']})")
+                print(f"      ask      : {question['ask']}{when}")
+                if question.get("ask_fa"):
+                    print(f"      ask_fa   : {question['ask_fa']}")
+                print(f"      answers  : {answers}")
+                print(f"      binds    : {bindings}")
+                print(f"      evidence : {evidence}")
+                if question.get("based_on"):
+                    print(f"      because  : {question['based_on']}")
+                for uncertainty_id in question.get("escalates_to") or []:
+                    print(f"      surfaces : {uncertainty_id}")
+                print(f"      why      : {question['why']}")
+        if args.format == "markdown":
+            print()
+    return 0
+
+
+def _cmd_parameters(args: argparse.Namespace, kb: Knowledge) -> int:
+    if args.format == "markdown" and not args.branch:
+        print(parameters_markdown(kb))
+        return 0
+    nodes = sorted(kb.slots.values(), key=lambda node: node["node_id"])
+    if args.branch:
+        wanted = kb.canonical_branch(args.branch)
+        nodes = [node for node in nodes if wanted in (node.get("required_for_branches") or [])]
+        if not nodes:
+            print(f"no parameter slot is declared required for branch {args.branch!r}")
+            return 1
+    for node in nodes:
+        fillers = [q["node_id"] for q in kb.questions_filling_slot(node["node_id"])]
+        if args.format == "markdown":
+            print(
+                f"| {node['node_id']} | {node.get('unit')} | {node.get('authority')} | "
+                f"{', '.join(fillers) or '-'} | {node.get('missing_behavior')} | "
+                f"{node.get('blocking_uncertainty') or '-'} | {node.get('guardrail') or '-'} | "
+                f"{', '.join(node.get('required_for_branches') or []) or '-'} |"
+            )
+            continue
+        print(f"{node['node_id']}  [{node.get('authority')}]  unit={node.get('unit')}")
+        print(f"  case field : {node.get('case_field')}")
+        print(f"  supplied by: {', '.join(fillers) or '-'}  via {', '.join(node.get('supplied_via') or [])}")
+        print(f"  if absent  : {node.get('missing_behavior')}")
+        if node.get("governed_by"):
+            print(f"  governed by: {node['governed_by']}")
+        if node.get("subject_to"):
+            print(f"  read by    : {node['subject_to']}")
+        if node.get("blocking_uncertainty"):
+            print(f"  blocks on  : {node['blocking_uncertainty']}")
+        if node.get("guardrail"):
+            print(f"  guarded by : {node['guardrail']}")
+        print(f"  how to pick: {node.get('select')}")
+        print()
+    if args.format == "markdown" and args.branch:
+        pass
+    return 0
+
+
+def _cmd_ladder(args: argparse.Namespace, kb: Knowledge) -> int:
+    if args.format == "markdown":
+        print(ladder_markdown(kb))
+        return 0
+    for node in kb.ordered_tiers():
+        print(f"{node['node_id']}  {node['name']}")
+        print(f"  adds        : {node.get('purpose')}")
+        print(f"  gate        : {json.dumps(node.get('gate'), ensure_ascii=False)}")
+        print(f"  branches    : {', '.join(node.get('reachable_branches') or [])}")
+        print(f"  outcomes    : {', '.join(node.get('permitted_outcomes') or [])}")
+        print(f"  slots       : {', '.join(node.get('required_slots') or []) or '-'}")
+        for boundary in node.get("boundary_cases_required") or []:
+            print(f"  boundary    : {boundary}")
+        print(f"  corpus      : {', '.join(node.get('example_cases') or []) or '-'}")
+        if node.get("exit_evidence"):
+            print(f"  exit proof  : {node['exit_evidence']}")
+        if node.get("must_not"):
+            print(f"  must not    : {node['must_not']}")
+        print(f"  calibration : {', '.join(node.get('calibration_needed') or []) or 'nothing outstanding'}")
+        print(f"  next        : {node.get('next_tier') or 'end of ladder'}")
+        print()
+    for rule in kb.tiers_raw.get("promotion_rule", []):
+        print(f"* {rule}")
+    return 0
+
+
+def _cmd_flowchart(args: argparse.Namespace, kb: Knowledge) -> int:
+    print(mermaid_flowchart(kb))
+    return 0
+
+
 _HANDLERS: dict[str, Any] = {
     "fixtures": _cmd_fixtures,
     "validate": _cmd_validate,
@@ -430,6 +620,11 @@ _HANDLERS: dict[str, Any] = {
     "sources": _cmd_sources,
     "queries": _cmd_queries,
     "ingest": _cmd_ingest,
+    "review": _cmd_review,
+    "questionnaire": _cmd_questionnaire,
+    "parameters": _cmd_parameters,
+    "ladder": _cmd_ladder,
+    "flowchart": _cmd_flowchart,
 }
 
 

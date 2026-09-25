@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/schemas/review-answers.schema.json",
+  "title": "Body-insurance claim review answers",
+  "description": "Input contract for `claim.py review`. One entry per questionnaire item, plus the evidence the file actually holds. This is not a claim case: it cannot carry a rate, an order, or any other calculation parameter directly - answers bind slots in knowledge/parameter_slots.json, and the derived case is what the engine reads.",
+  "type": "object",
+  "required": ["claim_id", "answers"],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "File reference. No personal data: the repository holds synthetic and anonymised files only."
+    },
+    "id": {
+      "type": "string",
+      "description": "Accepted synonym for claim_id, matching the case schema."
+    },
+    "unit": {
+      "type": "string",
+      "enum": ["irr", "million_toman", "toman"],
+      "default": "million_toman",
+      "description": "Applies to every money answer in this file. Money answers are never mixed within one file."
+    },
+    "note": {
+      "type": "string",
+      "description": "Why the file exists or what it demonstrates. Never read by the engine."
+    },
+    "answers": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Questionnaire answers keyed by ReviewQuestion node_id. Keys outside the procedure are refused, not ignored; inadmissible choice values are refused. 'UNKNOWN' is admissible and binds nothing - absence is recorded, never defaulted.",
+      "propertyNames": {
+        "pattern": "^Q-S[0-9]-[0-9]{2}$"
+      },
+      "additionalProperties": true
+    },
+    "evidence_present": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^EVT_[A-Z0-9_]+$"
+      },
+      "uniqueItems": true,
+      "description": "EvidenceItem ids confirmed to be in the file. Absence of an id here is what drives the 'EVIDENCE STILL MISSING' list; nothing infers a document from an answer."
+    },
+    "evidence_received": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^EVT_[A-Z0-9_]+$"
+      },
+      "uniqueItems": true,
+      "description": "Synonym channel for a form that only ticks documents off."
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Named reviewer, when the file records one separately from Q-S10-01."
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Review date, for deterministic output in tests and audits."
+    }
+  },
+  "x-answer-formats": {
+    "choice": "one token from the question's `answers`",
+    "list": "array of tokens, or array of objects for component records",
+    "money": "number or numeric string, in the file's declared unit",
+    "integer": "integer",
+    "date": "ISO-like string; a leading year between 1300 and 1500 is read as a Shamsi year",
+    "text": "free text, used for identification and sign-off only; it may not bind a money slot"
+  },
+  "x-refusals": [
+    "unknown question id",
+    "choice value outside the closed vocabulary",
+    "non-numeric money answer or non-integer integer answer",
+    "a payload that is not a JSON object"
+  ]
+}
