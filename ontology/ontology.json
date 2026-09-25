@@ -236,6 +236,97 @@
         { "name": "amount", "type": "money", "required": true },
         { "name": "basis_branch", "type": "ref", "required": true }
       ]
+    },
+    {
+      "id": "ReviewStage",
+      "note": "One gate-ordered step of the adjuster's investigation. A stage closes only when its own condition is met; the next stage may not decide anything the previous one left open.",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "order", "type": "integer", "required": true },
+        { "name": "name", "type": "string", "required": true },
+        { "name": "closes_when", "type": "string", "required": true },
+        { "name": "gate", "type": "string", "required": true }
+      ]
+    },
+    {
+      "id": "ReviewQuestion",
+      "note": "A discriminating question. It may only bind a declared ParameterSlot, name evidence, or route the case: a question can never carry a formula or a rate. `when` uses the shared predicate language (always, all, any, not, answered, unanswered, answer_is, slot_present, slot_live, branch_is, stage_open).",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "stage", "type": "ref", "required": true },
+        { "name": "order", "type": "integer", "required": true },
+        { "name": "ask", "type": "string", "required": true },
+        { "name": "ask_fa", "type": "string", "required": false },
+        { "name": "answer_format", "type": "enum", "required": true },
+        { "name": "answers", "type": "array", "required": false },
+        { "name": "when", "type": "predicate", "required": false },
+        { "name": "sets", "type": "array", "required": false },
+        { "name": "requires_evidence", "type": "array", "required": false },
+        { "name": "based_on", "type": "ref", "required": false },
+        { "name": "escalates_to", "type": "array", "required": false },
+        { "name": "guardrail", "type": "ref", "required": false },
+        { "name": "blocking", "type": "enum", "required": true },
+        { "name": "tier", "type": "ref", "required": true },
+        { "name": "why", "type": "string", "required": true }
+      ]
+    },
+    {
+      "id": "EvidenceItem",
+      "note": "A document or artefact. source_class states what kind of authority demands it, which is how an insurer's checklist stays distinguishable from a regulation's duty.",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "name", "type": "string", "required": true },
+        { "name": "name_fa", "type": "string", "required": false },
+        { "name": "source_class", "type": "enum", "required": true },
+        { "name": "sourced_from", "type": "array", "required": true },
+        { "name": "stage", "type": "ref", "required": true },
+        { "name": "required_for_branches", "type": "array", "required": true },
+        { "name": "required_when", "type": "predicate", "required": false },
+        { "name": "affects", "type": "array", "required": true },
+        { "name": "if_absent", "type": "enum", "required": true }
+      ]
+    },
+    {
+      "id": "ParameterSlot",
+      "note": "A value the calculation consumes. The slot records who may supply it, which operator reads it, and what happens when it is absent, so selecting parameters is a declared act rather than a guess.",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "name", "type": "string", "required": true },
+        { "name": "case_field", "type": "string", "required": true },
+        { "name": "unit", "type": "enum", "required": true },
+        { "name": "authority", "type": "enum", "required": true },
+        { "name": "governed_by", "type": "ref", "required": false },
+        { "name": "subject_to", "type": "ref", "required": false },
+        { "name": "supplied_via", "type": "array", "required": true },
+        { "name": "supplied_by", "type": "array", "required": false },
+        { "name": "required_for_branches", "type": "array", "required": false },
+        { "name": "missing_behavior", "type": "enum", "required": true },
+        { "name": "blocking_uncertainty", "type": "ref", "required": false },
+        { "name": "guardrail", "type": "ref", "required": false },
+        { "name": "select", "type": "string", "required": true },
+        { "name": "validation", "type": "string", "required": false }
+      ]
+    },
+    {
+      "id": "CaseTier",
+      "note": "One rung of the iterative completion ladder. Each rung adds exactly one source of complexity, states the outcomes it certifies, and names the calibration that would move the next rung forward.",
+      "properties": [
+        { "name": "node_id", "type": "string", "required": true },
+        { "name": "rank", "type": "integer", "required": true },
+        { "name": "name", "type": "string", "required": true },
+        { "name": "purpose", "type": "string", "required": true },
+        { "name": "gate", "type": "predicate", "required": true },
+        { "name": "reachable_branches", "type": "array", "required": false },
+        { "name": "required_slots", "type": "array", "required": false },
+        { "name": "conditional_slots", "type": "array", "required": false },
+        { "name": "permitted_outcomes", "type": "array", "required": true },
+        { "name": "boundary_cases_required", "type": "array", "required": false },
+        { "name": "example_cases", "type": "array", "required": false },
+        { "name": "exit_evidence", "type": "string", "required": false },
+        { "name": "must_not", "type": "string", "required": false },
+        { "name": "calibration_needed", "type": "array", "required": false },
+        { "name": "next_tier", "type": "ref", "required": false }
+      ]
     }
   ],
 
@@ -265,7 +356,22 @@
     { "id": "about", "from": "Contradiction", "to": "LegalRule", "cardinality": "many-to-many" },
     { "id": "rejects", "from": "Contradiction", "to": "LegalRule", "cardinality": "many-to-many" },
     { "id": "creates", "from": "Payment", "to": "SubrogationRight", "cardinality": "one-to-one" },
-    { "id": "guards", "from": "Guardrail", "to": "Operator", "cardinality": "many-to-many" }
+    { "id": "guards", "from": "Guardrail", "to": "Operator", "cardinality": "many-to-many" },
+
+    { "id": "in_stage", "from": "ReviewQuestion | EvidenceItem", "to": "ReviewStage", "cardinality": "many-to-one", "note": "Where in the investigation the item belongs." },
+    { "id": "requires_evidence", "from": "ReviewQuestion", "to": "EvidenceItem", "cardinality": "many-to-many" },
+    { "id": "based_on", "from": "ReviewQuestion", "to": "LegalRule", "cardinality": "many-to-one", "note": "Why the question is asked. A question with no authority behind it is a preference, and must be marked so." },
+    { "id": "escalates_to", "from": "ReviewQuestion", "to": "Uncertainty", "cardinality": "many-to-many", "note": "The unresolved variable this answer can surface." },
+    { "id": "supplies_slot", "from": "EvidenceItem", "to": "ParameterSlot", "cardinality": "many-to-many" },
+    { "id": "supplied_by", "from": "ParameterSlot", "to": "ReviewQuestion", "cardinality": "many-to-many", "reverse_of": "sets_slot" },
+    { "id": "sets_slot", "from": "ReviewQuestion", "to": "ParameterSlot", "cardinality": "many-to-many", "note": "Carried inside the question's `sets` bindings, so it is not a string reference field; declared here because the loader validates both directions." },
+    { "id": "required_for", "from": "EvidenceItem | ParameterSlot", "to": "Branch", "cardinality": "many-to-many" },
+    { "id": "requires_parameter", "from": "CaseTier", "to": "ParameterSlot", "cardinality": "many-to-many" },
+    { "id": "conditionally_requires_parameter", "from": "CaseTier", "to": "ParameterSlot", "cardinality": "many-to-many" },
+    { "id": "calibrated_by", "from": "CaseTier", "to": "Uncertainty", "cardinality": "many-to-many", "note": "What has to be settled before this rung can certify more than it does today." },
+    { "id": "next_tier", "from": "CaseTier", "to": "CaseTier", "cardinality": "one-to-one" },
+    { "id": "entry_from", "from": "ReviewStage", "to": "ReviewStage", "cardinality": "many-to-many" },
+    { "id": "gates_on_evidence", "from": "ReviewStage", "to": "EvidenceItem", "cardinality": "many-to-many" }
   ],
 
   "branch_aliases": {
@@ -294,6 +400,10 @@
     "knowledge/uncertainties.json": "Uncertainty",
     "knowledge/contradictions.json": "Contradiction",
     "knowledge/exclusions.json": "Exclusion",
-    "knowledge/guards.json": "Guardrail"
+    "knowledge/guards.json": "Guardrail",
+    "knowledge/evidence_items.json": "EvidenceItem",
+    "knowledge/review_procedure.json": "ReviewStage + ReviewQuestion",
+    "knowledge/parameter_slots.json": "ParameterSlot",
+    "knowledge/case_tiers.json": "CaseTier"
   }
 }
