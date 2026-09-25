@@ -25,4 +25,5 @@ jobs:
       - run: python claim.py validate
       - run: python claim.py fixtures
       - run: python -m pytest
+      - run: python scripts/sync_review_docs.py
       - run: python scripts/sync_github_issues.py --repo SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph

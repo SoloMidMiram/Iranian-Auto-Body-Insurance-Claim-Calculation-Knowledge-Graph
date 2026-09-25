@@ -13,6 +13,7 @@ python -m compileall -q claim.py src scripts
 python claim.py validate
 python claim.py fixtures
 python -m pytest
+python scripts/sync_review_docs.py
 python scripts/sync_github_issues.py \
   --repo SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph
 ```
@@ -99,6 +100,26 @@ Every supported calculation must satisfy all of these:
 - Lower, equal, and higher authority with effective-date precedence.
 - Injected failure after each planned write proves atomic rollback.
 - Concurrent writers cannot lose or interleave updates.
+
+### Case review and parameter selection
+
+- A question id outside the procedure, an inadmissible choice token, and a non-numeric
+  money answer are each refused rather than ignored.
+- `UNKNOWN`, `NOT_STATED` and `NOT_REVIEWED` bind nothing and must change the decision.
+- A question whose trigger condition has not been met is reported as "not asked", never
+  as an omission; and one gated off must not contribute evidence demands.
+- No questionnaire binding may carry a numeric literal: answers select tokens, amounts
+  come from a policy slot with a named source.
+- Every slot a body branch requires is reachable by a question, a declared supplier, or
+  derivation from evidenced slots.
+- The case emitted by `review --emit-case` is accepted by `calc` and produces the same
+  payable as the review itself.
+- Ladder assignment excludes the `always` fallback rung, so a well-formed file is not
+  reported as uncertified; every `example_cases` entry must exist in the corpus.
+- Licence state keeps its three-way distinction: void, wrong class and absent defeat
+  cover, expired does not.
+- Refusal, insufficiency and scenario-set decisions each have a worked file in `cases/`
+  and a test that pins the outcome, not only the happy path.
 
 ## Phase acceptance metrics
 

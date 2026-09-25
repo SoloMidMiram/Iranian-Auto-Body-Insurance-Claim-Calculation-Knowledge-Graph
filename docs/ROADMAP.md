@@ -150,6 +150,22 @@ Exit gate:
 - All seven branches and aliases pass the branch matrix.
 - No branch relies on uncontrolled free-text classification.
 
+Delivered toward this phase (2026-09-25):
+
+- The **case-review layer** (`knowledge/review_procedure.json`,
+  `knowledge/parameter_slots.json`, `knowledge/evidence_items.json`,
+  `knowledge/case_tiers.json`, `src/iran_auto_claim/review.py`) supplies the
+  controlled evidence fields that replace keyword-only predicates: 11 gate-ordered
+  stages, 58 questions with closed answer vocabularies, 36 parameter slots declaring
+  who may supply each value and what absence means, and 24 evidence items tagged with
+  the class of authority that demands them.
+- Branch `required_evidence` is now referential data validated against `EvidenceItem`
+  nodes instead of a free-text hint, and the ladder in `knowledge/case_tiers.json`
+  states the permitted terminal state per rung (`claim.py ladder`).
+- Remaining for this phase: the branch execution-plan compiler, graph/code parity
+  proofs that a mutated graph changes execution, and replacing the last keyword
+  predicates in `classify.py` with the evidence fields this layer now produces.
+
 Next-phase preparation:
 
 - Publish the adapter interface and calibration worksheet template.
