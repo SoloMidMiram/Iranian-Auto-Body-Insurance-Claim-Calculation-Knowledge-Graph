@@ -268,7 +268,7 @@ Validated on 2026-10-01:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 305 tests;
+- the complete automated suite passes: 320 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;

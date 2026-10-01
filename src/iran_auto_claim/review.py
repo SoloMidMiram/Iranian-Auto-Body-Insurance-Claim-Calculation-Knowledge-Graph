@@ -30,6 +30,7 @@ from .case import PART_CATEGORIES
 from .classify import classify
 from .engine import CalcResult, compute
 from .knowledge import Knowledge
+from .schema_input import validate_review
 
 # Answers that mean "this file does not say". They bind nothing.
 UNANSWERED_TOKENS = {"", None, "UNKNOWN", "NOT_STATED", "NOT_REVIEWED", "NOT_APPLICABLE_TO_BODY"}
@@ -124,6 +125,7 @@ class Review:
     def __init__(self, payload: dict[str, Any], kb: Knowledge | None = None) -> None:
         if not isinstance(payload, dict):
             raise ReviewInputError("a review payload must be a JSON object")
+        validate_review(payload)
         self.kb = kb or Knowledge.load()
         self.claim_id = str(payload.get("claim_id") or payload.get("id") or "unnamed-review")
         self.unit = payload.get("unit") or "million_toman"
@@ -453,15 +455,17 @@ class Review:
             for item in _as_list(slot_value("PS_PART_CATEGORY")):
                 if isinstance(item, dict):
                     category = str(item.get("category") or "OTHER_REPLACEMENT_PART")
-                    records.append(
-                        {
-                            "name": item.get("name"),
-                            "category": category,
-                            "assessed_loss_irr": item.get("assessed_loss", item.get("assessed_loss_irr", 0)),
-                            "new_price_irr": item.get("new_price", item.get("new_price_irr")),
-                            "requires_replacement": bool(item.get("requires_replacement", True)),
-                        }
-                    )
+                    record: dict[str, Any] = {
+                        "category": category,
+                        "assessed_loss_irr": item.get("assessed_loss", item.get("assessed_loss_irr", 0)),
+                        "requires_replacement": bool(item.get("requires_replacement", True)),
+                    }
+                    if isinstance(item.get("name"), str) and item["name"]:
+                        record["name"] = item["name"]
+                    new_price = item.get("new_price", item.get("new_price_irr"))
+                    if new_price is not None:
+                        record["new_price_irr"] = new_price
+                    records.append(record)
                 elif str(item) in PART_CATEGORIES:
                     records.append({"category": str(item), "assessed_loss_irr": 0})
             return records
@@ -481,7 +485,9 @@ class Review:
             if str(item).upper() not in ("NONE", "HELD", "UNKNOWN", "")
         ]
 
-        event: dict[str, Any] = {"event_date": slot_value("PS_EVENT_DATE")}
+        event: dict[str, Any] = {}
+        if (occurred := slot_value("PS_EVENT_DATE")) is not None:
+            event["event_date"] = occurred
         for key, slot in (
             ("awareness_date", "PS_AWARENESS_DATE"),
             ("declaration_date", "PS_DECLARATION_DATE"),

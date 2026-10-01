@@ -479,7 +479,7 @@ def test_review_cli_refuses_an_unknown_question(capsys, tmp_path):
     from iran_auto_claim.cli import main
 
     bad = tmp_path / "bad.json"
-    bad.write_text(json.dumps({"claim_id": "X", "answers": {"Q-NOPE": "YES"}}), encoding="utf-8")
+    bad.write_text(json.dumps({"claim_id": "X", "answers": {"Q-S9-99": "YES"}}), encoding="utf-8")
     assert main(["review", str(bad)]) == 1
     assert "not a question in the procedure" in capsys.readouterr().out
 

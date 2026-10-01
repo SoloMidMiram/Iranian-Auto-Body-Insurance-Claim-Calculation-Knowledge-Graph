@@ -37,6 +37,7 @@ from .fixtures import run_all
 from .ingest import apply_ingest, load_submission, plan_ingest
 from .knowledge import DEFAULT_ROOT, Knowledge, Node
 from .render import render_claim
+from .schema_input import InputSchemaError, validate_claim
 from .review import (
     Review,
     ReviewInputError,
@@ -120,6 +121,16 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _print_schema_error(error: InputSchemaError) -> None:
+    print(
+        json.dumps(
+            {"ok": False, "errors": [item.to_dict() for item in error.errors]},
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -129,7 +140,11 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     kb = Knowledge.load(args.root)
     handler = _HANDLERS[args.command]
-    return handler(args, kb)
+    try:
+        return handler(args, kb)
+    except InputSchemaError as error:
+        _print_schema_error(error)
+        return 1
 
 
 def _load_case(path: str) -> Case:
@@ -137,6 +152,7 @@ def _load_case(path: str) -> Case:
     if "claim_id" not in payload and "id" in payload:
         payload["claim_id"] = payload["id"]
     payload.setdefault("unit", "million_toman")
+    validate_claim(payload)
     return Case(payload)
 
 
@@ -457,6 +473,7 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
 
     if args.emit_case:
         payload = review.case_payload()
+        validate_claim(payload)
         Path(args.emit_case).write_text(
             json.dumps(payload, ensure_ascii=False, indent=2, default=str),
             encoding="utf-8",
