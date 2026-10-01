@@ -240,6 +240,9 @@ def _copy_graph(tmp_path: Path):
 
     for name in ("ontology", "knowledge"):
         shutil.copytree(REPO_ROOT / name, tmp_path / name)
+    # The tier ladder cites case ids from the validation corpus, so an isolated
+    # graph copy must carry it too or validate() reports every case as unknown.
+    shutil.copytree(REPO_ROOT / "fixtures", tmp_path / "fixtures")
     return Knowledge.load(tmp_path)
 
 

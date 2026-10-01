@@ -1,0 +1,14 @@
+{
+  "claim_id": "REVIEW-T0-INTAKE-PARTIAL",
+  "unit": "million_toman",
+  "note": "Deliberately incomplete: only stage S0 is worked. `claim.py review` must report the next questions instead of guessing, and the decision must stop at INSUFFICIENT_INFORMATION.",
+  "evidence_present": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_LICENCE"],
+  "answers": {
+    "Q-S0-01": "IRAN_INSURANCE / بيمه بدنه 1404",
+    "Q-S0-02": "1404-08-20",
+    "Q-S0-03": "1404-08-20",
+    "Q-S0-04": "ONTIME",
+    "Q-S0-05": "INSURED",
+    "Q-S0-06": "IN_FORCE"
+  }
+}

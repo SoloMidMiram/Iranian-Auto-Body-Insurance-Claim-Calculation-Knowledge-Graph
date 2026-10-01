@@ -1,0 +1,101 @@
+{
+  "claim_id": "REVIEW-T1-FULLCOVER-PARTIAL",
+  "unit": "million_toman",
+  "note": "Rung T1: a fully covered partial loss on a sixth-production-year car. Depreciation is computed from the year index, lamp glass is exempt, the ratio is one so the unresolved operator order cannot change the answer, and every franchise term is sourced. This is the simplest file that may issue one number.",
+  "evidence_present": [
+    "EVT_CLAIM_FORM",
+    "EVT_POLICY_COPY",
+    "EVT_PROPOSAL_FORM",
+    "EVT_PREMIUM_PROOF",
+    "EVT_LICENCE",
+    "EVT_OWNERSHIP_DOCS",
+    "EVT_ASSESSMENT_REPORT",
+    "EVT_MARKET_VALUE_EVIDENCE",
+    "EVT_REPAIR_INVOICE",
+    "EVT_PHOTOS",
+    "EVT_POLICE_CROQUIS",
+    "EVT_PRIOR_CLAIM_HISTORY"
+  ],
+  "answers": {
+    "Q-S0-01": "IRAN_INSURANCE / بيمه بدنه 1404",
+    "Q-S0-02": "1404-08-20",
+    "Q-S0-03": "1404-08-20",
+    "Q-S0-04": "ONTIME",
+    "Q-S0-07": "1404-08-25",
+    "Q-S0-05": "INSURED",
+    "Q-S0-06": "IN_FORCE",
+
+    "Q-S1-01": "PASSENGER_CAR",
+    "Q-S1-02": "LISTED",
+    "Q-S1-03": "INSIDE_IRAN",
+
+    "Q-S2-01": "COLLISION",
+    "Q-S2-02": "ESTABLISHED",
+    "Q-S2-04": "INSURED_AT_FAULT",
+    "Q-S2-09": "CONSISTENT",
+
+    "Q-S3-01": "VALID_AND_APPROPRIATE",
+    "Q-S3-02": "NO",
+    "Q-S3-03": "NO",
+    "Q-S3-04": "NONE",
+    "Q-S3-05": "NONE",
+    "Q-S3-06": "NO",
+    "Q-S3-07": "NO",
+    "Q-S3-08": "NO",
+
+    "Q-S4-01": "ITEMISED",
+    "Q-S4-02": 40,
+    "Q-S4-03": [
+      { "name": "front bumper", "category": "OTHER_REPLACEMENT_PART", "assessed_loss": 120 },
+      { "name": "head lamp glass", "category": "LAMP_GLASS", "assessed_loss": 25 }
+    ],
+    "Q-S4-05": "COMPUTE_FROM_YEAR",
+    "Q-S4-07": 10,
+    "Q-S4-09": "NOT_APPLICABLE",
+    "Q-S4-10": "REPAIRABLE",
+
+    "Q-S5-01": 800,
+    "Q-S5-02": 800,
+    "Q-S5-03": 1399,
+    "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
+
+    "Q-S6-01": "PERCENT",
+    "Q-S6-02": {
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "calculation_base": "AFTER_DEPRECIATION",
+      "claim_sequence_rule": "first claim",
+      "source": "POLICY",
+      "source_reference": "policy schedule 1404, franchise clause",
+      "source_version": "1404"
+    },
+    "Q-S6-03": {
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "calculation_base": "AFTER_DEPRECIATION",
+      "source": "POLICY",
+      "source_version": "1404"
+    },
+    "Q-S6-04": {
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "claim_sequence_rule": "first claim",
+      "source": "POLICY",
+      "source_reference": "policy schedule 1404, franchise clause",
+      "source_version": "1404"
+    },
+    "Q-S6-05": "NO",
+
+    "Q-S7-01": "NO_BODY_ONLY",
+
+    "Q-S8-03": "ASSESSED_GROSS",
+    "Q-S8-04": "CASH",
+
+    "Q-S9-01": "NO",
+    "Q-S9-02": "NO_THIRD_PARTY",
+    "Q-S9-03": 0,
+
+    "Q-S10-01": "adjuster: reviewer-01, decision reconciled 1404-09-02"
+  }
+}
+

@@ -33,8 +33,8 @@
           "expression": "(loss - depreciation - franchise) * ratio + rescue"
         }
       ],
-      "blocking_uncertainties": ["U01_ARTICLE10_PARTIAL_ORDER", "U02_FRANCHISE_BASE_SCHEDULES", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION", "U05_RESCUE_DENOMINATOR"],
-      "required_evidence": ["expert_assessment", "market_value_evidence", "policy_terms"],
+      "blocking_uncertainties": ["U01_ARTICLE10_PARTIAL_ORDER", "U02_FRANCHISE_BASE_SCHEDULES", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION", "U05_RESCUE_DENOMINATOR", "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"],
+      "required_evidence": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_PROPOSAL_FORM", "EVT_LICENCE", "EVT_ASSESSMENT_REPORT", "EVT_MARKET_VALUE_EVIDENCE", "EVT_REPAIR_INVOICE", "EVT_PHOTOS"],
       "note": "When ratio == 1 both scenarios coincide and the engine returns one number even though the order is unresolved."
     },
     {
@@ -55,7 +55,8 @@
       "controlled_by": ["CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE", "REG53_ART19_TOTAL_LOSS_VALUATION"],
       "scenarios": [],
       "guardrails": ["G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS", "G_SALVAGE_XOR_TITLE_TRANSFER", "G_INSURED_SUM_CEILING"],
-      "blocking_uncertainties": ["U05_RESCUE_DENOMINATOR", "U12_SALVAGE_DISPOSITION"],
+      "blocking_uncertainties": ["U05_RESCUE_DENOMINATOR", "U12_SALVAGE_DISPOSITION", "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"],
+      "required_evidence": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_ASSESSMENT_REPORT", "EVT_MARKET_VALUE_EVIDENCE", "EVT_SALVAGE_VALUATION", "EVT_PHOTOS"],
       "note": "The 75% test is strictly greater-than. Where salvage ownership transfers to the insurer, salvage must not also be subtracted."
     },
     {
@@ -85,7 +86,8 @@
           "expression": "(gross - franchise) * ratio"
         }
       ],
-      "blocking_uncertainties": ["U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION"],
+      "blocking_uncertainties": ["U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION", "U14_GLASS_INSURED_AT_VALUE_CONDITION", "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"],
+      "required_evidence": ["EVT_POLICY_COPY", "EVT_ENDORSEMENT_WORDING", "EVT_PHOTOS", "EVT_MARKET_VALUE_EVIDENCE"],
       "note": "Depreciation is 0 for GLASS and LAMP_GLASS: this is the only universal calculation fact established. If the glass damage was caused by a base body peril, the claim is routed to PARTIAL_DAMAGE instead."
     },
     {
@@ -102,7 +104,8 @@
       "order_status_reason": "Whole-vehicle theft routes to its own settlement branch after 60 days with title transfer; attempted-theft damage routes to PARTIAL_DAMAGE; partial parts theft depends on its endorsement.",
       "controlled_by": ["REG53_ART19_THEFT_TOTAL_LOSS_60D"],
       "scenarios": [],
-      "blocking_uncertainties": ["U02_FRANCHISE_BASE_SCHEDULES"],
+      "blocking_uncertainties": ["U02_FRANCHISE_BASE_SCHEDULES", "U13_THEFT_CLOCK_ANCHOR", "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"],
+      "required_evidence": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_MARKET_VALUE_EVIDENCE", "EVT_TITLE_TRANSFER_PROOF"],
       "note": "Whole-vehicle theft is not a partial-loss formula with a different deductible."
     },
     {
@@ -118,6 +121,7 @@
       "controlled_by": ["TPL_LAW_1395_ART8_MIN_FINANCIAL_COMMITMENT", "HIC_ARTICLE8_CONVENTIONAL_DEFINITION"],
       "scenarios": [],
       "blocking_uncertainties": [],
+      "required_evidence": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_ASSESSMENT_REPORT"],
       "note": "No body-policy depreciation or franchise stack is imported into this branch automatically."
     },
     {
@@ -136,6 +140,7 @@
       "controlled_by": ["HIC_ARTICLE8_CORRESPONDING_DAMAGE"],
       "scenarios": [],
       "blocking_uncertainties": ["U06_ARTICLE8_COMPONENT_CATALOGUE", "U07_ANNUAL_CONVENTIONAL_REFERENCE_SET"],
+      "required_evidence": ["EVT_POLICY_COPY", "EVT_ASSESSMENT_REPORT", "EVT_MARKET_VALUE_EVIDENCE"],
       "guardrails": ["G_ARTICLE8_NO_WHOLE_CAR_RATIO", "G_DUAL_LIABILITY_CAP", "G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE"],
       "note": "The non-corresponding excess is a body-insurance candidate, not automatically a debt of the at-fault driver."
     },
@@ -154,6 +159,7 @@
       "controlled_by": ["REG53_ART14_SUBROGATION"],
       "scenarios": [],
       "blocking_uncertainties": ["U09_DIMINUTION_OF_VALUE_TP"],
+      "required_evidence": ["EVT_ARBITRATION_OR_COURT_AWARD", "EVT_POLICY_COPY", "EVT_OTHER_POLICIES"],
       "note": "For an Article 8 vehicle, direct liability stays subject to the corresponding-damage cap. Impairing insurer recourse can trigger denial or recovery."
     }
   ],

@@ -1,0 +1,89 @@
+{
+  "claim_id": "REVIEW-T3-UNDERINSURED-PARTIAL",
+  "unit": "million_toman",
+  "note": "Rung T3: the same shape of loss as the T1 file, but the vehicle is insured at 600 against a market value of 800. The ratio is below one, so the position of the underinsurance relative to the franchise is now load-bearing - and the regulation does not fix it. The correct output is two sourced scenarios, not one number.",
+  "evidence_present": [
+    "EVT_CLAIM_FORM",
+    "EVT_POLICY_COPY",
+    "EVT_PROPOSAL_FORM",
+    "EVT_PREMIUM_PROOF",
+    "EVT_LICENCE",
+    "EVT_OWNERSHIP_DOCS",
+    "EVT_ASSESSMENT_REPORT",
+    "EVT_MARKET_VALUE_EVIDENCE",
+    "EVT_REPAIR_INVOICE",
+    "EVT_PHOTOS",
+    "EVT_PRIOR_CLAIM_HISTORY"
+  ],
+  "answers": {
+    "Q-S0-01": "ASIA / بيمه بدنه 1403",
+    "Q-S0-02": "1404-05-11",
+    "Q-S0-03": "1404-05-11",
+    "Q-S0-04": "ONTIME",
+    "Q-S0-07": "1404-05-14",
+    "Q-S0-05": "FAMILY",
+    "Q-S0-06": "IN_FORCE",
+
+    "Q-S1-01": "PASSENGER_CAR",
+    "Q-S1-02": "LISTED",
+    "Q-S1-03": "INSIDE_IRAN",
+
+    "Q-S2-01": "COLLISION",
+    "Q-S2-02": "ESTABLISHED",
+    "Q-S2-04": "THIRD_PARTY_AT_FAULT",
+    "Q-S2-05": "WITH_OTHER_DAMAGE",
+    "Q-S2-09": "CONSISTENT",
+
+    "Q-S3-01": "VALID_AND_APPROPRIATE",
+    "Q-S3-02": "NO",
+    "Q-S3-03": "NO",
+    "Q-S3-04": "NONE",
+    "Q-S3-05": "NONE",
+    "Q-S3-06": "DONE_WITH_CONSENT",
+    "Q-S3-07": "NO",
+    "Q-S3-08": "NO",
+
+    "Q-S4-01": "ITEMISED",
+    "Q-S4-02": 30,
+    "Q-S4-03": [
+      { "name": "left front door", "category": "OTHER_REPLACEMENT_PART", "assessed_loss": 150 },
+      { "name": "windscreen", "category": "GLASS", "assessed_loss": 45 }
+    ],
+    "Q-S4-05": "COMPUTE_FROM_YEAR",
+    "Q-S4-07": 8,
+    "Q-S4-09": "NOT_APPLICABLE",
+    "Q-S4-10": "REPAIRABLE",
+
+    "Q-S5-01": 800,
+    "Q-S5-02": 600,
+    "Q-S5-03": 1398,
+    "Q-S5-04": "UNDERINSURANCE_CLEAR",
+
+    "Q-S6-01": "PERCENT",
+    "Q-S6-02": {
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "calculation_base": "AFTER_DEPRECIATION",
+      "claim_sequence_rule": "first claim",
+      "source": "POLICY",
+      "source_reference": "policy schedule 1403, franchise clause",
+      "source_version": "1403"
+    },
+    "Q-S6-03": { "calculation_base": "AFTER_DEPRECIATION" },
+    "Q-S6-04": { "claim_sequence_rule": "first claim", "source_version": "1403" },
+    "Q-S6-05": "NO",
+
+    "Q-S7-01": "NO_BODY_ONLY",
+
+    "Q-S8-01": "UNRESOLVED",
+    "Q-S8-03": "ASSESSED_GROSS",
+    "Q-S8-04": "CASH",
+
+    "Q-S9-01": "NO",
+    "Q-S9-02": "IDENTIFIED_INSURED",
+    "Q-S9-03": 0,
+
+    "Q-S10-01": "adjuster: reviewer-02, both scenarios put to the claims department 1404-06-01"
+  }
+}
+

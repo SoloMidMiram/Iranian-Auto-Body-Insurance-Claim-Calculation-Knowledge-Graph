@@ -1,0 +1,179 @@
+{
+  "node_class": "CaseTier",
+  "note": "The iterative completion ladder. Simple cases first: a tier is only declared complete when its own cases reach their expected terminal state, no blocking uncertainty is hidden inside a single payable, and a named reviewer has signed the outcome. Higher tiers add exactly one new source of complexity each, so a failure always points at one operator, one config value, or one missing document. `gate` uses the same predicate language as knowledge/review_procedure.json.",
+  "promotion_rule": [
+    "A tier passes only on its own gate: every example case reaches its expected terminal state.",
+    "A tier may not be promoted over a case whose outcome was produced by a parameter nobody supplied.",
+    "Passing a tier certifies only the outcome class it names; it certifies nothing about the next tier.",
+    "A tier that can produce a single payable must also produce it with a computed confidence and a rule trace."
+  ],
+  "outcome_classes": ["SINGLE_PAYABLE", "SCENARIO_SET", "REFUSE", "PENDING", "ZERO_WITH_REASON", "ESCALATE_REVIEW", "NOT_CERTIFIED"],
+  "tiers": [
+    {
+      "node_id": "T0",
+      "rank": 0,
+      "name": "One number, nothing assumed",
+      "purpose": "Prove the pipeline can pay a fully specified claim without inventing a single input.",
+      "reachable_branches": ["PARTIAL_DAMAGE", "THIRD_PARTY_FINANCIAL"],
+      "gate": {
+        "all": [
+          { "slot_present": "PS_GROSS_DAMAGE" },
+          { "slot_present": "PS_FRANCHISE" },
+          { "not": { "slot_present": "PS_ASSESSED_DEPRECIATION" } },
+          { "not": { "slot_live": "U01_ARTICLE10_PARTIAL_ORDER" } },
+          { "not": { "answer_is": ["Q-S3-05", "HELD"] } },
+          { "answer_is": ["Q-S2-01", ["COLLISION", "OVERTURN", "FIRE", "EXPLOSION", "LIGHTNING"]] }
+        ]
+      },
+      "required_slots": ["PS_EVENT_DATE", "PS_MARKET_VALUE", "PS_INSURED_SUM", "PS_PERIL", "PS_CAUSATION_ESTABLISHED", "PS_GROSS_DAMAGE", "PS_FRANCHISE", "PS_LICENSE_STATE", "PS_INTOXICATION_CAUSAL"],
+      "permitted_outcomes": ["SINGLE_PAYABLE", "ZERO_WITH_REASON"],
+      "example_cases": ["P01", "P07", "G24", "G26", "TP34", "TP38", "TP39"],
+      "exit_evidence": "A payable whose every deduction is traceable to an assessor figure plus one policy term, with no defaulted input.",
+      "must_not": "Do not certify this tier with a case that has an unresolved blocking uncertainty, or where the franchise was defaulted to zero because nobody answered.",
+      "calibration_needed": [],
+      "next_tier": "T1"
+    },
+    {
+      "node_id": "T1",
+      "rank": 1,
+      "name": "Computed deductions",
+      "purpose": "Add the operators that compute rather than copy: the depreciation year index, the component categories, the special-part cap and the rescue ceiling.",
+      "reachable_branches": ["PARTIAL_DAMAGE"],
+      "gate": {
+        "all": [
+          { "slot_present": "PS_PRODUCTION_YEAR" },
+          { "slot_present": "PS_PART_CATEGORY" },
+          { "not": { "slot_live": "U01_ARTICLE10_PARTIAL_ORDER" } }
+        ]
+      },
+      "required_slots": ["PS_PRODUCTION_YEAR", "PS_CLAIM_YEAR", "PS_PART_CATEGORY", "PS_LABOR", "PS_RESCUE_ACTUAL", "PS_RESCUE_CAP_BASE"],
+      "conditional_slots": ["PS_PART_NEW_PRICE", "PS_ASSESSED_DEPRECIATION"],
+      "permitted_outcomes": ["SINGLE_PAYABLE"],
+      "boundary_cases_required": [
+        "year index 4 (no depreciation), 5 (first 5%), and the 25% ceiling",
+        "glass and lamp glass in the same itemised assessment as an ordinary part",
+        "battery or tyre where the cap binds but the vehicle is still too new to depreciate",
+        "rescue below, exactly at, and above the 20% ceiling"
+      ],
+      "example_cases": ["P02", "P03", "P04", "P05", "P06", "P08", "P09", "P12", "G28"],
+      "exit_evidence": "The depreciation figure matches the year index for every part, and the cap binds before any age schedule does.",
+      "must_not": "Do not stack the 50% battery/tyre cap with the age schedule to make this tier pass - that collision belongs to T3.",
+      "calibration_needed": [],
+      "next_tier": "T2"
+    },
+    {
+      "node_id": "T2",
+      "rank": 2,
+      "name": "Branch boundaries",
+      "purpose": "Decide which engine the case belongs to, and prove the boundary is strict rather than rounded.",
+      "reachable_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
+      "gate": {
+        "any": [
+          { "slot_present": "PS_DAYS_MISSING" },
+          { "branch_is": ["TOTAL_LOSS", "GLASS_ONLY", "THEFT"] },
+          { "answer_is": ["Q-S4-09", ["INSURED_RETAINS", "INSURER_TAKES_TITLE", "UNRESOLVED"]] },
+          { "answer_is": ["Q-S4-10", ["TECHNICALLY_IRREPAIRABLE", "ECONOMICALLY_TOTAL"]] },
+          { "answer_is": ["Q-S2-05", "ALONE"] }
+        ]
+      },
+      "required_slots": ["PS_REPAIR_TOTAL", "PS_MARKET_VALUE", "PS_THEFT_TYPE", "PS_DAYS_MISSING", "PS_SALVAGE_DISPOSITION", "PS_TITLE_TRANSFERRED", "PS_GLASS_CAUSE_PRECEDENCE"],
+      "permitted_outcomes": ["SINGLE_PAYABLE", "PENDING", "ZERO_WITH_REASON", "REFUSE"],
+      "boundary_cases_required": [
+        "repair plus rescue below, exactly at, and one unit above 75% of value",
+        "whole-vehicle theft at 59, 60 and 61 days, with and without title transfer",
+        "standalone glass with and without the endorsement; glass broken with other damage",
+        "parts stolen after an accident, which is an exclusion, not a theft branch",
+        "salvage retained versus insurer takes title"
+      ],
+      "example_cases": ["T16", "T17", "T18", "T20", "T22", "T23", "G25", "G26", "P13", "P15", "TH29", "TH30", "TH31", "TH32"],
+      "exit_evidence": "Equality at 75% stays partial; sixty days is total and fifty-nine is pending; a non-compensable peril returns zero with the reason, not a blank.",
+      "must_not": "A declared branch that contradicts the evidence is refused here, not honoured.",
+      "calibration_needed": ["U12_SALVAGE_DISPOSITION", "U13_THEFT_CLOCK_ANCHOR"],
+      "next_tier": "T3"
+    },
+    {
+      "node_id": "T3",
+      "rank": 3,
+      "name": "The ratio is live",
+      "purpose": "Introduce under-insurance, where the correct answer is a set of sourced scenarios rather than one number.",
+      "reachable_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
+      "gate": {
+        "all": [ { "slot_live": "U01_ARTICLE10_PARTIAL_ORDER" } ]
+      },
+      "required_slots": ["PS_UNDERINSURANCE_RATIO", "PS_ARTICLE10_PARTIAL_ORDER", "PS_BATTERY_TIRE_INTERACTION", "PS_RESCUE_CAP_BASE"],
+      "permitted_outcomes": ["SCENARIO_SET", "SINGLE_PAYABLE"],
+      "boundary_cases_required": [
+        "ratio below one in partial damage with a franchise: two scenarios, one blocking uncertainty",
+        "total loss where the ratio must not be applied a second time after the insured-sum cap",
+        "battery or tyre on a vehicle whose depreciation year index has reached five",
+        "ratio exactly one, where both orders coincide and a single payable is honest"
+      ],
+      "example_cases": ["P10", "P11", "T19", "G27"],
+      "exit_evidence": "Every scenario is labelled with the order that produced it, and the confidence drops to the single-interpretation confidence of the unresolved ordering.",
+      "must_not": "Do not average the scenarios, do not pick the flattering one, and do not apply the ratio twice in total loss.",
+      "calibration_needed": ["U01_ARTICLE10_PARTIAL_ORDER", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION", "U05_RESCUE_DENOMINATOR"],
+      "next_tier": "T4"
+    },
+    {
+      "node_id": "T4",
+      "rank": 4,
+      "name": "The contract has not been read yet",
+      "purpose": "Handle claims where the law is settled and the policy wording is missing - the engine must name the artefact it needs.",
+      "reachable_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY", "THEFT", "TOTAL_LOSS"],
+      "gate": {
+        "all": [
+          { "any": [ { "answer_is": ["Q-S3-05", "HELD"] }, { "answer_is": ["Q-S6-01", "NOT_STATED"] }, { "slot_live": "U02_FRANCHISE_BASE_SCHEDULES" } ] }
+        ]
+      },
+      "required_slots": ["PS_ENDORSEMENTS", "PS_FRANCHISE", "PS_GLASS_VALUATION_CONDITION", "PS_SALVAGE_DISPOSITION"],
+      "permitted_outcomes": ["REFUSE", "SCENARIO_SET", "ESCALATE_REVIEW"],
+      "boundary_cases_required": [
+        "an endorsement token with no printed schedule: coverage yes, amount no",
+        "a percentage franchise with no named calculation base or source version",
+        "a glass endorsement whose wording conditions payment on being insured at market value",
+        "an unresolved salvage disposition"
+      ],
+      "example_cases": ["P14", "TH33", "G27", "T21"],
+      "exit_evidence": "The refusal names the document, the coverage line and the field within it that is missing, and no amount is produced.",
+      "must_not": "Never fill a contractual gap with a rate remembered from another insurer, a blog table, or the same company's different product version.",
+      "calibration_needed": ["U02_FRANCHISE_BASE_SCHEDULES", "U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION", "U14_GLASS_INSURED_AT_VALUE_CONDITION"],
+      "next_tier": "T5"
+    },
+    {
+      "node_id": "T5",
+      "rank": 5,
+      "name": "Two policies, one loss",
+      "purpose": "Add allocation: contribution between insurers, prior indemnity, recourse, and the split between an ordinary and a non-conventional vehicle.",
+      "reachable_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL", "LEGAL_RECOVERY"],
+      "gate": {
+        "all": [ { "answer_is": ["Q-S6-05", ["YES_OTHER_POLICIES", "YES_SAME_INSURER"]] } ]
+      },
+      "required_slots": ["PS_MULTIPLE_POLICIES", "PS_SUBROGATION_IMPAIRED", "PS_RISK_INTENSIFICATION", "PS_MARKET_VALUE"],
+      "permitted_outcomes": ["SINGLE_PAYABLE", "ESCALATE_REVIEW", "REFUSE"],
+      "boundary_cases_required": [
+        "another policy already paid part of the loss: this insurer pays its ratio of its own commitment",
+        "the insured released the responsible party: review, not arithmetic",
+        "risk intensified without notice: escalate, because the premium-ratio operator is not implemented",
+        "a non-conventional vehicle where correspondence assessment is absent: refuse rather than invent a ratio"
+      ],
+      "example_cases": ["A40", "A41", "A42", "A46", "A47", "A48", "L49", "L50"],
+      "exit_evidence": "Each payer's share, each cap and each created right of recourse is stated separately, and no party pays twice.",
+      "must_not": "Do not model a third-party cap inside a body branch, and do not treat an Article 8 excess as automatically a debt of the at-fault driver.",
+      "calibration_needed": ["U06_ARTICLE8_COMPONENT_CATALOGUE", "U07_ANNUAL_CONVENTIONAL_REFERENCE_SET", "U09_DIMINUTION_OF_VALUE_TP", "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"],
+      "next_tier": "T6"
+    },
+    {
+      "node_id": "T6",
+      "rank": 6,
+      "name": "Anything not yet certified",
+      "purpose": "The default state for any case outside T0-T5: new peril, new product, new insurer, missing annual parameters, or a rule the graph does not carry.",
+      "reachable_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT", "THIRD_PARTY_FINANCIAL", "ARTICLE_8_NON_CONVENTIONAL", "LEGAL_RECOVERY"],
+      "gate": { "always": true },
+      "permitted_outcomes": ["NOT_CERTIFIED", "ESCALATE_REVIEW"],
+      "exit_evidence": "The file states which rung of the ladder it fell off and what would put it back on.",
+      "must_not": "Reaching this tier is not an error; presenting its answer as a payment decision is.",
+      "calibration_needed": ["U08_DIYAH_1405_PRIMARY", "U10_IMMEDIATE_CAUSE_TERMINOLOGY"],
+      "next_tier": null
+    }
+  ]
+}

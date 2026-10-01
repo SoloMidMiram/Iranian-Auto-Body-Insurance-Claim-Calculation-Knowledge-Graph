@@ -36,6 +36,11 @@ No dependencies beyond the standard library. Python 3.10+.
 ```bash
 python claim.py validate              # integrity gate over the whole graph
 python claim.py fixtures              # run the 50-case P01–L50 validation corpus
+python claim.py review cases/review_t1_fullcover_partial.json --calc
+python claim.py questionnaire --stage S4_DAMAGE_SCOPE
+python claim.py parameters --branch PARTIAL_DAMAGE
+python claim.py ladder                # the iterative completion rungs and their gates
+python claim.py flowchart             # the review-and-calculation flowchart, as mermaid
 python claim.py calc cases/example_partial_resolved.json
 python claim.py calc cases/example_partial_unresolved.json
 python claim.py unknowns              # every unresolved variable, with what resolves it
@@ -48,7 +53,7 @@ python claim.py params --year 1405
 python claim.py ingest submissions/example_conflicting_educational.json
 ```
 
-Tests: `python -m pytest` (258 parametrized cases). Install development/test
+Tests: `python -m pytest` (311 tests). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 
@@ -56,6 +61,37 @@ The two worked examples are the same claim under two configurations. With the
 operator order resolved you get one payable and confidence 0.95; with it
 unresolved you get two scenarios and confidence 0.55, plus an escalation prompt.
 That contrast is the whole point of the model.
+
+## Case review: from a claim file to the right parameters
+
+The engine computes an amount from a claim case. Before it may do that, someone has
+to establish what happened, whether cover applies, and which parameters are sourced.
+That review layer is a gate-ordered questionnaire over the same graph:
+
+```
+FILE → INVESTIGATION → CLASSIFICATION → PARAMETER LOCK → DECISION
+                                            COMPUTE | SCENARIO_SET | REFUSE | INSUFFICIENT
+```
+
+* `knowledge/review_procedure.json` — 11 stages, 58 discriminating questions, each
+  with a closed answer vocabulary, the condition under which it is asked, the
+  parameter slots its answer binds, the evidence it demands and the rung it belongs to.
+* `knowledge/parameter_slots.json` — every value a calculation consumes, with who is
+  allowed to supply it, which operator reads it, and what happens when it is absent.
+* `knowledge/evidence_items.json` — the documents a file must hold, each tagged with
+  the kind of authority that demands it, so an insurer checklist never reads as law.
+* `knowledge/case_tiers.json` — the iterative ladder, T0 (one number, nothing assumed)
+  to T6 (anything not yet certified), each rung adding one source of complexity.
+
+An answer may **select** knowledge but never create it: a questionnaire entry that
+tried to bind a numeric rate fails `validate`. Absence is recorded as `UNKNOWN`,
+`NOT_TRIGGERED` or `NOT_APPLICABLE` and stops the decision, rather than defaulting to
+zero or to a full-cover ratio of one. See the compact
+[`Body Claim Acceptance Model`](docs/BODY_CLAIM_ACCEPTANCE_MODEL.md) for the FAQ-facing
+architecture and calculation contract, and
+[`docs/BODY_CASE_REVIEW_MODEL.md`](docs/BODY_CASE_REVIEW_MODEL.md) for the generated
+questionnaire, parameter-selection matrix and worked traces;
+`python scripts/sync_review_docs.py --write` refreshes the generated tables inside it.
 
 ## Project delivery and safety status
 
@@ -96,13 +132,18 @@ knowledge/uncertainties.json      unresolved variables, blocking flags, resoluti
 knowledge/contradictions.json     the contradiction matrix, resolution + confidence
 knowledge/exclusions.json         Article 5 endorsable vs Article 6 non-compensable
 knowledge/guards.json             guardrails, each with an enforced_in and a triggered_label
+knowledge/evidence_items.json     the documents a claim file must hold, and who demands them
+knowledge/review_procedure.json   review stages and the questionnaire that drives them
+knowledge/parameter_slots.json    every value a calculation consumes, and who may supply it
+knowledge/case_tiers.json         the iterative completion ladder, T0 through T6
 fixtures/cases.json               the P01–L50 corpus, with expected outcomes
 submissions/                      sample ingestion submissions (rejected / superseding)
-cases/                            schema-shaped worked examples
+cases/                            schema-shaped worked examples, plus review answer files
 src/iran_auto_claim/              money, case normalisation, knowledge, operators,
-                                  guards, classify, engine, render, ingest, fixtures, cli
+                                  guards, classify, engine, render, review, ingest,
+                                  fixtures, cli
 tests/                            fixtures, knowledge, operators, engine, guards,
-                                  ingest, money, cli
+                                  ingest, money, cli, review
 ```
 
 `src/iran_auto_claim/knowledge.py` is the only module that reads the knowledge
@@ -271,3 +312,4 @@ insurer documents. In priority order:
 `claim.py ingest` is the supported path for all of them: schema-validated,
 hierarchy-checked, contradiction-flagged, and human-authorised before it changes
 what the engine does.
+

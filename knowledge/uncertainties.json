@@ -248,6 +248,71 @@
       "confidence_of_single_interpretation": 0.7,
       "affected_outputs": ["payable"],
       "release_effect": "changes the payable amount by the salvage value"
+    },
+    {
+      "node_id": "U13_THEFT_CLOCK_ANCHOR",
+      "topic": "THEFT_SIXTY_DAY_CLOCK_ANCHOR",
+      "question": "From which date does the sixty-day unrecovered-vehicle clock run: the theft, the insured's awareness, or the declaration to the insurer?",
+      "blocking": true,
+      "engine_status": "REQUIRES_CASE_INPUT_AND_TEXT_REVALIDATION",
+      "config_field": "event.days_vehicle_missing",
+      "blocks": ["OP_LIABILITY_CAP_INSURED_SUM"],
+      "affects_branches": ["THEFT"],
+      "scenarios": [
+        "From the theft itself, as the total-loss clause is worded",
+        "From the declaration to the insurer, as the payment clause and one insurer's published procedure count",
+        "From the non-discovery enquiry date used by the claims department"
+      ],
+      "known": "The general conditions make an unrecovered whole vehicle a total loss at a minimum of sixty days after the theft, while the payment provision carries a separate clock that starts on declaration of complete documents. Insurer practice pages have been observed anchoring the sixty days on the declaration. The engine models one integer and cannot tell which clock produced it.",
+      "resolved_by": ["SRC_REG53_MIRROR", "SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS", "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE"],
+      "resolution_artefact": "The regulation text with article numbers quoted verbatim from an official copy, plus the insurer's claims instruction stating which date its sixty-day count starts from.",
+      "confidence_of_single_interpretation": 0.5,
+      "affected_outputs": ["status", "payable"],
+      "release_effect": "decides whether a theft claim is pending or settleable",
+      "live_only_when": "theft_type == WHOLE_VEHICLE until an explicit clock anchor and as-of date are modeled"
+    },
+    {
+      "node_id": "U14_GLASS_INSURED_AT_VALUE_CONDITION",
+      "topic": "GLASS_ENDORSEMENT_VALUATION_CONDITION",
+      "question": "Does the standalone-glass cover depend on the vehicle being insured at market value, and does that condition remove the route entirely for an under-insured vehicle?",
+      "blocking": true,
+      "engine_status": "POLICY_TERM_NOT_YET_LOADED",
+      "config_field": "policy.glass_valuation_condition",
+      "blocks": ["OP_FRANCHISE"],
+      "affects_branches": ["GLASS_ONLY"],
+      "scenarios": [
+        "No such condition in this wording: the ordinary pipeline applies",
+        "Condition present: an under-insured vehicle falls back to the base body branch or outside cover",
+        "Condition present with a valuation ceiling on the glass itself"
+      ],
+      "known": "At least one insurer's printed glass endorsement pays the current value of the glass plus installation after a stated franchise, expressly conditional on the vehicle being insured at market price. That is a contract term observed in one company's wording, not a regulation rule, so it must not be generalised across insurers.",
+      "resolved_by": ["SRC_IRANINSURANCE_BODY_ENDORSEMENT_TERMS", "SRC_INSURER_MANUAL_PENDING"],
+      "resolution_artefact": "The actual endorsement wording for the insurer and product version on the claim, including the printed franchise and any valuation condition or ceiling.",
+      "confidence_of_single_interpretation": 0.2,
+      "affected_outputs": ["payable", "branch"],
+      "release_effect": "can change the branch as well as the amount for standalone glass"
+    },
+    {
+      "node_id": "U15_RISK_INTENSIFICATION_PREMIUM_RATIO",
+      "topic": "RISK_INTENSIFICATION_OPERATOR",
+      "question": "How is payment reduced when the risk intensified without notification, and may the underinsurance ratio be used as a substitute?",
+      "blocking": true,
+      "engine_status": "NOT_IMPLEMENTED_DO_NOT_SUBSTITUTE",
+      "config_field": "coverage_gate.risk_intensified",
+      "blocks": ["OP_UNDERINSURANCE_RATIO"],
+      "affects_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
+      "scenarios": [
+        "Reduce by the ratio of the premium charged to the premium appropriate to the intensified risk",
+        "No reduction where the insurer cannot show the intensification caused or worsened the loss"
+      ],
+      "known": "The general conditions provide a premium-ratio reduction for intensification of risk. That is a distinct mechanism from under-insurance: it compares premiums, not insured sum to market value. This engine implements only the underinsurance operator, so a case with intensification must escalate rather than have the ratio reused.",
+      "resolved_by": ["SRC_REG53_MIRROR", "SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS"],
+      "resolution_artefact": "The underwriting record of the premium actually charged, the tariff premium for the intensified risk, and the claims instruction stating how the two are combined.",
+      "confidence_of_single_interpretation": 0.15,
+      "affected_outputs": ["payable"],
+      "release_effect": "prevents a premium-ratio reduction being faked with the underinsurance ratio",
+      "live_only_when": "answer to Q-S3-07 is YES"
     }
   ]
 }
+
