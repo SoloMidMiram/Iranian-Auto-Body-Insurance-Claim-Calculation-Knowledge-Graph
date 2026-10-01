@@ -272,13 +272,101 @@ def test_the_underinsured_file_returns_scenarios_and_names_the_gap(kb):
     assert "UNDERINSURANCE_APPLIED" in result.labels
 
 
-def test_the_pending_theft_file_stops_at_the_sixty_day_criterion(kb):
+def test_the_pending_theft_file_stops_before_the_unanchored_clock_reaches_the_engine(kb):
     review = Review.from_file(CASES / "review_t2_theft_pending.json", kb)
     assert review.classification()["branch"] == "THEFT"
     assert review.tier()["assigned"] == "T2"
-    result = review.calculate()
-    assert result.payable is None
-    assert result.status == "PENDING_60_DAY_CRITERION"
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert "U13_THEFT_CLOCK_ANCHOR" in review.open_uncertainties()
+    assert review.calculate() is None
+
+
+def test_overdue_instalment_is_unresolved_and_lapse_refuses_without_arithmetic(kb, monkeypatch):
+    def unexpected_compute(*args, **kwargs):
+        pytest.fail("a blocked policy must not reach the calculation engine")
+
+    monkeypatch.setattr("iran_auto_claim.review.compute", unexpected_compute)
+    for state, expected in (("INSTALMENT_OVERDUE", DECISION_INSUFFICIENT), ("LAPSED", DECISION_REFUSE)):
+        payload = load("review_t1_fullcover_partial.json")
+        payload["answers"]["Q-S0-06"] = state
+        review = Review(payload, kb)
+        decision = review.decision()
+        assert decision["decision"] == expected
+        if state == "INSTALMENT_OVERDUE":
+            assert decision["refused_by"] == []
+            assert decision["blocking_conditions"] == ["POLICY_CANCELLATION_STATUS_UNRESOLVED"]
+        assert review.calculate() is None
+
+
+def test_collision_and_fire_require_the_remaining_exclusion_answer(kb):
+    for peril in ("COLLISION", "FIRE"):
+        payload = load("review_t1_fullcover_partial.json")
+        payload["answers"]["Q-S2-01"] = peril
+        if peril == "FIRE":
+            payload["answers"]["Q-S2-06"] = "REPORT_WITH_CAUSE"
+            payload["evidence_present"].append("EVT_FIRE_CAUSE_REPORT")
+        assert Review(payload, kb).decision()["decision"] == DECISION_COMPUTE
+        payload["answers"].pop("Q-S3-04")
+        review = Review(payload, kb)
+        assert "Q-S3-04" in review.decision()["open_hard_questions"]
+        assert review.decision()["decision"] == DECISION_INSUFFICIENT
+        assert review.calculate() is None
+        payload["answers"]["Q-S3-04"] = "OVERLOAD"
+        assert Review(payload, kb).decision()["decision"] == DECISION_REFUSE
+
+
+def test_no_stored_whole_theft_day_count_or_title_transfer_clears_u13(kb, monkeypatch):
+    def unexpected_compute(*args, **kwargs):
+        pytest.fail("an unanchored whole-theft clock must not reach the engine")
+
+    monkeypatch.setattr("iran_auto_claim.review.compute", unexpected_compute)
+    for days in (0, 38, 40, 55, 59, 60, 65, 70, 120):
+        payload = load("review_t2_theft_pending.json")
+        payload["answers"]["Q-S2-08"] = days
+        payload["answers"]["Q-S4-06"] = "TRANSFERRED"
+        review = Review(payload, kb)
+        assert review.decision()["decision"] == DECISION_INSUFFICIENT
+        assert "U13_THEFT_CLOCK_ANCHOR" in review.open_uncertainties()
+        assert review.calculate() is None
+        emitted = review.case_payload()
+        assert emitted["damage"]["theft_type"] == "WHOLE_VEHICLE"
+        assert "theft_type" not in emitted["event"]
+        assert emitted["vehicle"]["title_transferred"] is True
+    pending = Review.from_file(CASES / "review_t2_theft_pending.json", kb)
+    assert pending.case_payload()["vehicle"]["title_transferred"] is False
+
+
+def test_missing_event_year_stays_unknown_for_special_parts(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"].pop("Q-S0-02")
+    payload["answers"]["Q-S4-03"] = [{"category": "BATTERY", "assessed_loss": 120, "new_price": 200}]
+    review = Review(payload, kb)
+    assert review.slot_status("PS_CLAIM_YEAR").value is None
+    assert "iranian_year" not in review.case_payload()["regulatory_snapshot"]
+    assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" not in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+
+
+def test_emission_preserves_sourced_dates_causation_mode_ratio_and_year(kb):
+    review = Review.from_file(CASES / "review_t1_fullcover_partial.json", kb)
+    payload = review.case_payload()
+    assert payload["event"]["awareness_date"] == "1404-08-20"
+    assert payload["event"]["declaration_date"] == "1404-08-25"
+    assert payload["coverage_gate"]["causal_relationship_established"] is True
+    assert payload["calculation_config"]["settlement_mode"] == "CASH"
+    assert payload["derived"]["article10_ratio"] == 1.0
+    assert payload["regulatory_snapshot"]["iranian_year"] == 1404
+
+
+def test_glass_with_other_damage_binds_after_the_later_part_list(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S4-03"].append({"category": "GLASS", "assessed_loss": 10})
+    payload["answers"]["Q-S2-05"] = "WITH_OTHER_DAMAGE"
+    review = Review(payload, kb)
+    assert review.slot_status("PS_GLASS_CAUSE_PRECEDENCE").value == "true"
+    assert review.case_payload()["coverage_gate"]["glass_from_base_peril"] is True
+    assert review.classification()["branch"] == "PARTIAL_DAMAGE"
 
 
 def test_a_missing_endorsement_schedule_is_named_not_guessed(kb):

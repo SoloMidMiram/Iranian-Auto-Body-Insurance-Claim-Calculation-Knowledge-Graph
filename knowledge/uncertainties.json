@@ -269,7 +269,7 @@
       "confidence_of_single_interpretation": 0.5,
       "affected_outputs": ["status", "payable"],
       "release_effect": "decides whether a theft claim is pending or settleable",
-      "live_only_when": "theft_type == WHOLE_VEHICLE and days_missing within five days of the threshold"
+      "live_only_when": "theft_type == WHOLE_VEHICLE until an explicit clock anchor and as-of date are modeled"
     },
     {
       "node_id": "U14_GLASS_INSURED_AT_VALUE_CONDITION",
@@ -315,3 +315,4 @@
     }
   ]
 }
+

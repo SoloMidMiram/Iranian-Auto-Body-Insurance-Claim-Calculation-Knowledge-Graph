@@ -37,6 +37,7 @@
     "Q-S3-01": "VALID_AND_APPROPRIATE",
     "Q-S3-02": "NO",
     "Q-S3-03": "NO",
+    "Q-S3-04": "NONE",
     "Q-S3-05": "NONE",
     "Q-S3-06": "DONE_WITH_CONSENT",
     "Q-S3-07": "NO",
@@ -85,3 +86,4 @@
     "Q-S10-01": "adjuster: reviewer-02, both scenarios put to the claims department 1404-06-01"
   }
 }
+

@@ -66,8 +66,8 @@
       "supplied_by": ["Q-S0-02"],
       "supplied_via": ["DERIVED_FROM_OTHER_SLOTS"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
-      "missing_behavior": "DEFAULT_ONE",
-      "select": "Use the Iranian year of the event, not the settlement year: the depreciation year index and the annual parameters are both event-dated. A missing year silently defaults to the current parameter set, so state it when it is defaulted."
+      "missing_behavior": "REFUSE",
+      "select": "Use the Iranian year of the event, not the settlement year. Review preserves a missing event year as unknown and emits no snapshot year. Direct calc still has a legacy year fallback; P0-01 and P1-02 must close that bypass."
     },
     {
       "node_id": "PS_PERIL",
@@ -506,3 +506,4 @@
     }
   ]
 }
+

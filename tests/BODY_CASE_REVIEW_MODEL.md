@@ -58,8 +58,8 @@ Three invariants hold everywhere in this layer:
 3. **The decision belongs to the review layer; the outcome belongs to the engine.**
    Review says whether a file may be run. The engine then says what the claim is
    worth — including "pending" and "nothing payable", which are outcomes, not
-   review failures. The 38-day theft file is the clearest example: it is *complete
-   enough to run* and the answer it gets is `PENDING_60_DAY_CRITERION`.
+   review failures. The whole-vehicle theft file currently remains insufficient:
+   its stored day-count does not identify a clock anchor, so U13 stops the handoff.
 
 ## 2. Execution model
 
@@ -115,15 +115,19 @@ missing, void, or the wrong class, intoxication is confirmed and causal, or the
 vehicle was transferred after an accident that was never declared. An expired
 licence is not in that list. An unpaid instalment on a policy the insurer has
 not cancelled is not in it either: settlement then follows the private
-conditions. The running review still treats `INSTALMENT_OVERDUE` as a refusal;
-that is stricter than the premium article.
+conditions. `INSTALMENT_OVERDUE` therefore stops as
+`INSUFFICIENT_INFORMATION` until cancellation and the private conditions are
+resolved; `LAPSED` still refuses before arithmetic.
 
 Two stops are enforced by review but not yet by direct `calc`. A missing
 production year still yields depreciation of 0, and a missing franchise is
 stored as 0 when calculation is called without the review gate. Review blocks
-both incomplete inputs. It still compares one stored day-count with 60, and
-the theft-clock uncertainty is live only when that count is 55–65, so a count
-anchored on the declaration date can pass the gate.
+both incomplete inputs. U13 is now live for every whole-vehicle theft, and
+review returns `INSUFFICIENT_INFORMATION` without invoking the engine. A count
+of 70 or a confirmed title transfer cannot clear it. The questionnaire still
+records only an integer; explicit theft-date and as-of-date inputs remain
+work for P1-02/P2-01. A missing event year is omitted from review emission,
+while direct `calc` still defaults to 1405 and remains work for P0-01/P1-02.
 
 ### 2.2 Knowledge graph to calculation engine
 
@@ -270,7 +274,7 @@ the evidence it demands and the rung it belongs to
 | Q-S3-01 | What was the licence position of the driver at the time of the event? | VALID_AND_APPROPRIATE, EXPIRED, VOID_OR_SUSPENDED, WRONG_CLASS, UNLICENSED, NOT_DRIVING, UNKNOWN | PS_LICENSE_STATE | EVT_LICENCE | hard | T0 |
 | Q-S3-02 | Is there a competent-authority finding that alcohol or drugs were used, with a causal link to the loss? | CONFIRMED_AND_CAUSAL, CONFIRMED_NOT_CAUSAL, SUSPECTED_NO_REPORT, NO, UNKNOWN | PS_INTOXICATION_CAUSAL | EVT_JUDICIAL_FINDING | hard | T0 |
 | Q-S3-03 | Any sign of intentional damage by the insured, a beneficiary or the driver, or of loss while fleeing the authorities? | NO, YES_INTENTIONAL, YES_FLIGHT, UNKNOWN | - | EVT_JUDICIAL_FINDING | hard | T0 |
-| Q-S3-04 | Do any of the remaining non-compensable conditions apply? _(asked when: `{"not": {"answer_is": ["Q-S2-01", ["COLLISION", "FIRE"]]}}`)_ | NONE, WAR_OR_NUCLEAR, UNAUTHORIZED_TOWING, OVERLOAD, INHERENT_ELECTRICAL, UNKNOWN | - | EVT_ASSESSMENT_REPORT | hard | T1 |
+| Q-S3-04 | Do any of the remaining non-compensable conditions apply? | NONE, WAR_OR_NUCLEAR, UNAUTHORIZED_TOWING, OVERLOAD, INHERENT_ELECTRICAL, UNKNOWN | - | EVT_ASSESSMENT_REPORT | hard | T1 |
 | Q-S3-05 | Which endorsements does this policy actually carry? | NONE, HELD, UNKNOWN | PS_ENDORSEMENTS | EVT_POLICY_COPY, EVT_ENDORSEMENT_WORDING | amount | T1 |
 | Q-S3-06 | Was the vehicle moved or repaired before the insurer's consent or inspection? | NO, DONE_WITH_CONSENT, DONE_WITHOUT_CONSENT, POLICE_ORDERED_MOVE, UNKNOWN | - | EVT_REPAIR_CONSENT, EVT_PHOTOS | review | T1 |
 | Q-S3-07 | Did the risk or the use of the vehicle intensify without notifying the insurer? | NO, YES, UNKNOWN | PS_RISK_INTENSIFICATION | EVT_RISK_INTENSIFICATION_RECORD | review | T2 |
@@ -331,7 +335,7 @@ where people most often get it wrong.
 | PS_AWARENESS_DATE | date | REGULATION | Q-S0-03 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_BATTERY_TIRE_INTERACTION | enum | ADJUSTER_CONFIG | Q-S8-02 | SCENARIO_SET | U04_BATTERY_TIRE_CAP_VS_DEPRECIATION | - | PARTIAL_DAMAGE |
 | PS_CAUSATION_ESTABLISHED | boolean | REGULATION | Q-S2-02 | REFUSE | - | G_NO_ASSUMED_CAUSATION | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
-| PS_CLAIM_YEAR | integer | DERIVED | Q-S0-02 | DEFAULT_ONE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
+| PS_CLAIM_YEAR | integer | DERIVED | Q-S0-02 | REFUSE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_DAYS_MISSING | integer | REGULATION | Q-S2-08 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
 | PS_DECLARATION_DATE | date | REGULATION | Q-S0-07 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_ENDORSEMENTS | list | POLICY | Q-S3-05 | REFUSE | U03_GLASS_ONLY_ENDORSEMENT_WORDING | G_NO_GUESSED_ENDORSEMENT_TERMS | GLASS_ONLY, THEFT, PARTIAL_DAMAGE |
@@ -452,7 +456,7 @@ Where the implementation actually stands against that ladder, measured by
 |---|---|---|
 | T0 | certified | single payable, every deduction traceable, no defaulted input |
 | T1 | certified | `cases/review_t1_fullcover_partial.json` → 165.70 m-toman, confidence 0.95 |
-| T2 | certified for the boundaries the corpus covers | theft pending at 59 days, total at 60/61, equality at 75% stays partial |
+| T2 | tested boundary behavior; review theft handoff remains blocked | legacy engine fixtures exercise 59/60/61 days, but review requires a sourced clock anchor; equality at 75% stays partial |
 | T3 | returns scenarios, does not certify one number | `cases/review_t3_underinsured_partial.json` → two outcomes, confidence 0.55 |
 | T4 | refuses with the artefact named | `cases/review_t4_glass_terms_missing.json` |
 | T5 | refuses where correspondence is absent | `TP37`, `U06`/`U07` remain open |
@@ -469,7 +473,7 @@ authority for anything above that. That matches the release posture in
 |---|---|---|---|
 | `review_t0_intake_partial.json` | T4 | `INSUFFICIENT_INFORMATION` | 27 questions still open, earliest is in S1/S2; the ladder already sees that nobody has read the franchise schedule |
 | `review_t1_fullcover_partial.json` | T1 | `COMPUTE` | 165.70 m-toman single payable, trace of five rules, confidence 0.95 |
-| `review_t2_theft_pending.json` | T2 | `COMPUTE` | engine answers `PENDING_60_DAY_CRITERION` at 38 days; title not transferred, enquiry demanded |
+| `review_t2_theft_pending.json` | T2 | `INSUFFICIENT_INFORMATION` | U13 blocks every unanchored whole-vehicle theft; engine is not invoked |
 | `review_t3_underinsured_partial.json` | T3 | `SCENARIO_SET` | 139.625 / 144.6875 m-toman, `U01` live, confidence capped at 0.55 |
 | `review_t4_glass_terms_missing.json` | T4 | `INSUFFICIENT_INFORMATION` | coverage exists through the endorsement, its schedule does not; `U02`/`U03`/`U11` live |
 | `review_refuse_wrong_licence.json` | T0 | `REFUSE` | licence class wrong: no depreciation, franchise or ratio is ever computed |
@@ -559,3 +563,4 @@ amount-affecting):**
   judgement (`Q-S0-04`) rather than computing it.
 * **Free-text answers are confined to identification and sign-off** (`Q-S0-01`,
   `Q-S10-01`). A narrative field can never move an amount, by construction.
+

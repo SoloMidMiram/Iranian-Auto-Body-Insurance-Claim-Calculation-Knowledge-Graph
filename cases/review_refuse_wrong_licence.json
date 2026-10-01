@@ -30,6 +30,7 @@
     "Q-S3-01": "WRONG_CLASS",
     "Q-S3-02": "NO",
     "Q-S3-03": "NO",
+    "Q-S3-04": "NONE",
     "Q-S3-05": "NONE",
     "Q-S3-06": "NO",
     "Q-S3-07": "NO",
@@ -65,3 +66,4 @@
     "Q-S10-01": "adjuster: reviewer-05, refusal notified to the insured 1404-02-28"
   }
 }
+

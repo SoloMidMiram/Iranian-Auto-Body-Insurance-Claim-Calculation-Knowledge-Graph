@@ -274,18 +274,21 @@ class Review:
             self._bound[slot_id] = value
 
     def bind(self) -> None:
-        """Run every question's bindings in procedure order."""
-        for question in self.kb.ordered_questions():
-            if not self.is_answered(question["node_id"]):
-                continue
-            when = question.get("when")
-            if when and not self.holds(when):
-                continue
-            for binding in question.get("sets") or []:
-                if not isinstance(binding, dict):
+        """Bind in order, then resolve gates depending on later-recorded slots."""
+        for _ in range(2):
+            self._classification_cache = None
+            for question in self.kb.ordered_questions():
+                if not self.is_answered(question["node_id"]):
                     continue
-                self._apply_binding(question, binding)
-        self._derive_dependent_slots()
+                when = question.get("when")
+                if when and not self.holds(when):
+                    continue
+                for binding in question.get("sets") or []:
+                    if not isinstance(binding, dict):
+                        continue
+                    self._apply_binding(question, binding)
+            self._derive_dependent_slots()
+        self._classification_cache = None
 
     def _derive_dependent_slots(self) -> None:
         """Recompute the slots that are functions of other slots, never of opinions.
@@ -401,16 +404,15 @@ class Review:
             parts = [item for item in _as_list(slot("PS_PART_CATEGORY")) if isinstance(item, dict)]
             special = any(str(item.get("category")) in ("BATTERY", "TIRE") for item in parts)
             year = slot("PS_PRODUCTION_YEAR")
-            claim_year = slot("PS_CLAIM_YEAR") or self.kb.annual_raw.get("default_year", 1405)
-            index = (int(claim_year) - int(year) + 1) if year else 0
+            claim_year = slot("PS_CLAIM_YEAR")
+            index = (int(claim_year) - int(year) + 1) if year is not None and claim_year is not None else 0
             return special and index >= 5
         if uncertainty_id == "U05_RESCUE_DENOMINATOR":
             return _is_number(slot("PS_RESCUE_ACTUAL")) and money.D(slot("PS_RESCUE_ACTUAL")) > 0
         if uncertainty_id == "U12_SALVAGE_DISPOSITION":
             return str(slot("PS_SALVAGE_DISPOSITION") or "") == "UNRESOLVED"
         if uncertainty_id == "U13_THEFT_CLOCK_ANCHOR":
-            days = slot("PS_DAYS_MISSING")
-            return str(slot("PS_THEFT_TYPE") or "") == "WHOLE_VEHICLE" and isinstance(days, int) and 55 <= days <= 65
+            return str(slot("PS_THEFT_TYPE") or "") == "WHOLE_VEHICLE"
         if uncertainty_id == "U14_GLASS_INSURED_AT_VALUE_CONDITION":
             return branch == "GLASS_ONLY" and str(slot("PS_GLASS_VALUATION_CONDITION") or "") == (
                 "REQUIRES_INSURED_AT_MARKET_VALUE"
@@ -480,12 +482,15 @@ class Review:
         ]
 
         event: dict[str, Any] = {"event_date": slot_value("PS_EVENT_DATE")}
+        for key, slot in (
+            ("awareness_date", "PS_AWARENESS_DATE"),
+            ("declaration_date", "PS_DECLARATION_DATE"),
+        ):
+            if (value := slot_value(slot)) is not None:
+                event[key] = value
         if peril := slot_value("PS_PERIL"):
             event["cause"] = peril
             event["peril"] = peril
-        if theft := slot_value("PS_THEFT_TYPE"):
-            if str(theft) != "NOT_A_THEFT":
-                event["theft_type"] = str(theft)
         if days := slot_value("PS_DAYS_MISSING"):
             event["days_vehicle_missing"] = days
         licence = slot_value("PS_LICENSE_STATE")
@@ -511,10 +516,12 @@ class Review:
             vehicle["salvage_value_irr"] = salvage
         if (disposition := slot_value("PS_SALVAGE_DISPOSITION")) is not None:
             vehicle["salvage_disposition"] = disposition
-        if str(slot_value("PS_TITLE_TRANSFERRED") or "").lower() == "true":
-            vehicle["title_transferred"] = True
+        if (transferred := slot_value("PS_TITLE_TRANSFERRED")) is not None:
+            vehicle["title_transferred"] = str(transferred).lower() == "true"
 
         damage: dict[str, Any] = {}
+        if (theft := slot_value("PS_THEFT_TYPE")) is not None and str(theft) != "NOT_A_THEFT":
+            damage["theft_type"] = str(theft)
         if parts:
             damage["parts"] = parts
         for key, slot in (
@@ -532,12 +539,19 @@ class Review:
             ("article10_partial_order", "PS_ARTICLE10_PARTIAL_ORDER"),
             ("battery_tire_depreciation_interaction", "PS_BATTERY_TIRE_INTERACTION"),
             ("rescue_cap_base", "PS_RESCUE_CAP_BASE"),
+            ("settlement_mode", "PS_SETTLEMENT_MODE"),
         ):
             value = slot_value(slot)
             if value is not None and str(value) != "UNRESOLVED":
                 config[key] = value
 
         coverage: dict[str, Any] = {}
+        for key, slot in (
+            ("causal_relationship_established", "PS_CAUSATION_ESTABLISHED"),
+            ("glass_from_base_peril", "PS_GLASS_CAUSE_PRECEDENCE"),
+        ):
+            if (value := slot_value(slot)) is not None:
+                coverage[key] = str(value).lower() == "true"
         if str(slot_value("PS_NOTICE_TIMELINESS") or "").lower() == "true":
             coverage["late_notice_issue"] = True
         if str(slot_value("PS_SUBROGATION_IMPAIRED") or "").lower() == "true":
@@ -551,7 +565,10 @@ class Review:
         payload: dict[str, Any] = {
             "claim_id": self.claim_id,
             "unit": self.unit,
-            "regulatory_snapshot": {"iranian_year": slot_value("PS_CLAIM_YEAR") or 1405},
+            "regulatory_snapshot": (
+                {"iranian_year": slot_value("PS_CLAIM_YEAR")}
+                if slot_value("PS_CLAIM_YEAR") is not None else {}
+            ),
             "classification": {},
             "vehicle": vehicle,
             "event": event,
@@ -568,6 +585,10 @@ class Review:
             "evidence": evidence,
             "coverage_gate": coverage,
             "calculation_config": config,
+            "derived": (
+                {"article10_ratio": slot_value("PS_UNDERINSURANCE_RATIO")}
+                if slot_value("PS_UNDERINSURANCE_RATIO") is not None else {}
+            ),
         }
         branch = None if getattr(self, "_classification_guard", False) else self.classification().get("branch")
         classification: dict[str, Any] = {}
@@ -804,6 +825,11 @@ class Review:
         refused_by = self.refusal_reasons()
 
         evidence_blocks = self.stopping_evidence()
+        blocking_conditions = []
+        if str(self.answer("Q-S0-06") or "").upper() == "INSTALMENT_OVERDUE":
+            blocking_conditions.append("POLICY_CANCELLATION_STATUS_UNRESOLVED")
+        if self.uncertainty_is_live("U13_THEFT_CLOCK_ANCHOR"):
+            blocking_conditions.append("THEFT_CLOCK_ANCHOR_UNRESOLVED")
 
         if refused_by:
             kind = DECISION_REFUSE
@@ -811,6 +837,7 @@ class Review:
             branch is None
             or self.has_blocking_questions(blocking_open)
             or evidence_blocks
+            or blocking_conditions
         ):
             kind = DECISION_INSUFFICIENT
         elif self.open_uncertainties():
@@ -827,6 +854,7 @@ class Review:
             "open_hard_questions": hard_open,
             "open_blocking_questions": blocking_open,
             "evidence_blocks": evidence_blocks,
+            "blocking_conditions": blocking_conditions,
             "live_uncertainties": self.open_uncertainties(),
             "missing_evidence": [entry["item"] for entry in self.missing_evidence()],
         }
@@ -873,7 +901,7 @@ class Review:
     def refusal_reasons(self) -> list[str]:
         """Coverage-gate answers that stop the file before arithmetic."""
         reasons: list[str] = []
-        if str(self.answer("Q-S0-06") or "").upper() in ("LAPSED", "INSTALMENT_OVERDUE"):
+        if str(self.answer("Q-S0-06") or "").upper() == "LAPSED":
             reasons.append("policy not in force on the event date (Q-S0-06)")
         if str(self.answer("Q-S1-03") or "").upper() == "OUTSIDE_NO_AGREEMENT":
             reasons.append("loss outside the territorial scope with no special agreement (Q-S1-03)")
@@ -959,6 +987,12 @@ class Review:
             add("REFUSALS ESTABLISHED BY THE FILE")
             for reason in decision["refused_by"]:
                 add(f"  - {reason}")
+            add("")
+
+        if decision["blocking_conditions"]:
+            add("UNRESOLVED ACCEPTANCE CONDITIONS")
+            for condition in decision["blocking_conditions"]:
+                add(f"  - {condition}")
             add("")
 
         nxt = self.next_questions(limit=8)

@@ -142,7 +142,7 @@ path before they affect acceptance or arithmetic.
 |---|---|---|
 | Missing franchise terms | `INSUFFICIENT_INFORMATION`; never zero | Review gate enforced and regression-tested; direct low-level `calc` remains an unsafe bypass |
 | Missing production year where depreciation can apply | `INSUFFICIENT_INFORMATION`; never assume 0% | Review gate enforced and regression-tested; direct low-level `calc` remains an unsafe bypass |
-| Theft-clock anchor ambiguity | Return pending/anchor scenarios or request the dated source; never pick a clock silently | Represented by `U13`; a structured multi-anchor clock is still an engineering gap |
+| Theft-clock anchor ambiguity | Return pending/anchor scenarios or request the dated source; never pick a clock silently | U13 blocks every whole-vehicle theft in review; no engine handoff until explicit clock inputs are modeled |
 | Underinsurance order unresolved | Return both approved scenarios; never choose or average | Enforced by `U01` and the partial-loss engine |
 
 These gates separate two kinds of uncertainty:
@@ -327,3 +327,4 @@ Every answer should use this shape, even when no amount is produced:
 
 The natural-language response should lead with the decision, explain why, list only
 the next necessary questions, and show arithmetic only after the acceptance gate.
+
