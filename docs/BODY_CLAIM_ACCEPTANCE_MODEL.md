@@ -268,7 +268,7 @@ Validated on 2026-10-01:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 301 tests;
+- the complete automated suite passes: 305 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
@@ -281,8 +281,9 @@ Remaining gaps, in priority order:
 2. Prevent public/FAQ callers from reaching the low-level calculator without an
    accepted review token; direct calculation can still default missing franchise or
    year inputs.
-3. Verify evidence, rather than trusting `evidence_present`, and record document
-   identity, issuer, date, version, and hash.
+3. The evidence id list's `if_absent` token is enforced. Document contents are still
+   not verified: the gate trusts `evidence_present` rather than recording identity,
+   issuer, date, version, and hash.
 4. Reconcile a declared branch again at the engine boundary or require a signed
    classification artifact.
 5. Drive uncertainty liveness from graph predicates instead of duplicating it in

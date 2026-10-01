@@ -765,6 +765,20 @@ class Knowledge:
                 issues.append(
                     f"evidence {item_id}: unknown if_absent {node.get('if_absent')!r}"
                 )
+            if node.get("if_absent") == "REDUCE_CONFIDENCE":
+                raw = node.get("confidence_if_absent")
+                try:
+                    cap = D(raw)
+                except (ValueError, ArithmeticError):
+                    issues.append(
+                        f"evidence {item_id}: REDUCE_CONFIDENCE requires a numeric "
+                        "confidence_if_absent"
+                    )
+                else:
+                    if cap < 0 or cap > 1:
+                        issues.append(
+                            f"evidence {item_id}: confidence_if_absent {raw} is outside 0..1"
+                        )
             if node.get("source_class") not in self.source_class_rank:
                 issues.append(f"evidence {item_id}: unknown source_class {node.get('source_class')!r}")
             issues.extend(

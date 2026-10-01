@@ -458,7 +458,8 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
     if args.emit_case:
         payload = review.case_payload()
         Path(args.emit_case).write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+            json.dumps(payload, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
         )
         print(f"wrote derived case to {args.emit_case}")
 
@@ -466,7 +467,7 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
         document = review.to_json()
         if not args.calc:
             document["calculation"] = None
-        print(json.dumps(document, ensure_ascii=False, indent=2))
+        print(json.dumps(document, ensure_ascii=False, indent=2, default=str))
         return 0
 
     print(review.report())

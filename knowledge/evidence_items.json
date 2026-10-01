@@ -129,7 +129,9 @@
       "obtained_from": "the insured or the inspection station",
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "affects": ["branch", "amount"],
-      "if_absent": "REDUCE_CONFIDENCE"
+      "if_absent": "REDUCE_CONFIDENCE",
+      "confidence_if_absent": 0.8,
+      "note": "confidence_if_absent is an uncertified implementation ceiling, not a Regulation 53 rate. It caps a calculated result when this document is listed as absent."
     },
     {
       "node_id": "EVT_POLICE_CROQUIS",
@@ -222,9 +224,10 @@
       "stage": "S4_DAMAGE_SCOPE",
       "obtained_from": "notary / insurer",
       "required_for_branches": ["THEFT"],
-      "required_when": { "answer_is": ["Q-S2-07", "WHOLE_VEHICLE"] },
+      "required_when": { "answer_is": ["Q-S4-06", "TRANSFERRED"] },
       "affects": ["amount", "admissibility"],
-      "if_absent": "BLOCK_PARAMETER"
+      "if_absent": "BLOCK_PARAMETER",
+      "note": "Demanded only once the file says title has transferred. A pending clock or an explicit NOT_TRANSFERRED answer is the engine outcome, not a missing document."
     },
     {
       "node_id": "EVT_SALVAGE_VALUATION",
@@ -277,7 +280,9 @@
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "required_when": { "answer_is": ["Q-S6-05", ["YES_OTHER_POLICIES", "YES_SAME_INSURER", "UNKNOWN"]] },
       "affects": ["amount", "recovery"],
-      "if_absent": "REDUCE_CONFIDENCE"
+      "if_absent": "REDUCE_CONFIDENCE",
+      "confidence_if_absent": 0.8,
+      "note": "confidence_if_absent is an uncertified implementation ceiling, not a Regulation 53 rate. It caps a calculated result when this document is listed as absent."
     },
     {
       "node_id": "EVT_ARBITRATION_OR_COURT_AWARD",

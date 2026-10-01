@@ -45,6 +45,10 @@ DECISION_SCENARIO = "SCENARIO_SET"
 DECISION_REFUSE = "REFUSE"
 DECISION_INSUFFICIENT = "INSUFFICIENT_INFORMATION"
 
+# Missing documents with these tokens stop a handoff. ROUTE_TO_REVIEW is reported
+# only, and REDUCE_CONFIDENCE still calculates under the evidence node's cap.
+STOPPING_IF_ABSENT = frozenset({"REFUSE_INTAKE", "BLOCK_PARAMETER", "ESCALATE_INSURER"})
+
 STATUS_RESOLVED = "RESOLVED"
 STATUS_MISSING = "MISSING"
 STATUS_UNANSWERED = "UNANSWERED"
@@ -233,19 +237,6 @@ class Review:
 
     # ------------------------------------------------------------------ binding
 
-    def bind(self) -> None:
-        """Run every question's bindings in procedure order."""
-        for question in self.kb.ordered_questions():
-            if not self.is_answered(question["node_id"]):
-                continue
-            when = question.get("when")
-            if when and not self.holds(when):
-                continue
-            for binding in question.get("sets") or []:
-                if not isinstance(binding, dict):
-                    continue
-                self._apply_binding(question, binding)
-
     def _apply_binding(self, question: dict, binding: dict) -> None:
         slot_id = binding.get("slot")
         slot = self.kb.slot(slot_id or "")
@@ -269,7 +260,7 @@ class Review:
         if slot.get("unit") in ("money", "ratio") and not _is_number(value):
             return  # a qualitative answer cannot be a measurement
         if slot.get("unit") == "money" and fmt == "money":
-            value = int(money.D(value))
+            value = money.D(value)
         if slot.get("unit") == "integer" and fmt != "integer":
             return
 
@@ -314,11 +305,17 @@ class Review:
         if self._bound.get("PS_REPAIR_TOTAL") is None:
             records = [item for item in _as_list(self._bound.get("PS_PART_CATEGORY")) if isinstance(item, dict)]
             if records:
-                total = sum(money.D(item.get("assessed_loss", item.get("assessed_loss_irr", 0)) or 0) for item in records)
+                total = sum(
+                    (
+                        money.D(item.get("assessed_loss", item.get("assessed_loss_irr", 0)) or 0)
+                        for item in records
+                    ),
+                    Decimal(0),
+                )
                 total += money.D(self._bound.get("PS_LABOR") or 0)
-                self._bound["PS_REPAIR_TOTAL"] = int(total)
+                self._bound["PS_REPAIR_TOTAL"] = total
                 if self._bound.get("PS_GROSS_DAMAGE") is None:
-                    self._bound["PS_GROSS_DAMAGE"] = int(total)
+                    self._bound["PS_GROSS_DAMAGE"] = total
 
     def _derive(self, slot_id: str, derivation: str) -> None:
         if derivation == "iranian_year_of_event":
@@ -806,11 +803,15 @@ class Review:
         ]
         refused_by = self.refusal_reasons()
 
+        evidence_blocks = self.stopping_evidence()
+
         if refused_by:
             kind = DECISION_REFUSE
-        elif branch is None:
-            kind = DECISION_INSUFFICIENT
-        elif self.has_blocking_questions(blocking_open):
+        elif (
+            branch is None
+            or self.has_blocking_questions(blocking_open)
+            or evidence_blocks
+        ):
             kind = DECISION_INSUFFICIENT
         elif self.open_uncertainties():
             kind = DECISION_SCENARIO
@@ -825,9 +826,35 @@ class Review:
             "refused_by": refused_by,
             "open_hard_questions": hard_open,
             "open_blocking_questions": blocking_open,
+            "evidence_blocks": evidence_blocks,
             "live_uncertainties": self.open_uncertainties(),
             "missing_evidence": [entry["item"] for entry in self.missing_evidence()],
         }
+
+    def stopping_evidence(self) -> list[str]:
+        """Demanded documents whose absence must stop calculation.
+
+        ``ROUTE_TO_REVIEW`` stays on the report. ``REDUCE_CONFIDENCE`` still
+        calculates, under ``evidence_confidence_cap``.
+        """
+        return [
+            entry["item"]
+            for entry in self.missing_evidence()
+            if entry.get("if_absent") in STOPPING_IF_ABSENT
+        ]
+
+    def evidence_confidence_cap(self) -> Decimal | None:
+        """Lowest ``confidence_if_absent`` among missing REDUCE_CONFIDENCE items."""
+        caps: list[Decimal] = []
+        for entry in self.missing_evidence():
+            if entry.get("if_absent") != "REDUCE_CONFIDENCE":
+                continue
+            node = self.kb.evidence_item(entry["item"]) or {}
+            raw = node.get("confidence_if_absent")
+            if raw is None:
+                continue
+            caps.append(money.D(raw))
+        return min(caps) if caps else None
 
     def has_blocking_questions(self, blocking_open: list[str] | None = None) -> bool:
         """Whether an unanswered question prevents a calculation handoff.
@@ -872,7 +899,14 @@ class Review:
         kind = self.decision()["decision"]
         if kind in (DECISION_REFUSE, DECISION_INSUFFICIENT):
             return None
-        return compute(self.case_payload(), self.kb)
+        result = compute(self.case_payload(), self.kb)
+        cap = self.evidence_confidence_cap()
+        if cap is not None and result.formula_confidence is not None:
+            current = money.D(str(result.formula_confidence))
+            if cap < current:
+                result.formula_confidence = float(cap)
+                result.label("EVIDENCE_CONFIDENCE_REDUCED")
+        return result
 
     # ------------------------------------------------------------------ report
 

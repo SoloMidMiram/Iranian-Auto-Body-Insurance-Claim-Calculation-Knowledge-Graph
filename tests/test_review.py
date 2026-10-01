@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import copy
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
+
 from iran_auto_claim.case import Case
 from iran_auto_claim.engine import compute
 from iran_auto_claim.review import (
@@ -204,6 +206,53 @@ def test_missing_franchise_terms_are_incomplete_not_a_scenario(kb):
     assert review.calculate() is None
 
 
+def _without_evidence(name: str, item_id: str) -> dict:
+    payload = load(name)
+    payload["evidence_present"] = [item for item in payload["evidence_present"] if item != item_id]
+    return payload
+
+
+def test_a_blocking_document_stops_calculation(kb):
+    review = Review(_without_evidence("review_t1_fullcover_partial.json", "EVT_POLICY_COPY"), kb)
+    decision = review.decision()
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "EVT_POLICY_COPY" in decision["missing_evidence"]
+    assert "EVT_POLICY_COPY" in decision["evidence_blocks"]
+    assert review.calculate() is None
+
+
+def test_a_review_only_document_is_reported_and_still_calculated(kb):
+    review = Review(_without_evidence("review_t1_fullcover_partial.json", "EVT_POLICE_CROQUIS"), kb)
+    decision = review.decision()
+    assert decision["decision"] == DECISION_COMPUTE
+    assert "EVT_POLICE_CROQUIS" in decision["missing_evidence"]
+    assert decision["evidence_blocks"] == []
+    assert float(review.calculate().payable) == pytest.approx(165.70)
+
+
+def test_a_confidence_document_caps_the_result_and_still_calculates(kb):
+    review = Review(_without_evidence("review_t1_fullcover_partial.json", "EVT_PHOTOS"), kb)
+    decision = review.decision()
+    cap = kb.evidence_item("EVT_PHOTOS")["confidence_if_absent"]
+    assert decision["decision"] == DECISION_COMPUTE
+    assert "EVT_PHOTOS" in decision["missing_evidence"]
+    result = review.calculate()
+    assert float(result.payable) == pytest.approx(165.70)
+    assert result.formula_confidence == cap
+    assert "EVIDENCE_CONFIDENCE_REDUCED" in result.labels
+
+
+def test_a_fractional_labour_amount_is_not_truncated(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S4-02"] = 40.9
+    review = Review(payload, kb)
+    assert review.slot_status("PS_LABOR").value == Decimal("40.9")
+    assert review.slot_status("PS_REPAIR_TOTAL").value == Decimal("185.9")
+    assert review.slot_status("PS_GROSS_DAMAGE").value == Decimal("185.9")
+    result = review.calculate()
+    assert result.payable == Decimal("166.51")
+
+
 # ----------------------------------------------------------------- other rungs
 
 
@@ -213,6 +262,8 @@ def test_the_underinsured_file_returns_scenarios_and_names_the_gap(kb):
     assert decision["decision"] == DECISION_SCENARIO
     assert decision["tier"] == "T3"
     assert decision["live_uncertainties"] == ["U01_ARTICLE10_PARTIAL_ORDER"]
+    assert "EVT_POLICE_CROQUIS" in decision["missing_evidence"]
+    assert "EVT_POLICE_CROQUIS" not in decision["evidence_blocks"]
 
     result = review.calculate()
     assert result.payable is None
