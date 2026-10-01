@@ -53,7 +53,7 @@ python claim.py params --year 1405
 python claim.py ingest submissions/example_conflicting_educational.json
 ```
 
-Tests: `python -m pytest` (297 parametrized cases). Install development/test
+Tests: `python -m pytest` (301 tests). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 
@@ -86,9 +86,11 @@ FILE → INVESTIGATION → CLASSIFICATION → PARAMETER LOCK → DECISION
 An answer may **select** knowledge but never create it: a questionnaire entry that
 tried to bind a numeric rate fails `validate`. Absence is recorded as `UNKNOWN`,
 `NOT_TRIGGERED` or `NOT_APPLICABLE` and stops the decision, rather than defaulting to
-zero or to a full-cover ratio of one. See
-[`docs/BODY_CASE_REVIEW_MODEL.md`](docs/BODY_CASE_REVIEW_MODEL.md) for the flowchart,
-the full procedure, the parameter-selection matrix and the worked traces;
+zero or to a full-cover ratio of one. See the compact
+[`Body Claim Acceptance Model`](docs/BODY_CLAIM_ACCEPTANCE_MODEL.md) for the FAQ-facing
+architecture and calculation contract, and
+[`docs/BODY_CASE_REVIEW_MODEL.md`](docs/BODY_CASE_REVIEW_MODEL.md) for the generated
+questionnaire, parameter-selection matrix and worked traces;
 `python scripts/sync_review_docs.py --write` refreshes the generated tables inside it.
 
 ## Project delivery and safety status

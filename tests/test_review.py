@@ -23,6 +23,8 @@ from iran_auto_claim.review import (
     Review,
     ReviewInputError,
     ladder_markdown,
+    mermaid_architecture,
+    mermaid_branch_tree,
     mermaid_flowchart,
     parameters_markdown,
     questionnaire_markdown,
@@ -152,6 +154,10 @@ def test_the_derived_case_round_trips_through_the_engine(kb):
     assert payload["classification"]["branch"] == "PARTIAL_DAMAGE"
     assert payload["classification"]["domain"] == "BODY"
     assert payload["policy"]["franchise"]["source"] == "POLICY"
+    assert payload["policy"]["multiple_insurance"] == {
+        "state": "NO",
+        "prior_compensation": 0,
+    }
 
     recomputed = compute(Case(copy.deepcopy(payload)), kb)
     assert recomputed.payable == review.calculate().payable
@@ -172,6 +178,30 @@ def test_the_underinsurance_ratio_is_derived_and_not_asked(kb):
     assert binding.value == pytest.approx(1.0)
     open_ids = {item["id"] for item in review.next_questions()}
     assert "Q-S8-01" not in open_ids, "the ratio is one, so the operator order cannot matter"
+
+
+def test_a_missing_production_year_stops_before_zero_depreciation(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"].pop("Q-S5-03")
+    review = Review(payload, kb)
+
+    decision = review.decision()
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "Q-S5-03" in decision["open_blocking_questions"]
+    assert "Q-S5-03" not in decision["open_hard_questions"]
+    assert review.calculate() is None
+
+
+def test_missing_franchise_terms_are_incomplete_not_a_scenario(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    for question_id in ("Q-S6-01", "Q-S6-02", "Q-S6-03", "Q-S6-04"):
+        payload["answers"].pop(question_id)
+    review = Review(payload, kb)
+
+    decision = review.decision()
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "U02_FRANCHISE_BASE_SCHEDULES" in decision["live_uncertainties"]
+    assert review.calculate() is None
 
 
 # ----------------------------------------------------------------- other rungs
@@ -263,6 +293,8 @@ def test_the_ladder_reports_rungs_in_order_and_the_promotion_rule(kb):
     "marker, text",
     [
         ("flowchart", mermaid_flowchart),
+        ("architecture", mermaid_architecture),
+        ("branch-tree", mermaid_branch_tree),
         ("questionnaire", questionnaire_markdown),
         ("parameters", parameters_markdown),
         ("ladder", ladder_markdown),

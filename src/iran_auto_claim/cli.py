@@ -41,6 +41,8 @@ from .review import (
     Review,
     ReviewInputError,
     ladder_markdown,
+    mermaid_architecture,
+    mermaid_branch_tree,
     mermaid_flowchart,
     parameters_markdown,
     questionnaire_markdown,
@@ -601,6 +603,10 @@ def _cmd_ladder(args: argparse.Namespace, kb: Knowledge) -> int:
 
 def _cmd_flowchart(args: argparse.Namespace, kb: Knowledge) -> int:
     print(mermaid_flowchart(kb))
+    print()
+    print(mermaid_architecture(kb))
+    print()
+    print(mermaid_branch_tree(kb))
     return 0
 
 

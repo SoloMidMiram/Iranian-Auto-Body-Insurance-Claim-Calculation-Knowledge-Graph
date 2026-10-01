@@ -1,5 +1,8 @@
 # Body-insurance case review and calculation model
 
+> Compact FAQ-facing architecture: [Body Claim Acceptance Model](BODY_CLAIM_ACCEPTANCE_MODEL.md).
+> This file is the detailed review procedure and generated implementation reference.
+
 Scope: **بیمه بدنه** — monetary damage to the insured vehicle itself, under the
 general conditions of Regulation 53. Not bodily injury, and not the third-party
 branches, which the same graph carries separately (`THIRD_PARTY_FINANCIAL`,
@@ -58,16 +61,25 @@ Three invariants hold everywhere in this layer:
    review failures. The 38-day theft file is the clearest example: it is *complete
    enough to run* and the answer it gets is `PENDING_60_DAY_CRITERION`.
 
-## 2. Flowchart
+## 2. Execution model
 
-Generated from the graph, so it cannot drift from it
-(`python claim.py flowchart`; verified by `tests/test_review.py`):
+Three diagrams, all printed by `python claim.py flowchart` and parity-checked
+in `tests/test_review.py`. They describe how a file is accepted and how this
+repository runs. They are not a picture of one payable.
+
+### 2.1 Acceptance pipeline
+
+The stages come from the graph. Every path ends at one gate. A missing
+franchise, a missing production year, an unresolved operator order, an unread
+endorsement, or a live risk-intensification flag stops here. The engine is not
+asked to fill the gap with zero, with a ratio of one, or with the underinsurance
+ratio standing in for a premium ratio.
 
 <!-- BEGIN GENERATED: flowchart -->
 
 ```mermaid
 flowchart TD
-  START "Claim file opened" --> S0 "0. Establish the file: dates, insurer, driver, cover in force"
+  START "Claim file opened" --> S0 "0. Establish the file"
   S0 --> S1 "1. Identify the insured subject"
   S1 --> S2 "2. Establish what happened and what caused it"
   S2 --> S3 "3. Test cover before computing"
@@ -78,50 +90,127 @@ flowchart TD
   S7 --> S8 "8. Lock the operators and their order"
   S8 --> S9 "9. Allocation, recourse and double cover"
   S9 --> S10 "10. Decide what may be issued"
-  S10 --> GATE {"Decision gate: what may be issued?"}
-  GATE -- refusal established --> REFUSE "REFUSE: denial with the provision named"
-  GATE -- a hard question still open --> INSUF "INSUFFICIENT_INFORMATION: the open question is printed, no amount"
-  GATE -- classified --> BRANCH{Branch}
-  BRANCH -- GLASS_ONLY --> E_GLASS_ONLY "شکست شیشه به تنهایی: 3 operators, order INSURER_SPECIFIC"
-  E_GLASS_ONLY --> PAY_GLASS_ONLY "SINGLE_PAYABLE: trace + provenance + confidence"
-  E_GLASS_ONLY --> SCEN_GLASS_ONLY "SCENARIO_SET: one outcome per sourced operator order"
-  E_GLASS_ONLY --> STOP_GLASS_ONLY "REFUSE: names the document or term that is missing"
-  SCEN_GLASS_ONLY --> ESC "ESCALATE: insurer, assessor or underwriting"
-  STOP_GLASS_ONLY --> ESC
-  PAY_GLASS_ONLY --> TRACE "Audit trace: rules, operators, provenance, confidence"
-  BRANCH -- PARTIAL_DAMAGE --> E_PARTIAL_DAMAGE "خسارت جزئی: 5 operators, order UNRESOLVED"
-  E_PARTIAL_DAMAGE --> PAY_PARTIAL_DAMAGE "SINGLE_PAYABLE: trace + provenance + confidence"
-  E_PARTIAL_DAMAGE --> SCEN_PARTIAL_DAMAGE "SCENARIO_SET: one outcome per sourced operator order"
-  E_PARTIAL_DAMAGE --> STOP_PARTIAL_DAMAGE "REFUSE: names the document or term that is missing"
-  SCEN_PARTIAL_DAMAGE --> ESC "ESCALATE: insurer, assessor or underwriting"
-  STOP_PARTIAL_DAMAGE --> ESC
-  PAY_PARTIAL_DAMAGE --> TRACE "Audit trace: rules, operators, provenance, confidence"
-  BRANCH -- THEFT --> E_THEFT "سرقت: 2 operators, order RESOLVED"
-  E_THEFT --> PAY_THEFT "SINGLE_PAYABLE: trace + provenance + confidence"
-  E_THEFT --> SCEN_THEFT "SCENARIO_SET: one outcome per sourced operator order"
-  E_THEFT --> STOP_THEFT "REFUSE: names the document or term that is missing"
-  SCEN_THEFT --> ESC "ESCALATE: insurer, assessor or underwriting"
-  STOP_THEFT --> ESC
-  PAY_THEFT --> TRACE "Audit trace: rules, operators, provenance, confidence"
-  BRANCH -- TOTAL_LOSS --> E_TOTAL_LOSS "خسارت کلی: 4 operators, order RESOLVED"
-  E_TOTAL_LOSS --> PAY_TOTAL_LOSS "SINGLE_PAYABLE: trace + provenance + confidence"
-  E_TOTAL_LOSS --> SCEN_TOTAL_LOSS "SCENARIO_SET: one outcome per sourced operator order"
-  E_TOTAL_LOSS --> STOP_TOTAL_LOSS "REFUSE: names the document or term that is missing"
-  SCEN_TOTAL_LOSS --> ESC "ESCALATE: insurer, assessor or underwriting"
-  STOP_TOTAL_LOSS --> ESC
-  PAY_TOTAL_LOSS --> TRACE "Audit trace: rules, operators, provenance, confidence"
-  REFUSE --> ESC
-  INSUF --> ESC
-  ESC --> TRACE
+  S10 --> GATE {"Decision gate"}
+  GATE -- cover defeated --> REFUSE "REFUSE: name the provision, run no arithmetic"
+  GATE -- a required question is open --> INSUF "INSUFFICIENT_INFORMATION: print the question"
+  GATE -- a blocking uncertainty is live --> SCEN "SCENARIO_SET: do not pick or average"
+  GATE -- classified and sourced --> RUN "COMPUTE: hand the case to the engine"
+  REFUSE --> TRACE "Trace: rules, provenance, confidence"
+  INSUF --> TRACE
+  SCEN --> TRACE
+  RUN --> TRACE
 ```
 
 <!-- END GENERATED: flowchart -->
 
-The single **Decision gate** node is the whole point of the design. Every path
-through the stages ends there, and only four exits exist: one number, a set of
-sourced scenarios, a refusal that names the missing document, or an insufficiency
-report that names the next question to ask. There is no edge from the investigation
-stages to a payment figure that bypasses that gate.
+The gate has four exits: refuse with the provision named, print the open
+question, return a scenario set, or hand a sourced case to the engine. Nothing
+in the investigation stages has an edge to a payment figure.
+
+Cover that defeats payment is a refusal, and it is decided before arithmetic:
+the policy is not in force, the loss is outside Iran with no agreement, the
+stated cause is contradicted, the damage was intentional or caused in flight
+from the police, another non-compensable condition applies, the licence is
+missing, void, or the wrong class, intoxication is confirmed and causal, or the
+vehicle was transferred after an accident that was never declared. An expired
+licence is not in that list. An unpaid instalment on a policy the insurer has
+not cancelled is not in it either: settlement then follows the private
+conditions. The running review still treats `INSTALMENT_OVERDUE` as a refusal;
+that is stricter than the premium article.
+
+Two stops are enforced by review but not yet by direct `calc`. A missing
+production year still yields depreciation of 0, and a missing franchise is
+stored as 0 when calculation is called without the review gate. Review blocks
+both incomplete inputs. It still compares one stored day-count with 60, and
+the theft-clock uncertainty is live only when that count is 55–65, so a count
+anchored on the declaration date can pass the gate.
+
+### 2.2 Knowledge graph to calculation engine
+
+Review sits on this path because a file can be refused, or left insufficient,
+without the engine inventing an input. `COMPUTE` and `SCENARIO_SET` are the
+only edges into the engine.
+
+<!-- BEGIN GENERATED: architecture -->
+
+```mermaid
+flowchart TD
+  SRC "Sources"
+  RULE "LegalRule, Circular, or Policy"
+  KG "Knowledge graph"
+  OG "Operator graph"
+  VAL "Validation gate"
+  REV "Review decision"
+  ENG "Calculation engine"
+  OUT "Result, provenance, confidence, uncertainty"
+  SRC --> RULE
+  RULE --> KG
+  KG --> OG
+  OG --> VAL
+  VAL --> REV
+  REV -- "COMPUTE or SCENARIO_SET" --> ENG
+  REV -- "REFUSE or INSUFFICIENT" --> OUT
+  ENG --> OUT
+```
+
+<!-- END GENERATED: architecture -->
+
+### 2.3 Claim branch decision
+
+Selection order is theft, then the 75% test, then standalone glass, then partial
+damage. A repair that is not above 75% is not yet a partial loss: glass is
+still open. Regulation wording and insurer procedure do not currently give this
+repository one normalized anchor for the 60-day theft clock, so `U13` must surface
+whenever the anchor can change the outcome. Reaching 60 days under a sourced anchor
+without a title transfer is `TITLE_TRANSFER_REQUIRED`, which is a different stop
+from `PENDING_60_DAY_CRITERION`. The declaration date also starts the insurer's
+payment period; that is a separate clock.
+Attempted-theft damage is partial damage. Parts taken after the accident are
+an exclusion unless that endorsement has been read.
+
+`review` derives the branch and emits that derivation. `calc` uses a branch
+already written on the case and does not re-check it, so a contradictory
+declaration has to be caught before that handoff.
+
+<!-- BEGIN GENERATED: branch-tree -->
+
+```mermaid
+flowchart TD
+  CLAIM "Cover gate passed"
+  RECON "Reconcile a declared branch with the evidence"
+  REFUSE "REFUSE before arithmetic"
+  THEFT "Theft?"
+  CLOCK "60-day clock under the sourced anchor, and title transferred?"
+  PENDING "PENDING_60_DAY_CRITERION"
+  TITLE "TITLE_TRANSFER_REQUIRED"
+  TSET "Theft total settlement"
+  EXCL "Exclusion unless that endorsement is read"
+  TERMS "INSUFFICIENT: endorsement terms"
+  TOTAL "Repair + replacement + rescue above 75% of day value?"
+  TLOSS "Total loss settlement"
+  GLASS "Standalone glass?"
+  GCALC "Glass calculation, depreciation zero"
+  INSUF "INSUFFICIENT_INFORMATION"
+  PARTIAL "Partial damage"
+  CLAIM --> RECON
+  RECON -- "contradicts the evidence" --> REFUSE
+  RECON -- "agrees, or none declared" --> THEFT
+  THEFT -- "whole vehicle" --> CLOCK
+  CLOCK -- "under 60 days" --> PENDING
+  CLOCK -- "at least 60 days, no title" --> TITLE
+  CLOCK -- "at least 60 days and title transferred" --> TSET
+  THEFT -- "attempted theft" --> PARTIAL
+  THEFT -- "parts after the accident" --> EXCL
+  THEFT -- "partial parts theft" --> TERMS
+  THEFT -- "not a theft" --> TOTAL
+  TOTAL -- "above 75%" --> TLOSS
+  TOTAL -- "not total" --> GLASS
+  GLASS -- "endorsement read" --> GCALC
+  GLASS -- "wording missing" --> INSUF
+  GLASS -- "with other damage, or not glass" --> PARTIAL
+```
+
+<!-- END GENERATED: branch-tree -->
 
 ## 3. Investigation procedure
 
@@ -256,7 +345,7 @@ where people most often get it wrong.
 | PS_LABOR | money | ASSESSOR | Q-S4-02 | TREAT_AS_ZERO | - | - | PARTIAL_DAMAGE |
 | PS_LICENSE_STATE | enum | REGULATION | Q-S3-01 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_MARKET_VALUE | money | REGULATION | Q-S5-01 | ASSESSOR_REQUIRED | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
-| PS_MULTIPLE_POLICIES | list | REGULATION | Q-S6-05, Q-S9-03 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
+| PS_MULTIPLE_POLICIES | object | REGULATION | Q-S6-05, Q-S9-03 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_NOTICE_TIMELINESS | enum | REGULATION | Q-S0-04 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_PART_CATEGORY | enum | REGULATION | Q-S4-03 | REFUSE | - | - | PARTIAL_DAMAGE, GLASS_ONLY |
 | PS_PART_NEW_PRICE | money | REGULATION | Q-S4-04 | REFUSE | U04_BATTERY_TIRE_CAP_VS_DEPRECIATION | - | PARTIAL_DAMAGE |

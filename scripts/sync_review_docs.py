@@ -24,6 +24,8 @@ sys.path.insert(0, str(ROOT / "src"))
 from iran_auto_claim.knowledge import Knowledge  # noqa: E402
 from iran_auto_claim.review import (  # noqa: E402
     ladder_markdown,
+    mermaid_architecture,
+    mermaid_branch_tree,
     mermaid_flowchart,
     parameters_markdown,
     questionnaire_markdown,
@@ -35,6 +37,8 @@ DOC = ROOT / "docs" / "BODY_CASE_REVIEW_MODEL.md"
 def blocks(kb: Knowledge) -> dict[str, str]:
     return {
         "flowchart": mermaid_flowchart(kb),
+        "architecture": mermaid_architecture(kb),
+        "branch-tree": mermaid_branch_tree(kb),
         "questionnaire": questionnaire_markdown(kb),
         "parameters": parameters_markdown(kb),
         "ladder": ladder_markdown(kb),

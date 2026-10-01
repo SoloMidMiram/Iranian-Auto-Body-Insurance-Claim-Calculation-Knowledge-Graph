@@ -475,6 +475,7 @@ class Review:
                     record["new_price_irr"] = new_price
 
         franchise = slot_value("PS_FRANCHISE")
+        multiple_insurance = slot_value("PS_MULTIPLE_POLICIES")
         endorsements = [
             str(item).upper()
             for item in _as_list(slot_value("PS_ENDORSEMENTS"))
@@ -561,6 +562,11 @@ class Review:
             "policy": {
                 "endorsements": endorsements,
                 **({"franchise": franchise} if isinstance(franchise, dict) else {}),
+                **(
+                    {"multiple_insurance": multiple_insurance}
+                    if isinstance(multiple_insurance, dict)
+                    else {}
+                ),
             },
             "evidence": evidence,
             "coverage_gate": coverage,
@@ -792,14 +798,19 @@ class Review:
         """What the pipeline may issue now. This is the only gate that answers it."""
         classification = self.classification()
         branch = classification.get("branch")
-        hard_open = [item for item in self.blocking_unanswered()]
+        blocking_open = self.blocking_unanswered()
+        hard_open = [
+            item
+            for item in blocking_open
+            if (self.kb.question(item) or {}).get("blocking") == "hard"
+        ]
         refused_by = self.refusal_reasons()
 
         if refused_by:
             kind = DECISION_REFUSE
         elif branch is None:
             kind = DECISION_INSUFFICIENT
-        elif self.has_hard_blockers(hard_open):
+        elif self.has_blocking_questions(blocking_open):
             kind = DECISION_INSUFFICIENT
         elif self.open_uncertainties():
             kind = DECISION_SCENARIO
@@ -813,15 +824,23 @@ class Review:
             "tier": self.tier()["assigned"],
             "refused_by": refused_by,
             "open_hard_questions": hard_open,
+            "open_blocking_questions": blocking_open,
             "live_uncertainties": self.open_uncertainties(),
             "missing_evidence": [entry["item"] for entry in self.missing_evidence()],
         }
 
-    def has_hard_blockers(self, hard_open: list[str] | None = None) -> bool:
-        hard_open = hard_open if hard_open is not None else self.blocking_unanswered()
+    def has_blocking_questions(self, blocking_open: list[str] | None = None) -> bool:
+        """Whether an unanswered question prevents a calculation handoff.
+
+        ``hard`` questions prevent classification and ``amount`` questions leave an
+        engine input unset. Both stop the handoff. Treating only the first group as
+        blocking allowed a missing production year to become zero depreciation and
+        allowed a missing franchise to become a misleading scenario decision.
+        """
+        blocking_open = blocking_open if blocking_open is not None else self.blocking_unanswered()
         return any(
-            (self.kb.question(item) or {}).get("blocking") == "hard"
-            for item in hard_open
+            (self.kb.question(item) or {}).get("blocking") in ("hard", "amount")
+            for item in blocking_open
         )
 
     def refusal_reasons(self) -> list[str]:
@@ -1023,9 +1042,13 @@ def _q(text: str) -> str:
 
 
 def mermaid_flowchart(kb: Knowledge) -> str:
-    """The review-and-calculation flowchart, drawn from the graph itself."""
+    """Acceptance pipeline: stages, then the one gate that may issue a result.
+
+    Body branches are not drawn here. Each used to repeat the same three exits,
+    which hid the gate. Branch selection is ``mermaid_branch_tree``.
+    """
     lines = ["```mermaid", "flowchart TD"]
-    lines.append(f"  START {_q('Claim file opened')} --> S0 {_q('0. Establish the file: dates, insurer, driver, cover in force')}")
+    lines.append(f"  START {_q('Claim file opened')} --> S0 {_q('0. Establish the file')}")
     previous = "S0"
     for stage in kb.ordered_stages():
         node_id = stage["node_id"].split("_", 1)[0]
@@ -1035,30 +1058,97 @@ def mermaid_flowchart(kb: Knowledge) -> str:
         lines.append("  %s --> %s %s" % (previous, node_id, _q(label)))
         previous = node_id
 
-    lines.append('  %s --> GATE {"Decision gate: what may be issued?"}' % previous)
-    lines.append(f"  GATE -- refusal established --> REFUSE {_q('REFUSE: denial with the provision named')}")
-    lines.append(f"  GATE -- a hard question still open --> INSUF {_q('INSUFFICIENT_INFORMATION: the open question is printed, no amount')}")
-    lines.append("  GATE -- classified --> BRANCH{Branch}")
-    for branch in sorted(kb.branches):
-        info = kb.branch(branch) or {}
-        if info.get("domain") != "BODY":
-            continue
-        operators = len(info.get("operators") or [])
-        label = "%s: %s operators, order %s" % (
-            info.get("label_fa", ""),
-            operators,
-            info.get("order_status"),
-        )
-        lines.append("  BRANCH -- %s --> E_%s %s" % (branch, branch, _q(label)))
-        lines.append(f"  E_{branch} --> PAY_{branch} {_q('SINGLE_PAYABLE: trace + provenance + confidence')}")
-        lines.append(f"  E_{branch} --> SCEN_{branch} {_q('SCENARIO_SET: one outcome per sourced operator order')}")
-        lines.append(f"  E_{branch} --> STOP_{branch} {_q('REFUSE: names the document or term that is missing')}")
-        lines.append(f"  SCEN_{branch} --> ESC {_q('ESCALATE: insurer, assessor or underwriting')}")
-        lines.append(f"  STOP_{branch} --> ESC")
-        lines.append(f"  PAY_{branch} --> TRACE {_q('Audit trace: rules, operators, provenance, confidence')}")
-    lines.append("  REFUSE --> ESC")
-    lines.append("  INSUF --> ESC")
-    lines.append("  ESC --> TRACE")
+    lines.append('  %s --> GATE {"Decision gate"}' % previous)
+    lines.append(f"  GATE -- cover defeated --> REFUSE {_q('REFUSE: name the provision, run no arithmetic')}")
+    lines.append(f"  GATE -- a required question is open --> INSUF {_q('INSUFFICIENT_INFORMATION: print the question')}")
+    lines.append(f"  GATE -- a blocking uncertainty is live --> SCEN {_q('SCENARIO_SET: do not pick or average')}")
+    lines.append(f"  GATE -- classified and sourced --> RUN {_q('COMPUTE: hand the case to the engine')}")
+    lines.append(f"  REFUSE --> TRACE {_q('Trace: rules, provenance, confidence')}")
+    lines.append("  INSUF --> TRACE")
+    lines.append("  SCEN --> TRACE")
+    lines.append("  RUN --> TRACE")
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def _link(src: str, dst: str, via: str | None = None) -> str:
+    if via:
+        return f'  {src} -- "{via}" --> {dst}'
+    return f"  {src} --> {dst}"
+
+
+def mermaid_architecture(kb: Knowledge) -> str:
+    """Repository execution path, from sources to a traced result."""
+    del kb  # the path is the runtime, not a projection of one node class
+    nodes = [
+        ("SRC", "Sources"),
+        ("RULE", "LegalRule, Circular, or Policy"),
+        ("KG", "Knowledge graph"),
+        ("OG", "Operator graph"),
+        ("VAL", "Validation gate"),
+        ("REV", "Review decision"),
+        ("ENG", "Calculation engine"),
+        ("OUT", "Result, provenance, confidence, uncertainty"),
+    ]
+    lines = ["```mermaid", "flowchart TD"]
+    lines.extend(f"  {node_id} {_q(label)}" for node_id, label in nodes)
+    chain = ["SRC", "RULE", "KG", "OG", "VAL", "REV"]
+    for left, right in zip(chain, chain[1:]):
+        lines.append(_link(left, right))
+    lines.append(_link("REV", "ENG", "COMPUTE or SCENARIO_SET"))
+    lines.append(_link("REV", "OUT", "REFUSE or INSUFFICIENT"))
+    lines.append(_link("ENG", "OUT"))
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def mermaid_branch_tree(kb: Knowledge) -> str:
+    """Body-branch selection after the cover gate.
+
+    A failed 75% test is not yet partial damage: standalone glass is still open.
+    The theft-clock anchor must be sourced; declaration also starts a separate
+    payment period.
+    """
+    del kb
+    nodes = [
+        ("CLAIM", "Cover gate passed"),
+        ("RECON", "Reconcile a declared branch with the evidence"),
+        ("REFUSE", "REFUSE before arithmetic"),
+        ("THEFT", "Theft?"),
+        ("CLOCK", "60-day clock under the sourced anchor, and title transferred?"),
+        ("PENDING", "PENDING_60_DAY_CRITERION"),
+        ("TITLE", "TITLE_TRANSFER_REQUIRED"),
+        ("TSET", "Theft total settlement"),
+        ("EXCL", "Exclusion unless that endorsement is read"),
+        ("TERMS", "INSUFFICIENT: endorsement terms"),
+        ("TOTAL", "Repair + replacement + rescue above 75% of day value?"),
+        ("TLOSS", "Total loss settlement"),
+        ("GLASS", "Standalone glass?"),
+        ("GCALC", "Glass calculation, depreciation zero"),
+        ("INSUF", "INSUFFICIENT_INFORMATION"),
+        ("PARTIAL", "Partial damage"),
+    ]
+    links = [
+        ("CLAIM", "RECON", None),
+        ("RECON", "REFUSE", "contradicts the evidence"),
+        ("RECON", "THEFT", "agrees, or none declared"),
+        ("THEFT", "CLOCK", "whole vehicle"),
+        ("CLOCK", "PENDING", "under 60 days"),
+        ("CLOCK", "TITLE", "at least 60 days, no title"),
+        ("CLOCK", "TSET", "at least 60 days and title transferred"),
+        ("THEFT", "PARTIAL", "attempted theft"),
+        ("THEFT", "EXCL", "parts after the accident"),
+        ("THEFT", "TERMS", "partial parts theft"),
+        ("THEFT", "TOTAL", "not a theft"),
+        ("TOTAL", "TLOSS", "above 75%"),
+        ("TOTAL", "GLASS", "not total"),
+        ("GLASS", "GCALC", "endorsement read"),
+        ("GLASS", "INSUF", "wording missing"),
+        ("GLASS", "PARTIAL", "with other damage, or not glass"),
+    ]
+    lines = ["```mermaid", "flowchart TD"]
+    lines.extend(f"  {node_id} {_q(label)}" for node_id, label in nodes)
+    lines.extend(_link(src, dst, via) for src, dst, via in links)
     lines.append("```")
     return "\n".join(lines)
 

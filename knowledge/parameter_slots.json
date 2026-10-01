@@ -440,16 +440,16 @@
     },
     {
       "node_id": "PS_MULTIPLE_POLICIES",
-      "name": "Other policies on the same vehicle and risk",
-      "case_field": "policy.other_policies",
-      "unit": "list",
+      "name": "Other policies and prior compensation for the same loss",
+      "case_field": "policy.multiple_insurance",
+      "unit": "object",
       "authority": "REGULATION",
       "governed_by": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
-      "supplied_by": ["Q-S6-05"],
+      "supplied_by": ["Q-S6-05", "Q-S9-03"],
       "supplied_via": ["INSURED_ANSWER", "POLICY_SCHEDULE"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "Without fraudulent intent the paying insurer settles and then pursues the others; where another policy has already paid part, this insurer pays its ratio of its commitment to total cover. Never let the insured recover twice."
+      "select": "Record both whether another policy covers the same risk and every amount already received for this loss. Without fraudulent intent the paying insurer settles and then pursues contribution; the insured may never recover twice."
     },
     {
       "node_id": "PS_SUBROGATION_IMPAIRED",

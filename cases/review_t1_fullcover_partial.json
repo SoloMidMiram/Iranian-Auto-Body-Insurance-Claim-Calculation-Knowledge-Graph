@@ -92,6 +92,7 @@
 
     "Q-S9-01": "NO",
     "Q-S9-02": "NO_THIRD_PARTY",
+    "Q-S9-03": 0,
 
     "Q-S10-01": "adjuster: reviewer-01, decision reconciled 1404-09-02"
   }
