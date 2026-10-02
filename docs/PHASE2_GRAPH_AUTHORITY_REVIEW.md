@@ -6,13 +6,20 @@ This is a planning checkpoint. It is not a GitHub issue.
 
 - The graph described operators, scenarios, and branch scope.
 - Python owned the ratio-versus-franchise formulas inside the body calculators.
+- During the transition, `graph_partial_payable()` selected a legacy formula
+  instead of walking the recorded sequence itself.
 
 ## After
 
 - Partial and glass scenario order is read from `knowledge/branches.json` sequences.
-- `src/iran_auto_claim/plans.py` applies that sequence. The legacy formulas remain only as the parity comparison.
+- `src/iran_auto_claim/plans.py` now walks the recorded sequence directly. The
+  legacy formulas remain callable only as independent parity oracles in tests.
 - A swapped ratio and franchise sequence changes the scenario amount.
-- Total-loss and theft results record the branch `operators` list as `execution_plan`.
+- Total-loss settlement walks salvage, franchise, rescue, and the insured-sum
+  cap in graph order. Theft walks its smaller recorded plan.
+- Each active body result records the exact sequence and a content-derived plan
+  identity of the branch plus that sequence.
+- A missing, duplicate, or unknown operator refuses the active body plan.
 - Python still executes the approved arithmetic. It does not invent a second order.
 
 ## Verification
