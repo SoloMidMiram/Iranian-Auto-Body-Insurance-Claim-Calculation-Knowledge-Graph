@@ -32,7 +32,7 @@ from typing import Any
 from . import money
 from .case import Case
 from .classify import classify
-from .engine import compute
+from .engine import compute, reconcile_classification
 from .fixtures import run_all
 from .ingest import apply_ingest, load_submission, plan_ingest
 from .knowledge import DEFAULT_ROOT, Knowledge, Node
@@ -216,13 +216,12 @@ def _cmd_json(args: argparse.Namespace, kb: Knowledge) -> int:
 
 def _cmd_classify(args: argparse.Namespace, kb: Knowledge) -> int:
     case = _load_case(args.case)
-    verdict = classify(case, kb)
-    if case.declared_branch:
+    if case.branch in {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"} or case.branch is None:
+        verdict, selected, _ = reconcile_classification(case, kb)
+        verdict["selected_branch"] = selected
+    else:
+        verdict = classify(case, kb)
         verdict["declared_branch"] = case.declared_branch
-        verdict["note"] = (
-            "the engine uses the declared branch and does not re-derive it; the derivation above is "
-            "shown for comparison"
-        )
     print(json.dumps(verdict, ensure_ascii=False, indent=2))
     return 0
 

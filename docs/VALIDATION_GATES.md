@@ -50,6 +50,8 @@ and never changes a persisted or engine input.
 - Negative, boolean, `NaN`, infinite, over-precision, and extremely large money.
 - Missing one of insured sum/market value where the ratio is assessed.
 - Production year after claim year and unsupported Iranian year.
+- Declared/derived classification match, conflict, insufficient evidence, and a
+  documented authorized override with actor, reason, source, and timestamp.
 - Unknown fields, categories, branches, variants, and enum spellings.
 - Numeric strings and string booleans rejected at the claim boundary; JSON `false`
   and numeric zero preserved through normalization.

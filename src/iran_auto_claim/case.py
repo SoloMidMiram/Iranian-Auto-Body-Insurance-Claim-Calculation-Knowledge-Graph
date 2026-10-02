@@ -104,6 +104,7 @@ class Case:
         self.coverage = dict(raw.get("coverage_gate") or {})
 
         classification = dict(raw.get("classification") or {})
+        self.classification_declaration = classification
         declared = classification.get("branch") or raw.get("branch")
         declared = str(declared) if declared else None
         alias = BRANCH_ALIASES.get(declared) if declared else None
@@ -113,6 +114,11 @@ class Case:
             alias["variant"] if alias else classification.get("variant") or raw.get("variant")
         )
         self.domain = classification.get("domain") or DOMAIN_BY_BRANCH.get(self.branch)
+
+    @property
+    def classification_override(self) -> dict[str, Any] | None:
+        value = self.classification_declaration.get("override")
+        return dict(value) if isinstance(value, dict) else None
 
     # ---------------------------------------------------------------- lookups
 

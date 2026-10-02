@@ -201,6 +201,25 @@ def test_review_schema_rejects_an_unknown_top_level_field():
     assert caught.value.errors[0].path == "payable"
 
 
+def test_classification_override_requires_actor_reason_source_and_time():
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "classification": {
+            "branch": "TOTAL_LOSS",
+            "override": {"authorized": True, "actor": "reviewer"},
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    missing = {item.path for item in caught.value.errors if item.code == "missing_field"}
+    assert {
+        "classification.override.reason",
+        "classification.override.source",
+        "classification.override.timestamp",
+    } <= missing
+
+
 def test_public_calc_rejects_a_malformed_case(capsys, tmp_path):
     target = tmp_path / "bad.json"
     target.write_text(json.dumps({"claim_id": "X", "unit": "farsakh"}), encoding="utf-8")

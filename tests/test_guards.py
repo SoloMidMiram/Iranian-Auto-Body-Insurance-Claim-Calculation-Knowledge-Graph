@@ -128,6 +128,7 @@ def test_salvage_is_not_both_deducted_and_transferred(kb):
             "TOTAL_LOSS",
             market=2000,
             insured=2000,
+            repair=1600,
             salvage_value=300,
             salvage_disposition="INSURER_TAKES_TITLE",
             franchise=100,
@@ -141,7 +142,7 @@ def test_salvage_is_not_both_deducted_and_transferred(kb):
 
 def test_salvage_precedes_franchise_under_the_circular(kb):
     result = compute(
-        _case("TOTAL_LOSS", market=2000, insured=2000, salvage_value=300, franchise=100),
+        _case("TOTAL_LOSS", market=2000, insured=2000, repair=1600, salvage_value=300, franchise=100),
         kb,
     )
     assert result.fields["salvage_deduction"] == D(300)
@@ -151,7 +152,7 @@ def test_salvage_precedes_franchise_under_the_circular(kb):
 
 
 def test_unresolved_salvage_disposition_surfaces_an_uncertainty(kb):
-    payload = _case("TOTAL_LOSS", market=2000, insured=2000)
+    payload = _case("TOTAL_LOSS", market=2000, insured=2000, repair=1600)
     payload["vehicle"] = {"salvage_disposition": "UNRESOLVED"}
     result = compute(payload, kb)
     assert result.payable is None
@@ -161,7 +162,7 @@ def test_unresolved_salvage_disposition_surfaces_an_uncertainty(kb):
 
 def test_underinsurance_is_never_applied_to_an_already_capped_base(kb):
     result = compute(
-        _case("TOTAL_LOSS", market=3000, insured=2400, salvage_value=400, franchise=120, rescue_payable=50),
+        _case("TOTAL_LOSS", market=3000, insured=2400, repair=2300, salvage_value=400, franchise=120, rescue_payable=50),
         kb,
     )
     # min(3000, 2400) - 400 - 120 + 50 = 1930; a second 0.8 ratio would give 1544
@@ -176,6 +177,7 @@ def test_insured_sum_ceiling_is_enforced(kb):
             "TOTAL_LOSS",
             market=1000,
             insured=1000,
+            repair=800,
             salvage_value=100,
             franchise=1000,
         ),

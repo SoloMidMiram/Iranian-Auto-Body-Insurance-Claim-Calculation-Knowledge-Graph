@@ -123,6 +123,41 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1
+        },
+        "override": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "authorized",
+            "actor",
+            "reason",
+            "source",
+            "timestamp"
+          ],
+          "properties": {
+            "authorized": {
+              "const": true
+            },
+            "actor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "timestamp": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$"
+            }
+          }
         }
       }
     },
