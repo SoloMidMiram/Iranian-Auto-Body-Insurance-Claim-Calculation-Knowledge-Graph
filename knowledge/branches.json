@@ -78,11 +78,13 @@
         {
           "scenario_id": "A",
           "name": "RATIO_BEFORE_FRANCHISE",
+          "sequence": ["OP_UNDERINSURANCE_RATIO", "OP_FRANCHISE", "OP_RESCUE_CAP"],
           "expression": "gross * ratio - franchise"
         },
         {
           "scenario_id": "B",
           "name": "FRANCHISE_BEFORE_RATIO",
+          "sequence": ["OP_FRANCHISE", "OP_UNDERINSURANCE_RATIO", "OP_RESCUE_CAP"],
           "expression": "(gross - franchise) * ratio"
         }
       ],

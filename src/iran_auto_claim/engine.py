@@ -31,6 +31,13 @@ from . import guards, money, operators
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
 from .classify import classify
 from .knowledge import Knowledge
+from .plans import (
+    FRANCHISE,
+    RATIO,
+    graph_partial_payable,
+    named_sequence,
+    sequences_with_ratio,
+)
 
 UNRESOLVED_ORDER = "UNRESOLVED"
 
@@ -405,26 +412,30 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
     ratio = _ratio(case, res)
     order = str(case.config.get("article10_partial_order", UNRESOLVED_ORDER)).upper()
 
+    branch_plan = kb.branch("PARTIAL_DAMAGE") or {}
     if ratio == 1:
         res.fields["order_used"] = "RATIO_NOT_APPLICABLE"
+        res.fields["execution_plan"] = list(branch_plan.get("operators") or [])
         res.payable = max(Decimal(0), after_depreciation - franchise + rescue)
         return
 
-    if order == "AFTER_DEPRECIATION_BEFORE_FRANCHISE":
+    sequence = named_sequence(branch_plan, order)
+    if sequence and RATIO in sequence and FRANCHISE in sequence:
         res.fields["order_used"] = order
-        res.payable = max(Decimal(0), after_depreciation * ratio - franchise + rescue)
+        res.fields["execution_plan"] = sequence
+        res.payable = graph_partial_payable(
+            after_depreciation, franchise, ratio, rescue, sequence
+        )
         return
 
-    if order == "AFTER_DEPRECIATION_AND_FRANCHISE":
-        res.fields["order_used"] = order
-        res.payable = max(Decimal(0), (after_depreciation - franchise) * ratio + rescue)
-        return
-
-    ratio_first = max(Decimal(0), after_depreciation * ratio - franchise + rescue)
-    franchise_first = max(Decimal(0), (after_depreciation - franchise) * ratio + rescue)
-    res.fields["scenario_ratio_then_franchise"] = ratio_first
-    res.fields["scenario_franchise_then_ratio"] = franchise_first
-    res.payable_scenarios = [ratio_first, franchise_first]
+    scenario_amounts = [
+        graph_partial_payable(after_depreciation, franchise, ratio, rescue, item)
+        for item in sequences_with_ratio(branch_plan)
+    ]
+    res.fields["execution_plan"] = sequences_with_ratio(branch_plan)
+    res.fields["scenario_ratio_then_franchise"] = scenario_amounts[0]
+    res.fields["scenario_franchise_then_ratio"] = scenario_amounts[1]
+    res.payable_scenarios = scenario_amounts
     res.payable = None
     res.status = "ORDER_UNRESOLVED"
     res.fields["order_used"] = UNRESOLVED_ORDER
@@ -445,6 +456,8 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
 
     base = min(market, insured)
     res.fields["settlement_base"] = base
+    active = kb.branch(res.branch or "TOTAL_LOSS") or {}
+    res.fields["execution_plan"] = list(active.get("operators") or [])
     res.note_rule("REG53_ART19_TOTAL_LOSS_VALUATION")
 
     if insured < market:
@@ -568,23 +581,34 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     order = str(case.config.get("article10_partial_order", UNRESOLVED_ORDER)).upper()
     contractually_resolved = bool(case.config.get("glass_article10_order_resolved_by_endorsement"))
 
+    glass_plan = kb.branch("GLASS_ONLY") or {}
     if ratio == 1:
         res.fields["order_used"] = "RATIO_NOT_APPLICABLE"
+        res.fields["execution_plan"] = list(glass_plan.get("operators") or [])
         res.payable = max(Decimal(0), gross - franchise + rescue)
         return
 
-    if contractually_resolved and order == "AFTER_DEPRECIATION_BEFORE_FRANCHISE":
-        res.fields["order_used"] = order
-        res.payable = max(Decimal(0), gross * ratio - franchise + rescue)
-        return
+    if contractually_resolved:
+        ratio_before = order == "AFTER_DEPRECIATION_BEFORE_FRANCHISE"
+        sequence = next(
+            (
+                item
+                for item in sequences_with_ratio(glass_plan)
+                if (item.index(RATIO) < item.index(FRANCHISE)) == ratio_before
+            ),
+            None,
+        )
+        if sequence is not None:
+            res.fields["order_used"] = order
+            res.fields["execution_plan"] = sequence
+            res.payable = graph_partial_payable(gross, franchise, ratio, rescue, sequence)
+            return
 
-    if contractually_resolved and order == "AFTER_DEPRECIATION_AND_FRANCHISE":
-        res.fields["order_used"] = order
-        res.payable = max(Decimal(0), (gross - franchise) * ratio + rescue)
-        return
-
-    ratio_first = max(Decimal(0), gross * ratio - franchise + rescue)
-    franchise_first = max(Decimal(0), (gross - franchise) * ratio + rescue)
+    scenario_amounts = [
+        graph_partial_payable(gross, franchise, ratio, rescue, item)
+        for item in sequences_with_ratio(glass_plan)
+    ]
+    ratio_first, franchise_first = scenario_amounts
     res.fields["scenario_ratio_then_franchise"] = ratio_first
     res.fields["scenario_franchise_then_ratio"] = franchise_first
     res.payable_scenarios = [ratio_first, franchise_first]
