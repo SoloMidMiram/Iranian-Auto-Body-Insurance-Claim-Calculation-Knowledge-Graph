@@ -263,6 +263,27 @@ def _unique(items: list[str]) -> list[str]:
     return ordered
 
 
+def source_integrity_findings_for(source_id: str, source: dict[str, Any]) -> list[str]:
+    """Metadata presence only. A past revalidation date stays a finding."""
+    findings: list[str] = []
+    if not (source.get("locator") or source.get("url")):
+        findings.append(f"source {source_id}: locator missing")
+    if not source.get("content_hash"):
+        findings.append(f"source {source_id}: content hash missing")
+    if not source.get("retrieved_on"):
+        findings.append(f"source {source_id}: retrieval date missing")
+    if not (source.get("effective_from") or source.get("effective_date")) or not source.get(
+        "effective_until"
+    ):
+        findings.append(f"source {source_id}: effective interval incomplete")
+    revalidation = source.get("next_revalidation")
+    if not revalidation:
+        findings.append(f"source {source_id}: revalidation date missing")
+    elif str(revalidation) < "2026-10-02":
+        findings.append(f"source {source_id}: revalidation date is past")
+    return findings
+
+
 def _jalali_date(value: str | None) -> str | None:
     if not isinstance(value, str) or len(value) != 10 or value[4] != "/" or value[7] != "/":
         return None
@@ -928,6 +949,13 @@ class Knowledge:
                 issues.append(f"ontology: node_files entry {rel_path!r} does not exist")
 
         return issues
+
+    def source_integrity_findings(self) -> list[str]:
+        """Incomplete source metadata is visible. It does not fail the release gate."""
+        findings: list[str] = []
+        for source_id, source in self.sources.items():
+            findings.extend(source_integrity_findings_for(source_id, source))
+        return findings
 
     def validate_review(self) -> list[str]:
         """Integrity gate for the review layer: stages, questions, slots, evidence, tiers.

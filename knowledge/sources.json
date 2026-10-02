@@ -18,7 +18,12 @@
         "Circular 1400/401/146850 salvage/franchise ordering",
         "Compulsory Third-Party Insurance Law 1395 (Article 8) as reproduced"
       ],
-      "access_note": "Compilation document; authoritative accessible copy used for statute-level cross-checking."
+      "access_note": "Compilation document; authoritative accessible copy used for statute-level cross-checking.",
+      "locator": "https://centinsur.ir/_douranportal/documents/2277/carinsurance.pdf",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_IRANINSURANCE_REG53",
@@ -33,7 +38,14 @@
       "retrieved_on": "2026-09-18",
       "effective_date": "1384/12/09",
       "access_note": "Direct open timed out during research; clause-level checks used the Central Insurance compilation and the mirror below.",
-      "used_for": ["Regulation 53 approval date and clause structure"]
+      "used_for": [
+        "Regulation 53 approval date and clause structure"
+      ],
+      "locator": "https://www.iraninsurance.ir/fa/w/%D8%A2%DB%8C%DB%8C%D9%86-%D9%86%D8%A7%D9%85%D9%87-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-53-5",
+      "content_hash": null,
+      "effective_from": "1384/12/09",
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_REG53_MIRROR",
@@ -51,7 +63,12 @@
         "Regulation 53 Articles 10-14 (rescue ceiling, duties, subrogation)",
         "Regulation 53 Articles 19-21 (partial/total loss, depreciation, underinsurance, multiple insurance)"
       ],
-      "access_note": "Text mirror used to inspect clause wording; not elevated above the Central Insurance compilation."
+      "access_note": "Text mirror used to inspect clause wording; not elevated above the Central Insurance compilation.",
+      "locator": "https://www.gostareshins.com/%D8%A2%D8%A6%DB%8C%D9%86-%D9%86%D8%A7%D9%85%D9%87-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-53-%D8%A8%DB%8C%D9%85%D9%87-%D8%A8%D8%AF%D9%86%D9%87-%D8%AE%D9%88%D8%AF%D8%B1%D9%88.html",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_HIC_ARTICLE8_INSTRUCTION",
@@ -71,7 +88,12 @@
         "Non-conventional vehicle definition: >= 50%",
         "Component-wise corresponding damage to the most expensive conventional car",
         "Same-part / similar-part rules and highest qualifying part value rule"
-      ]
+      ],
+      "locator": "https://davoudabadi.ir/page/90973652",
+      "content_hash": null,
+      "effective_from": "1396/05/29",
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_CIC_CIRCULAR_1404_06_10",
@@ -89,7 +111,12 @@
         "Article 8 non-corresponding excess may be paid by the victim's own body policy",
         "No regulatory mandate to treat that body payment as a claims-history event or to deduct a franchise",
         "Any such insurer treatment must be disclosed at issuance; ambiguity favours the insured (Regulation 71)"
-      ]
+      ],
+      "locator": "https://www.centinsur.ir/fa-IR/Portal/1/news/view/15628/5736/Staging",
+      "content_hash": null,
+      "effective_from": "1404/06/10",
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_CIC_CIRCULAR_1400_401_146850",
@@ -106,7 +133,12 @@
       "used_for": [
         "Salvage is not itself damage",
         "Total-loss franchise is calculated after probable salvage is deducted"
-      ]
+      ],
+      "locator": "https://centinsur.ir/_douranportal/documents/2277/carinsurance.pdf",
+      "content_hash": null,
+      "effective_from": "1400/09/13",
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_TPL_LAW_1395",
@@ -125,7 +157,12 @@
         "Non-conventional vehicle limitation on financial compensation",
         "Statutory recourse against the at-fault party"
       ],
-      "access_note": "Accessed as Statute Article 8 reproduced inside the Central Insurance motor-insurance compilation."
+      "access_note": "Accessed as Statute Article 8 reproduced inside the Central Insurance motor-insurance compilation.",
+      "locator": "https://centinsur.ir/_douranportal/documents/2277/carinsurance.pdf",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_IRANINSURANCE_CLAIMS_FAQ",
@@ -141,7 +178,12 @@
       "used_for": [
         "Evidence that body franchise rates are insurer-specific (illustration only, never a statutory schedule)"
       ],
-      "access_note": "Page timed out when opened; indexed content only. Must not be elevated above actual policy wording."
+      "access_note": "Page timed out when opened; indexed content only. Must not be elevated above actual policy wording.",
+      "locator": "https://iraninsurance.ir/fa/w/%D8%A2%D9%86%D8%A7%D9%84%DB%8C%D8%B2-%D8%AE%D8%B3%D8%A7%D8%B1%D8%AA-%D9%BE%D8%B1%D8%AF%D8%A7%D8%AE%D8%AA%DB%8C-%DA%86%DA%AF%D9%88%D9%86%D9%87-%D8%A7%D8%B3%D8%AA%D8%9F",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_1405_DIYAH_SECONDARY",
@@ -159,7 +201,12 @@
         "Basis for the derived 1.4bn-toman conventional threshold and 70m-toman minimum financial commitment"
       ],
       "requires_primary_revalidation": true,
-      "access_note": "Secondary source. The 50% and 2.5% derivation rules are primary law; the 1405 diyah base is not yet primary-verified."
+      "access_note": "Secondary source. The 50% and 2.5% derivation rules are primary law; the 1405 diyah base is not yet primary-verified.",
+      "locator": "https://www.bimeh.com/",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_INSURER_MANUAL_PENDING",
@@ -173,7 +220,12 @@
       "url": "n/a",
       "retrieved_on": "2026-09-18",
       "used_for": [],
-      "access_note": "No sufficiently detailed current authoritative public manual was retrieved. The insurer adapter layer is deliberately unpopulated; see uncertainties U02, U03, U06."
+      "access_note": "No sufficiently detailed current authoritative public manual was retrieved. The insurer adapter layer is deliberately unpopulated; see uncertainties U02, U03, U06.",
+      "locator": "n/a",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS",
@@ -192,7 +244,12 @@
         "Confirming the twenty per cent rescue ceiling and the five-working-day notice from awareness",
         "Confirming that the regulation names no expert board and no per-peril document list"
       ],
-      "access_note": "Insurer-hosted copy, opened and read. Still not an official-gazette or Central Insurance copy, so it corroborates numbering but does not upgrade the source tier above PRIMARY_MIRROR."
+      "access_note": "Insurer-hosted copy, opened and read. Still not an official-gazette or Central Insurance copy, so it corroborates numbering but does not upgrade the source tier above PRIMARY_MIRROR.",
+      "locator": "https://www.iraninsurance.ir/fa/w/%D8%B4%D8%B1%D8%A7%DB%8C%D8%B7-%D8%B9%D9%85%D9%88%D9%85%DB%8C-%D8%A8%DB%8C%D9%85%D9%87-%D8%A8%D8%AF%D9%86%D9%87-%D8%A7%D8%AA%D9%88%D9%85%D8%A8%DB%8C%D9%84-2",
+      "content_hash": null,
+      "effective_from": "1384/12/09",
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_IRANINSURANCE_BODY_ENDORSEMENT_TERMS",
@@ -210,7 +267,12 @@
         "Parts theft: ceiling at the lesser of insured or current accessory value, fifty per cent of new for tyres, battery and spare wheel, twenty per cent franchise, insurer right to withdraw the cover after a claim",
         "Loss of use: capped daily indemnity with a three-day franchise, and the price-fluctuation increase cover"
       ],
-      "access_note": "One company's wording. It is evidence for what an endorsement schedule can contain and for the fields the questionnaire must read; it is not authority for other insurers or products. See U03, U11, U14."
+      "access_note": "One company's wording. It is evidence for what an endorsement schedule can contain and for the fields the questionnaire must read; it is not authority for other insurers or products. See U03, U11, U14.",
+      "locator": "https://www.iraninsurance.ir/fa/w/%D8%B4%D8%B1%D8%A7%DB%8C%D8%B7-%D8%B9%D9%85%D9%88%D9%85%DB%8C-%D8%A8%DB%8C%D9%85%D9%87-%D8%A8%D8%AF%D9%86%D9%87-%D8%A7%D8%AA%D9%88%D9%85%D8%A8%DB%8C%D9%84-2",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_IRANINSURANCE_BODY_FRANCHISE_SCHEDULE",
@@ -228,7 +290,12 @@
         "Shows that theft, partial theft and total loss carry their own lines within one schedule"
       ],
       "requires_primary_revalidation": true,
-      "access_note": "No printed version or effective date on the page, and some minimum amounts look legacy. Recorded as a calibration candidate for U02; the engine must not execute any of these rates until a dated instrument is ingested."
+      "access_note": "No printed version or effective date on the page, and some minimum amounts look legacy. Recorded as a calibration candidate for U02; the engine must not execute any of these rates until a dated instrument is ingested.",
+      "locator": "https://www.iraninsurance.ir/fa/w/%D8%AD%D9%82-%D8%A8%DB%8C%D9%85%D9%87-%D9%88-%D9%81%D8%B1%D8%A7%D9%86%D8%B4%DB%8C%D8%B2-%D8%A8%DB%8C%D9%85%D9%87-%D8%A8%D8%AF%D9%86%D9%87-%D8%A7%D8%AA%D9%88%D9%85%D8%A8%DB%8C%D9%84-2",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE",
@@ -245,7 +312,12 @@
         "Per-peril document lists used in practice: croquis and authority reports, fire cause report, police station and criminal investigation files, non-discovery enquiry, ownership and technical-inspection papers",
         "One insurer's statement of the sixty-day theft settlement clock"
       ],
-      "access_note": "A company checklist, not regulation. It supplies the evidence vocabulary of the questionnaire; it cannot supply a formula. See U13."
+      "access_note": "A company checklist, not regulation. It supplies the evidence vocabulary of the questionnaire; it cannot supply a formula. See U13.",
+      "locator": "https://bimeday.ir/%D9%85%D8%B1%D8%A7%D8%AD%D9%84-%D9%88-%D9%85%D8%AF%D8%A7%D8%B1%DA%A9-%D9%84%D8%A7%D8%B2%D9%85-%D8%A8%D8%B1%D8%A7%DB%8C-%D9%BE%D8%B1%D8%AF%D8%A7%D8%AE%D8%AA-%D8%AE%D8%B3%D8%A7%D8%B1%D8%AA-%D8%A8%DB%8C/",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_REG53_MIRROR_DAVOUDABADI",
@@ -261,7 +333,12 @@
       "used_for": [
         "Independent corroboration of article numbering against the other two copies"
       ],
-      "access_note": "Unofficial host. Corroboration only; never the sole authority for an amount-affecting rule."
+      "access_note": "Unofficial host. Corroboration only; never the sole authority for an amount-affecting rule.",
+      "locator": "https://davoudabadi.ir/page/91785462",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     },
     {
       "node_id": "SRC_HIC_DIMINUTION_INSTRUCTION_1403",
@@ -279,7 +356,12 @@
         "Formula shape: age coefficient times accident coefficient times vehicle value over four hundred, capped at twenty per cent of value and excluded above seventy per cent repair cost"
       ],
       "requires_primary_revalidation": true,
-      "access_note": "Single unofficial mirror; the header dates were not cross-checked against an official copy. Relevant to U09, which is a third-party matter and outside the body branches."
+      "access_note": "Single unofficial mirror; the header dates were not cross-checked against an official copy. Relevant to U09, which is a third-party matter and outside the body branches.",
+      "locator": "https://www.ekhtebar.ir/%D8%AF%D8%B3%D8%AA%D9%88%D8%B1%D8%A7%D9%84%D8%B9%D9%85%D9%84-%D9%86%D8%AD%D9%88%D9%87-%D9%85%D8%AD%D8%A7%D8%B3%D8%A8%D9%87-%D8%AE%D8%B3%D8%A7%D8%B1%D8%AA-%DA%A9%D8%B3%D8%B1-%D9%82%DB%8C%D9%85%D8%AA/",
+      "content_hash": null,
+      "effective_from": null,
+      "effective_until": null,
+      "next_revalidation": null
     }
   ]
 }

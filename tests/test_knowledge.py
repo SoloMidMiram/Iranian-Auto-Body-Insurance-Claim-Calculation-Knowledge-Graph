@@ -5,7 +5,12 @@ from __future__ import annotations
 import re
 from decimal import Decimal
 
-from iran_auto_claim.knowledge import OPERATOR_TYPES, SOURCE_CLASSES, resolve_callable
+from iran_auto_claim.knowledge import (
+    OPERATOR_TYPES,
+    SOURCE_CLASSES,
+    resolve_callable,
+    source_integrity_findings_for,
+)
 
 DATE = re.compile(r"^\d{4}[/-]\d{2}[/-]\d{2}$")
 
@@ -216,6 +221,48 @@ def test_authority_findings_stay_visible_and_do_not_rewrite_tiers(kb):
         assert source.get("source_tier") != "PRIMARY" or source["node_id"] not in {
             "SRC_REG53_MIRROR"
         }
+
+
+def test_source_metadata_gaps_are_findings_not_gate_failures(kb):
+    from iran_auto_claim.knowledge import source_integrity_findings_for
+
+    findings = kb.source_integrity_findings()
+    assert any("content hash missing" in finding for finding in findings)
+    assert any("effective interval incomplete" in finding for finding in findings)
+    assert kb.validate() == []
+    past = source_integrity_findings_for(
+        "SRC_EXAMPLE",
+        {
+            "locator": "https://example.invalid/text",
+            "content_hash": "abc",
+            "retrieved_on": "2026-01-01",
+            "effective_from": "1384/12/09",
+            "effective_until": "1400/01/01",
+            "next_revalidation": "2020-01-01",
+        },
+    )
+    assert past == ["source SRC_EXAMPLE: revalidation date is past"]
+    assert "SRC_EXAMPLE: revalidation date is past" not in " ".join(kb.validate())
+
+
+def test_incomplete_source_metadata_is_a_finding_not_a_gate_failure(kb):
+    findings = kb.source_integrity_findings()
+    assert any("content hash missing" in finding for finding in findings)
+    assert any("effective interval incomplete" in finding for finding in findings)
+    assert kb.validate() == []
+    past = source_integrity_findings_for(
+        "SRC_EXAMPLE",
+        {
+            "locator": "https://example.invalid/text",
+            "content_hash": "abc",
+            "retrieved_on": "2020-01-01",
+            "effective_from": "1384/12/09",
+            "effective_until": "1400/01/01",
+            "next_revalidation": "2020-01-01",
+        },
+    )
+    assert past == ["source SRC_EXAMPLE: revalidation date is past"]
+    assert "source SRC_EXAMPLE" not in " ".join(kb.validate())
 
 
 def test_snapshot_follows_the_event_date_and_not_a_current_year(kb):
