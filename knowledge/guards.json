@@ -11,7 +11,7 @@
       "violation_status": "GUARD_VIOLATION_DOUBLE_UNDERINSURANCE",
       "related_rules": ["REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE", "REG53_ART19_TOTAL_LOSS_VALUATION", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"],
       "related_operators": ["OP_LIABILITY_CAP_INSURED_SUM", "OP_UNDERINSURANCE_RATIO"],
-      "exercised_by": ["T19"],
+      "exercised_by": ["T19", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     },
     {
@@ -23,7 +23,7 @@
       "violation_status": "GUARD_VIOLATION_SALVAGE_DOUBLE_COUNT",
       "related_rules": ["REG53_ART19_INSURER_TAKES_TITLE", "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE"],
       "related_operators": ["OP_SALVAGE_DEDUCTION"],
-      "exercised_by": ["T21"],
+      "exercised_by": ["T21", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     },
     {
@@ -35,7 +35,7 @@
       "violation_status": "GUARD_VIOLATION_RESCUE_OVER_CAP",
       "related_rules": ["REG53_RESCUE_TRANSPORT_CAP"],
       "related_operators": ["OP_RESCUE_CAP"],
-      "exercised_by": ["P12"],
+      "exercised_by": ["P12", "tests/test_guard_paths.py"],
       "severity": "HIGH",
       "note": "The triggered label is recorded only because the cap is enforced; it is not itself a guard breach."
     },
@@ -48,7 +48,7 @@
       "violation_status": "GUARD_VIOLATION_ABOVE_INSURED_SUM",
       "related_rules": ["REG53_ART19_TOTAL_LOSS_VALUATION"],
       "related_operators": ["OP_LIABILITY_CAP_INSURED_SUM"],
-      "exercised_by": ["T16", "T20"],
+      "exercised_by": ["T16", "T20", "tests/test_guard_paths.py"],
       "severity": "HIGH"
     },
     {
@@ -60,7 +60,7 @@
       "violation_status": "GUARD_VIOLATION_LIABILITY_CAP",
       "related_rules": ["TPL_LAW_1395_ART8_NON_CONVENTIONAL_LIMIT", "HIC_ARTICLE8_CORRESPONDING_DAMAGE"],
       "related_operators": ["OP_LIABILITY_CAP_FINANCIAL_LIMIT", "OP_CORRESPONDING_DAMAGE"],
-      "exercised_by": ["A42", "A44"],
+      "exercised_by": ["A42", "A44", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     },
     {
@@ -72,7 +72,7 @@
       "violation_status": "GUARD_VIOLATION_ARTICLE8_METHOD",
       "related_rules": ["HIC_ARTICLE8_CORRESPONDING_DAMAGE"],
       "related_operators": ["OP_CORRESPONDING_DAMAGE"],
-      "exercised_by": ["tests/test_guards.py"],
+      "exercised_by": ["tests/test_guards.py", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     },
     {
@@ -84,7 +84,7 @@
       "violation_status": "GUARD_VIOLATION_UNSOURCED_FRANCHISE_RATE",
       "related_rules": ["REG53_POLICY_DEFINED_FRANCHISE"],
       "related_operators": ["OP_FRANCHISE"],
-      "exercised_by": ["tests/test_guards.py"],
+      "exercised_by": ["tests/test_guards.py", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     },
     {
@@ -96,7 +96,7 @@
       "violation_status": "GUARD_VIOLATION_UNIVERSAL_GLASS_FRANCHISE",
       "related_rules": ["REG53_POLICY_DEFINED_FRANCHISE"],
       "related_operators": ["OP_FRANCHISE"],
-      "exercised_by": ["tests/test_guards.py"],
+      "exercised_by": ["tests/test_guards.py", "tests/test_guard_paths.py"],
       "severity": "HIGH"
     },
     {
@@ -108,7 +108,7 @@
       "violation_status": "GUARD_VIOLATION_ASSUMED_EXEMPTION",
       "related_rules": ["REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"],
       "related_operators": ["OP_UNDERINSURANCE_RATIO"],
-      "exercised_by": ["G27"],
+      "exercised_by": ["G27", "tests/test_guard_paths.py"],
       "severity": "HIGH"
     },
     {
@@ -120,7 +120,7 @@
       "violation_status": "GUARD_VIOLATION_UNDISCLOSED_FRANCHISE",
       "related_rules": ["CIC_CIRC_1404_06_10_NO_MANDATORY_FRANCHISE_ON_ART8_EXCESS", "CIC_CIRC_1404_06_10_ARTICLE8_EXCESS_OWN_BODY"],
       "related_operators": ["OP_FRANCHISE"],
-      "exercised_by": ["A47", "A48"],
+      "exercised_by": ["A47", "A48", "tests/test_guard_paths.py"],
       "severity": "HIGH"
     },
     {
@@ -132,7 +132,7 @@
       "violation_status": "GUARD_VIOLATION_ASSUMED_ENDORSEMENT_TERMS",
       "related_rules": ["REG53_ART5_ENDORSABLE_EXCLUSIONS"],
       "related_operators": ["OP_FRANCHISE"],
-      "exercised_by": ["P14", "TH33"],
+      "exercised_by": ["P14", "TH33", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     },
     {
@@ -145,7 +145,7 @@
       "related_rules": ["REG53_ART6_NON_COMPENSABLE"],
       "related_operators": [],
       "related_uncertainties": ["U10_IMMEDIATE_CAUSE_TERMINOLOGY"],
-      "exercised_by": ["P15"],
+      "exercised_by": ["P15", "tests/test_guard_paths.py"],
       "severity": "HIGH"
     },
     {
@@ -157,7 +157,7 @@
       "violation_status": "GUARD_VIOLATION_HIDDEN_UNCERTAINTY",
       "related_rules": ["REG53_ART19B_PARTIAL_LOSS_BASE"],
       "related_operators": [],
-      "exercised_by": ["P10", "P11", "G27"],
+      "exercised_by": ["P10", "P11", "G27", "tests/test_guard_paths.py"],
       "severity": "CRITICAL"
     }
   ]

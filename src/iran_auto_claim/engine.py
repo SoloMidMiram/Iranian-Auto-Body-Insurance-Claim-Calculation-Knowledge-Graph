@@ -68,11 +68,16 @@ class CalcResult:
     formula_confidence: float | None = None
     evidence_confidence: float | None = None
     provenance: list[dict[str, Any]] = field(default_factory=list)
+    guards_executed: list[str] = field(default_factory=list)
 
     def label(self, *names: str) -> None:
         for name in names:
             if name:
                 self.labels.add(name)
+
+    def note_guard(self, guard_id: str) -> None:
+        if guard_id and guard_id not in self.guards_executed:
+            self.guards_executed.append(guard_id)
 
     def note_rule(self, *rule_ids: str) -> None:
         for rule_id in rule_ids:
@@ -107,6 +112,7 @@ class CalcResult:
             "formula_confidence": self.formula_confidence,
             "evidence_confidence": self.evidence_confidence,
             "provenance": _out(self.provenance),
+            "guards_executed": list(self.guards_executed),
         }
 
 
@@ -158,6 +164,7 @@ def _rescue(case: Case, res: CalcResult, cap_base: Decimal) -> Decimal:
     res.fields["rescue_claimed"] = actual
     if actual > 0:
         res.note_rule("REG53_RESCUE_TRANSPORT_CAP")
+        res.note_guard("G_RESCUE_CAP_CEILING")
         if cap < actual:
             res.label("RESCUE_CAPPED")
     return cap
@@ -233,6 +240,8 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
             "the absolute franchise amount is missing from the applicable policy schedule",
             status="FRANCHISE_TERMS_REQUIRED",
         )
+    guards.check_franchise_source(case, mode, source)
+    res.note_guard("G_NO_HARDCODED_FRANCHISE_RATE")
     if source not in guards.SOURCED_FRANCHISE_SOURCES:
         res.fields["franchise_source"] = source or "UNKNOWN"
         res.fields["franchise_evidence_needed"] = (
@@ -243,7 +252,6 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
             "the franchise has no authorised policy, endorsement or insurer-manual source",
             status="FRANCHISE_AUTHORITY_REQUIRED",
         )
-    guards.check_franchise_source(case, mode, source)
 
     def _dec(value: Any) -> Decimal | None:
         return None if value is None else money.D(value)
@@ -328,6 +336,7 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
             res.fields["exclusion_applied"] = exclusion["node_id"]
             res.fields["exclusion_state"] = "NON_COMPENSABLE"
             res.note_rule("REG53_ART6_NON_COMPENSABLE")
+            res.note_guard("G_NO_ASSUMED_CAUSATION")
             res.label("NON_COMPENSABLE")
             return True
 
@@ -344,6 +353,7 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
             outcome = exclusion.get("insured_outcome") or {}
             res.payable = None
             res.status = outcome.get("status", "ENDORSEMENT_TERMS_REQUIRED")
+            res.note_guard("G_NO_GUESSED_ENDORSEMENT_TERMS")
             res.label("ENDORSEMENT_TERMS_REQUIRED")
             res.fields["endorsement_terms_needed"] = exclusion.get("endorsement_terms_needed", [])
             res.block("U02_FRANCHISE_BASE_SCHEDULES")
@@ -511,6 +521,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.fields["guard_ratio_twice"] = "PROHIBITED"
         res.note_rule("REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE")
         res.label("DO_NOT_APPLY_RATIO_TWICE")
+    res.note_guard("G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS")
 
     disposition = case.salvage_disposition
     if disposition == "UNRESOLVED":
@@ -535,6 +546,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         if salvage_to_deduct > 0:
             res.note_rule("CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE")
             res.label("SALVAGE_DEDUCTED_BEFORE_FRANCHISE")
+    res.note_guard("G_SALVAGE_XOR_TITLE_TRANSFER")
     res.fields["base_after_salvage"] = after_salvage
 
     repair = case.repair_total
@@ -565,6 +577,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     )
     if res.payable != max(Decimal(0), result_before_cap):
         res.label("INSURED_SUM_CEILING_APPLIED")
+    res.note_guard("G_INSURED_SUM_CEILING")
 
 
 def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
@@ -611,6 +624,7 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
 def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("GLASS_ONLY")
     guards.check_universal_glass_franchise(case)
+    res.note_guard("G_NO_UNIVERSAL_GLASS_FRANCHISE")
 
     if case.glass_damage_from_base_peril:
         res.route = "PARTIAL_DAMAGE"
@@ -672,6 +686,7 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
         if sequence is not None:
             res.fields["order_used"] = order
             sequence = _activate_body_plan(res, "GLASS_ONLY", glass_plan, sequence)
+            res.note_guard("G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT")
             res.payable = graph_partial_payable(gross, franchise, ratio, rescue, sequence)
             return
 
@@ -691,6 +706,7 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.payable = None
     res.status = "ENDORSEMENT_AND_ORDER_REQUIRED"
     res.block("U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION")
+    res.note_guard("G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT")
     res.label("GLASS_UNDERINSURANCE_UNRESOLVED")
 
 
@@ -798,6 +814,7 @@ def calculate_third_party(case: Case, kb: Knowledge, res: CalcResult) -> None:
 def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("ARTICLE_8_NON_CONVENTIONAL")
     guards.check_article8_method(case)
+    res.note_guard("G_ARTICLE8_NO_WHOLE_CAR_RATIO")
 
     corresponding = case.corresponding_damage
     if corresponding is None:
@@ -830,6 +847,7 @@ def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
     )
     if insurer_payable < corresponding:
         res.label("DUAL_CAP_APPLIED")
+    res.note_guard("G_DUAL_LIABILITY_CAP")
 
     if res.variant == "DUAL_COVERAGE":
         res.fields["third_party"] = insurer_payable
@@ -842,6 +860,7 @@ def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
                 res.fields["body_candidate_before_other_body_terms"] = excess
                 res.fields["regulatory_mandatory_franchise_on_this_excess"] = money.D(0)
                 res.note_rule("CIC_CIRC_1404_06_10_NO_MANDATORY_FRANCHISE_ON_ART8_EXCESS")
+            res.note_guard("G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE")
         res.payable = insurer_payable
         return
 
@@ -1141,6 +1160,7 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         if uncertainty.scenarios:
             res.fields["candidate_scenarios"] = uncertainty.scenarios
     except guards.GuardViolation as violation:
+        res.note_guard(violation.guard_id)
         res.payable = None
         res.status = violation.violation_status
         res.reason = str(violation)
@@ -1164,7 +1184,9 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
 
     try:
         guards.check_uncertainty_propagation(res)
+        res.note_guard("G_UNCERTAINTY_MUST_SURFACE")
     except guards.GuardViolation as violation:
+        res.note_guard(violation.guard_id)
         res.payable = None
         res.status = violation.violation_status
         res.reason = str(violation)
