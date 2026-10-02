@@ -12,7 +12,7 @@ import math
 import re
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -461,15 +461,8 @@ def _check_review_list(
 
 
 def _review_number(value: Any) -> bool:
-    """Review forms temporarily retain numeric strings until the P0-02 IRR migration."""
-    if _is_number(value):
-        return True
-    if not isinstance(value, str):
-        return False
-    try:
-        return Decimal(value).is_finite()
-    except InvalidOperation:
-        return False
+    """Money answers cross the review boundary as non-negative integer IRR."""
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
 
 
 def _encode_json(value: Any, level: int) -> str:

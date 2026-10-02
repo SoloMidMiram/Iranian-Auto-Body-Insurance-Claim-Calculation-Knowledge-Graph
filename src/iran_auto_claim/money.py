@@ -1,12 +1,9 @@
-"""Money handling.
+"""IRR money boundary and explicit presentation conversion.
 
-Production callers should supply integer IRR and set unit=IRR. Assessment
-fixtures use million tomans for readability, so the engine is deliberately
-unit-agnostic: it computes in the case's declared unit and only converts when it
-must intersect a value whose unit is fixed (the annual parameters, which are
-stored in IRR).
-
-1 toman = 10 IRR.
+Persisted cases and the calculation engine use non-negative integer IRR only.
+Toman-based units exist solely for explicit import/display conversion.
+Rounding occurs once, half-up to the nearest rial, when a display amount enters
+the IRR boundary and when a final payable leaves the calculation pipeline.
 """
 
 from __future__ import annotations
@@ -44,9 +41,10 @@ def D(value: Any) -> Decimal:
 
 
 def to_irr(amount: Decimal, unit: str) -> Decimal:
+    """Explicitly convert a display amount and round half-up to one rial."""
     if unit not in IRR_PER_UNIT:
         raise UnitError(f"unknown unit {unit!r}")
-    return amount * IRR_PER_UNIT[unit]
+    return round_irr(amount * IRR_PER_UNIT[unit])
 
 
 def from_irr(amount_irr: Decimal, unit: str) -> Decimal:
@@ -60,7 +58,12 @@ def quantize(amount: Decimal, places: int = 2) -> Decimal:
     return amount.quantize(exp, rounding=ROUND_HALF_UP)
 
 
+def round_irr(amount: Decimal) -> Decimal:
+    return amount.to_integral_value(rounding=ROUND_HALF_UP)
+
+
 def fmt(amount: Decimal | None, unit: str = "million_toman") -> str:
+    """Format an IRR amount in an explicitly requested presentation unit."""
     if amount is None:
         return "n/a"
     suffix = {
@@ -69,4 +72,6 @@ def fmt(amount: Decimal | None, unit: str = "million_toman") -> str:
         "million_toman": "m-toman",
         "billion_toman": "bn-toman",
     }[unit]
-    return f"{quantize(amount, 2):,} {suffix}"
+    display = from_irr(D(amount), unit)
+    places = 0 if unit == "IRR" else 2
+    return f"{quantize(display, places):,} {suffix}"

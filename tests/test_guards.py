@@ -13,7 +13,7 @@ from iran_auto_claim.money import D
 
 
 def _case(branch: str, **inputs):
-    return {"claim_id": "guard-test", "unit": "million_toman", "classification": {"branch": branch}, "damage": inputs}
+    return {"claim_id": "guard-test", "unit": "IRR", "classification": {"branch": branch}, "damage": inputs}
 
 
 # ------------------------------------------------------- Article 8 method guard

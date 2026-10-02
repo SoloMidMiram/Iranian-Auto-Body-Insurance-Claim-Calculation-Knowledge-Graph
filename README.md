@@ -53,7 +53,10 @@ python claim.py params --year 1405
 python claim.py ingest submissions/example_conflicting_educational.json
 ```
 
-Tests: `python -m pytest` (331 tests). Install development/test
+The persistence and engine boundary accepts monetary values only as non-negative
+integer IRR. Toman and million-toman conversion is explicit presentation logic.
+
+Tests: `python -m pytest` (348 tests). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 

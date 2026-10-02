@@ -13,7 +13,7 @@ from iran_auto_claim.schema_input import InputSchemaError
 
 
 def _case(branch=None, **inputs):
-    payload = {"claim_id": "engine-test", "unit": "million_toman", "damage": inputs}
+    payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs}
     if branch:
         payload["classification"] = {"branch": branch}
     return payload

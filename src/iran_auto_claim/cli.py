@@ -203,7 +203,7 @@ def _cmd_validate(args: argparse.Namespace, kb: Knowledge) -> int:
 def _cmd_calc(args: argparse.Namespace, kb: Knowledge) -> int:
     case = _load_case(args.case)
     result = compute(case, kb)
-    print(render_claim(result, kb, case.unit))
+    print(render_claim(result, kb, "million_toman"))
     return 0
 
 
@@ -504,7 +504,7 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
         result = review.calculate()
         if result is not None:
             print()
-            print(render_claim(result, kb, review.unit))
+            print(render_claim(result, kb, "million_toman"))
     return 0
 
 

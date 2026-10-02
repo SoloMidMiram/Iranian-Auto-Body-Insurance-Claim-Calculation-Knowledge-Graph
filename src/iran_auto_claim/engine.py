@@ -41,7 +41,7 @@ class CalcResult:
     variant: str | None = None
     domain: str | None = None
     claim_id: str | None = None
-    unit: str = "million_toman"
+    unit: str = "IRR"
     payable: Decimal | None = None
     payable_scenarios: list[Decimal] = field(default_factory=list)
     status: str | None = None
@@ -79,9 +79,9 @@ class CalcResult:
             "branch": self.branch,
             "variant": self.variant,
             "domain": self.domain,
-            "unit": self.unit,
-            "payable": _out(self.payable),
-            "payable_scenarios": [_out(value) for value in self.payable_scenarios],
+            "unit": "IRR",
+            "payable_irr": _out(self.payable),
+            "payable_scenarios_irr": [_out(value) for value in self.payable_scenarios],
             "status": self.status,
             "reason": self.reason,
             "route": self.route,
@@ -96,7 +96,11 @@ class CalcResult:
 
 def _out(value: Any) -> Any:
     if isinstance(value, Decimal):
-        return int(value) if value == value.to_integral_value() else float(value)
+        return int(value) if value == value.to_integral_value() else format(value, "f")
+    if isinstance(value, dict):
+        return {key: _out(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_out(item) for item in value]
     return value
 
 
@@ -185,7 +189,7 @@ def _threshold(case: Case, kb: Knowledge) -> Decimal | None:
     irr = kb.annual_value(case.claim_year, "CONVENTIONAL_THRESHOLD")
     if irr is None:
         return None
-    return money.from_irr(irr, case.unit)
+    return money.D(irr)
 
 
 # ---------------------------------------------------------------- coverage gate
@@ -750,6 +754,9 @@ def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
     res.provenance = provenance
     if res.blocking_uncertainties:
         res.label("BLOCKING_UNCERTAINTY_SURFACED")
+    if res.payable is not None:
+        res.payable = money.round_irr(res.payable)
+    res.payable_scenarios = [money.round_irr(value) for value in res.payable_scenarios]
 
 
 def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcResult:

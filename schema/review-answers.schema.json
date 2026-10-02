@@ -2,10 +2,14 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.invalid/schemas/review-answers.schema.json",
   "title": "Body-insurance claim review answers",
-  "description": "Input contract for `claim.py review`. One entry per questionnaire item, plus the evidence the file actually holds. This is not a claim case: it cannot carry a rate, an order, or any other calculation parameter directly - answers bind slots in knowledge/parameter_slots.json, and the derived case is what the engine reads.",
+  "description": "Input contract for claim.py review. Every money answer is non-negative integer IRR; display conversion happens before this boundary. Answers bind sourced slots and cannot carry undeclared calculation parameters.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["claim_id", "answers"],
+  "required": [
+    "claim_id",
+    "unit",
+    "answers"
+  ],
   "properties": {
     "claim_id": {
       "type": "string",
@@ -18,9 +22,8 @@
     },
     "unit": {
       "type": "string",
-      "enum": ["IRR", "irr", "toman", "million_toman", "billion_toman"],
-      "default": "million_toman",
-      "description": "Applies to every money answer in this file. Money answers are never mixed within one file."
+      "const": "IRR",
+      "description": "Persistence and engine boundary unit. Display units are not accepted here."
     },
     "note": {
       "type": "string",
@@ -66,7 +69,7 @@
   "x-answer-formats": {
     "choice": "one token from the question's `answers`",
     "list": "array of tokens, or array of objects for component records",
-    "money": "number or numeric string, in the file's declared unit",
+    "money": "non-negative integer IRR",
     "integer": "integer",
     "date": "ISO-like string; a leading year between 1300 and 1500 is read as a Shamsi year",
     "text": "free text, used for identification and sign-off only; it may not bind a money slot"

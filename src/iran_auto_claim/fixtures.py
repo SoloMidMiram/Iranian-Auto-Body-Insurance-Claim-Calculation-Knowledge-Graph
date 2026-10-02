@@ -117,7 +117,7 @@ def check_expectations(expected: dict[str, Any], result: CalcResult) -> list[str
 def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult, list[str]]:
     case_payload = {
         "claim_id": fixture["id"],
-        "unit": fixture.get("unit", "million_toman"),
+        "unit": fixture.get("unit", "IRR"),
         "classification": {
             "branch": fixture["branch"],
             "domain": _domain_for(fixture["branch"]),

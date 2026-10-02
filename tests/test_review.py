@@ -106,27 +106,27 @@ def test_a_predicate_naming_an_unknown_node_is_an_integrity_issue(kb):
 
 def test_an_unknown_question_is_refused_rather_than_ignored(kb):
     with pytest.raises(InputSchemaError) as caught:
-        Review({"claim_id": "X", "answers": {"Q-S99-99": "YES"}}, kb)
+        Review({"claim_id": "X", "unit": "IRR", "answers": {"Q-S99-99": "YES"}}, kb)
     assert caught.value.errors[0].code == "unknown_field"
     assert caught.value.errors[0].path == "answers.Q-S99-99"
 
 
 def test_an_inadmissible_choice_is_refused(kb):
     with pytest.raises(InputSchemaError) as caught:
-        Review({"claim_id": "X", "answers": {"Q-S2-01": "METEORITE"}}, kb)
+        Review({"claim_id": "X", "unit": "IRR", "answers": {"Q-S2-01": "METEORITE"}}, kb)
     assert caught.value.errors[0].code == "invalid_enum"
 
 
 def test_a_non_numeric_money_answer_is_refused(kb):
     with pytest.raises(InputSchemaError) as caught:
         Review(
-            {"claim_id": "X", "answers": {"Q-S2-01": "COLLISION", "Q-S4-02": "about forty"}}, kb
+            {"claim_id": "X", "unit": "IRR", "answers": {"Q-S2-01": "COLLISION", "Q-S4-02": "about forty"}}, kb
         )
     assert caught.value.errors[0].code == "invalid_type"
 
 
 def test_unknown_is_admissible_and_binds_nothing(kb):
-    review = Review({"claim_id": "X", "answers": {"Q-S2-01": "UNKNOWN"}}, kb)
+    review = Review({"claim_id": "X", "unit": "IRR", "answers": {"Q-S2-01": "UNKNOWN"}}, kb)
     assert not review.is_answered("Q-S2-01")
     assert review.slot_status("PS_PERIL").status == "UNANSWERED"
 
@@ -147,7 +147,7 @@ def test_the_full_cover_partial_file_issues_exactly_one_number(kb):
     assert result is not None
     # 185 gross, 12 depreciation on the depreciable part only (index 6 -> 10%),
     # 10% franchise after depreciation, rescue 10 under the 20% ceiling.
-    assert float(result.payable) == pytest.approx(165.70)
+    assert result.payable == Decimal("1657000000")
     assert result.payable_scenarios == []
     assert result.formula_confidence == 0.95
     assert "REG53_ART19_REPLACEMENT_PART_DEPRECIATION" in result.rule_trace
@@ -231,7 +231,7 @@ def test_a_review_only_document_is_reported_and_still_calculated(kb):
     assert decision["decision"] == DECISION_COMPUTE
     assert "EVT_POLICE_CROQUIS" in decision["missing_evidence"]
     assert decision["evidence_blocks"] == []
-    assert float(review.calculate().payable) == pytest.approx(165.70)
+    assert review.calculate().payable == Decimal("1657000000")
 
 
 def test_a_confidence_document_caps_the_result_and_still_calculates(kb):
@@ -241,20 +241,18 @@ def test_a_confidence_document_caps_the_result_and_still_calculates(kb):
     assert decision["decision"] == DECISION_COMPUTE
     assert "EVT_PHOTOS" in decision["missing_evidence"]
     result = review.calculate()
-    assert float(result.payable) == pytest.approx(165.70)
+    assert result.payable == Decimal("1657000000")
     assert result.formula_confidence == cap
     assert "EVIDENCE_CONFIDENCE_REDUCED" in result.labels
 
 
-def test_a_fractional_labour_amount_is_not_truncated(kb):
+def test_a_fractional_irr_labour_amount_is_rejected(kb):
     payload = load("review_t1_fullcover_partial.json")
     payload["answers"]["Q-S4-02"] = 40.9
-    review = Review(payload, kb)
-    assert review.slot_status("PS_LABOR").value == Decimal("40.9")
-    assert review.slot_status("PS_REPAIR_TOTAL").value == Decimal("185.9")
-    assert review.slot_status("PS_GROSS_DAMAGE").value == Decimal("185.9")
-    result = review.calculate()
-    assert result.payable == Decimal("166.51")
+    with pytest.raises(InputSchemaError) as caught:
+        Review(payload, kb)
+    assert caught.value.errors[0].code == "invalid_type"
+    assert caught.value.errors[0].path == "answers.Q-S4-02"
 
 
 # ----------------------------------------------------------------- other rungs
@@ -483,7 +481,7 @@ def test_review_cli_refuses_an_unknown_question(capsys, tmp_path):
     from iran_auto_claim.cli import main
 
     bad = tmp_path / "bad.json"
-    bad.write_text(json.dumps({"claim_id": "X", "answers": {"Q-S9-99": "YES"}}), encoding="utf-8")
+    bad.write_text(json.dumps({"claim_id": "X", "unit": "IRR", "answers": {"Q-S9-99": "YES"}}), encoding="utf-8")
     assert main(["review", str(bad)]) == 1
     error = json.loads(capsys.readouterr().out)
     assert error["errors"][0]["code"] == "unknown_field"

@@ -152,8 +152,9 @@ These gates separate two kinds of uncertainty:
 
 ## 7. Calculation model
 
-All amounts must carry one declared unit. The repository's worked cases use
-`million_toman`; production data must never mix rial, toman, and million toman.
+All persisted and engine-boundary amounts are non-negative integer IRR. The
+repository converts them to `million_toman` only for human-readable output;
+production data must never mix rial, toman, and million toman.
 
 ### Partial damage
 
@@ -268,7 +269,7 @@ Validated on 2026-10-01:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 331 tests;
+- the complete automated suite passes: 348 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
