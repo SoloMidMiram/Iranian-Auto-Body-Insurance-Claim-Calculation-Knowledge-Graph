@@ -66,6 +66,7 @@ class CalcResult:
     rule_trace: list[str] = field(default_factory=list)
     blocking_uncertainties: list[str] = field(default_factory=list)
     formula_confidence: float | None = None
+    evidence_confidence: float | None = None
     provenance: list[dict[str, Any]] = field(default_factory=list)
 
     def label(self, *names: str) -> None:
@@ -104,7 +105,8 @@ class CalcResult:
             "rule_trace": list(self.rule_trace),
             "blocking_uncertainties": list(self.blocking_uncertainties),
             "formula_confidence": self.formula_confidence,
-            "provenance": self.provenance,
+            "evidence_confidence": self.evidence_confidence,
+            "provenance": _out(self.provenance),
         }
 
 
@@ -970,22 +972,76 @@ def reconcile_classification(
 def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
     confidences: list[float] = []
     provenance: list[dict[str, Any]] = []
+    findings: list[str] = []
+    plan = _flat_plan(res.fields.get("execution_plan"))
     for rule_id in res.rule_trace:
         rule = kb.rule(rule_id)
-        if rule is not None:
+        if rule is None:
+            findings.append(f"rule {rule_id} is missing from the graph")
+        else:
             confidences.append(float(rule.get("confidence", 0.0)))
-            provenance.append(kb.provenance(rule_id))
+            if not rule.get("sources"):
+                findings.append(f"rule {rule_id} has no source")
+        operators_for_rule = [
+            operator_id
+            for operator_id, operator in kb.operators.items()
+            if rule_id in (operator.get("sourced_from") or [])
+        ]
+        on_plan = (
+            [operator_id for operator_id in operators_for_rule if operator_id in plan]
+            if plan
+            else operators_for_rule
+        )
+        entry = kb.provenance(rule_id)
+        entry["source"] = list(entry.get("sources") or [])
+        entry["rule"] = rule_id
+        entry["operator"] = on_plan
+        entry["execution"] = {
+            "snapshot_id": res.fields.get("snapshot_id"),
+            "plan": plan,
+        }
+        provenance.append(entry)
     for uncertainty_id in res.blocking_uncertainties:
         uncertainty = kb.uncertainty(uncertainty_id)
-        if uncertainty is not None and uncertainty.get("confidence_of_single_interpretation") is not None:
-            confidences.append(float(uncertainty["confidence_of_single_interpretation"]))
+        confidence = None if uncertainty is None else uncertainty.get(
+            "confidence_of_single_interpretation"
+        )
+        if confidence is not None:
+            confidences.append(float(confidence))
     res.formula_confidence = min(confidences) if confidences else None
-    res.provenance = provenance
+    required = list((kb.branch(res.branch or "") or {}).get("required_evidence") or [])
+    supplied = set(case.evidence) if isinstance(case.evidence, dict) else set()
+    missing = [item for item in required if item not in supplied]
+    if missing or not required:
+        res.evidence_confidence = None
+        if missing:
+            findings.append("evidence missing: " + ", ".join(missing))
+        elif res.branch in BODY_BRANCHES and not required:
+            findings.append("body branch declares no required evidence")
+    else:
+        res.evidence_confidence = 1.0
+    if findings:
+        res.fields["provenance_findings"] = findings
     if res.blocking_uncertainties:
         res.label("BLOCKING_UNCERTAINTY_SURFACED")
     if res.payable is not None:
         res.payable = money.round_irr(res.payable)
     res.payable_scenarios = [money.round_irr(value) for value in res.payable_scenarios]
+    for entry in provenance:
+        entry["result"] = res.payable
+    res.provenance = provenance
+
+
+def _flat_plan(plan: Any) -> list[str]:
+    if not isinstance(plan, list):
+        return []
+    flat: list[str] = []
+    for item in plan:
+        if isinstance(item, list):
+            flat.extend(str(step) for step in item)
+        else:
+            flat.append(str(item))
+    return flat
 
 
 def _bind_body_snapshot(case: Case, kb: Knowledge, res: CalcResult) -> bool:
