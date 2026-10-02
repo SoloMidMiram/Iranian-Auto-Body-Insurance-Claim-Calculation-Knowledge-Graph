@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from iran_auto_claim.engine import compute
 from iran_auto_claim.money import D
 
@@ -44,3 +46,81 @@ def test_body_result_traces_source_rule_operator_execution_and_result(kb):
     assert entry["execution"]["plan"]
     assert entry["result"] == D(1500)
     assert result.formula_confidence != result.evidence_confidence
+
+
+def _required_evidence(kb) -> list[str]:
+    return list(kb.branch("PARTIAL_DAMAGE")["required_evidence"])
+
+
+@pytest.mark.parametrize(
+    ("evidence", "expect_missing"),
+    [
+        ({}, True),
+        ("all_false", True),
+        ("mixed", True),
+        ("all_true", False),
+    ],
+)
+def test_evidence_confidence_counts_boolean_values_not_key_presence(kb, evidence, expect_missing):
+    required = _required_evidence(kb)
+    if evidence == "all_false":
+        evidence_map = {item: False for item in required}
+    elif evidence == "mixed":
+        evidence_map = {item: False for item in required}
+        evidence_map[required[0]] = True
+    elif evidence == "all_true":
+        evidence_map = {item: True for item in required}
+    else:
+        evidence_map = evidence
+
+    payload = _partial()
+    payload["evidence"] = evidence_map
+    result = compute(payload, kb)
+
+    assert result.payable == D(1500)
+    findings = result.fields.get("provenance_findings") or []
+    if expect_missing:
+        assert result.evidence_confidence is None
+        assert any("evidence missing" in finding for finding in findings)
+    else:
+        assert result.evidence_confidence == 1.0
+        assert not any("evidence missing" in finding for finding in findings)
+
+
+def _required_evidence(kb) -> list[str]:
+    return list(kb.branch("PARTIAL_DAMAGE")["required_evidence"])
+
+
+@pytest.mark.parametrize(
+    ("evidence", "expect_missing"),
+    [
+        ({}, True),
+        ("all_false", True),
+        ("mixed", True),
+        ("all_true", False),
+    ],
+)
+def test_evidence_confidence_counts_boolean_values_not_key_presence(kb, evidence, expect_missing):
+    required = _required_evidence(kb)
+    if evidence == "all_false":
+        evidence_map = {item: False for item in required}
+    elif evidence == "mixed":
+        evidence_map = {item: False for item in required}
+        evidence_map[required[0]] = True
+    elif evidence == "all_true":
+        evidence_map = {item: True for item in required}
+    else:
+        evidence_map = evidence
+
+    payload = _partial()
+    payload["evidence"] = evidence_map
+    result = compute(payload, kb)
+
+    assert result.payable == D(1500)
+    findings = result.fields.get("provenance_findings") or []
+    if expect_missing:
+        assert result.evidence_confidence is None
+        assert any("evidence missing" in finding for finding in findings)
+    else:
+        assert result.evidence_confidence == 1.0
+        assert not any("evidence missing" in finding for finding in findings)

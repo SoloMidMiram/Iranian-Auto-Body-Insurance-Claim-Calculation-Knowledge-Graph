@@ -1010,7 +1010,8 @@ def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
             confidences.append(float(confidence))
     res.formula_confidence = min(confidences) if confidences else None
     required = list((kb.branch(res.branch or "") or {}).get("required_evidence") or [])
-    supplied = set(case.evidence) if isinstance(case.evidence, dict) else set()
+    evidence = case.evidence if isinstance(case.evidence, dict) else {}
+    supplied = {key for key, value in evidence.items() if value is True}
     missing = [item for item in required if item not in supplied]
     if missing or not required:
         res.evidence_confidence = None
