@@ -20,6 +20,11 @@ python scripts/sync_github_issues.py \
 
 The issue sync command is a dry run unless `--apply` is explicitly supplied.
 
+`python claim.py validate` also checks the body-operator authority chain:
+operator, rule, source, authority class, effective date, and branch scope.
+Source tiers are not rewritten. A missing reviewer or a `PRIMARY_MIRROR`
+source is printed as a finding and does not by itself fail the gate.
+
 ## Universal invariants
 
 Every supported calculation must satisfy all of these:
