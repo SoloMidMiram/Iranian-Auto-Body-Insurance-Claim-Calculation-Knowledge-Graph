@@ -13,7 +13,25 @@ from iran_auto_claim.money import D
 
 
 def _case(branch: str, **inputs):
-    return {"claim_id": "guard-test", "unit": "IRR", "classification": {"branch": branch}, "damage": inputs}
+    franchise = inputs.pop("franchise", None)
+    payload = {
+        "claim_id": "guard-test",
+        "unit": "IRR",
+        "classification": {"branch": branch},
+        "damage": inputs,
+    }
+    if franchise is not None:
+        payload["policy"] = {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": franchise,
+                "source": "POLICY",
+                "source_reference": "test policy schedule",
+                "source_version": "TEST-v1",
+            },
+        }
+    return payload
 
 
 # ------------------------------------------------------- Article 8 method guard

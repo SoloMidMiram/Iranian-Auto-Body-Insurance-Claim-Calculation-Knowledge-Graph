@@ -99,7 +99,17 @@ def test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float(kb):
             "claim_id": "ROUND-SCENARIOS",
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
-            "damage": {"gross": 10, "market": 3, "insured": 1, "franchise": 1},
+            "damage": {"gross": 10, "market": 3, "insured": 1},
+            "policy": {
+                "policy_version": "TEST-v1",
+                "franchise": {
+                    "mode": "ABSOLUTE",
+                    "absolute_irr": 1,
+                    "source": "POLICY",
+                    "source_reference": "test policy schedule",
+                    "source_version": "TEST-v1",
+                },
+            },
         },
         kb,
     )
@@ -127,7 +137,17 @@ def test_very_large_integer_irr_does_not_overflow(kb):
             "claim_id": "LARGE-IRR",
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
-            "damage": {"gross": amount, "franchise": 0},
+            "damage": {"gross": amount},
+            "policy": {
+                "policy_version": "TEST-v1",
+                "franchise": {
+                    "mode": "ABSOLUTE",
+                    "absolute_irr": 0,
+                    "source": "POLICY",
+                    "source_reference": "test declarations page",
+                    "source_version": "TEST-v1",
+                },
+            },
         },
         kb,
     )

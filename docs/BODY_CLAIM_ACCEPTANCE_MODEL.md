@@ -140,7 +140,7 @@ path before they affect acceptance or arithmetic.
 
 | Problem | Correct behavior | Current enforcement |
 |---|---|---|
-| Missing franchise terms | `INSUFFICIENT_INFORMATION`; never zero | Review gate enforced and regression-tested; direct low-level `calc` remains an unsafe bypass |
+| Missing franchise terms | U02 with no single payable; never zero | Enforced at the shared engine boundary for direct calc, public `compute()`, and review-to-engine; explicit zero requires versioned, referenced policy evidence |
 | Missing production year where depreciation can apply | `INSUFFICIENT_INFORMATION`; never assume 0% | Review gate enforced and regression-tested; direct low-level `calc` remains an unsafe bypass |
 | Theft-clock anchor ambiguity | Return pending/anchor scenarios or request the dated source; never pick a clock silently | U13 blocks every whole-vehicle theft in review; no engine handoff until explicit clock inputs are modeled |
 | Underinsurance order unresolved | Return both approved scenarios; never choose or average | Enforced by `U01` and the partial-loss engine |
@@ -265,23 +265,23 @@ documents are authentic or legally sufficient.
 
 ## 10. Current status and next engineering steps
 
-Validated on 2026-10-01:
+Validated on 2026-10-02:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 348 tests;
+- the complete automated suite passes: 356 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
-- missing production year and missing franchise now stop the review before arithmetic.
+- missing franchise terms or authority stop every body settlement path on U02;
+- explicit zero franchise is accepted only from versioned, referenced policy evidence.
 
 Remaining gaps, in priority order:
 
 1. Make structured event clocks first-class (`start_event`, `start_date`, `as_of`,
    calendar, elapsed days) and calculate every material theft-clock scenario.
-2. Prevent public/FAQ callers from reaching the low-level calculator without an
-   accepted review token; direct calculation can still default missing franchise or
-   year inputs.
+2. Prevent direct calculation from defaulting missing production-year inputs where
+   replacement-part depreciation can apply.
 3. The evidence id list's `if_absent` token is enforced. Document contents are still
    not verified: the gate trusts `evidence_present` rather than recording identity,
    issuer, date, version, and hash.

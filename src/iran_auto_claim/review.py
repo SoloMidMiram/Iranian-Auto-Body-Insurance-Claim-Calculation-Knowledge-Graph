@@ -410,13 +410,27 @@ class Review:
         mode = str(franchise.get("mode") or "").upper()
         if mode in ("", "NOT_STATED"):
             return False
+        if franchise.get("source") not in ("POLICY", "ENDORSEMENT", "INSURER_MANUAL"):
+            return False
         if mode.startswith("PERCENT"):
-            return franchise.get("rate") is not None and franchise.get("source") in (
-                "POLICY",
-                "ENDORSEMENT",
-                "INSURER_MANUAL",
+            if franchise.get("rate") is None:
+                return False
+            if mode == "PERCENT_WITH_MINIMUM" and franchise.get(
+                "minimum_irr", franchise.get("minimum")
+            ) is None:
+                return False
+        elif franchise.get("absolute_irr", franchise.get("absolute")) is None:
+            return False
+
+        amount = franchise.get("absolute_irr", franchise.get("absolute"))
+        rate = franchise.get("rate")
+        if amount == 0 or rate == 0:
+            return bool(
+                franchise.get("source") in ("POLICY", "ENDORSEMENT", "INSURER_MANUAL")
+                and franchise.get("source_reference")
+                and franchise.get("source_version")
             )
-        return franchise.get("absolute_irr") is not None or franchise.get("absolute") is not None
+        return True
 
     # ------------------------------------------------------------ case emission
 

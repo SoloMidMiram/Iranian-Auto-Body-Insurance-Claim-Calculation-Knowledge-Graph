@@ -10,7 +10,7 @@
     "L49-L50"
   ],
   "unit": "IRR",
-  "note": "Synthetic fixtures, not customer records. Every monetary input and expected amount is integer IRR; ratios, rates, years, and day counts are dimensionless. Null payables preserve unresolved or blocked outcomes.",
+  "note": "Synthetic fixtures, not customer records. Every monetary input and expected amount is integer IRR; ratios, rates, years, and day counts are dimensionless. The fixture harness normalizes each legacy scalar franchise into a versioned synthetic policy term before calling the public engine boundary. Null payables preserve unresolved or blocked outcomes.",
   "corrections_applied": [
     {
       "fixture": "L49",

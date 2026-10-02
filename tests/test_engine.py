@@ -13,7 +13,19 @@ from iran_auto_claim.schema_input import InputSchemaError
 
 
 def _case(branch=None, **inputs):
+    franchise = inputs.pop("franchise", None)
     payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs}
+    if franchise is not None:
+        payload["policy"] = {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": franchise,
+                "source": "POLICY",
+                "source_reference": "test policy schedule",
+                "source_version": "TEST-v1",
+            },
+        }
     if branch:
         payload["classification"] = {"branch": branch}
     return payload
@@ -50,11 +62,11 @@ def test_classifier_splits_conventional_and_non_conventional():
 
 
 def test_a_declared_branch_wins_over_derivation(kb):
-    payload = _case("PARTIAL_DAMAGE", gross=1600)
+    payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
     result = compute(payload, kb)
     assert result.branch == "PARTIAL_DAMAGE"
     assert "PARTIAL_DAMAGE" in result.labels
-    assert result.payable == D(1600)
+    assert result.payable == D(1500)
     assert "classification" not in result.fields, "a declared branch must not be re-derived"
 
 
@@ -213,3 +225,71 @@ def test_interest_of_the_insured_is_reported_for_a_single_payable_result(kb):
     assert result.payable_is_single
     assert result.payable == D(90)
     assert result.fields["franchise"] == D(10)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        _case("PARTIAL_DAMAGE", gross=100),
+        _case("TOTAL_LOSS", market=2000, insured=2000, salvage=100),
+        _case("GLASS_ONLY", glass_endorsement=True, gross=100),
+        _case(
+            "THEFT",
+            theft_type="WHOLE_VEHICLE",
+            days_missing=65,
+            market=2000,
+            insured=2000,
+            title_transferred=True,
+        ),
+    ],
+)
+def test_body_settlement_without_franchise_terms_blocks_on_u02(kb, payload):
+    result = compute(payload, kb)
+    assert result.payable is None
+    assert result.payable_scenarios == []
+    assert result.status == "FRANCHISE_TERMS_REQUIRED"
+    assert result.blocking_uncertainties == ["U02_FRANCHISE_BASE_SCHEDULES"]
+    assert "policy/product/version" in result.fields["franchise_evidence_needed"]
+
+
+def test_scalar_zero_franchise_does_not_mean_no_franchise_coverage(kb):
+    payload = _case("PARTIAL_DAMAGE", gross=100)
+    payload["damage"]["franchise"] = 0
+    result = compute(payload, kb)
+    assert result.payable is None
+    assert result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+    assert result.blocking_uncertainties == ["U02_FRANCHISE_BASE_SCHEDULES"]
+
+
+def test_unsourced_absolute_franchise_is_not_authority(kb):
+    payload = _case("PARTIAL_DAMAGE", gross=100)
+    payload["policy"] = {
+        "franchise": {
+            "mode": "ABSOLUTE",
+            "absolute_irr": 10,
+            "source": "UNKNOWN",
+        }
+    }
+    result = compute(payload, kb)
+    assert result.payable is None
+    assert result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+    assert result.blocking_uncertainties == ["U02_FRANCHISE_BASE_SCHEDULES"]
+    assert "policy/product/version" in result.fields["franchise_evidence_needed"]
+
+
+def test_versioned_policy_evidence_can_explicitly_set_zero_franchise(kb):
+    payload = _case("PARTIAL_DAMAGE", gross=100)
+    payload["policy"] = {
+        "policy_version": "BODY-1405-v1",
+        "franchise": {
+            "mode": "ABSOLUTE",
+            "absolute_irr": 0,
+            "source": "POLICY",
+            "source_reference": "declarations page, franchise line",
+            "source_version": "BODY-1405-v1",
+        },
+    }
+    result = compute(payload, kb)
+    assert result.payable == D(100)
+    assert result.fields["franchise"] == D(0)
+    assert result.fields["franchise_source_version"] == "BODY-1405-v1"

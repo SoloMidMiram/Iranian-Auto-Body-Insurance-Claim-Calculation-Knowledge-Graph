@@ -115,6 +115,8 @@ def check_expectations(expected: dict[str, Any], result: CalcResult) -> list[str
 
 
 def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult, list[str]]:
+    inputs = dict(fixture.get("inputs", {}))
+    fixture_franchise = inputs.pop("franchise", inputs.pop("franchise_from_policy", None))
     case_payload = {
         "claim_id": fixture["id"],
         "unit": fixture.get("unit", "IRR"),
@@ -122,11 +124,22 @@ def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult
             "branch": fixture["branch"],
             "domain": _domain_for(fixture["branch"]),
         },
-        "damage": fixture.get("inputs", {}),
+        "damage": inputs,
     }
     for field in ("regulatory_snapshot", "vehicle", "event", "policy", "coverage_gate", "calculation_config"):
         if field in fixture:
             case_payload[field] = fixture[field]
+    if fixture_franchise is not None:
+        policy = dict(case_payload.get("policy") or {})
+        policy.setdefault("policy_version", "SYNTHETIC-FIXTURE-v1")
+        policy["franchise"] = {
+            "mode": "ABSOLUTE",
+            "absolute_irr": fixture_franchise,
+            "source": "POLICY",
+            "source_reference": f"synthetic fixture {fixture['id']} franchise term",
+            "source_version": "SYNTHETIC-FIXTURE-v1",
+        }
+        case_payload["policy"] = policy
     result = compute(case_payload, kb)
     return result, check_expectations(fixture.get("expected", {}), result)
 

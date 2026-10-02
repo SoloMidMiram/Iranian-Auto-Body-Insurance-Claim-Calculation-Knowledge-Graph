@@ -60,7 +60,8 @@ and never changes a persisted or engine input.
 
 - Fully insured claim where ratio order is immaterial.
 - Underinsured claim returning both approved U01 scenarios.
-- Missing franchise terms must block on U02.
+- Missing franchise terms or authority must block on U02 with no single payable;
+  explicit zero requires a versioned, referenced policy or endorsement term.
 - Mixed glass, lamp glass, repair-only, ordinary part, battery, and tire items.
 - Battery/tire old enough for U04; each approved resolution mode.
 - Depreciation boundary at production-year indices 4, 5, and the 25% ceiling.
