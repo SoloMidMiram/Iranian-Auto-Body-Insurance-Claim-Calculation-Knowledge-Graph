@@ -13,6 +13,7 @@ python -m compileall -q claim.py src scripts
 python claim.py validate
 python claim.py fixtures
 python -m pytest
+python scripts/run_mutation_gate.py --check-report
 python scripts/sync_review_docs.py
 python scripts/sync_github_issues.py \
   --repo SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph
@@ -143,6 +144,27 @@ and never changes a persisted or engine input.
   cover, expired does not.
 - Refusal, insufficiency and scenario-set decisions each have a worked file in `cases/`
   and a test that pins the outcome, not only the happy path.
+
+## Body calculation properties and mutation gate
+
+The deterministic examples remain regression anchors. Generated cases use fixed
+seeds so failures reproduce exactly and enforce these properties across a wider
+input range:
+
+- Holding all other facts fixed, increasing eligible partial loss cannot reduce
+  the payable.
+- Holding all other facts fixed, increasing the franchise cannot increase the
+  payable.
+- Removing required franchise economics cannot improve a claim from blocked to
+  a single payable.
+- A total-loss or whole-theft payable is non-negative and cannot exceed the
+  insured sum.
+- For each real partial and glass sequence, the graph walk equals the independent
+  legacy parity oracle; swapping ratio and franchise still changes the amount.
+
+The calculation-module mutation gate is defined in
+`docs/MUTATION_REPORT.md`. Its curated high-risk mutation set must score at least
+90%; the report is regenerated and checked by `scripts/run_mutation_gate.py`.
 
 ## Phase acceptance metrics
 

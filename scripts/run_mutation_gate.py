@@ -1,0 +1,159 @@
+"""Run the curated body-calculation mutation gate and verify its report."""
+
+from __future__ import annotations
+
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+REPORT = ROOT / "docs" / "MUTATION_REPORT.md"
+
+
+@dataclass(frozen=True)
+class Mutation:
+    mutation_id: str
+    path: str
+    original: str
+    replacement: str
+    risk: str
+
+
+MUTATIONS = (
+    Mutation("M01", "src/iran_auto_claim/plans.py", 'return value * operands["ratio"]', 'return value + operands["ratio"]', "ratio changes from multiplication to addition"),
+    Mutation("M02", "src/iran_auto_claim/plans.py", 'return value - operands["franchise"]', 'return value + operands["franchise"]', "franchise is added instead of deducted"),
+    Mutation("M03", "src/iran_auto_claim/plans.py", 'return value + operands["rescue"]', 'return value - operands["rescue"]', "rescue is deducted instead of added"),
+    Mutation("M04", "src/iran_auto_claim/plans.py", 'return value - operands["salvage"]', 'return value + operands["salvage"]', "salvage is added instead of deducted"),
+    Mutation("M05", "src/iran_auto_claim/plans.py", 'return min(value, operands["insured"])', 'return max(value, operands["insured"])', "insured-sum cap becomes a floor"),
+    Mutation("M06", "src/iran_auto_claim/plans.py", "return max(Decimal(0), value)", "return min(Decimal(0), value)", "non-negative floor is inverted"),
+    Mutation("M07", "src/iran_auto_claim/plans.py", "duplicates or unknown or missing or unexpected or len(normalized) != len(expected_ids)", "duplicates or unknown or unexpected", "missing active operator is accepted"),
+    Mutation("M08", "src/iran_auto_claim/operators.py", "return min(actual_cost, RESCUE_CAP_RATIO * cap_base)", "return max(actual_cost, RESCUE_CAP_RATIO * cap_base)", "rescue cap becomes a floor"),
+    Mutation("M09", "src/iran_auto_claim/operators.py", "return combined > threshold, combined, threshold", "return combined >= threshold, combined, threshold", "strict total-loss boundary becomes inclusive"),
+    Mutation("M10", "src/iran_auto_claim/operators.py", "if insured_sum >= market_value:\n        return Decimal(1)", "if insured_sum >= market_value:\n        return Decimal(0)", "fully insured claim receives a zero ratio"),
+    Mutation("M11", "src/iran_auto_claim/engine.py", "if not missing:\n        return", "if missing:\n        return", "a bypassed required guard is accepted"),
+)
+
+THRESHOLD = 90.0
+
+
+def _run_probe(root: Path) -> subprocess.CompletedProcess[str]:
+    environment = dict(os.environ)
+    environment["PYTHONPATH"] = str(root / "src")
+    return subprocess.run(
+        [sys.executable, str(root / "scripts" / "mutation_probe.py")],
+        cwd=root,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _copy_repository(target: Path) -> None:
+    shutil.copytree(
+        ROOT,
+        target,
+        ignore=shutil.ignore_patterns(
+            ".git",
+            ".qwen",
+            ".pytest_cache",
+            "__pycache__",
+            "*.pyc",
+            "COMMIT_STAGING_DRAFT.txt",
+            ".venv",
+        ),
+    )
+
+
+def _apply_mutation(root: Path, mutation: Mutation) -> None:
+    target = root / mutation.path
+    source = target.read_text(encoding="utf-8")
+    count = source.count(mutation.original)
+    if count != 1:
+        raise RuntimeError(
+            f"{mutation.mutation_id}: expected one mutation target in {mutation.path}, found {count}"
+        )
+    target.write_text(source.replace(mutation.original, mutation.replacement), encoding="utf-8")
+
+
+def _render(results: list[tuple[Mutation, bool]]) -> str:
+    killed = sum(1 for _, was_killed in results if was_killed)
+    total = len(results)
+    score = 100.0 * killed / total
+    rows = [
+        "# Body Calculation Mutation Report",
+        "",
+        "This is a reproducible, curated high-risk mutation set for the deterministic",
+        "body calculation boundary. It is not a claim of exhaustive mutation coverage.",
+        "",
+        f"- Target modules: `plans.py`, `operators.py`, and the guard-plan gate in `engine.py`",
+        f"- Required score: **{THRESHOLD:.0f}%**",
+        f"- Result: **{killed}/{total} killed ({score:.1f}%)**",
+        "- Command: `python scripts/run_mutation_gate.py --check-report`",
+        "",
+        "| Mutant | Result | Safety property |",
+        "|---|---|---|",
+    ]
+    rows.extend(
+        f"| {mutation.mutation_id} | {'KILLED' if was_killed else 'SURVIVED'} | {mutation.risk} |"
+        for mutation, was_killed in results
+    )
+    rows.extend(
+        [
+            "",
+            "A surviving mutant or a score below the threshold fails the gate. The checked-in",
+            "report must exactly match a fresh run.",
+            "",
+        ]
+    )
+    return "\n".join(rows)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--write-report", action="store_true")
+    parser.add_argument("--check-report", action="store_true")
+    args = parser.parse_args(argv)
+
+    baseline = _run_probe(ROOT)
+    if baseline.returncode != 0:
+        print("baseline mutation probe failed", file=sys.stderr)
+        print(baseline.stdout, file=sys.stderr)
+        print(baseline.stderr, file=sys.stderr)
+        return 2
+
+    results: list[tuple[Mutation, bool]] = []
+    with tempfile.TemporaryDirectory(prefix="body-model-mutations-") as temporary:
+        temporary_root = Path(temporary)
+        for mutation in MUTATIONS:
+            mutant_root = temporary_root / mutation.mutation_id
+            _copy_repository(mutant_root)
+            _apply_mutation(mutant_root, mutation)
+            results.append((mutation, _run_probe(mutant_root).returncode != 0))
+
+    rendered = _render(results)
+    killed = sum(1 for _, was_killed in results if was_killed)
+    score = 100.0 * killed / len(results)
+    if args.write_report:
+        REPORT.write_text(rendered, encoding="utf-8")
+        print(f"wrote {REPORT.relative_to(ROOT)}")
+    elif args.check_report:
+        if not REPORT.exists() or REPORT.read_text(encoding="utf-8") != rendered:
+            print("mutation report is stale; rerun with --write-report", file=sys.stderr)
+            return 1
+        print("mutation report is current")
+    else:
+        print(rendered, end="")
+    if score < THRESHOLD:
+        print(f"mutation score {score:.1f}% is below {THRESHOLD:.1f}%", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
