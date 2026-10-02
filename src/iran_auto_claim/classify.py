@@ -40,8 +40,9 @@ THIRD_PARTY_SIGNALS = (
 
 
 def classify(case: Case | dict[str, Any], kb: Knowledge | None = None) -> dict[str, Any]:
-    if isinstance(case, dict):
-        case = Case(case)
+    from .schema_input import validated_case
+
+    case = validated_case(case)
     kb = kb or Knowledge.load()
 
     basis: list[str] = []

@@ -57,6 +57,8 @@
       "id": "P07",
       "branch": "PARTIAL_DAMAGE",
       "unit": "million_toman",
+      "regulatory_snapshot": {"iranian_year": 1405},
+      "vehicle": {"production_year_shamsi": 1405},
       "inputs": {"gross": 80, "replacement_parts": [{"type": "GLASS", "loss": 80}], "franchise": 16},
       "expected": {"depreciation": 0, "payable": 64}
     },
@@ -64,6 +66,8 @@
       "id": "P08",
       "branch": "PARTIAL_DAMAGE",
       "unit": "million_toman",
+      "regulatory_snapshot": {"iranian_year": 1405},
+      "vehicle": {"production_year_shamsi": 1405},
       "inputs": {"battery_new_price": 40, "battery_loss": 40, "franchise": 2},
       "expected": {"eligible_before_other_terms": 20, "payable_if_no_further_deduction": 18, "flag": "BATTERY_50_PERCENT_CAP"}
     },
@@ -71,6 +75,8 @@
       "id": "P09",
       "branch": "PARTIAL_DAMAGE",
       "unit": "million_toman",
+      "regulatory_snapshot": {"iranian_year": 1405},
+      "vehicle": {"production_year_shamsi": 1405},
       "inputs": {"tires_new_price": 100, "tire_loss": 100, "franchise": 5},
       "expected": {"eligible_before_other_terms": 50, "payable_if_no_further_deduction": 45, "flag": "TIRE_50_PERCENT_CAP"}
     },
@@ -163,14 +169,14 @@
       "id": "T22",
       "branch": "TOTAL_THEFT",
       "unit": "million_toman",
-      "inputs": {"days_missing": 59, "market": 1800, "insured": 1800},
+      "inputs": {"theft_type": "WHOLE_VEHICLE", "days_missing": 59, "market": 1800, "insured": 1800},
       "expected": {"payable": null, "status": "60_DAY_TOTAL_LOSS_CRITERION_NOT_MET"}
     },
     {
       "id": "T23",
       "branch": "TOTAL_THEFT",
       "unit": "million_toman",
-      "inputs": {"days_missing": 60, "market": 1800, "insured": 1800, "franchise": 180, "title_transferred": true},
+      "inputs": {"theft_type": "WHOLE_VEHICLE", "days_missing": 60, "market": 1800, "insured": 1800, "franchise": 180, "title_transferred": true},
       "expected": {"total_loss_criterion": true, "payable_if_no_other_deductions": 1620}
     },
 
@@ -206,6 +212,8 @@
       "id": "G28",
       "branch": "PARTIAL_DAMAGE",
       "unit": "million_toman",
+      "regulatory_snapshot": {"iranian_year": 1405},
+      "vehicle": {"production_year_shamsi": 1405},
       "inputs": {"lamp_glass": 20, "other_replacement_part": 40, "other_part_depreciation_rate": 0.05, "franchise": 6},
       "expected": {"glass_depreciation": 0, "other_depreciation": 2, "payable": 52}
     },

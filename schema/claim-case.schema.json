@@ -4,9 +4,12 @@
   "title": "Iran Auto Claim Calculation Case",
   "description": "Input contract for the Iranian motor claim rule engine. Money is carried in the case's declared `unit`; production callers should supply integer IRR and set unit=IRR. Where a regulation leaves an operation unresolved the case must say so explicitly rather than omit the field, because the engine refuses to invent a sequence.",
   "type": "object",
-  "required": ["claim_id", "classification", "vehicle", "event", "policy", "calculation_config"],
+  "additionalProperties": false,
+  "required": ["claim_id"],
   "properties": {
-    "claim_id": { "type": "string" },
+    "claim_id": { "type": "string", "minLength": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "note": { "type": "string" },
     "unit": {
       "enum": ["IRR", "toman", "million_toman", "billion_toman"],
       "default": "million_toman"
@@ -14,14 +17,14 @@
 
     "regulatory_snapshot": {
       "type": "object",
-      "required": ["as_of_date"],
+      "additionalProperties": false,
       "description": "Annual parameters frozen at the case's assessment date. Values here override the knowledge base's AnnualParameter nodes for that Iranian year.",
       "properties": {
         "as_of_date": { "type": "string", "format": "date" },
         "iranian_year": { "type": "integer" },
-        "bodily_limit_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "conventional_vehicle_threshold_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "minimum_financial_limit_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "bodily_limit_irr": { "type": ["number", "null"], "minimum": 0 },
+        "conventional_vehicle_threshold_irr": { "type": ["number", "null"], "minimum": 0 },
+        "minimum_financial_limit_irr": { "type": ["number", "null"], "minimum": 0 },
         "annual_parameter_source": { "type": ["string", "null"] },
         "annual_parameter_confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
       }
@@ -29,7 +32,7 @@
 
     "classification": {
       "type": "object",
-      "required": ["domain", "branch"],
+      "additionalProperties": false,
       "properties": {
         "domain": {
           "enum": ["BODY", "THIRD_PARTY_FINANCIAL", "LEGAL_RECOVERY"]
@@ -71,26 +74,30 @@
 
     "vehicle": {
       "type": "object",
-      "required": ["market_value_at_event_irr"],
+      "additionalProperties": false,
       "properties": {
         "vehicle_type": { "type": "string" },
         "is_passenger_car": { "type": "boolean" },
         "production_year_shamsi": { "type": ["integer", "null"] },
-        "market_value_at_event_irr": { "type": "integer", "minimum": 0 },
-        "insured_sum_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "salvage_value_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "market_value_at_event_irr": { "type": "number", "minimum": 0 },
+        "insured_sum_irr": { "type": ["number", "null"], "minimum": 0 },
+        "salvage_value_irr": { "type": ["number", "null"], "minimum": 0 },
         "salvage_disposition": {
           "enum": ["NOT_APPLICABLE", "INSURED_RETAINS", "INSURER_TAKES_TITLE", "UNRESOLVED"],
           "default": "NOT_APPLICABLE"
         },
-        "title_transferred_to_insurer": { "type": ["boolean", "null"] }
+        "title_transferred_to_insurer": { "type": ["boolean", "null"] },
+        "title_transferred": { "type": "boolean" }
       }
     },
 
     "event": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "event_date": { "type": "string", "format": "date" },
+        "event_date": { "type": "string" },
+        "awareness_date": { "type": "string" },
+        "declaration_date": { "type": "string" },
         "cause": { "type": "string" },
         "peril": { "type": "string" },
         "theft_type": {
@@ -101,9 +108,19 @@
             "PARTS_STOLEN_AFTER_ACCIDENT"
           ]
         },
-        "days_vehicle_missing": { "type": ["integer", "null"], "minimum": 0 },
+        "days_vehicle_missing": { "type": ["number", "null"], "minimum": 0 },
         "fault_status": {
-          "enum": ["INSURED_FAULT", "THIRD_PARTY_FAULT", "SHARED", "UNKNOWN", "NOT_APPLICABLE"]
+          "enum": [
+            "INSURED_FAULT",
+            "THIRD_PARTY_FAULT",
+            "SHARED",
+            "UNKNOWN",
+            "NOT_APPLICABLE",
+            "INSURED_AT_FAULT",
+            "THIRD_PARTY_AT_FAULT",
+            "NO_OTHER_PARTY",
+            "UNDETERMINED"
+          ]
         },
         "intoxication_causally_confirmed": { "type": "boolean" },
         "valid_licence": { "type": ["boolean", "null"] },
@@ -115,24 +132,38 @@
 
     "damage": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Assessed damage. Either itemise `parts` + `labor`, or supply an aggregate `gross_damage_irr`. The scalar shorthand keys are accepted for assessment-estimator integration and fixture readability; they normalise into the same Part records.",
       "properties": {
-        "labor_irr": { "type": "integer", "minimum": 0 },
-        "gross_damage_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "repair_total_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "repair_and_replacement_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "rescue_transport_actual_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "rescue_for_total_loss_test_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "assessed_depreciation_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "depreciable_parts_base_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "theft_type": {
+          "enum": [
+            "WHOLE_VEHICLE",
+            "ATTEMPTED_VEHICLE_THEFT_DAMAGE",
+            "PARTIAL_PARTS_THEFT",
+            "PARTS_STOLEN_AFTER_ACCIDENT"
+          ]
+        },
+        "labor_irr": { "type": "number", "minimum": 0 },
+        "gross_damage_irr": { "type": ["number", "null"], "minimum": 0 },
+        "repair_total_irr": { "type": ["number", "null"], "minimum": 0 },
+        "repair_and_replacement_irr": { "type": ["number", "null"], "minimum": 0 },
+        "rescue_transport_actual_irr": { "type": ["number", "null"], "minimum": 0 },
+        "rescue_for_total_loss_test_irr": { "type": ["number", "null"], "minimum": 0 },
+        "assessed_depreciation_irr": { "type": ["number", "null"], "minimum": 0 },
+        "depreciable_parts_base_irr": { "type": ["number", "null"], "minimum": 0 },
         "depreciation_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
-        "actual_financial_loss_irr": { "type": ["integer", "null"], "minimum": 0 },
-        "article8_corresponding_damage_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "actual_financial_loss_irr": { "type": ["number", "null"], "minimum": 0 },
+        "article8_corresponding_damage_irr": { "type": ["number", "null"], "minimum": 0 },
         "parts": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["category", "assessed_loss_irr"],
+            "additionalProperties": false,
+            "required": ["category"],
+            "anyOf": [
+              { "required": ["assessed_loss_irr"] },
+              { "required": ["assessed_loss"] }
+            ],
             "properties": {
               "name": { "type": "string" },
               "category": {
@@ -145,10 +176,104 @@
                   "REPAIR_ONLY"
                 ]
               },
-              "new_price_irr": { "type": ["integer", "null"], "minimum": 0 },
-              "assessed_loss_irr": { "type": "integer", "minimum": 0 },
+              "new_price_irr": { "type": ["number", "null"], "minimum": 0 },
+              "assessed_loss_irr": { "type": "number", "minimum": 0 },
+              "assessed_loss": { "type": "number", "minimum": 0 },
               "requires_replacement": { "type": "boolean" },
-              "article8_corresponding_part_irr": { "type": ["integer", "null"], "minimum": 0 }
+              "article8_corresponding_part_irr": { "type": ["number", "null"], "minimum": 0 }
+            }
+          }
+        },
+        "labor": { "type": "number", "minimum": 0 },
+        "gross": { "type": "number", "minimum": 0 },
+        "gross_damage": { "type": "number", "minimum": 0 },
+        "repair": { "type": "number", "minimum": 0 },
+        "repair_total": { "type": "number", "minimum": 0 },
+        "market": { "type": "number", "minimum": 0 },
+        "market_value": { "type": "number", "minimum": 0 },
+        "insured": { "type": "number", "minimum": 0 },
+        "insured_sum": { "type": "number", "minimum": 0 },
+        "franchise": { "type": "number", "minimum": 0 },
+        "franchise_from_policy": { "type": "number", "minimum": 0 },
+        "depreciation": { "type": "number", "minimum": 0 },
+        "depreciable_parts": { "type": "number", "minimum": 0 },
+        "rescue": { "type": "number", "minimum": 0 },
+        "actual_rescue": { "type": "number", "minimum": 0 },
+        "rescue_payable": { "type": "number", "minimum": 0 },
+        "rescue_for_threshold": { "type": "number", "minimum": 0 },
+        "salvage": { "type": "number", "minimum": 0 },
+        "salvage_value": { "type": "number", "minimum": 0 },
+        "battery_loss": { "type": "number", "minimum": 0 },
+        "battery_new_price": { "type": "number", "minimum": 0 },
+        "tire_loss": { "type": "number", "minimum": 0 },
+        "tires_new_price": { "type": "number", "minimum": 0 },
+        "lamp_glass": { "type": "number", "minimum": 0 },
+        "other_replacement_part": { "type": "number", "minimum": 0 },
+        "other_part_depreciation_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "actual_damage": { "type": "number", "minimum": 0 },
+        "corresponding_damage": { "type": "number", "minimum": 0 },
+        "similar_part_corresponding_damage": { "type": "number", "minimum": 0 },
+        "policy_financial_limit": { "type": "number", "minimum": 0 },
+        "tp_limit": { "type": "number", "minimum": 0 },
+        "vehicle_value": { "type": "number", "minimum": 0 },
+        "victim_vehicle_value": { "type": "number", "minimum": 0 },
+        "conventional_threshold": { "type": "number", "minimum": 0 },
+        "threshold": { "type": "number", "minimum": 0 },
+        "body_insurer_paid": { "type": "number", "minimum": 0 },
+        "glass_franchise_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "whole_car_ratio": { "type": "number", "minimum": 0 },
+        "article8_whole_car_ratio": { "type": "number", "minimum": 0 },
+        "proportional_ratio": { "type": "number", "minimum": 0 },
+        "article8_proportional_ratio": { "type": "number", "minimum": 0 },
+        "glass_only_franchise_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "universal_glass_franchise": { "type": "number", "minimum": 0, "maximum": 1 },
+        "days_missing": { "type": "integer", "minimum": 0 },
+        "production_year": { "type": "integer" },
+        "cause": { "type": "string" },
+        "peril": { "type": "string" },
+        "property_type": { "type": "string" },
+        "salvage_disposition": {
+          "enum": ["NOT_APPLICABLE", "INSURED_RETAINS", "INSURER_TAKES_TITLE", "UNRESOLVED"]
+        },
+        "title_transferred": { "type": "boolean" },
+        "glass_endorsement": { "type": "boolean" },
+        "endorsement": { "type": "boolean" },
+        "partial_theft_endorsement": { "type": "boolean" },
+        "has_body_policy": { "type": "boolean" },
+        "body_franchise_for_excess_disclosed": { "type": "boolean" },
+        "insured_preserved_recovery_rights": { "type": "boolean" },
+        "insured_released_responsible_party": { "type": "boolean" },
+        "responsible_third_party_identified": { "type": "boolean" },
+        "recovery_right_impaired": { "type": "boolean" },
+        "replacement_parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "anyOf": [
+                  { "required": ["type"] },
+                  { "required": ["category"] }
+                ]
+              },
+              {
+                "anyOf": [
+                  { "required": ["loss"] },
+                  { "required": ["assessed_loss"] }
+                ]
+              }
+            ],
+            "properties": {
+              "name": { "type": "string" },
+              "type": {
+                "enum": ["GLASS", "LAMP_GLASS", "BATTERY", "TIRE", "OTHER_REPLACEMENT_PART", "REPAIR_ONLY"]
+              },
+              "category": {
+                "enum": ["GLASS", "LAMP_GLASS", "BATTERY", "TIRE", "OTHER_REPLACEMENT_PART", "REPAIR_ONLY"]
+              },
+              "loss": { "type": "number", "minimum": 0 },
+              "assessed_loss": { "type": "number", "minimum": 0 }
             }
           }
         }
@@ -157,20 +282,40 @@
 
     "policy": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "insurer": { "type": ["string", "null"] },
         "policy_version": { "type": ["string", "null"] },
-        "third_party_financial_limit_irr": { "type": ["integer", "null"], "minimum": 0 },
+        "third_party_financial_limit_irr": { "type": ["number", "null"], "minimum": 0 },
         "endorsements": { "type": "array", "items": { "type": "string" } },
         "has_body_policy": { "type": ["boolean", "null"] },
+        "glass_valuation_condition": {
+          "enum": [
+            "CONDITION_ABSENT",
+            "REQUIRES_INSURED_AT_MARKET_VALUE",
+            "HAS_VALUATION_CEILING",
+            "WORDING_NOT_OBTAINED"
+          ]
+        },
+        "multiple_insurance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "enum": ["NO", "YES_OTHER_POLICIES", "YES_SAME_INSURER", "UNKNOWN"]
+            },
+            "prior_compensation": { "type": "number", "minimum": 0 }
+          }
+        },
         "franchise": {
           "type": ["object", "null"],
+          "additionalProperties": false,
           "required": ["mode", "source"],
           "properties": {
             "mode": { "enum": ["ABSOLUTE", "PERCENT", "PERCENT_WITH_MINIMUM"] },
-            "absolute_irr": { "type": ["integer", "null"] },
+            "absolute_irr": { "type": ["number", "null"] },
             "rate": { "type": ["number", "null"] },
-            "minimum_irr": { "type": ["integer", "null"] },
+            "minimum_irr": { "type": ["number", "null"] },
             "calculation_base": { "type": ["string", "null"] },
             "claim_sequence_rule": { "type": ["string", "null"] },
             "coverage_specific_rule": { "type": ["string", "null"] },
@@ -184,17 +329,25 @@
 
     "coverage_gate": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "base_peril": { "type": "boolean" },
         "endorsement_restores_excluded_peril": { "type": "boolean" },
         "non_compensable_exclusion": { "type": "boolean" },
         "subrogation_impaired": { "type": "boolean" },
-        "late_notice_issue": { "type": "boolean" }
+        "late_notice_issue": { "type": "boolean" },
+        "causal_relationship_established": { "type": "boolean" },
+        "glass_from_base_peril": { "type": "boolean" },
+        "risk_intensified": { "type": "boolean" }
       }
     },
 
     "evidence": {
       "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^EVT_[A-Z0-9_]+$": { "type": "boolean" }
+      },
       "properties": {
         "policy_terms_available": { "type": "boolean" },
         "expert_assessment_available": { "type": "boolean" },
@@ -208,6 +361,7 @@
 
     "calculation_config": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Explicit carriers for the operations primary sources do not settle. Defaults are UNRESOLVED, which makes the engine return a scenario set rather than one fabricated number.",
       "properties": {
         "article10_partial_order": {
@@ -234,12 +388,25 @@
           "enum": ["ASSESSED_GROSS", "ELIGIBLE_GROSS", "SETTLEMENT_BASE"],
           "default": "ASSESSED_GROSS"
         },
-        "franchise_rate": { "type": ["number", "null"] }
+        "franchise_rate": { "type": ["number", "null"] },
+        "settlement_mode": {
+          "enum": ["CASH", "REPAIR_IN_KIND", "REPLACEMENT_VEHICLE", "NOT_DECIDED"]
+        },
+        "article8_method": { "enum": ["COMPONENT", "WHOLE_CAR_RATIO"] }
+      }
+    },
+
+    "derived": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "article10_ratio": { "type": "number", "minimum": 0, "maximum": 1 }
       }
     },
 
     "result": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Engine output. Present only in persisted/annotated cases; the engine writes it.",
       "properties": {
         "payable_irr": { "type": ["integer", "null"] },
@@ -250,5 +417,105 @@
         "rule_trace": { "type": "array", "items": { "type": "string" } }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["classification"],
+        "properties": {
+          "classification": {
+            "required": ["branch"],
+            "properties": {
+              "branch": { "enum": ["THEFT", "TOTAL_THEFT", "THEFT_PARTIAL_DAMAGE"] }
+            }
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": ["damage"],
+            "properties": { "damage": { "required": ["theft_type"] } }
+          },
+          {
+            "required": ["event"],
+            "properties": { "event": { "required": ["theft_type"] } }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": ["classification"],
+        "properties": {
+          "classification": {
+            "required": ["branch"],
+            "properties": {
+              "branch": { "enum": ["PARTIAL_DAMAGE", "GLASS_ONLY"] }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": ["damage"],
+        "properties": {
+          "damage": {
+            "anyOf": [
+              { "required": ["gross_damage_irr"] },
+              { "required": ["gross"] },
+              { "required": ["gross_damage"] },
+              { "required": ["repair_total_irr"] },
+              { "required": ["repair_and_replacement_irr"] },
+              { "required": ["repair"] },
+              { "required": ["repair_total"] },
+              { "required": ["parts"] },
+              { "required": ["replacement_parts"] },
+              { "required": ["labor_irr"] },
+              { "required": ["labor"] },
+              { "required": ["lamp_glass"] },
+              { "required": ["battery_loss"] },
+              { "required": ["tire_loss"] },
+              { "required": ["other_replacement_part"] }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["damage"],
+        "properties": {
+          "damage": {
+            "anyOf": [
+              { "required": ["parts"] },
+              { "required": ["replacement_parts"] },
+              { "required": ["battery_loss"] },
+              { "required": ["tire_loss"] },
+              { "required": ["other_replacement_part"] }
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": ["regulatory_snapshot"],
+        "properties": {
+          "regulatory_snapshot": { "required": ["iranian_year"] }
+        },
+        "anyOf": [
+          {
+            "required": ["vehicle"],
+            "properties": {
+              "vehicle": { "required": ["production_year_shamsi"] }
+            }
+          },
+          {
+            "required": ["damage"],
+            "properties": {
+              "damage": { "required": ["production_year"] }
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

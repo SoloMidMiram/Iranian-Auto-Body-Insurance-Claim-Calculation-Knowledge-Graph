@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+import pytest
+
 from iran_auto_claim.classify import classify
 from iran_auto_claim.engine import compute
 from iran_auto_claim.money import D
+from iran_auto_claim.schema_input import InputSchemaError
 
 
 def _case(branch=None, **inputs):
@@ -65,9 +68,12 @@ def test_an_unknown_part_category_is_refused_rather_than_silently_depreciated(kb
         "PARTIAL_DAMAGE",
         parts=[{"category": "BATTERY_TYPO", "assessed_loss": 100}],
     )
-    result = compute(payload, kb)
-    assert result.status == "INPUT_ERROR"
-    assert "unknown part category" in result.reason
+    with pytest.raises(InputSchemaError) as caught:
+        compute(payload, kb)
+    assert any(
+        item.code == "invalid_enum" and item.path == "damage.parts[0].category"
+        for item in caught.value.errors
+    )
 
 
 def test_engine_derives_when_no_branch_is_declared(kb):
@@ -80,10 +86,10 @@ def test_engine_derives_when_no_branch_is_declared(kb):
 # ----------------------------------------------------------------- dispatch
 
 
-def test_unknown_branch_is_reported_not_guessed(kb):
-    result = compute(_case("NOT_A_BRANCH"), kb)
-    assert result.payable is None
-    assert result.status == "UNKNOWN_BRANCH"
+def test_unknown_branch_is_rejected_by_the_schema(kb):
+    with pytest.raises(InputSchemaError) as caught:
+        compute(_case("NOT_A_BRANCH"), kb)
+    assert any(item.code == "invalid_enum" and item.path == "classification.branch" for item in caught.value.errors)
 
 
 def test_missing_insured_sum_alongside_a_market_value_is_an_input_error(kb):
@@ -141,10 +147,9 @@ def test_confidence_model_is_computed_from_the_trace(kb):
     assert unresolved.formula_confidence == 0.55
 
 
-def test_confidence_is_never_asserted_without_a_cited_rule(kb):
-    result = compute(_case("NOT_A_BRANCH"), kb)
-    assert result.formula_confidence is None
-    assert result.provenance == []
+def test_an_unknown_branch_never_receives_a_confidence_figure(kb):
+    with pytest.raises(InputSchemaError):
+        compute(_case("NOT_A_BRANCH"), kb)
 
 
 # ---------------------------------------------------------------- provenance
@@ -164,15 +169,15 @@ def test_provenance_is_attached_for_every_cited_rule(kb):
 
 
 def test_depreciation_is_zero_for_glass_inside_a_mixed_claim(kb):
-    result = compute(
-        _case(
+    payload = _case(
             "PARTIAL_DAMAGE",
             gross=80,
+            production_year=1405,
             replacement_parts=[{"type": "GLASS", "loss": 80}],
             franchise=16,
-        ),
-        kb,
     )
+    payload["regulatory_snapshot"] = {"iranian_year": 1405}
+    result = compute(payload, kb)
     assert result.fields["glass_depreciation"] == D(0)
     assert result.fields["depreciation"] == D(0)
 

@@ -46,6 +46,10 @@ Every supported calculation must satisfy all of these:
 - Missing one of insured sum/market value where the ratio is assessed.
 - Production year after claim year and unsupported Iranian year.
 - Unknown fields, categories, branches, variants, and enum spellings.
+- Numeric strings and string booleans rejected at the claim boundary; JSON `false`
+  and numeric zero preserved through normalization.
+- Malformed itemised and shorthand parts rejected rather than skipped or defaulted.
+- Itemised depreciation rejected until both event year and production year are sourced.
 
 ### Partial damage
 
@@ -112,8 +116,8 @@ Every supported calculation must satisfy all of these:
   come from a policy slot with a named source.
 - Every slot a body branch requires is reachable by a question, a declared supplier, or
   derivation from evidenced slots.
-- The case emitted by `review --emit-case` is accepted by `calc` and produces the same
-  payable as the review itself.
+- An authorized case emitted by `review --emit-case` is accepted by `calc` and produces
+  the same payable as the review itself; incomplete and refused reviews cannot export.
 - Ladder assignment excludes the `always` fallback rung, so a well-formed file is not
   reported as uncertified; every `example_cases` entry must exist in the corpus.
 - Licence state keeps its three-way distinction: void, wrong class and absent defeat

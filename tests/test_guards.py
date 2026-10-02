@@ -170,16 +170,15 @@ def test_insured_sum_ceiling_is_enforced(kb):
 
 
 def test_old_battery_and_tires_surface_the_interaction_uncertainty(kb):
-    result = compute(
-        _case(
+    payload = _case(
             "PARTIAL_DAMAGE",
             production_year=1392,
             battery_loss=40,
             battery_new_price=80,
             franchise=2,
-        ),
-        kb,
     )
+    payload["regulatory_snapshot"] = {"iranian_year": 1405}
+    result = compute(payload, kb)
     assert result.payable is None
     assert result.status == "BATTERY_TIRE_INTERACTION_UNRESOLVED"
     assert result.blocking_uncertainties == ["U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
@@ -198,6 +197,7 @@ def test_resolving_the_interaction_yields_a_single_number(kb):
         battery_new_price=80,
         franchise=2,
     )
+    payload["regulatory_snapshot"] = {"iranian_year": 1405}
     payload["calculation_config"] = {"battery_tire_depreciation_interaction": "CAP_THEN_DEPRECIATE"}
     result = compute(payload, kb)
     # cap = 0.5 * 80 = 40; rate = min(0.25, 0.05 * 10) = 0.25; dep = 10

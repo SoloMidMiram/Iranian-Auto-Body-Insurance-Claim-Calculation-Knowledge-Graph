@@ -17,13 +17,13 @@ import pytest
 
 from iran_auto_claim.case import Case
 from iran_auto_claim.engine import compute
+from iran_auto_claim.schema_input import InputSchemaError
 from iran_auto_claim.review import (
     DECISION_COMPUTE,
     DECISION_INSUFFICIENT,
     DECISION_REFUSE,
     DECISION_SCENARIO,
     Review,
-    ReviewInputError,
     ladder_markdown,
     mermaid_architecture,
     mermaid_branch_tree,
@@ -105,20 +105,24 @@ def test_a_predicate_naming_an_unknown_node_is_an_integrity_issue(kb):
 
 
 def test_an_unknown_question_is_refused_rather_than_ignored(kb):
-    with pytest.raises(ReviewInputError, match="not a question in the procedure"):
+    with pytest.raises(InputSchemaError) as caught:
         Review({"claim_id": "X", "answers": {"Q-S99-99": "YES"}}, kb)
+    assert caught.value.errors[0].code == "unknown_field"
+    assert caught.value.errors[0].path == "answers.Q-S99-99"
 
 
 def test_an_inadmissible_choice_is_refused(kb):
-    with pytest.raises(ReviewInputError, match="is not admissible"):
+    with pytest.raises(InputSchemaError) as caught:
         Review({"claim_id": "X", "answers": {"Q-S2-01": "METEORITE"}}, kb)
+    assert caught.value.errors[0].code == "invalid_enum"
 
 
 def test_a_non_numeric_money_answer_is_refused(kb):
-    with pytest.raises(ReviewInputError, match="is not a money amount"):
+    with pytest.raises(InputSchemaError) as caught:
         Review(
             {"claim_id": "X", "answers": {"Q-S2-01": "COLLISION", "Q-S4-02": "about forty"}}, kb
         )
+    assert caught.value.errors[0].code == "invalid_type"
 
 
 def test_unknown_is_admissible_and_binds_nothing(kb):
@@ -479,9 +483,21 @@ def test_review_cli_refuses_an_unknown_question(capsys, tmp_path):
     from iran_auto_claim.cli import main
 
     bad = tmp_path / "bad.json"
-    bad.write_text(json.dumps({"claim_id": "X", "answers": {"Q-NOPE": "YES"}}), encoding="utf-8")
+    bad.write_text(json.dumps({"claim_id": "X", "answers": {"Q-S9-99": "YES"}}), encoding="utf-8")
     assert main(["review", str(bad)]) == 1
-    assert "not a question in the procedure" in capsys.readouterr().out
+    error = json.loads(capsys.readouterr().out)
+    assert error["errors"][0]["code"] == "unknown_field"
+    assert error["errors"][0]["path"] == "answers.Q-S9-99"
+
+
+def test_review_cli_does_not_export_an_unauthorized_case(capsys, tmp_path):
+    from iran_auto_claim.cli import main
+
+    emitted = tmp_path / "blocked.json"
+    assert main(["review", str(CASES / "review_t0_intake_partial.json"), "--emit-case", str(emitted)]) == 1
+    error = json.loads(capsys.readouterr().out)
+    assert error["errors"][0]["code"] == "review_not_authorized"
+    assert not emitted.exists()
 
 
 def test_review_cli_reports_readiness_as_json(capsys):

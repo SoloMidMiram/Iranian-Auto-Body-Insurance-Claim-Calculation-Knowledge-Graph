@@ -753,8 +753,9 @@ def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
 
 
 def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcResult:
-    if isinstance(case, dict):
-        case = Case(case)
+    from .schema_input import validated_case
+
+    case = validated_case(case)
     kb = kb or Knowledge.load()
 
     res = CalcResult(
