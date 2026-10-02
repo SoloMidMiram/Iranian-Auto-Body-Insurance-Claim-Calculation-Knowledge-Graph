@@ -20,7 +20,8 @@
     {"title": "Phase 3 - Insurer calibration", "description": "Versioned insurer and assessor procedures."},
     {"title": "Phase 4 - Independent validation", "description": "Golden cases and governed knowledge expansion."},
     {"title": "Phase 5 - Private shadow pilot", "description": "Human-reviewed, observable, non-payment-controlling pilot."},
-    {"title": "Phase 6 - Controlled release", "description": "Certification, supported scope, rollback, and release."}
+    {"title": "Phase 6 - Controlled release", "description": "Certification, supported scope, rollback, and release."},
+    {"title": "Third-party / Article 8 expansion", "description": "Deferred beyond body-model v0.1. Article 8 actual-loss ceilings and third-party expansion."}
   ],
   "issues": [
     {
@@ -71,7 +72,7 @@
     {
       "id": "P0-04",
       "title": "Correct Article 8 actual-loss ceilings and zero handling",
-      "milestone": "Phase 0 - Safety baseline",
+      "milestone": "Third-party / Article 8 expansion",
       "labels": ["priority:P0", "segment:calculation"],
       "dependencies": ["P0-02"],
       "objective": "Ensure Article 8 never pays above actual proven loss and never treats zero as missing.",
