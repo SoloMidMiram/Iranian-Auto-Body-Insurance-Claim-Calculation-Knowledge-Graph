@@ -30,7 +30,7 @@ from .case import PART_CATEGORIES
 from .classify import classify
 from .engine import CalcResult, compute
 from .knowledge import Knowledge
-from .schema_input import validate_review
+from .schema_input import load_json_document, validate_review
 
 # Answers that mean "this file does not say". They bind nothing.
 UNANSWERED_TOKENS = {"", None, "UNKNOWN", "NOT_STATED", "NOT_REVIEWED", "NOT_APPLICABLE_TO_BODY"}
@@ -123,47 +123,21 @@ class Review:
     whether an amount may be issued yet."""
 
     def __init__(self, payload: dict[str, Any], kb: Knowledge | None = None) -> None:
-        if not isinstance(payload, dict):
-            raise ReviewInputError("a review payload must be a JSON object")
-        validate_review(payload)
         self.kb = kb or Knowledge.load()
+        validate_review(payload, self.kb)
         self.claim_id = str(payload.get("claim_id") or payload.get("id") or "unnamed-review")
         self.unit = payload.get("unit") or "million_toman"
         self.payload = payload
         self.answers: dict[str, Any] = dict(payload.get("answers") or {})
-        self._validate_answers()
         self.slots: dict[str, SlotBinding] = {}
         self._bound: dict[str, Any] = {}
         self.bind()
 
     @classmethod
     def from_file(cls, path: Path | str, kb: Knowledge | None = None) -> "Review":
-        return cls(json.loads(Path(path).read_text(encoding="utf-8")), kb)
+        return cls(load_json_document(path), kb)
 
     # ------------------------------------------------------------------ answers
-
-    def _validate_answers(self) -> None:
-        for question_id, value in self.answers.items():
-            question = self.kb.question(question_id)
-            if question is None:
-                raise ReviewInputError(
-                    f"{question_id!r} is not a question in the procedure; "
-                    "the answer vocabulary is closed"
-                )
-            allowed = {str(item) for item in question.get("answers") or []}
-            fmt = question.get("answer_format")
-            if fmt in ("choice", "list_of_choices"):
-                for item in _as_list(value):
-                    if str(item) == "UNKNOWN" or str(item) in allowed:
-                        continue
-                    raise ReviewInputError(
-                        f"{question_id}: {item!r} is not admissible; expected "
-                        f"{', '.join(sorted(allowed))} or UNKNOWN"
-                    )
-            if fmt == "money" and not _is_number(value):
-                raise ReviewInputError(f"{question_id}: {value!r} is not a money amount")
-            if fmt == "integer" and not isinstance(value, int):
-                raise ReviewInputError(f"{question_id}: {value!r} is not an integer")
 
     def answer(self, question_id: str) -> Any:
         return self.answers.get(question_id)
@@ -562,6 +536,9 @@ class Review:
             coverage["late_notice_issue"] = True
         if str(slot_value("PS_SUBROGATION_IMPAIRED") or "").lower() == "true":
             coverage["subrogation_impaired"] = True
+        risk_answer = str(self.answer("Q-S3-07") or "")
+        if risk_answer in ("YES", "NO"):
+            coverage["risk_intensified"] = risk_answer == "YES"
 
         evidence = {
             item["node_id"]: item["node_id"] in self.evidence_present()
@@ -570,7 +547,7 @@ class Review:
 
         payload: dict[str, Any] = {
             "claim_id": self.claim_id,
-            "unit": self.unit,
+            "unit": "IRR" if str(self.unit).lower() == "irr" else self.unit,
             "regulatory_snapshot": (
                 {"iranian_year": slot_value("PS_CLAIM_YEAR")}
                 if slot_value("PS_CLAIM_YEAR") is not None else {}
@@ -582,6 +559,11 @@ class Review:
             "policy": {
                 "endorsements": endorsements,
                 **({"franchise": franchise} if isinstance(franchise, dict) else {}),
+                **(
+                    {"glass_valuation_condition": slot_value("PS_GLASS_VALUATION_CONDITION")}
+                    if slot_value("PS_GLASS_VALUATION_CONDITION") is not None
+                    else {}
+                ),
                 **(
                     {"multiple_insurance": multiple_insurance}
                     if isinstance(multiple_insurance, dict)

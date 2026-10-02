@@ -37,8 +37,17 @@ from .fixtures import run_all
 from .ingest import apply_ingest, load_submission, plan_ingest
 from .knowledge import DEFAULT_ROOT, Knowledge, Node
 from .render import render_claim
-from .schema_input import InputSchemaError, validate_claim
+from .schema_input import (
+    CODE_UNAUTHORIZED,
+    InputSchemaError,
+    SchemaIssue,
+    load_json_document,
+    validated_case,
+    write_validated_claim,
+)
 from .review import (
+    DECISION_COMPUTE,
+    DECISION_SCENARIO,
     Review,
     ReviewInputError,
     ladder_markdown,
@@ -148,12 +157,8 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _load_case(path: str) -> Case:
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    if "claim_id" not in payload and "id" in payload:
-        payload["claim_id"] = payload["id"]
-    payload.setdefault("unit", "million_toman")
-    validate_claim(payload)
-    return Case(payload)
+    payload = load_json_document(path)
+    return validated_case(payload)
 
 
 def _cmd_fixtures(args: argparse.Namespace, kb: Knowledge) -> int:
@@ -472,12 +477,19 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
         return 1
 
     if args.emit_case:
+        decision = review.decision()["decision"]
+        if decision not in (DECISION_COMPUTE, DECISION_SCENARIO):
+            raise InputSchemaError(
+                [
+                    SchemaIssue(
+                        CODE_UNAUTHORIZED,
+                        "$",
+                        f"review decision {decision} does not authorize an engine case",
+                    )
+                ]
+            )
         payload = review.case_payload()
-        validate_claim(payload)
-        Path(args.emit_case).write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2, default=str),
-            encoding="utf-8",
-        )
+        write_validated_claim(args.emit_case, payload)
         print(f"wrote derived case to {args.emit_case}")
 
     if args.json:

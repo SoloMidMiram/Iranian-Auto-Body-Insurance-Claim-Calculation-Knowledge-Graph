@@ -169,15 +169,15 @@ def test_provenance_is_attached_for_every_cited_rule(kb):
 
 
 def test_depreciation_is_zero_for_glass_inside_a_mixed_claim(kb):
-    result = compute(
-        _case(
+    payload = _case(
             "PARTIAL_DAMAGE",
             gross=80,
+            production_year=1405,
             replacement_parts=[{"type": "GLASS", "loss": 80}],
             franchise=16,
-        ),
-        kb,
     )
+    payload["regulatory_snapshot"] = {"iranian_year": 1405}
+    result = compute(payload, kb)
     assert result.fields["glass_depreciation"] == D(0)
     assert result.fields["depreciation"] == D(0)
 

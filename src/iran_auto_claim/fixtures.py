@@ -124,6 +124,9 @@ def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult
         },
         "damage": fixture.get("inputs", {}),
     }
+    for field in ("regulatory_snapshot", "vehicle", "event", "policy", "coverage_gate", "calculation_config"):
+        if field in fixture:
+            case_payload[field] = fixture[field]
     result = compute(case_payload, kb)
     return result, check_expectations(fixture.get("expected", {}), result)
 

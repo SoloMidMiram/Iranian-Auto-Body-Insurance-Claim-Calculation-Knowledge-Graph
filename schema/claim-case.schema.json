@@ -250,6 +250,20 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
+            "allOf": [
+              {
+                "anyOf": [
+                  { "required": ["type"] },
+                  { "required": ["category"] }
+                ]
+              },
+              {
+                "anyOf": [
+                  { "required": ["loss"] },
+                  { "required": ["assessed_loss"] }
+                ]
+              }
+            ],
             "properties": {
               "name": { "type": "string" },
               "type": {
@@ -411,7 +425,9 @@
         "properties": {
           "classification": {
             "required": ["branch"],
-            "properties": { "branch": { "const": "THEFT" } }
+            "properties": {
+              "branch": { "enum": ["THEFT", "TOTAL_THEFT", "THEFT_PARTIAL_DAMAGE"] }
+            }
           }
         }
       },
@@ -424,6 +440,79 @@
           {
             "required": ["event"],
             "properties": { "event": { "required": ["theft_type"] } }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": ["classification"],
+        "properties": {
+          "classification": {
+            "required": ["branch"],
+            "properties": {
+              "branch": { "enum": ["PARTIAL_DAMAGE", "GLASS_ONLY"] }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": ["damage"],
+        "properties": {
+          "damage": {
+            "anyOf": [
+              { "required": ["gross_damage_irr"] },
+              { "required": ["gross"] },
+              { "required": ["gross_damage"] },
+              { "required": ["repair_total_irr"] },
+              { "required": ["repair_and_replacement_irr"] },
+              { "required": ["repair"] },
+              { "required": ["repair_total"] },
+              { "required": ["parts"] },
+              { "required": ["replacement_parts"] },
+              { "required": ["labor_irr"] },
+              { "required": ["labor"] },
+              { "required": ["lamp_glass"] },
+              { "required": ["battery_loss"] },
+              { "required": ["tire_loss"] },
+              { "required": ["other_replacement_part"] }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["damage"],
+        "properties": {
+          "damage": {
+            "anyOf": [
+              { "required": ["parts"] },
+              { "required": ["replacement_parts"] },
+              { "required": ["battery_loss"] },
+              { "required": ["tire_loss"] },
+              { "required": ["other_replacement_part"] }
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": ["regulatory_snapshot"],
+        "properties": {
+          "regulatory_snapshot": { "required": ["iranian_year"] }
+        },
+        "anyOf": [
+          {
+            "required": ["vehicle"],
+            "properties": {
+              "vehicle": { "required": ["production_year_shamsi"] }
+            }
+          },
+          {
+            "required": ["damage"],
+            "properties": {
+              "damage": { "required": ["production_year"] }
+            }
           }
         ]
       }

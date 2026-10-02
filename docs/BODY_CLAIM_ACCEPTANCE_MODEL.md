@@ -268,7 +268,7 @@ Validated on 2026-10-01:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 320 tests;
+- the complete automated suite passes: 331 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
@@ -327,4 +327,3 @@ Every answer should use this shape, even when no amount is produced:
 
 The natural-language response should lead with the decision, explain why, list only
 the next necessary questions, and show arithmetic only after the acceptance gate.
-

@@ -11,6 +11,7 @@ import json
 import math
 import re
 from dataclasses import dataclass
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,17 @@ CODE_UNKNOWN = "unknown_field"
 CODE_TYPE = "invalid_type"
 CODE_ENUM = "invalid_enum"
 CODE_BOOLEAN = "invalid_boolean"
+CODE_UNAUTHORIZED = "review_not_authorized"
+CODE_SCHEMA = "unsupported_schema_keyword"
+CODE_JSON = "invalid_json"
+
+_SUPPORTED_SCHEMA_KEYS = {
+    "$schema", "$id", "title", "description", "default",
+    "type", "const", "enum", "minimum", "maximum", "minLength", "minProperties",
+    "pattern", "format", "uniqueItems", "required", "properties", "patternProperties",
+    "propertyNames", "additionalProperties", "items", "allOf", "anyOf", "if", "then", "else",
+    "x-answer-formats", "x-refusals",
+}
 
 
 @dataclass(frozen=True)
@@ -50,8 +62,41 @@ def validate_claim(payload: Any) -> None:
     _require(payload, _load(CLAIM_SCHEMA))
 
 
-def validate_review(payload: Any) -> None:
+def validate_review(payload: Any, kb: Any | None = None) -> None:
     _require(payload, _load(REVIEW_SCHEMA))
+    if kb is None:
+        from .knowledge import Knowledge
+
+        kb = Knowledge.load()
+    issues = _review_issues(payload, kb)
+    if issues:
+        raise InputSchemaError(issues)
+
+
+def validated_case(payload: Any) -> Any:
+    """Return a Case only after its raw payload passes the shared boundary."""
+    from .case import Case
+
+    raw = payload.raw if isinstance(payload, Case) else payload
+    validate_claim(raw)
+    return payload if isinstance(payload, Case) else Case(raw)
+
+
+def write_validated_claim(path: Path | str, payload: Any) -> None:
+    """Validate and write JSON without turning Decimal amounts into strings or floats."""
+    validate_claim(payload)
+    Path(path).write_text(_encode_json(payload, 0) + "\n", encoding="utf-8")
+
+
+def load_json_document(path: Path | str) -> Any:
+    """Load a JSON document and expose parse failures through the stable error model."""
+    target = Path(path)
+    try:
+        return json.loads(target.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise InputSchemaError(
+            [SchemaIssue(CODE_JSON, "$", f"invalid JSON at line {error.lineno}, column {error.colno}")]
+        ) from error
 
 
 def _require(payload: Any, schema: dict[str, Any]) -> None:
@@ -68,6 +113,10 @@ def _load(name: str) -> dict[str, Any]:
         raise InputSchemaError(
             [SchemaIssue(CODE_TYPE, name, "schema document must be an object")]
         )
+    unsupported: list[SchemaIssue] = []
+    _check_schema_keywords(loaded, "$", unsupported)
+    if unsupported:
+        raise InputSchemaError(unsupported)
     return loaded
 
 
@@ -115,6 +164,11 @@ def _check(instance: Any, schema: dict[str, Any], path: str, issues: list[Schema
         minimum = schema.get("minLength")
         if isinstance(minimum, int) and len(instance) < minimum:
             issues.append(SchemaIssue(CODE_TYPE, path or "$", "value is empty"))
+        if schema.get("format") == "date":
+            try:
+                date.fromisoformat(instance)
+            except ValueError:
+                issues.append(SchemaIssue(CODE_TYPE, path or "$", "value must be an ISO date"))
     if _is_number(instance):
         _check_bounds(instance, schema, path, issues)
 
@@ -194,7 +248,7 @@ def _check_bounds(instance: Any, schema: dict[str, Any], path: str, issues: list
 def _enum_holds(instance: Any, allowed: Any) -> bool:
     if not isinstance(allowed, list):
         return True
-    return any(instance == item for item in allowed)
+    return any(type(instance) is type(item) and instance == item for item in allowed)
 
 
 def _type_holds(instance: Any, expected: Any) -> bool:
@@ -223,11 +277,6 @@ def _one_type(instance: Any, name: Any) -> bool:
 def _is_number(instance: Any) -> bool:
     if isinstance(instance, bool):
         return False
-    if isinstance(instance, str):
-        try:
-            return Decimal(instance).is_finite()
-        except InvalidOperation:
-            return False
     if isinstance(instance, Decimal):
         return instance.is_finite()
     if isinstance(instance, float):
@@ -259,3 +308,189 @@ def _freeze(values: list[Any]) -> set[str]:
     for item in values:
         frozen.add(json.dumps(item, sort_keys=True, default=str))
     return frozen
+
+
+def _check_schema_keywords(
+    schema: dict[str, Any], path: str, issues: list[SchemaIssue]
+) -> None:
+    for key in schema:
+        if key not in _SUPPORTED_SCHEMA_KEYS:
+            issues.append(
+                SchemaIssue(
+                    CODE_SCHEMA,
+                    f"{path}.{key}",
+                    "runtime validator does not implement this keyword",
+                )
+            )
+    for container in ("properties", "patternProperties"):
+        children = schema.get(container)
+        if isinstance(children, dict):
+            for name, child in children.items():
+                if isinstance(child, dict):
+                    _check_schema_keywords(child, f"{path}.{container}.{name}", issues)
+    for key in ("additionalProperties", "items", "propertyNames", "if", "then", "else"):
+        child = schema.get(key)
+        if isinstance(child, dict):
+            _check_schema_keywords(child, f"{path}.{key}", issues)
+    for key in ("allOf", "anyOf"):
+        children = schema.get(key)
+        if isinstance(children, list):
+            for index, child in enumerate(children):
+                if isinstance(child, dict):
+                    _check_schema_keywords(child, f"{path}.{key}[{index}]", issues)
+
+
+def _review_issues(payload: Any, kb: Any) -> list[SchemaIssue]:
+    """Apply the graph's closed question/evidence vocabularies at the same boundary."""
+    if not isinstance(payload, dict):
+        return []
+    issues: list[SchemaIssue] = []
+    answers = payload.get("answers")
+    if isinstance(answers, dict):
+        for question_id, value in answers.items():
+            path = f"answers.{question_id}"
+            question = kb.question(question_id)
+            if question is None:
+                issues.append(SchemaIssue(CODE_UNKNOWN, path, "question is not in the procedure"))
+                continue
+            fmt = question.get("answer_format")
+            allowed = question.get("answers") or []
+            if fmt == "choice":
+                if not isinstance(value, str) or value not in allowed:
+                    issues.append(SchemaIssue(CODE_ENUM, path, "answer is outside the closed set"))
+            elif fmt == "money" and not _review_number(value):
+                issues.append(SchemaIssue(CODE_TYPE, path, "answer must be a finite number"))
+            elif fmt == "integer" and not (
+                isinstance(value, int) and not isinstance(value, bool)
+            ):
+                issues.append(SchemaIssue(CODE_TYPE, path, "answer must be an integer"))
+            elif fmt == "date" and not (
+                isinstance(value, str)
+                and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value)
+            ):
+                issues.append(SchemaIssue(CODE_TYPE, path, "answer must be YYYY-MM-DD"))
+            elif fmt == "list":
+                _check_review_list(question_id, value, allowed, path, issues)
+
+    known_evidence = set(kb.evidence)
+    for field in ("evidence_present", "evidence_received"):
+        values = payload.get(field)
+        if not isinstance(values, list):
+            continue
+        for index, value in enumerate(values):
+            if value not in known_evidence:
+                issues.append(
+                    SchemaIssue(CODE_ENUM, f"{field}[{index}]", "evidence id is outside the closed set")
+                )
+    return issues
+
+
+def _check_review_list(
+    question_id: str,
+    value: Any,
+    allowed: list[Any],
+    path: str,
+    issues: list[SchemaIssue],
+) -> None:
+    values = value if isinstance(value, list) else [value]
+    if question_id != "Q-S4-03":
+        for index, item in enumerate(values):
+            if not isinstance(item, str) or item not in allowed:
+                issues.append(
+                    SchemaIssue(CODE_ENUM, f"{path}[{index}]", "answer is outside the closed set")
+                )
+        return
+
+    permitted = {
+        "name",
+        "category",
+        "assessed_loss",
+        "assessed_loss_irr",
+        "new_price",
+        "new_price_irr",
+        "requires_replacement",
+    }
+    for index, item in enumerate(values):
+        item_path = f"{path}[{index}]"
+        if not isinstance(item, dict):
+            issues.append(SchemaIssue(CODE_TYPE, item_path, "part must be an object"))
+            continue
+        for key in item:
+            if key not in permitted:
+                issues.append(
+                    SchemaIssue(
+                        CODE_UNKNOWN,
+                        f"{item_path}.{key}",
+                        "field is not in the part schema",
+                    )
+                )
+        category = item.get("category")
+        if not isinstance(category, str) or category not in allowed:
+            issues.append(
+                SchemaIssue(
+                    CODE_ENUM,
+                    f"{item_path}.category",
+                    "category is outside the closed set",
+                )
+            )
+        if "assessed_loss" not in item and "assessed_loss_irr" not in item:
+            issues.append(
+                SchemaIssue(
+                    CODE_MISSING,
+                    f"{item_path}.assessed_loss",
+                    "required field is missing",
+                )
+            )
+        for key in ("assessed_loss", "assessed_loss_irr", "new_price", "new_price_irr"):
+            if key in item and item[key] is not None and not _review_number(item[key]):
+                issues.append(
+                    SchemaIssue(
+                        CODE_TYPE,
+                        f"{item_path}.{key}",
+                        "value must be a finite number",
+                    )
+                )
+        if "requires_replacement" in item and not isinstance(item["requires_replacement"], bool):
+            issues.append(
+                SchemaIssue(
+                    CODE_BOOLEAN,
+                    f"{item_path}.requires_replacement",
+                    "value must be a JSON boolean",
+                )
+            )
+
+
+def _review_number(value: Any) -> bool:
+    """Review forms temporarily retain numeric strings until the P0-02 IRR migration."""
+    if _is_number(value):
+        return True
+    if not isinstance(value, str):
+        return False
+    try:
+        return Decimal(value).is_finite()
+    except InvalidOperation:
+        return False
+
+
+def _encode_json(value: Any, level: int) -> str:
+    """Small exact JSON encoder used for schema-shaped review exports."""
+    pad = "  " * level
+    child_pad = "  " * (level + 1)
+    if isinstance(value, dict):
+        if not value:
+            return "{}"
+        rows = [
+            f"{child_pad}{json.dumps(str(key), ensure_ascii=False)}: {_encode_json(item, level + 1)}"
+            for key, item in value.items()
+        ]
+        return "{\n" + ",\n".join(rows) + f"\n{pad}}}"
+    if isinstance(value, (list, tuple)):
+        if not value:
+            return "[]"
+        rows = [f"{child_pad}{_encode_json(item, level + 1)}" for item in value]
+        return "[\n" + ",\n".join(rows) + f"\n{pad}]"
+    if isinstance(value, Decimal):
+        if not value.is_finite():
+            raise ValueError("non-finite Decimal cannot be written as JSON")
+        return format(value, "f")
+    return json.dumps(value, ensure_ascii=False, allow_nan=False)
