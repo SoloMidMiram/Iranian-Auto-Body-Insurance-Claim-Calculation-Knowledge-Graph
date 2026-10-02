@@ -127,3 +127,66 @@ def test_compute_refuses_a_broken_active_body_sequence(kb, mutation):
     )
     assert result.payable is None
     assert result.status == "EXECUTION_PLAN_INVALID"
+
+
+# ------------------------------------------------------------------ glass order
+
+
+def _glass_case(config: dict | None) -> dict:
+    """Endorsed, underinsured glass with sourced franchise terms (ratio 0.5)."""
+    payload = {
+        "claim_id": "glass-resolved-order",
+        "unit": "IRR",
+        "classification": {"branch": "GLASS_ONLY"},
+        "event": {"event_date": "1405/06/01"},
+        "damage": {
+            "glass_endorsement": True,
+            "gross": 1000,
+            "market": 2000,
+            "insured": 1000,
+        },
+        "policy": {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": 100,
+                "source": "POLICY",
+                "source_reference": "test policy schedule",
+                "source_version": "TEST-v1",
+            },
+        },
+    }
+    if config is not None:
+        payload["calculation_config"] = config
+    return payload
+
+
+@pytest.mark.parametrize("order", [None, "UNRESOLVED", "INSURER_SPECIFIC"])
+def test_endorsement_flag_alone_never_selects_one_glass_payable(kb, order):
+    """Flag true with a missing or unresolved order keeps the scenario set."""
+    config: dict[str, object] = {"glass_article10_order_resolved_by_endorsement": True}
+    if order is not None:
+        config["article10_partial_order"] = order
+    result = compute(_glass_case(config), kb)
+    assert result.payable is None
+    assert result.status == "ENDORSEMENT_AND_ORDER_REQUIRED"
+    assert result.payable_scenarios == [Decimal(400), Decimal(450)]
+
+
+@pytest.mark.parametrize(
+    ("order", "payable"),
+    [
+        ("AFTER_DEPRECIATION_BEFORE_FRANCHISE", 400),
+        ("AFTER_DEPRECIATION_AND_FRANCHISE", 450),
+    ],
+)
+def test_endorsed_glass_uses_the_explicitly_resolved_order(kb, order, payable):
+    """Flag true plus one of the two supported orders selects that single outcome."""
+    config = {
+        "article10_partial_order": order,
+        "glass_article10_order_resolved_by_endorsement": True,
+    }
+    result = compute(_glass_case(config), kb)
+    assert result.payable == Decimal(payable)
+    assert result.fields["order_used"] == order
+    assert result.payable_scenarios == []

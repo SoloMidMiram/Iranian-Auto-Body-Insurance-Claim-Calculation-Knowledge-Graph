@@ -44,6 +44,9 @@ from .plans import (
 )
 
 UNRESOLVED_ORDER = "UNRESOLVED"
+RESOLVED_PARTIAL_ORDERS = frozenset(
+    {"AFTER_DEPRECIATION_BEFORE_FRANCHISE", "AFTER_DEPRECIATION_AND_FRANCHISE"}
+)
 
 
 @dataclass
@@ -654,7 +657,7 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.payable = graph_partial_payable(gross, franchise, ratio, rescue, sequence)
         return
 
-    if contractually_resolved:
+    if contractually_resolved and order in RESOLVED_PARTIAL_ORDERS:
         ratio_before = order == "AFTER_DEPRECIATION_BEFORE_FRANCHISE"
         sequence = next(
             (
