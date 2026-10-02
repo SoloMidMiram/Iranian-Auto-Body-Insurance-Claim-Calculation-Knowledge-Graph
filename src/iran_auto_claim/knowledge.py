@@ -512,7 +512,7 @@ class Knowledge:
             findings.extend(
                 f"operator {row['operator_id']}: {problem}" for problem in row["findings"]
             )
-        return findings
+        return _unique(findings)
 
     def _audit_body_operator(
         self,
@@ -700,6 +700,12 @@ class Knowledge:
     def body_operator_scope(self) -> dict[str, list[str]]:
         """Body branches that list each operator. The graph listing is the scope."""
         scope: dict[str, list[str]] = {}
+        for operator_id, operator in self.operators.items():
+            if any(
+                (self.branches.get(str(branch_id)) or {}).get("domain") == "BODY"
+                for branch_id in operator.get("applies_to_branches") or []
+            ):
+                scope.setdefault(operator_id, [])
         for branch_id, branch in self.branches.items():
             if branch.get("domain") != "BODY":
                 continue
