@@ -160,10 +160,10 @@ def validate_body_sequence(
     return normalized
 
 
-def plan_identity(branch: str, sequence: list[str]) -> str:
-    """Content-derived identity binding a branch and its operator sequence."""
+def plan_identity(branch: str, sequence: list[str], guards: list[str]) -> str:
+    """Content-derived identity binding a branch, its sequence, and guard set."""
     payload = json.dumps(
-        {"branch": branch, "sequence": sequence},
+        {"branch": branch, "sequence": sequence, "guards": guards},
         ensure_ascii=True,
         separators=(",", ":"),
         sort_keys=True,

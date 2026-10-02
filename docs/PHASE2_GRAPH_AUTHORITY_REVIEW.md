@@ -17,8 +17,8 @@ This is a planning checkpoint. It is not a GitHub issue.
 - A swapped ratio and franchise sequence changes the scenario amount.
 - Total-loss settlement walks salvage, franchise, rescue, and the insured-sum
   cap in graph order. Theft walks its smaller recorded plan.
-- Each active body result records the exact sequence and a content-derived plan
-  identity of the branch plus that sequence.
+- Each active body result records the exact sequence, a content-derived plan
+  identity, and the guards required on that path.
 - A missing, duplicate, or unknown operator refuses the active body plan.
 - Python still executes the approved arithmetic. It does not invent a second order.
 
@@ -32,5 +32,4 @@ This is a planning checkpoint. It is not a GitHub issue.
 ## Not claimed
 
 - Every Python statement in the body calculators is a generic operator interpreter.
-- Guard invocation on every path is proved here. That is #14.
 - Overdue source metadata blocks release. That enforcement is later than #11.

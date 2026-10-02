@@ -15,6 +15,11 @@
         "OP_FRANCHISE",
         "OP_RESCUE_CAP"
       ],
+      "guardrails": [
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
       "order_status": "UNRESOLVED",
       "order_status_reason": "Regulation 53 states partial loss is based on repair/labour/replacement-part prices after depreciation and franchise, with rescue added, but its underinsurance provision appears separately and does not state its position relative to franchise.",
       "controlled_by": ["REG53_ART19B_PARTIAL_LOSS_BASE", "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"],
@@ -54,7 +59,14 @@
       "order_status_reason": "Central Insurance circular 1400/401/146850 places the total-loss franchise after probable salvage is deducted.",
       "controlled_by": ["CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE", "REG53_ART19_TOTAL_LOSS_VALUATION"],
       "scenarios": [],
-      "guardrails": ["G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS", "G_SALVAGE_XOR_TITLE_TRANSFER", "G_INSURED_SUM_CEILING"],
+      "guardrails": [
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
       "blocking_uncertainties": ["U05_RESCUE_DENOMINATOR", "U12_SALVAGE_DISPOSITION", "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"],
       "required_evidence": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_ASSESSMENT_REPORT", "EVT_MARKET_VALUE_EVIDENCE", "EVT_SALVAGE_VALUATION", "EVT_PHOTOS"],
       "note": "The 75% test is strictly greater-than. Where salvage ownership transfers to the insurer, salvage must not also be subtracted."
@@ -69,6 +81,13 @@
         "OP_FRANCHISE",
         "OP_UNDERINSURANCE_RATIO",
         "OP_RESCUE_CAP"
+      ],
+      "guardrails": [
+        "G_NO_UNIVERSAL_GLASS_FRANCHISE",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT",
+        "G_UNCERTAINTY_MUST_SURFACE"
       ],
       "order_status": "INSURER_SPECIFIC",
       "order_status_reason": "Standalone glass requires an endorsement. The regulation supplies no universal glass franchise rate and does not state whether the general underinsurance provision applies to an endorsement-based glass payment.",
@@ -101,6 +120,11 @@
       "operators": [
         "OP_FRANCHISE",
         "OP_LIABILITY_CAP_INSURED_SUM"
+      ],
+      "guardrails": [
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
       ],
       "order_status": "RESOLVED",
       "order_status_reason": "Whole-vehicle theft routes to its own settlement branch after 60 days with title transfer; attempted-theft damage routes to PARTIAL_DAMAGE; partial parts theft depends on its endorsement.",

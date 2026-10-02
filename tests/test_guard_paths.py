@@ -2,8 +2,27 @@
 
 from __future__ import annotations
 
-from iran_auto_claim.engine import compute
+import pytest
+
+from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
 from iran_auto_claim.money import D
+
+
+ALL_GUARDS = [
+    "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+    "G_SALVAGE_XOR_TITLE_TRANSFER",
+    "G_RESCUE_CAP_CEILING",
+    "G_INSURED_SUM_CEILING",
+    "G_DUAL_LIABILITY_CAP",
+    "G_ARTICLE8_NO_WHOLE_CAR_RATIO",
+    "G_NO_HARDCODED_FRANCHISE_RATE",
+    "G_NO_UNIVERSAL_GLASS_FRANCHISE",
+    "G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT",
+    "G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE",
+    "G_NO_GUESSED_ENDORSEMENT_TERMS",
+    "G_NO_ASSUMED_CAUSATION",
+    "G_UNCERTAINTY_MUST_SURFACE",
+]
 
 
 def _policy(
@@ -20,6 +39,26 @@ def _policy(
     else:
         spec["rate"] = "0.10"
     return {"policy_version": "TEST-v1", "franchise": spec}
+
+
+@pytest.mark.parametrize("guard_id", ALL_GUARDS, ids=ALL_GUARDS)
+def test_each_bypassed_required_guard_fails_the_result(guard_id):
+    result = CalcResult(branch="PARTIAL_DAMAGE", payable=D(100))
+    result.require_guard(guard_id)
+    _enforce_guard_plan(result)
+    assert result.payable is None
+    assert result.status == "GUARD_PLAN_INCOMPLETE"
+    assert result.fields["missing_required_guards"] == [guard_id]
+
+
+def test_article8_guards_are_not_bound_to_body_plans(kb):
+    article8_guards = {
+        "G_DUAL_LIABILITY_CAP",
+        "G_ARTICLE8_NO_WHOLE_CAR_RATIO",
+        "G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE",
+    }
+    for branch_name in ("PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"):
+        assert article8_guards.isdisjoint(kb.branch(branch_name).get("guardrails") or [])
 
 
 def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
