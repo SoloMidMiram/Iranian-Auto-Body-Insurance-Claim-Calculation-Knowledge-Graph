@@ -37,6 +37,11 @@ Every supported calculation must satisfy all of these:
 9. Repeating a calculation against the same frozen snapshot is deterministic.
 10. Invalid input and guard violations are machine-visible failures.
 
+Monetary calculations retain exact decimal intermediates. The engine rounds only
+final payable amounts and payable scenarios to the nearest IRR, using
+`ROUND_HALF_UP`. Conversion to toman-based units is explicit presentation logic
+and never changes a persisted or engine input.
+
 ## Minimum boundary corpus
 
 ### Input and money

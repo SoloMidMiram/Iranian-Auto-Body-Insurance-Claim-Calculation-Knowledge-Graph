@@ -13,8 +13,8 @@ Three rules give this module its shape:
    slot whose only source is a document nobody has read, produces a named gap and
    the decision stops at INSUFFICIENT. UNKNOWN is a real answer and is treated as
    one.
-3. **Money answers are in the case's declared unit**, exactly like the worked
-   examples in ``cases/``, and the key names keep the shape the engine reads.
+3. **Money answers are non-negative integer IRR**, exactly like the worked
+   examples in ``cases/``. Display-unit conversion is a presentation concern.
 """
 
 from __future__ import annotations
@@ -126,7 +126,7 @@ class Review:
         self.kb = kb or Knowledge.load()
         validate_review(payload, self.kb)
         self.claim_id = str(payload.get("claim_id") or payload.get("id") or "unnamed-review")
-        self.unit = payload.get("unit") or "million_toman"
+        self.unit = payload.get("unit") or "IRR"
         self.payload = payload
         self.answers: dict[str, Any] = dict(payload.get("answers") or {})
         self.slots: dict[str, SlotBinding] = {}
@@ -276,8 +276,8 @@ class Review:
         market = self._bound.get("PS_MARKET_VALUE")
         insured = self._bound.get("PS_INSURED_SUM")
         if market and insured:
-            self._bound["PS_UNDERINSURANCE_RATIO"] = float(
-                min(Decimal(1), money.D(insured) / money.D(market))
+            self._bound["PS_UNDERINSURANCE_RATIO"] = min(
+                Decimal(1), money.D(insured) / money.D(market)
             )
         # An itemised assessment *is* the repair-and-replacement figure the total-loss
         # test needs; deriving it keeps the 75% test from silently skipping.
@@ -306,7 +306,7 @@ class Review:
             market = self._bound.get("PS_MARKET_VALUE")
             insured = self._bound.get("PS_INSURED_SUM")
             if market and insured:
-                self._bound[slot_id] = min(1.0, float(insured) / float(market))
+                self._bound[slot_id] = min(Decimal(1), money.D(insured) / money.D(market))
 
     # ------------------------------------------------------------------- slots
 
@@ -424,6 +424,11 @@ class Review:
         """The schema-shaped case a completed review hands to the engine."""
         slot_value = lambda key: self._bound.get(key)  # noqa: E731
 
+        def irr(value: Any) -> Any:
+            if isinstance(value, Decimal) and value == value.to_integral_value():
+                return int(value)
+            return value
+
         def part_records() -> list[dict[str, Any]]:
             records = []
             for item in _as_list(slot_value("PS_PART_CATEGORY")):
@@ -431,14 +436,14 @@ class Review:
                     category = str(item.get("category") or "OTHER_REPLACEMENT_PART")
                     record: dict[str, Any] = {
                         "category": category,
-                        "assessed_loss_irr": item.get("assessed_loss", item.get("assessed_loss_irr", 0)),
+                        "assessed_loss_irr": irr(item.get("assessed_loss", item.get("assessed_loss_irr", 0))),
                         "requires_replacement": bool(item.get("requires_replacement", True)),
                     }
                     if isinstance(item.get("name"), str) and item["name"]:
                         record["name"] = item["name"]
                     new_price = item.get("new_price", item.get("new_price_irr"))
                     if new_price is not None:
-                        record["new_price_irr"] = new_price
+                        record["new_price_irr"] = irr(new_price)
                     records.append(record)
                 elif str(item) in PART_CATEGORIES:
                     records.append({"category": str(item), "assessed_loss_irr": 0})
@@ -449,7 +454,7 @@ class Review:
         if new_price is not None:
             for record in parts:
                 if record["category"] in ("BATTERY", "TIRE") and record.get("new_price_irr") in (None, 0):
-                    record["new_price_irr"] = new_price
+                    record["new_price_irr"] = irr(new_price)
 
         franchise = slot_value("PS_FRANCHISE")
         multiple_insurance = slot_value("PS_MULTIPLE_POLICIES")
@@ -487,13 +492,13 @@ class Review:
 
         vehicle: dict[str, Any] = {}
         if (market := slot_value("PS_MARKET_VALUE")) is not None:
-            vehicle["market_value_at_event_irr"] = market
+            vehicle["market_value_at_event_irr"] = irr(market)
         if (insured := slot_value("PS_INSURED_SUM")) is not None:
-            vehicle["insured_sum_irr"] = insured
+            vehicle["insured_sum_irr"] = irr(insured)
         if (year := slot_value("PS_PRODUCTION_YEAR")) is not None:
             vehicle["production_year_shamsi"] = year
         if (salvage := slot_value("PS_SALVAGE_VALUE")) is not None:
-            vehicle["salvage_value_irr"] = salvage
+            vehicle["salvage_value_irr"] = irr(salvage)
         if (disposition := slot_value("PS_SALVAGE_DISPOSITION")) is not None:
             vehicle["salvage_disposition"] = disposition
         if (transferred := slot_value("PS_TITLE_TRANSFERRED")) is not None:
@@ -512,7 +517,7 @@ class Review:
             ("assessed_depreciation_irr", "PS_ASSESSED_DEPRECIATION"),
         ):
             if (value := slot_value(slot)) is not None:
-                damage[key] = value
+                damage[key] = irr(value)
 
         config: dict[str, Any] = {}
         for key, slot in (
@@ -547,7 +552,7 @@ class Review:
 
         payload: dict[str, Any] = {
             "claim_id": self.claim_id,
-            "unit": "IRR" if str(self.unit).lower() == "irr" else self.unit,
+            "unit": "IRR",
             "regulatory_snapshot": (
                 {"iranian_year": slot_value("PS_CLAIM_YEAR")}
                 if slot_value("PS_CLAIM_YEAR") is not None else {}
@@ -1031,9 +1036,9 @@ class Review:
         if result is not None:
             add("CALCULATION")
             if result.payable is not None:
-                add(f"  payable: {money.fmt(result.payable, self.unit)}")
+                add(f"  payable: {money.fmt(result.payable, 'million_toman')}")
             for index, value in enumerate(result.payable_scenarios):
-                add(f"  scenario {chr(ord('A') + index)}: {money.fmt(value, self.unit)}")
+                add(f"  scenario {chr(ord('A') + index)}: {money.fmt(value, 'million_toman')}")
             add(f"  status : {result.status or 'SETTLED'}   confidence: {result.formula_confidence}")
             if result.labels:
                 add(f"  labels : {', '.join(sorted(result.labels))}")

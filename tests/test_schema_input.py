@@ -48,7 +48,7 @@ def test_fixture_payloads_pass_the_claim_schema():
     for fixture in load_fixtures():
         payload = {
                 "claim_id": fixture["id"],
-                "unit": fixture.get("unit", "million_toman"),
+                "unit": fixture.get("unit", "IRR"),
                 "classification": {"branch": fixture["branch"], "domain": _domain(fixture["branch"])},
                 "damage": fixture.get("inputs", {}),
             }
@@ -60,35 +60,61 @@ def test_fixture_payloads_pass_the_claim_schema():
 
 def test_unknown_field_missing_field_enum_and_boolean_have_stable_codes():
     with pytest.raises(InputSchemaError) as unknown:
-        validate_claim({"claim_id": "X", "invented": 1})
+        validate_claim({"claim_id": "X", "unit": "IRR", "invented": 1})
     assert unknown.value.errors[0].code == "unknown_field"
     assert unknown.value.errors[0].path == "invented"
 
     with pytest.raises(InputSchemaError) as missing:
-        validate_claim({"unit": "million_toman"})
+        validate_claim({"unit": "IRR"})
     assert any(item.code == "missing_field" and item.path == "claim_id" for item in missing.value.errors)
 
     with pytest.raises(InputSchemaError) as enum_error:
-        validate_claim({"claim_id": "X", "classification": {"branch": "NOT_A_BRANCH"}})
+        validate_claim({"claim_id": "X", "unit": "IRR", "classification": {"branch": "NOT_A_BRANCH"}})
     assert enum_error.value.errors[0].code == "invalid_enum"
 
     with pytest.raises(InputSchemaError) as boolean_error:
-        validate_claim({"claim_id": "X", "damage": {"gross": True}})
+        validate_claim({"claim_id": "X", "unit": "IRR", "damage": {"gross": True}})
     assert boolean_error.value.errors[0].code == "invalid_boolean"
     assert boolean_error.value.errors[0].path == "damage.gross"
 
 
 def test_a_boolean_string_is_not_accepted_as_a_boolean():
     with pytest.raises(InputSchemaError) as caught:
-        validate_claim({"claim_id": "X", "damage": {"title_transferred": "false"}})
+        validate_claim({"claim_id": "X", "unit": "IRR", "damage": {"title_transferred": "false"}})
     assert caught.value.errors[0].code == "invalid_boolean"
 
 
 def test_claim_numbers_do_not_accept_numeric_strings():
     with pytest.raises(InputSchemaError) as caught:
-        validate_claim({"claim_id": "X", "damage": {"gross": "10"}})
+        validate_claim({"claim_id": "X", "unit": "IRR", "damage": {"gross": "10"}})
     assert caught.value.errors[0].code == "invalid_type"
     assert caught.value.errors[0].path == "damage.gross"
+
+
+@pytest.mark.parametrize("amount", [-1, 1.5, float("nan"), float("inf"), -float("inf")])
+def test_claim_money_must_be_non_negative_integer_irr(amount):
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim({"claim_id": "X", "unit": "IRR", "damage": {"gross": amount}})
+    assert caught.value.errors[0].code == "invalid_type"
+    assert caught.value.errors[0].path == "damage.gross"
+
+
+@pytest.mark.parametrize("unit", ["toman", "million_toman", "billion_toman", "irr"])
+def test_display_units_cannot_cross_the_claim_boundary(unit):
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim({"claim_id": "X", "unit": unit, "damage": {"gross": 10}})
+    assert caught.value.errors[0].code == "invalid_enum"
+    assert caught.value.errors[0].path == "unit"
+
+
+def test_review_money_rejects_fractional_irr_and_numeric_strings(kb):
+    for value in (1.5, "100"):
+        with pytest.raises(InputSchemaError) as caught:
+            validate_review(
+                {"claim_id": "X", "unit": "IRR", "answers": {"Q-S4-02": value}}, kb
+            )
+        assert caught.value.errors[0].code == "invalid_type"
+        assert caught.value.errors[0].path == "answers.Q-S4-02"
 
 
 @pytest.mark.parametrize(
@@ -102,7 +128,7 @@ def test_claim_numbers_do_not_accept_numeric_strings():
 def test_malformed_parts_are_rejected_instead_of_skipped_or_defaulted(part, path):
     key = "replacement_parts" if part == {} else "parts"
     with pytest.raises(InputSchemaError) as caught:
-        validate_claim({"claim_id": "X", "damage": {key: [part]}})
+        validate_claim({"claim_id": "X", "unit": "IRR", "damage": {key: [part]}})
     assert any(item.path == path for item in caught.value.errors)
 
 
@@ -110,6 +136,7 @@ def test_false_and_zero_survive_validation_and_normalization():
     case = validated_case(
         {
             "claim_id": "X",
+            "unit": "IRR",
             "damage": {"gross": 0, "title_transferred": False},
         }
     )
@@ -120,6 +147,7 @@ def test_false_and_zero_survive_validation_and_normalization():
 def test_itemised_depreciation_requires_sourced_event_and_production_years():
     payload = {
         "claim_id": "X",
+        "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE"},
         "damage": {
             "parts": [{"category": "OTHER_REPLACEMENT_PART", "assessed_loss": 100}]
@@ -133,7 +161,7 @@ def test_itemised_depreciation_requires_sourced_event_and_production_years():
 
 def test_review_vocabularies_use_the_same_stable_errors(kb):
     with pytest.raises(InputSchemaError) as choice:
-        validate_review({"claim_id": "X", "answers": {"Q-S2-01": "METEORITE"}}, kb)
+        validate_review({"claim_id": "X", "unit": "IRR", "answers": {"Q-S2-01": "METEORITE"}}, kb)
     assert choice.value.errors[0].to_dict() == {
         "code": "invalid_enum",
         "path": "answers.Q-S2-01",
@@ -142,7 +170,7 @@ def test_review_vocabularies_use_the_same_stable_errors(kb):
 
     with pytest.raises(InputSchemaError) as evidence:
         validate_review(
-            {"claim_id": "X", "answers": {"Q-S2-01": "UNKNOWN"}, "evidence_present": ["EVT_NOT_REAL"]},
+            {"claim_id": "X", "unit": "IRR", "answers": {"Q-S2-01": "UNKNOWN"}, "evidence_present": ["EVT_NOT_REAL"]},
             kb,
         )
     assert evidence.value.errors[0].code == "invalid_enum"
@@ -161,14 +189,14 @@ def test_review_emits_every_previously_missing_case_field(kb):
 def test_theft_without_a_type_is_rejected():
     with pytest.raises(InputSchemaError) as caught:
         validate_claim(
-            {"claim_id": "X", "classification": {"branch": "THEFT"}, "damage": {"gross": 10}}
+            {"claim_id": "X", "unit": "IRR", "classification": {"branch": "THEFT"}, "damage": {"gross": 10}}
         )
     assert any(item.code == "missing_field" for item in caught.value.errors)
 
 
 def test_review_schema_rejects_an_unknown_top_level_field():
     with pytest.raises(InputSchemaError) as caught:
-        validate_review({"claim_id": "X", "answers": {"Q-S0-06": "IN_FORCE"}, "payable": 1})
+        validate_review({"claim_id": "X", "unit": "IRR", "answers": {"Q-S0-06": "IN_FORCE"}, "payable": 1})
     assert caught.value.errors[0].code == "unknown_field"
     assert caught.value.errors[0].path == "payable"
 
@@ -194,4 +222,4 @@ def test_cli_reports_malformed_json_with_a_stable_code(command, capsys, tmp_path
 
 def test_public_compute_rejects_before_arithmetic():
     with pytest.raises(InputSchemaError):
-        compute({"claim_id": "X", "damage": {"not_a_loss_figure": 1}})
+        compute({"claim_id": "X", "unit": "IRR", "damage": {"not_a_loss_figure": 1}})

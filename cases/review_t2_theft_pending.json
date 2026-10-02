@@ -1,6 +1,6 @@
 {
   "claim_id": "REVIEW-T2-THEFT-PENDING",
-  "unit": "million_toman",
+  "unit": "IRR",
   "note": "Rung T2. Thirty-eight days are recorded, but the file does not name whether that count starts at the theft, at awareness, or at declaration. U13 therefore blocks the handoff. A stored day-count, including one near or past sixty, is not an anchored clock.",
   "evidence_present": [
     "EVT_CLAIM_FORM",
@@ -22,17 +22,14 @@
     "Q-S0-07": "1404-04-21",
     "Q-S0-05": "NOT_APPLICABLE_NO_DRIVER",
     "Q-S0-06": "IN_FORCE",
-
     "Q-S1-01": "PASSENGER_CAR",
     "Q-S1-02": "LISTED",
     "Q-S1-03": "INSIDE_IRAN",
-
     "Q-S2-01": "THEFT",
     "Q-S2-02": "ESTABLISHED",
     "Q-S2-07": "WHOLE_VEHICLE",
     "Q-S2-08": 38,
     "Q-S2-09": "NOT_REVIEWED",
-
     "Q-S3-01": "NOT_DRIVING",
     "Q-S3-02": "NO",
     "Q-S3-03": "NO",
@@ -41,15 +38,12 @@
     "Q-S3-06": "NO",
     "Q-S3-07": "NO",
     "Q-S3-08": "NO",
-
     "Q-S4-06": "NOT_TRANSFERRED",
     "Q-S4-09": "NOT_APPLICABLE",
-
-    "Q-S5-01": 900,
-    "Q-S5-02": 900,
+    "Q-S5-01": 9000000000,
+    "Q-S5-02": 9000000000,
     "Q-S5-03": 1400,
     "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
-
     "Q-S6-01": "PERCENT",
     "Q-S6-02": {
       "mode": "PERCENT",
@@ -60,16 +54,18 @@
       "source_reference": "policy schedule 1403, theft franchise line",
       "source_version": "1403"
     },
-    "Q-S6-03": { "calculation_base": "SETTLEMENT_BASE" },
-    "Q-S6-04": { "claim_sequence_rule": "first claim", "source_version": "1403" },
+    "Q-S6-03": {
+      "calculation_base": "SETTLEMENT_BASE"
+    },
+    "Q-S6-04": {
+      "claim_sequence_rule": "first claim",
+      "source_version": "1403"
+    },
     "Q-S6-05": "NO",
-
     "Q-S7-01": "NO_BODY_ONLY",
-
     "Q-S9-01": "NO",
     "Q-S9-02": "UNKNOWN_DRIVER",
     "Q-S9-03": 0,
-
     "Q-S10-01": "adjuster: reviewer-04, diary note - re-test the clock on 1404-06-20"
   }
 }

@@ -1,6 +1,6 @@
 {
   "claim_id": "EXAMPLE-PARTIAL-UNRESOLVED",
-  "unit": "million_toman",
+  "unit": "IRR",
   "regulatory_snapshot": {
     "as_of_date": "2026-09-18",
     "iranian_year": 1405
@@ -13,8 +13,8 @@
     "vehicle_type": "passenger car",
     "is_passenger_car": true,
     "production_year_shamsi": 1392,
-    "market_value_at_event_irr": 6000,
-    "insured_sum_irr": 4500,
+    "market_value_at_event_irr": 60000000000,
+    "insured_sum_irr": 45000000000,
     "salvage_disposition": "NOT_APPLICABLE"
   },
   "event": {
@@ -23,11 +23,21 @@
     "fault_status": "INSURED_FAULT"
   },
   "damage": {
-    "labor_irr": 40,
-    "rescue_transport_actual_irr": 15,
+    "labor_irr": 400000000,
+    "rescue_transport_actual_irr": 150000000,
     "parts": [
-      { "name": "front bumper", "category": "OTHER_REPLACEMENT_PART", "assessed_loss_irr": 120, "requires_replacement": true },
-      { "name": "head lamp glass", "category": "LAMP_GLASS", "assessed_loss_irr": 25, "requires_replacement": true }
+      {
+        "name": "front bumper",
+        "category": "OTHER_REPLACEMENT_PART",
+        "assessed_loss_irr": 1200000000,
+        "requires_replacement": true
+      },
+      {
+        "name": "head lamp glass",
+        "category": "LAMP_GLASS",
+        "assessed_loss_irr": 250000000,
+        "requires_replacement": true
+      }
     ]
   },
   "policy": {

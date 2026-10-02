@@ -1,6 +1,6 @@
 {
   "claim_id": "REVIEW-T4-GLASS-TERMS-MISSING",
-  "unit": "million_toman",
+  "unit": "IRR",
   "note": "Rung T4: the law is settled and the paperwork is not. Standalone glass is exempt from depreciation - that is the one universal fact - but the cover only exists through an endorsement, and the token that an endorsement was issued is not its schedule. The file must name the document it needs and refuse to produce an amount.",
   "evidence_present": [
     "EVT_CLAIM_FORM",
@@ -20,16 +20,13 @@
     "Q-S0-07": "1404-07-05",
     "Q-S0-05": "NOT_APPLICABLE_NO_DRIVER",
     "Q-S0-06": "IN_FORCE",
-
     "Q-S1-01": "PASSENGER_CAR",
     "Q-S1-02": "LISTED",
     "Q-S1-03": "INSIDE_IRAN",
-
     "Q-S2-01": "INDEPENDENT_GLASS_BREAKAGE",
     "Q-S2-02": "ESTABLISHED",
     "Q-S2-05": "ALONE",
     "Q-S2-09": "CONSISTENT",
-
     "Q-S3-01": "NOT_DRIVING",
     "Q-S3-02": "NO",
     "Q-S3-03": "NO",
@@ -38,32 +35,34 @@
     "Q-S3-06": "NO",
     "Q-S3-07": "NO",
     "Q-S3-08": "NO",
-
     "Q-S4-01": "ITEMISED",
-    "Q-S4-02": 6,
+    "Q-S4-02": 60000000,
     "Q-S4-03": [
-      { "name": "windscreen", "category": "GLASS", "assessed_loss": 40 },
-      { "name": "rear window", "category": "GLASS", "assessed_loss": 12 }
+      {
+        "name": "windscreen",
+        "category": "GLASS",
+        "assessed_loss": 400000000
+      },
+      {
+        "name": "rear window",
+        "category": "GLASS",
+        "assessed_loss": 120000000
+      }
     ],
     "Q-S4-05": "NOT_STATED",
     "Q-S4-09": "NOT_APPLICABLE",
     "Q-S4-10": "REPAIRABLE",
-
-    "Q-S5-01": 500,
-    "Q-S5-02": 500,
+    "Q-S5-01": 5000000000,
+    "Q-S5-02": 5000000000,
     "Q-S5-03": 1401,
     "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
-
     "Q-S6-01": "NOT_STATED",
     "Q-S6-05": "NO",
     "Q-S6-06": "WORDING_NOT_OBTAINED",
-
     "Q-S7-01": "NO_BODY_ONLY",
-
     "Q-S9-01": "NO",
     "Q-S9-02": "NO_THIRD_PARTY",
     "Q-S9-03": 0,
-
     "Q-S10-01": "adjuster: reviewer-03, endorsement schedule requested from the insurer 1404-07-08"
   }
 }

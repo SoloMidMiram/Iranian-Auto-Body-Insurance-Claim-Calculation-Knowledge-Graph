@@ -7,6 +7,7 @@ from decimal import Decimal
 import pytest
 
 from iran_auto_claim import money
+from iran_auto_claim.engine import compute
 from iran_auto_claim.money import D
 
 
@@ -63,5 +64,72 @@ def test_unknown_units_are_refused():
 
 
 def test_formatting_is_stable():
-    assert money.fmt(D("342.5"), "million_toman") == "342.50 m-toman"
+    assert money.fmt(D("3425000000"), "million_toman") == "342.50 m-toman"
     assert money.fmt(None, "million_toman") == "n/a"
+
+
+@pytest.mark.parametrize(
+    ("display", "expected"),
+    [("0.00000004", 0), ("0.00000005", 1), ("0.00000006", 1)],
+)
+def test_explicit_display_conversion_rounds_half_up_to_one_rial(display, expected):
+    assert money.to_irr(D(display), "million_toman") == D(expected)
+
+
+def test_final_payable_rounds_half_up_once_at_the_engine_boundary(kb):
+    result = compute(
+        {
+            "claim_id": "ROUND-HALF-UP",
+            "unit": "IRR",
+            "classification": {"branch": "PARTIAL_DAMAGE"},
+            "damage": {"gross": 5},
+            "policy": {
+                "franchise": {"mode": "PERCENT", "rate": 0.5, "source": "POLICY"}
+            },
+        },
+        kb,
+    )
+    assert result.fields["franchise"] == D("2.5")
+    assert result.payable == D(3)
+
+
+def test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float(kb):
+    result = compute(
+        {
+            "claim_id": "ROUND-SCENARIOS",
+            "unit": "IRR",
+            "classification": {"branch": "PARTIAL_DAMAGE"},
+            "damage": {"gross": 10, "market": 3, "insured": 1, "franchise": 1},
+        },
+        kb,
+    )
+    assert result.payable_scenarios == [D(2), D(3)]
+    document = result.to_dict()
+    assert document["unit"] == "IRR"
+    assert document["payable_scenarios_irr"] == [2, 3]
+    assert isinstance(document["fields"]["article10_ratio"], str)
+    assert document["fields"]["article10_ratio"].startswith("0.333333")
+
+
+def test_result_serialization_never_coerces_nested_decimals_to_float():
+    from iran_auto_claim.engine import CalcResult
+
+    result = CalcResult(fields={"nested": {"ratio": D("0.125")}, "items": [D(7)]})
+    document = result.to_dict()
+    assert document["fields"]["nested"]["ratio"] == "0.125"
+    assert document["fields"]["items"] == [7]
+
+
+def test_very_large_integer_irr_does_not_overflow(kb):
+    amount = 10**100
+    result = compute(
+        {
+            "claim_id": "LARGE-IRR",
+            "unit": "IRR",
+            "classification": {"branch": "PARTIAL_DAMAGE"},
+            "damage": {"gross": amount, "franchise": 0},
+        },
+        kb,
+    )
+    assert result.payable == D(amount)
+    assert result.to_dict()["payable_irr"] == amount

@@ -92,7 +92,7 @@ class Case:
             raise CaseInputError("a case must be a JSON object")
         self.raw = raw
         self.claim_id = str(raw.get("claim_id") or raw.get("id") or "unnamed")
-        self.unit = raw.get("unit") or "million_toman"
+        self.unit = raw.get("unit") or "IRR"
 
         self.damage = dict(raw.get("damage") or raw.get("inputs") or {})
         self.vehicle = dict(raw.get("vehicle") or {})
