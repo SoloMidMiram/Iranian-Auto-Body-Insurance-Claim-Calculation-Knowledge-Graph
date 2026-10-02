@@ -15,9 +15,9 @@
     │   └── otherwise -> ARTICLE_8_NON_CONVENTIONAL
     └── LEGAL / RECOVERY -> LEGAL_RECOVERY
 
-A declared branch always wins: the engine trusts an explicit classification and
-only derives when the case leaves it out. Derivation confidence reports how much
-of the tree was actually evaluated from evidence.
+The classifier derives a branch from evidence independently of any declared
+branch. The engine reconciles declared and derived values before dispatch.
+Derivation confidence reports how much of the tree was actually evaluated.
 """
 
 from __future__ import annotations
@@ -73,7 +73,8 @@ def classify(case: Case | dict[str, Any], kb: Knowledge | None = None) -> dict[s
         if is_total:
             return {"branch": "TOTAL_LOSS", "variant": None, "confidence": 0.97, "basis": basis}
 
-    if case.has_glass_endorsement or _looks_like_glass(case):
+    named_endorsements = case.endorsement_tokens() & {"GLASS_ONLY", "GLASS"}
+    if named_endorsements or _looks_like_glass(case):
         basis.append("glass endorsement or glass-only cause")
         return {"branch": "GLASS_ONLY", "variant": None, "confidence": 0.8, "basis": basis}
 

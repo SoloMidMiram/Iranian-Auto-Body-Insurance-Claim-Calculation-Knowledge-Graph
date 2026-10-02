@@ -67,7 +67,15 @@ def render_claim(result: CalcResult, kb: Knowledge, unit: str | None = None) -> 
     if result.formula_confidence is not None:
         lines.append(f"  Formula confidence: {result.formula_confidence:.2f}")
     if result.fields.get("classification"):
-        basis = result.fields["classification"].get("basis") or []
+        classification = result.fields["classification"]
+        lines.append(
+            "  Reconciliation: "
+            f"{classification.get('outcome')} "
+            f"(declared={classification.get('declared_branch')}, "
+            f"derived={classification.get('derived_branch')}, "
+            f"confidence={classification.get('confidence')})"
+        )
+        basis = classification.get("basis") or []
         for item in basis:
             lines.append(f"    - {item}")
     lines.append("")

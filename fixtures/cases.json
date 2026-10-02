@@ -302,8 +302,8 @@
         "rescue_for_threshold": 0
       },
       "expected": {
-        "is_total": false,
-        "reason": "EXACTLY_75_PERCENT_IS_NOT_MORE_THAN_75_PERCENT"
+        "payable": null,
+        "status": "CLASSIFICATION_CONFLICT"
       }
     },
     {
@@ -331,6 +331,7 @@
       "inputs": {
         "market": 30000000000,
         "insured": 24000000000,
+        "repair": 23000000000,
         "salvage": 4000000000,
         "franchise": 1200000000,
         "rescue_payable": 500000000
@@ -349,6 +350,7 @@
       "inputs": {
         "market": 20000000000,
         "insured": 25000000000,
+        "repair": 16000000000,
         "salvage": 3000000000,
         "franchise": 1000000000,
         "rescue_payable": 200000000
@@ -365,6 +367,7 @@
       "inputs": {
         "market": 20000000000,
         "insured": 20000000000,
+        "repair": 16000000000,
         "salvage_disposition": "INSURER_TAKES_TITLE",
         "franchise": 1000000000,
         "rescue_payable": 200000000
@@ -438,7 +441,7 @@
     },
     {
       "id": "G26",
-      "branch": "GLASS_ONLY",
+      "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
         "cause": "COLLISION",
@@ -446,7 +449,6 @@
         "franchise": 50000000
       },
       "expected": {
-        "route": "PARTIAL_DAMAGE",
         "depreciation": 0,
         "payable": 450000000
       }

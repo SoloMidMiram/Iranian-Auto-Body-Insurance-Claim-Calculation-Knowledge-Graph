@@ -61,18 +61,21 @@ def test_classifier_splits_conventional_and_non_conventional():
     assert non_conventional["branch"] == "ARTICLE_8_NON_CONVENTIONAL"
 
 
-def test_a_declared_branch_wins_over_derivation(kb):
+def test_a_declared_branch_matching_evidence_is_reconciled(kb):
     payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
     result = compute(payload, kb)
     assert result.branch == "PARTIAL_DAMAGE"
     assert "PARTIAL_DAMAGE" in result.labels
     assert result.payable == D(1500)
-    assert "classification" not in result.fields, "a declared branch must not be re-derived"
+    assert result.fields["classification"]["outcome"] == "MATCH"
+    assert result.fields["classification"]["declared_branch"] == "PARTIAL_DAMAGE"
+    assert result.fields["classification"]["derived_branch"] == "PARTIAL_DAMAGE"
 
 
-def test_a_partial_claim_with_no_assessed_damage_is_an_input_error(kb):
+def test_a_declared_partial_branch_conflicting_with_total_evidence_is_blocked(kb):
     result = compute(_case("PARTIAL_DAMAGE", market=2000, repair_total=1600), kb)
-    assert result.status == "INPUT_ERROR"
+    assert result.status == "CLASSIFICATION_CONFLICT"
+    assert result.payable is None
 
 
 def test_an_unknown_part_category_is_refused_rather_than_silently_depreciated(kb):
@@ -91,7 +94,8 @@ def test_an_unknown_part_category_is_refused_rather_than_silently_depreciated(kb
 def test_engine_derives_when_no_branch_is_declared(kb):
     result = compute(_case(market=2000, insured=2000, repair=1600, franchise=100), kb)
     assert result.branch == "TOTAL_LOSS"
-    assert result.fields["classification"]["branch"] == "TOTAL_LOSS"
+    assert result.fields["classification"]["derived_branch"] == "TOTAL_LOSS"
+    assert result.fields["classification"]["outcome"] == "MATCH"
     assert result.fields["classification"]["basis"]
 
 
@@ -116,7 +120,7 @@ def test_missing_market_value_alongside_an_insured_sum_is_an_input_error(kb):
 
 
 def test_total_loss_settlement_requires_both_figures(kb):
-    payload = _case("TOTAL_LOSS", market=2000, salvage_value=300, franchise=100)
+    payload = _case("TOTAL_LOSS", market=2000, repair=1600, salvage_value=300, franchise=100)
     result = compute(payload, kb)
     assert result.status == "INPUT_ERROR"
 
@@ -231,7 +235,7 @@ def test_interest_of_the_insured_is_reported_for_a_single_payable_result(kb):
     "payload",
     [
         _case("PARTIAL_DAMAGE", gross=100),
-        _case("TOTAL_LOSS", market=2000, insured=2000, salvage=100),
+        _case("TOTAL_LOSS", market=2000, insured=2000, repair=1600, salvage=100),
         _case("GLASS_ONLY", glass_endorsement=True, gross=100),
         _case(
             "THEFT",
@@ -293,3 +297,81 @@ def test_versioned_policy_evidence_can_explicitly_set_zero_franchise(kb):
     assert result.payable == D(100)
     assert result.fields["franchise"] == D(0)
     assert result.fields["franchise_source_version"] == "BODY-1405-v1"
+
+
+@pytest.mark.parametrize("repair", [74, 75])
+def test_total_loss_below_or_at_75_percent_is_a_classification_conflict(kb, repair):
+    result = compute(
+        _case(
+            "TOTAL_LOSS",
+            market=100,
+            insured=100,
+            repair=repair,
+            franchise=10,
+        ),
+        kb,
+    )
+    classification = result.fields["classification"]
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_CONFLICT"
+    assert classification["outcome"] == "CONFLICT"
+    assert classification["declared_canonical_branch"] == "TOTAL_LOSS"
+    assert classification["derived_branch"] == "PARTIAL_DAMAGE"
+    assert classification["confidence"] == 0.85
+    assert classification["basis"]
+
+
+def test_total_loss_one_rial_above_75_percent_matches_and_settles(kb):
+    result = compute(
+        _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10), kb
+    )
+    classification = result.fields["classification"]
+    assert result.payable == D(90)
+    assert classification["outcome"] == "MATCH"
+    assert classification["derived_branch"] == "TOTAL_LOSS"
+    assert any("75% threshold" in item for item in classification["basis"])
+
+
+def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
+    result = compute(
+        _case(
+            "TOTAL_LOSS",
+            market=100,
+            insured=100,
+            repair=70,
+            rescue_for_threshold=6,
+            franchise=10,
+        ),
+        kb,
+    )
+    assert result.payable == D(90)
+    assert result.fields["combined_for_threshold"] == D(76)
+    assert result.fields["threshold_value"] == D(75)
+    assert result.fields["classification"]["outcome"] == "MATCH"
+
+
+def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):
+    result = compute(_case("TOTAL_LOSS", market=100, insured=100, franchise=10), kb)
+    classification = result.fields["classification"]
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert classification["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "repair-and-replacement assessment" in result.reason
+
+
+def test_documented_authorized_override_can_select_declared_total_loss(kb):
+    payload = _case("TOTAL_LOSS", market=100, insured=100, franchise=10)
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "destructive inspection made repair estimate unavailable",
+        "source": "review-board-record-2026-41",
+        "timestamp": "2026-10-02T04:00:00Z",
+    }
+    result = compute(payload, kb)
+    classification = result.fields["classification"]
+    assert result.payable == D(90)
+    assert classification["outcome"] == "AUTHORIZED_OVERRIDE"
+    assert classification["override"]["actor"] == "senior-adjuster-17"
+    assert result.fields["total_loss_threshold_override"] is True
+    assert "AUTHORIZED_CLASSIFICATION_OVERRIDE" in result.labels

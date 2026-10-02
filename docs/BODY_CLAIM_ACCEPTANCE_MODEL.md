@@ -100,8 +100,9 @@ Boundary rules:
   claim. Only independent glass breakage can enter `GLASS_ONLY`.
 - Whole-vehicle theft, attempted theft, partial-parts theft, and parts stolen after
   an accident are four different routes.
-- The review layer derives and reconciles the branch. The current low-level engine
-  trusts a branch already written on its input, so the FAQ must never bypass review.
+- The engine independently derives the branch and reconciles it with any declaration.
+  Outcomes are `MATCH`, `CONFLICT`, `INSUFFICIENT_EVIDENCE`, or
+  `AUTHORIZED_OVERRIDE`; only the first and last may reach branch arithmetic.
 
 ## 5. Knowledge graph to engine architecture
 
@@ -269,7 +270,7 @@ Validated on 2026-10-02:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 356 tests;
+- the complete automated suite passes: 363 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
@@ -285,8 +286,8 @@ Remaining gaps, in priority order:
 3. The evidence id list's `if_absent` token is enforced. Document contents are still
    not verified: the gate trusts `evidence_present` rather than recording identity,
    issuer, date, version, and hash.
-4. Reconcile a declared branch again at the engine boundary or require a signed
-   classification artifact.
+4. Replace documented caller-supplied classification overrides with signed,
+   role-authorized artifacts when the authenticated workflow is built.
 5. Drive uncertainty liveness from graph predicates instead of duplicating it in
    Python.
 6. Ingest the two verdicts after their actual texts and metadata are available.

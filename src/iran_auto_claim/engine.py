@@ -503,7 +503,10 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.fields["is_total"] = is_total
         res.note_rule("REG53_ART19_TOTAL_LOSS_THRESHOLD")
 
-    if is_total is False:
+    authorized_override = (
+        res.fields.get("classification", {}).get("outcome") == "AUTHORIZED_OVERRIDE"
+    )
+    if is_total is False and not authorized_override:
         res.payable = None
         if threshold is not None and combined == threshold:
             res.reason = "EXACTLY_75_PERCENT_IS_NOT_MORE_THAN_75_PERCENT"
@@ -512,6 +515,9 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
             res.reason = "NOT_TOTAL_LOSS"
             res.label("NOT_TOTAL_LOSS")
         return
+
+    if authorized_override:
+        res.fields["total_loss_threshold_override"] = True
 
     if res.variant == "THRESHOLD_TEST":
         res.fields["is_total"] = is_total
@@ -789,6 +795,77 @@ DISPATCH: dict[str, Callable[[Case, Knowledge, CalcResult], None]] = {
     "LEGAL_RECOVERY": calculate_legal_recovery,
 }
 
+BODY_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"}
+
+
+def _classification_evidence_gap(
+    case: Case, declared: str | None, derived: str
+) -> str | None:
+    if declared == "TOTAL_LOSS" and derived == "PARTIAL_DAMAGE":
+        missing = []
+        if case.repair_total is None:
+            missing.append("repair-and-replacement assessment")
+        if case.market_value is None:
+            missing.append("event-date market value")
+        if missing:
+            return "total-loss classification needs " + " and ".join(missing)
+    if declared == "THEFT" and case.theft_type is None and case.variant != "TOTAL_SETTLEMENT":
+        return "theft classification needs the theft type"
+    if (
+        declared == "GLASS_ONLY"
+        and derived == "PARTIAL_DAMAGE"
+        and not case.has_glass_endorsement
+        and not case.cause
+        and not case.peril
+    ):
+        return "glass-only classification needs cause or endorsement evidence"
+    return None
+
+
+def reconcile_classification(
+    case: Case, kb: Knowledge
+) -> tuple[dict[str, Any], str | None, str | None]:
+    verdict = classify(case, kb)
+    derived = verdict["branch"]
+    declared = case.branch
+    gap = _classification_evidence_gap(case, declared, derived)
+
+    if declared is None:
+        outcome = "MATCH"
+        selected = derived
+        reason = "no branch was declared; the evidence-derived branch is authoritative"
+    elif gap:
+        outcome = "INSUFFICIENT_EVIDENCE"
+        selected = None
+        reason = gap
+    elif declared == derived:
+        outcome = "MATCH"
+        selected = declared
+        reason = "declared and evidence-derived branches agree"
+    else:
+        outcome = "CONFLICT"
+        selected = None
+        reason = f"declared {declared} conflicts with evidence-derived {derived}"
+
+    override = case.classification_override
+    if outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE") and override is not None:
+        outcome = "AUTHORIZED_OVERRIDE"
+        selected = declared
+        reason = "documented classification override authorizes the declared branch"
+
+    record: dict[str, Any] = {
+        "declared_branch": case.declared_branch,
+        "declared_canonical_branch": declared,
+        "derived_branch": derived,
+        "outcome": outcome,
+        "confidence": verdict["confidence"],
+        "basis": verdict["basis"],
+        "reason": reason,
+    }
+    if override is not None:
+        record["override"] = override
+    return record, selected, gap
+
 
 # --------------------------------------------------------------------- driver
 
@@ -828,20 +905,53 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         unit=case.unit,
     )
 
-    if res.branch is None:
+    reconcile_body = res.branch in BODY_BRANCHES or (
+        res.branch is None and res.domain != "LEGAL_RECOVERY"
+    )
+    if reconcile_body:
+        reconciliation, selected, _ = reconcile_classification(case, kb)
+        res.fields["classification"] = reconciliation
+        if case.repair_total is not None and case.market_value is not None:
+            res.note_rule("REG53_ART19_TOTAL_LOSS_THRESHOLD")
+        if reconciliation["outcome"] == "CONFLICT":
+            res.payable = None
+            res.status = "CLASSIFICATION_CONFLICT"
+            res.reason = reconciliation["reason"]
+            res.label("CLASSIFICATION_CONFLICT")
+        elif reconciliation["outcome"] == "INSUFFICIENT_EVIDENCE":
+            res.payable = None
+            res.status = "CLASSIFICATION_EVIDENCE_REQUIRED"
+            res.reason = reconciliation["reason"]
+            res.label("CLASSIFICATION_EVIDENCE_REQUIRED")
+        else:
+            res.branch = selected
+            if case.declared_branch is None:
+                guessed = classify(case, kb)
+                res.variant = guessed["variant"]
+            res.domain = res.domain or DOMAIN_BY_BRANCH.get(res.branch)
+            if reconciliation["outcome"] == "AUTHORIZED_OVERRIDE":
+                res.label("AUTHORIZED_CLASSIFICATION_OVERRIDE")
+    elif res.branch is None:
         guessed = classify(case, kb)
         res.branch = guessed["branch"]
         res.variant = guessed["variant"]
         res.domain = res.domain or DOMAIN_BY_BRANCH.get(guessed["branch"])
         res.fields["classification"] = {
-            "branch": guessed["branch"],
-            "variant": guessed["variant"],
+            "declared_branch": None,
+            "declared_canonical_branch": None,
+            "derived_branch": guessed["branch"],
+            "outcome": "MATCH",
             "confidence": guessed["confidence"],
             "basis": guessed["basis"],
+            "reason": "no branch was declared; the evidence-derived branch is authoritative",
         }
 
     try:
-        if not evaluate_coverage_gate(case, kb, res):
+        classification_blocked = res.status in (
+            "CLASSIFICATION_CONFLICT",
+            "CLASSIFICATION_EVIDENCE_REQUIRED",
+        )
+        if not classification_blocked and not evaluate_coverage_gate(case, kb, res):
             handler = DISPATCH.get(res.branch)
             if handler is None:
                 res.payable = None
