@@ -34,9 +34,13 @@ from .knowledge import Knowledge
 from .plans import (
     FRANCHISE,
     RATIO,
+    PlanError,
     graph_partial_payable,
+    graph_total_loss_payable,
     named_sequence,
+    plan_identity,
     sequences_with_ratio,
+    validate_body_sequence,
 )
 
 UNRESOLVED_ORDER = "UNRESOLVED"
@@ -109,6 +113,33 @@ def _out(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_out(item) for item in value]
     return value
+
+
+def _activate_body_plan(
+    res: CalcResult,
+    branch_name: str,
+    branch_plan: dict[str, Any],
+    sequences: list[str] | list[list[str]],
+) -> list[str] | list[list[str]]:
+    """Validate and identify an active body plan. Guards are bound later."""
+    expected = [str(item) for item in branch_plan.get("operators") or []]
+    if not expected:
+        raise PlanError(f"body branch {branch_name} has no operator sequence")
+    if sequences and isinstance(sequences[0], list):
+        validated = [
+            validate_body_sequence(branch_name, list(sequence), expected)
+            for sequence in sequences
+        ]
+        res.fields["execution_plan"] = validated
+        res.fields["execution_plan_ids"] = [
+            plan_identity(branch_name, sequence) for sequence in validated
+        ]
+    else:
+        validated = validate_body_sequence(branch_name, list(sequences), expected)
+        res.fields["execution_plan"] = validated
+        res.fields["execution_plan_id"] = plan_identity(branch_name, validated)
+    res.fields["execution_plan_branch"] = branch_name
+    return validated
 
 
 # --------------------------------------------------------------------- helpers
@@ -415,24 +446,35 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
     branch_plan = kb.branch("PARTIAL_DAMAGE") or {}
     if ratio == 1:
         res.fields["order_used"] = "RATIO_NOT_APPLICABLE"
-        res.fields["execution_plan"] = list(branch_plan.get("operators") or [])
-        res.payable = max(Decimal(0), after_depreciation - franchise + rescue)
-        return
-
-    sequence = named_sequence(branch_plan, order)
-    if sequence and RATIO in sequence and FRANCHISE in sequence:
-        res.fields["order_used"] = order
-        res.fields["execution_plan"] = sequence
+        sequence = _activate_body_plan(
+            res,
+            "PARTIAL_DAMAGE",
+            branch_plan,
+            list(branch_plan.get("operators") or []),
+        )
         res.payable = graph_partial_payable(
             after_depreciation, franchise, ratio, rescue, sequence
         )
         return
 
+    sequence = named_sequence(branch_plan, order)
+    if sequence and RATIO in sequence and FRANCHISE in sequence:
+        res.fields["order_used"] = order
+        sequence = _activate_body_plan(res, "PARTIAL_DAMAGE", branch_plan, sequence)
+        res.payable = graph_partial_payable(
+            after_depreciation, franchise, ratio, rescue, sequence
+        )
+        return
+
+    scenario_sequences = _activate_body_plan(
+        res, "PARTIAL_DAMAGE", branch_plan, sequences_with_ratio(branch_plan)
+    )
     scenario_amounts = [
         graph_partial_payable(after_depreciation, franchise, ratio, rescue, item)
-        for item in sequences_with_ratio(branch_plan)
+        for item in scenario_sequences
     ]
-    res.fields["execution_plan"] = sequences_with_ratio(branch_plan)
+    if len(scenario_amounts) != 2:
+        raise PlanError("partial-damage plan must provide both operator-order scenarios")
     res.fields["scenario_ratio_then_franchise"] = scenario_amounts[0]
     res.fields["scenario_franchise_then_ratio"] = scenario_amounts[1]
     res.payable_scenarios = scenario_amounts
@@ -457,7 +499,6 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     base = min(market, insured)
     res.fields["settlement_base"] = base
     active = kb.branch(res.branch or "TOTAL_LOSS") or {}
-    res.fields["execution_plan"] = list(active.get("operators") or [])
     res.note_rule("REG53_ART19_TOTAL_LOSS_VALUATION")
 
     if insured < market:
@@ -475,17 +516,18 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         )
 
     if disposition == "INSURER_TAKES_TITLE":
+        salvage_to_deduct = Decimal(0)
         after_salvage = base
         res.fields["salvage_deduction"] = Decimal(0)
         res.fields["salvage_disposition"] = disposition
         res.note_rule("REG53_ART19_INSURER_TAKES_TITLE")
         res.label("DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT")
     else:
-        salvage = case.salvage or Decimal(0)
-        after_salvage = base - salvage
-        res.fields["salvage_deduction"] = salvage
+        salvage_to_deduct = case.salvage or Decimal(0)
+        after_salvage = base - salvage_to_deduct
+        res.fields["salvage_deduction"] = salvage_to_deduct
         res.fields["salvage_disposition"] = disposition
-        if salvage > 0:
+        if salvage_to_deduct > 0:
             res.note_rule("CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE")
             res.label("SALVAGE_DEDUCTED_BEFORE_FRANCHISE")
     res.fields["base_after_salvage"] = after_salvage
@@ -494,11 +536,30 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     rescue = _rescue(case, res, repair if repair is not None else base)
     franchise = _resolve_franchise(case, res, after_salvage)
 
-    result = after_salvage - franchise + rescue
-    capped = min(result, insured)
-    if capped != result:
+    sequence = _activate_body_plan(
+        res,
+        res.branch or "TOTAL_LOSS",
+        active,
+        list(active.get("operators") or []),
+    )
+    result_before_cap = graph_total_loss_payable(
+        base,
+        salvage_to_deduct,
+        franchise,
+        rescue,
+        Decimal("Infinity"),
+        sequence,
+    )
+    res.payable = graph_total_loss_payable(
+        base,
+        salvage_to_deduct,
+        franchise,
+        rescue,
+        insured,
+        sequence,
+    )
+    if res.payable != max(Decimal(0), result_before_cap):
         res.label("INSURED_SUM_CEILING_APPLIED")
-    res.payable = max(Decimal(0), capped)
 
 
 def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
@@ -584,8 +645,13 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     glass_plan = kb.branch("GLASS_ONLY") or {}
     if ratio == 1:
         res.fields["order_used"] = "RATIO_NOT_APPLICABLE"
-        res.fields["execution_plan"] = list(glass_plan.get("operators") or [])
-        res.payable = max(Decimal(0), gross - franchise + rescue)
+        sequence = _activate_body_plan(
+            res,
+            "GLASS_ONLY",
+            glass_plan,
+            list(glass_plan.get("operators") or []),
+        )
+        res.payable = graph_partial_payable(gross, franchise, ratio, rescue, sequence)
         return
 
     if contractually_resolved:
@@ -600,14 +666,19 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
         )
         if sequence is not None:
             res.fields["order_used"] = order
-            res.fields["execution_plan"] = sequence
+            sequence = _activate_body_plan(res, "GLASS_ONLY", glass_plan, sequence)
             res.payable = graph_partial_payable(gross, franchise, ratio, rescue, sequence)
             return
 
+    scenario_sequences = _activate_body_plan(
+        res, "GLASS_ONLY", glass_plan, sequences_with_ratio(glass_plan)
+    )
     scenario_amounts = [
         graph_partial_payable(gross, franchise, ratio, rescue, item)
-        for item in sequences_with_ratio(glass_plan)
+        for item in scenario_sequences
     ]
+    if len(scenario_amounts) != 2:
+        raise PlanError("glass plan must provide both operator-order scenarios")
     ratio_first, franchise_first = scenario_amounts
     res.fields["scenario_ratio_then_franchise"] = ratio_first
     res.fields["scenario_franchise_then_ratio"] = franchise_first
@@ -1015,6 +1086,13 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         res.reason = str(violation)
         res.fields["guard_violation"] = violation.guard_id
         res.label(violation.guard_id)
+    except PlanError as error:
+        res.payable = None
+        res.payable_scenarios = []
+        res.status = "EXECUTION_PLAN_INVALID"
+        res.reason = str(error)
+        res.fields["execution_plan_error"] = str(error)
+        res.label("EXECUTION_PLAN_INVALID")
     except operators.OperatorError as error:
         res.payable = None
         res.status = "INPUT_ERROR"
