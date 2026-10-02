@@ -218,6 +218,18 @@ def test_authority_findings_stay_visible_and_do_not_rewrite_tiers(kb):
         }
 
 
+def test_snapshot_follows_the_event_date_and_not_a_current_year(kb):
+    assert "current_year" not in kb.annual_raw
+    open_snapshot = kb.resolve_snapshot(None, None)
+    assert open_snapshot is not None
+    assert open_snapshot["snapshot_id"] == "BODY@open"
+    dated = kb.resolve_snapshot("1405/06/01", 1405)
+    assert dated is not None
+    assert dated["snapshot_id"] == "BODY@1405/06/01"
+    assert dated["rule_ids"]
+    assert kb.resolve_snapshot("1200/01/01", None) is None
+
+
 def test_a_body_operator_without_a_rule_is_a_validation_issue(kb):
     issues, _findings = kb._audit_body_operator(
         "OP_FRANCHISE",

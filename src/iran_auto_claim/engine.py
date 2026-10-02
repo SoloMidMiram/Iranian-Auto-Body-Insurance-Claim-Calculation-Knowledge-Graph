@@ -891,6 +891,20 @@ def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
     res.payable_scenarios = [money.round_irr(value) for value in res.payable_scenarios]
 
 
+def _bind_body_snapshot(case: Case, kb: Knowledge, res: CalcResult) -> bool:
+    """event date → snapshot. Operators run only after this identity exists."""
+    snapshot = kb.resolve_snapshot(case.event_date, case.claim_year)
+    if snapshot is None:
+        res.payable = None
+        res.status = "INSUFFICIENT_INFORMATION"
+        res.reason = "no regulatory snapshot resolves for the event date"
+        res.label("INSUFFICIENT_INFORMATION")
+        return False
+    res.fields["snapshot_id"] = snapshot["snapshot_id"]
+    res.fields["snapshot_rule_ids"] = snapshot["rule_ids"]
+    return True
+
+
 def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcResult:
     from .schema_input import validated_case
 
@@ -951,6 +965,12 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
             "CLASSIFICATION_CONFLICT",
             "CLASSIFICATION_EVIDENCE_REQUIRED",
         )
+        if (
+            not classification_blocked
+            and res.branch in BODY_BRANCHES
+            and not _bind_body_snapshot(case, kb, res)
+        ):
+            classification_blocked = True
         if not classification_blocked and not evaluate_coverage_gate(case, kb, res):
             handler = DISPATCH.get(res.branch)
             if handler is None:
