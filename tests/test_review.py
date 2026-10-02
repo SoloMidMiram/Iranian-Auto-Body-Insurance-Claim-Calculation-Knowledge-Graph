@@ -210,6 +210,23 @@ def test_missing_franchise_terms_are_incomplete_not_a_scenario(kb):
     assert review.calculate() is None
 
 
+def test_review_rejects_unsourced_zero_franchise_as_incomplete(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+    payload["answers"]["Q-S6-02"] = {
+        "mode": "ABSOLUTE",
+        "absolute_irr": 0,
+        "source": "POLICY",
+    }
+    payload["answers"].pop("Q-S6-03")
+    payload["answers"].pop("Q-S6-04")
+    review = Review(payload, kb)
+    decision = review.decision()
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "U02_FRANCHISE_BASE_SCHEDULES" in decision["live_uncertainties"]
+    assert review.calculate() is None
+
+
 def _without_evidence(name: str, item_id: str) -> dict:
     payload = load(name)
     payload["evidence_present"] = [item for item in payload["evidence_present"] if item != item_id]

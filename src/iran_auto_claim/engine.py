@@ -155,12 +155,51 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
         source = None
 
     if spec is None:
-        res.fields["franchise"] = Decimal(0)
         res.fields["franchise_source"] = "NOT_SPECIFIED"
-        res.label("FRANCHISE_NOT_SPECIFIED")
-        return Decimal(0)
+        res.fields["franchise_evidence_needed"] = (
+            "policy/product/version franchise schedule or endorsement"
+        )
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            (
+                "franchise terms are missing; supply the applicable policy or endorsement "
+                "schedule for the insurer, product and version"
+            ),
+            status="FRANCHISE_TERMS_REQUIRED",
+        )
 
     mode = str(spec.get("mode", "ABSOLUTE")).upper()
+    res.fields["franchise_evidence_needed"] = (
+        "policy/product/version franchise schedule or endorsement"
+    )
+    if mode in ("PERCENT", "PERCENT_WITH_MINIMUM") and spec.get("rate") is None:
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "the percentage franchise rate is missing from the applicable policy schedule",
+            status="FRANCHISE_TERMS_REQUIRED",
+        )
+    if mode == "PERCENT_WITH_MINIMUM" and spec.get("minimum_irr", spec.get("minimum")) is None:
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "the minimum amount for the percentage-with-minimum franchise is missing",
+            status="FRANCHISE_TERMS_REQUIRED",
+        )
+    if mode == "ABSOLUTE" and spec.get("absolute_irr", spec.get("absolute")) is None:
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "the absolute franchise amount is missing from the applicable policy schedule",
+            status="FRANCHISE_TERMS_REQUIRED",
+        )
+    if source not in guards.SOURCED_FRANCHISE_SOURCES:
+        res.fields["franchise_source"] = source or "UNKNOWN"
+        res.fields["franchise_evidence_needed"] = (
+            "policy/product/version franchise schedule or endorsement"
+        )
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "the franchise has no authorised policy, endorsement or insurer-manual source",
+            status="FRANCHISE_AUTHORITY_REQUIRED",
+        )
     guards.check_franchise_source(case, mode, source)
 
     def _dec(value: Any) -> Decimal | None:
@@ -173,6 +212,22 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
         absolute=_dec(spec.get("absolute_irr", spec.get("absolute"))),
         minimum=_dec(spec.get("minimum_irr", spec.get("minimum"))),
     )
+    if amount == 0:
+        version = spec.get("source_version") or case.policy.get("policy_version")
+        reference = spec.get("source_reference")
+        if source not in guards.SOURCED_FRANCHISE_SOURCES or not version or not reference:
+            res.fields["franchise_source"] = source or "UNKNOWN"
+            res.fields["franchise_evidence_needed"] = (
+                "versioned policy or endorsement reference explicitly stating zero franchise"
+            )
+            raise operators.UncertaintyRequired(
+                "U02_FRANCHISE_BASE_SCHEDULES",
+                (
+                    "zero franchise must be explicit in a referenced policy or endorsement "
+                    "for the applicable product version"
+                ),
+                status="FRANCHISE_AUTHORITY_REQUIRED",
+            )
     res.fields["franchise"] = amount
     res.fields["franchise_mode"] = mode
     res.fields["franchise_source"] = source or "UNKNOWN"
