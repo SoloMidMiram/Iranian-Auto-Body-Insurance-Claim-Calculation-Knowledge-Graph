@@ -61,6 +61,21 @@ def test_classifier_splits_conventional_and_non_conventional():
     assert non_conventional["branch"] == "ARTICLE_8_NON_CONVENTIONAL"
 
 
+def test_free_text_that_mentions_a_peril_does_not_exclude_cover(kb):
+    narrative = _case(
+        "PARTIAL_DAMAGE",
+        gross=1600,
+        franchise=100,
+        cause="the road flooded after rain but this is not a flood peril code",
+    )
+    result = compute(narrative, kb)
+    assert result.payable == D(1500)
+    coded = _case("PARTIAL_DAMAGE", gross=1600, franchise=100, peril="FLOOD")
+    excluded = compute(coded, kb)
+    assert excluded.payable == D(0)
+    assert excluded.reason == "EXCLUDED_WITHOUT_ENDORSEMENT"
+
+
 def test_a_body_claim_without_a_resolvable_snapshot_does_not_run_operators(kb):
     payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
     payload["event"] = {"event_date": "1200/01/01"}

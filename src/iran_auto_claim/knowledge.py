@@ -906,8 +906,13 @@ class Knowledge:
 
         for node in self.exclusions.values():
             exclusion_id = node.get("node_id", "<missing id>")
-            if not node.get("cause_predicate"):
+            predicate = node.get("cause_predicate") or {}
+            if not predicate:
                 issues.append(f"exclusion {exclusion_id}: empty cause_predicate")
+            if "cause_keywords" in predicate:
+                issues.append(
+                    f"exclusion {exclusion_id}: cause_keywords cannot grant or deny coverage"
+                )
             if node["type"] == "EXCLUDED_BUT_ENDORSABLE" and not node.get("restorable_by"):
                 issues.append(f"exclusion {exclusion_id}: endorsable but not restorable")
             if node["type"] == "NON_COMPENSABLE" and node.get("restorable_by"):
