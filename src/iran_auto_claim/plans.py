@@ -119,13 +119,7 @@ def validate_active_sequence(sequence: list[str], expected: list[str]) -> list[s
     unknown = sorted(set(normalized) - set(BODY_PLAN_STEPS))
     missing = sorted(set(expected_ids) - set(normalized))
     unexpected = sorted(set(normalized) - set(expected_ids))
-    if (
-        duplicates
-        or unknown
-        or missing
-        or unexpected
-        or len(normalized) != len(expected_ids)
-    ):
+    if duplicates or unknown or missing or unexpected or len(normalized) != len(expected_ids):
         details = []
         if duplicates:
             details.append("duplicate operators: " + ", ".join(duplicates))
