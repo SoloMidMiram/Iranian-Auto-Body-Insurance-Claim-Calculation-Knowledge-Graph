@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import re
 from decimal import Decimal
 
@@ -171,6 +172,78 @@ def test_graph_edges_are_declared_in_the_ontology(kb):
 def test_branch_aliases_map_onto_real_branches(kb):
     for alias, mapping in kb.branch_aliases.items():
         assert mapping["branch"] in kb.branches, alias
+
+
+BODY_OPERATORS = {
+    "OP_DEPRECIATION_REPLACEMENT_PART",
+    "OP_FRANCHISE",
+    "OP_UNDERINSURANCE_RATIO",
+    "OP_SALVAGE_DEDUCTION",
+    "OP_RESCUE_CAP",
+    "OP_SPECIAL_PART_CAP",
+    "OP_LIABILITY_CAP_INSURED_SUM",
+}
+
+
+def test_body_operators_have_rule_source_authority_date_and_scope(kb):
+    register = {row["operator_id"]: row for row in kb.body_operator_authority_register()}
+    assert set(register) == BODY_OPERATORS
+    assert kb.body_operator_authority_issues() == []
+    for operator_id, row in register.items():
+        assert row["branch_scope"], operator_id
+        assert row["issues"] == [], operator_id
+        for rule_id in row["sourced_from"]:
+            rule = kb.rule(rule_id)
+            assert rule["source_class"] in SOURCE_CLASSES
+            assert rule["authority"]
+            assert rule["effective_date"]
+            assert rule["sources"]
+            for source_id in rule["sources"]:
+                assert source_id in kb.sources
+
+
+def test_authority_findings_stay_visible_and_do_not_rewrite_tiers(kb):
+    findings = kb.body_operator_authority_findings()
+    assert findings, "missing reviewer and mirror status must stay visible"
+    assert len(findings) == len(set(findings))
+    assert any("no reviewer" in finding for finding in findings)
+    assert any("PRIMARY_MIRROR" in finding for finding in findings)
+    mirrors = [
+        source["node_id"]
+        for source in kb.sources.values()
+        if source.get("source_tier") == "PRIMARY_MIRROR"
+    ]
+    assert mirrors
+    for source in kb.sources.values():
+        assert source.get("source_tier") != "PRIMARY" or source["node_id"] not in {
+            "SRC_REG53_MIRROR"
+        }
+
+
+def test_declared_body_operator_is_audited_when_no_branch_composes_it(kb):
+    audit_kb = copy.deepcopy(kb)
+    operator_id = "OP_FRANCHISE"
+    for branch in audit_kb.branches.values():
+        branch["operators"] = [
+            listed for listed in branch.get("operators") or [] if listed != operator_id
+        ]
+
+    register = {
+        row["operator_id"]: row for row in audit_kb.body_operator_authority_register()
+    }
+
+    assert operator_id in register
+    assert register[operator_id]["branch_scope"] == []
+    assert "no body branch scope" in register[operator_id]["issues"]
+
+
+def test_a_body_operator_without_a_rule_is_a_validation_issue(kb):
+    issues, _findings = kb._audit_body_operator(
+        "OP_FRANCHISE",
+        {"node_id": "OP_FRANCHISE", "sourced_from": [], "applies_to_branches": ["PARTIAL_DAMAGE"]},
+        ["PARTIAL_DAMAGE"],
+    )
+    assert any("no sourced rule" in issue for issue in issues)
 
 
 def test_source_class_ranks_are_ordered_and_unique(kb):

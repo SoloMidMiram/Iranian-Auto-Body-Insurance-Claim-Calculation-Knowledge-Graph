@@ -192,6 +192,11 @@ def _cmd_validate(args: argparse.Namespace, kb: Knowledge) -> int:
             print(f"  - {issue}")
         return 1
     print("knowledge graph OK")
+    findings = kb.body_operator_authority_findings()
+    if findings:
+        print(f"  body authority findings: {len(findings)}")
+        for finding in findings:
+            print(f"    - {finding}")
     print(f"  nodes: {len(kb.all_ids)}")
     for cls, registry in sorted(kb._registry_by_class.items()):
         print(f"    {cls:<16}{len(registry)}")

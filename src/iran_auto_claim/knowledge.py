@@ -252,6 +252,17 @@ def _read_json(path: Path) -> dict[str, Any]:
         raise ValueError(f"{path}: invalid JSON at line {exc.lineno}: {exc.msg}") from exc
 
 
+def _unique(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        ordered.append(item)
+    return ordered
+
+
 def resolve_callable(dotted: str) -> Any:
     module_name, _, attribute = dotted.rpartition(".")
     if not module_name:
@@ -389,6 +400,120 @@ class Knowledge:
             return []
         return [self.operators[oid] for oid in info.get("operators", []) if oid in self.operators]
 
+    def body_branch_ids(self) -> list[str]:
+        return sorted(
+            branch_id
+            for branch_id, node in self.branches.items()
+            if node.get("domain") == "BODY"
+        )
+
+    def body_operator_scope(self) -> dict[str, list[str]]:
+        """Body branches that list each operator. This is the branch scope."""
+        scope: dict[str, list[str]] = {}
+        for branch_id in self.body_branch_ids():
+            for operator_id in self.branches[branch_id].get("operators") or []:
+                scope.setdefault(str(operator_id), []).append(branch_id)
+        return {operator_id: sorted(branches) for operator_id, branches in scope.items()}
+
+    def body_operator_authority_register(self) -> list[dict[str, Any]]:
+        """Chain operator → rule → source → authority class → effective date → branch scope.
+
+        Source tiers are reported as stored. A mirror is not rewritten to PRIMARY.
+        Missing reviewer text is a finding, not a correction.
+        """
+        rows: list[dict[str, Any]] = []
+        for operator_id, branch_scope in self.body_operator_scope().items():
+            operator = self.operators.get(operator_id)
+            issues, findings = self._audit_body_operator(operator_id, operator, branch_scope)
+            rows.append(
+                {
+                    "operator_id": operator_id,
+                    "branch_scope": branch_scope,
+                    "sourced_from": list((operator or {}).get("sourced_from") or []),
+                    "issues": issues,
+                    "findings": findings,
+                }
+            )
+        return rows
+
+    def body_operator_authority_issues(self) -> list[str]:
+        issues: list[str] = []
+        for row in self.body_operator_authority_register():
+            issues.extend(
+                f"operator {row['operator_id']}: {problem}" for problem in row["issues"]
+            )
+        return issues
+
+    def body_operator_authority_findings(self) -> list[str]:
+        findings: list[str] = []
+        for row in self.body_operator_authority_register():
+            findings.extend(
+                f"operator {row['operator_id']}: {problem}" for problem in row["findings"]
+            )
+        return _unique(findings)
+
+    def _audit_body_operator(
+        self,
+        operator_id: str,
+        operator: dict[str, Any] | None,
+        branch_scope: list[str],
+    ) -> tuple[list[str], list[str]]:
+        issues: list[str] = []
+        findings: list[str] = []
+        if not branch_scope:
+            issues.append("no body branch scope")
+        if operator is None:
+            issues.append("operator node is missing")
+            return issues, findings
+        declared = sorted(
+            branch_id
+            for branch_id in operator.get("applies_to_branches") or []
+            if (self.branches.get(branch_id) or {}).get("domain") == "BODY"
+        )
+        if declared != branch_scope:
+            findings.append(
+                "declared body branch list "
+                f"{declared} differs from branches that compose it {branch_scope}; "
+                "left unchanged"
+            )
+        rule_ids = [str(rule_id) for rule_id in operator.get("sourced_from") or []]
+        if not rule_ids:
+            issues.append("no sourced rule")
+            return issues, findings
+        for rule_id in rule_ids:
+            rule = self.rules.get(rule_id)
+            if rule is None:
+                issues.append(f"sourced rule {rule_id} is missing")
+                continue
+            authority_class = rule.get("source_class")
+            if authority_class not in self.source_class_rank:
+                issues.append(f"rule {rule_id} has no authority class")
+            if not rule.get("authority"):
+                issues.append(f"rule {rule_id} has no authority")
+            if not rule.get("effective_date"):
+                issues.append(f"rule {rule_id} has no effective date")
+            source_ids = [str(source_id) for source_id in rule.get("sources") or []]
+            if not source_ids:
+                issues.append(f"rule {rule_id} has no source")
+            for source_id in source_ids:
+                source = self.sources.get(source_id)
+                if source is None:
+                    issues.append(f"rule {rule_id} source {source_id} is missing")
+                    continue
+                tier = source.get("source_tier")
+                if tier == "PRIMARY_MIRROR":
+                    findings.append(
+                        f"source {source_id} remains PRIMARY_MIRROR; tier was not upgraded"
+                    )
+                if not source.get("reviewer"):
+                    findings.append(f"source {source_id} has no reviewer")
+                note = str(source.get("access_note") or "").lower()
+                if "timed out" in note or "not retrieved" in note or "was not retrieved" in note:
+                    findings.append(
+                        f"source {source_id} records that the official host was not retrieved"
+                    )
+        return issues, findings
+
     def contradictions_by_topic(self, topic: str) -> list[dict]:
         return [c for c in self.contradictions.values() if c.get("topic") == topic]
 
@@ -507,6 +632,116 @@ class Knowledge:
 
     def node_class(self, node_id: str) -> str | None:
         return self._locate(node_id)[1]
+
+    # ---------------------------------------------------- body authority chain
+
+    def body_operator_scope(self) -> dict[str, list[str]]:
+        """Body branches that list each operator. The graph listing is the scope."""
+        scope: dict[str, list[str]] = {}
+        for operator_id, operator in self.operators.items():
+            if any(
+                (self.branches.get(str(branch_id)) or {}).get("domain") == "BODY"
+                for branch_id in operator.get("applies_to_branches") or []
+            ):
+                scope.setdefault(operator_id, [])
+        for branch_id, branch in self.branches.items():
+            if branch.get("domain") != "BODY":
+                continue
+            for operator_id in branch.get("operators") or []:
+                scope.setdefault(str(operator_id), []).append(branch_id)
+        return {operator_id: sorted(branches) for operator_id, branches in scope.items()}
+
+    def body_operator_authority_report(self) -> tuple[list[str], list[str]]:
+        """Prove operator → rule → source → authority class → effective date → scope.
+
+        Broken links are issues. Mirror tiers and missing reviewers are findings.
+        Findings stay visible and are not rewritten into the source register.
+        """
+        issues: list[str] = []
+        findings: list[str] = []
+        for operator_id, branch_scope in self.body_operator_scope().items():
+            operator = self.operators.get(operator_id)
+            if operator is None:
+                issues.append(
+                    f"operator {operator_id}: listed on {branch_scope} but the operator node is missing"
+                )
+                continue
+            issues.extend(self._body_operator_chain_issues(operator_id, operator, branch_scope))
+            findings.extend(self._body_operator_chain_findings(operator_id, operator, branch_scope))
+        return issues, _unique(findings)
+
+    def _body_operator_chain_issues(
+        self, operator_id: str, operator: dict, branch_scope: list[str]
+    ) -> list[str]:
+        issues: list[str] = []
+        rule_ids = [str(item) for item in operator.get("sourced_from") or []]
+        if not rule_ids:
+            issues.append(f"operator {operator_id}: no rule in the authority chain")
+            return issues
+        if not branch_scope:
+            issues.append(f"operator {operator_id}: no body branch scope")
+        for rule_id in rule_ids:
+            rule = self.rules.get(rule_id)
+            if rule is None:
+                issues.append(f"operator {operator_id}: rule {rule_id} is missing")
+                continue
+            if rule.get("source_class") in (None, ""):
+                issues.append(f"operator {operator_id}: rule {rule_id} has no authority class")
+            elif rule.get("source_class") not in self.source_class_rank:
+                issues.append(
+                    f"operator {operator_id}: rule {rule_id} has unknown authority class "
+                    f"{rule.get('source_class')!r}"
+                )
+            if rule.get("authority") in (None, ""):
+                issues.append(f"operator {operator_id}: rule {rule_id} has no authority")
+            if rule.get("effective_date") in (None, ""):
+                issues.append(f"operator {operator_id}: rule {rule_id} has no effective date")
+            source_ids = [str(item) for item in rule.get("sources") or []]
+            if not source_ids:
+                issues.append(f"operator {operator_id}: rule {rule_id} has no source")
+            for source_id in source_ids:
+                if source_id not in self.sources:
+                    issues.append(
+                        f"operator {operator_id}: rule {rule_id} source {source_id} is missing"
+                    )
+        return issues
+
+    def _body_operator_chain_findings(
+        self, operator_id: str, operator: dict, branch_scope: list[str]
+    ) -> list[str]:
+        findings: list[str] = []
+        declared = sorted(
+            branch
+            for branch in operator.get("applies_to_branches") or []
+            if (self.branches.get(str(branch)) or {}).get("domain") == "BODY"
+        )
+        if declared != branch_scope:
+            findings.append(
+                f"operator {operator_id}: declared body scope {declared} differs from "
+                f"listing scope {branch_scope}; the declared scope is not rewritten"
+            )
+        for rule_id in [str(item) for item in operator.get("sourced_from") or []]:
+            rule = self.rules.get(rule_id)
+            if rule is None:
+                continue
+            for source_id in [str(item) for item in rule.get("sources") or []]:
+                source = self.sources.get(source_id)
+                if source is None:
+                    continue
+                tier = source.get("source_tier")
+                if tier == "PRIMARY_MIRROR":
+                    findings.append(
+                        f"source {source_id}: source_tier PRIMARY_MIRROR is left unchanged"
+                    )
+                if not source.get("reviewer"):
+                    findings.append(f"source {source_id}: reviewer is missing")
+                note = str(source.get("access_note") or "").lower()
+                if "timed out" in note or "not retrieved" in note:
+                    findings.append(
+                        f"source {source_id}: official host was not retrieved; "
+                        f"tier {tier} is not reinterpreted"
+                    )
+        return findings
 
     # ------------------------------------------------------------ validation
 
@@ -628,6 +863,7 @@ class Knowledge:
 
         issues.extend(self.superseded_reference_issues())
         issues.extend(self.validate_review())
+        issues.extend(self.body_operator_authority_issues())
 
         for rel_path in self.ontology.get("node_files", {}):
             if not (self.root / rel_path).exists():
