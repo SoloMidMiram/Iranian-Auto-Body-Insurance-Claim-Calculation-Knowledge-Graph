@@ -150,8 +150,16 @@ class Case:
         return _num(self._find(("production_year", "production_year_shamsi")))
 
     @property
-    def claim_year(self) -> int:
-        return _num(self.snapshot.get("iranian_year")) or 1405
+    def claim_year(self) -> int | None:
+        """Iranian year only when the case names it. There is no current-year fallback."""
+        return _num(self.snapshot.get("iranian_year"))
+
+    @property
+    def event_date(self) -> str | None:
+        value = self.event.get("event_date")
+        if value in (None, ""):
+            return None
+        return str(value)
 
     @property
     def labor(self) -> Decimal | None:

@@ -1,7 +1,6 @@
 {
   "node_class": "AnnualParameter",
-  "note": "Annual parameters are versioned nodes separate from rules. When the Judiciary announces a new year only these nodes change; every rule referencing them stays intact. Values are stored in IRR (1 toman = 10 IRR).",
-  "current_year": 1405,
+  "note": "Annual parameters are versioned nodes separate from rules. When the Judiciary announces a new year only these nodes change; every rule referencing them stays intact. Values are stored in IRR (1 toman = 10 IRR). There is no current-year fallback; the event date or iranian_year selects the snapshot.",
   "currency": "IRR",
   "derivation_rules": {
     "conventional_vehicle_threshold": "0.5 * bodily_liability_ceiling",

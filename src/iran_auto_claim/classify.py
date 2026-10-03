@@ -102,7 +102,8 @@ def _classify_third_party(case: Case, kb: Knowledge, basis: list[str]) -> dict[s
     value = case.victim_vehicle_value
     threshold = case.threshold
     if threshold is None:
-        irr = kb.annual_value(case.claim_year, "CONVENTIONAL_THRESHOLD")
+        year = case.claim_year
+        irr = None if year is None else kb.annual_value(year, "CONVENTIONAL_THRESHOLD")
         threshold = None if irr is None else money.D(irr)
     if value is None or threshold is None:
         basis.append("vehicle value or annual threshold unavailable; defaulting to the ordinary cap")

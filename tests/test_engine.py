@@ -61,6 +61,24 @@ def test_classifier_splits_conventional_and_non_conventional():
     assert non_conventional["branch"] == "ARTICLE_8_NON_CONVENTIONAL"
 
 
+def test_a_body_claim_without_a_resolvable_snapshot_does_not_run_operators(kb):
+    payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
+    payload["event"] = {"event_date": "1200/01/01"}
+    result = compute(payload, kb)
+    assert result.status == "INSUFFICIENT_INFORMATION"
+    assert result.payable is None
+    assert result.rule_trace == []
+
+
+def test_a_dated_body_claim_records_its_snapshot(kb):
+    payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
+    payload["event"] = {"event_date": "1405/06/01"}
+    payload["regulatory_snapshot"] = {"iranian_year": 1405}
+    result = compute(payload, kb)
+    assert result.payable == D(1500)
+    assert result.fields["snapshot_id"] == "BODY@1405/06/01"
+
+
 def test_a_declared_branch_matching_evidence_is_reconciled(kb):
     payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
     result = compute(payload, kb)

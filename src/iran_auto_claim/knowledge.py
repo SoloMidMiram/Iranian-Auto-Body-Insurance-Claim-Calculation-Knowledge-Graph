@@ -263,6 +263,15 @@ def _unique(items: list[str]) -> list[str]:
     return ordered
 
 
+def _jalali_date(value: str | None) -> str | None:
+    if not isinstance(value, str) or len(value) != 10 or value[4] != "/" or value[7] != "/":
+        return None
+    year, month, day = value[:4], value[5:7], value[8:]
+    if not (year.isdigit() and month.isdigit() and day.isdigit()):
+        return None
+    return value
+
+
 def resolve_callable(dotted: str) -> Any:
     module_name, _, attribute = dotted.rpartition(".")
     if not module_name:
@@ -382,6 +391,59 @@ class Knowledge:
         if node is None:
             return None
         return D(node["value"])
+
+    def resolve_snapshot(
+        self, event_date: str | None, iranian_year: int | None
+    ) -> dict[str, Any] | None:
+        """Select the body snapshot: event date, else the open loaded interval.
+
+        ``current_year`` is not read. A dated anchor that precedes every rule
+        returns None so the caller can fail closed.
+        """
+        if "current_year" in self.annual_raw:
+            return None
+        rules = self._body_snapshot_rules()
+        if not rules:
+            return None
+        anchor = _jalali_date(event_date)
+        if anchor is None and iranian_year is not None:
+            anchor = f"{int(iranian_year):04d}/12/29"
+        selected: list[dict[str, Any]] = []
+        for rule in rules:
+            start = str(rule.get("effective_date") or "")
+            end = rule.get("effective_until")
+            if not start:
+                continue
+            if anchor is None:
+                selected.append(rule)
+                continue
+            if start <= anchor and (end in (None, "") or anchor <= str(end)):
+                selected.append(rule)
+        if not selected:
+            return None
+        rule_ids = sorted(str(rule["node_id"]) for rule in selected)
+        label = anchor or "open"
+        return {
+            "snapshot_id": f"BODY@{label}",
+            "anchor": label,
+            "rule_ids": rule_ids,
+            "iranian_year": iranian_year,
+        }
+
+    def _body_snapshot_rules(self) -> list[dict[str, Any]]:
+        seen: set[str] = set()
+        rules: list[dict[str, Any]] = []
+        for operator_id in self.body_operator_scope():
+            operator = self.operators.get(operator_id) or {}
+            for rule_id in operator.get("sourced_from") or []:
+                if rule_id in seen:
+                    continue
+                rule = self.rules.get(rule_id)
+                if rule is None:
+                    continue
+                seen.add(str(rule_id))
+                rules.append(rule)
+        return rules
 
     def blocking_uncertainties(self) -> list[dict]:
         return [u for u in self.uncertainties.values() if u.get("blocking")]
@@ -864,6 +926,8 @@ class Knowledge:
         issues.extend(self.superseded_reference_issues())
         issues.extend(self.validate_review())
         issues.extend(self.body_operator_authority_issues())
+        if "current_year" in self.annual_raw:
+            issues.append("annual parameters: current_year fallback is not allowed")
 
         for rel_path in self.ontology.get("node_files", {}):
             if not (self.root / rel_path).exists():
