@@ -68,11 +68,22 @@ class CalcResult:
     formula_confidence: float | None = None
     evidence_confidence: float | None = None
     provenance: list[dict[str, Any]] = field(default_factory=list)
+    required_guards: list[str] = field(default_factory=list)
+    guards_executed: list[str] = field(default_factory=list)
 
     def label(self, *names: str) -> None:
         for name in names:
             if name:
                 self.labels.add(name)
+
+    def note_guard(self, guard_id: str) -> None:
+        if guard_id and guard_id not in self.guards_executed:
+            self.guards_executed.append(guard_id)
+
+    def require_guard(self, *guard_ids: str) -> None:
+        for guard_id in guard_ids:
+            if guard_id and guard_id not in self.required_guards:
+                self.required_guards.append(guard_id)
 
     def note_rule(self, *rule_ids: str) -> None:
         for rule_id in rule_ids:
@@ -107,6 +118,8 @@ class CalcResult:
             "formula_confidence": self.formula_confidence,
             "evidence_confidence": self.evidence_confidence,
             "provenance": _out(self.provenance),
+            "required_guards": list(self.required_guards),
+            "guards_executed": list(self.guards_executed),
         }
 
 
@@ -126,8 +139,9 @@ def _activate_body_plan(
     branch_plan: dict[str, Any],
     sequences: list[str] | list[list[str]],
 ) -> list[str] | list[list[str]]:
-    """Validate and identify an active body plan. Guards are bound later."""
+    """Validate, identify, and bind the guards for an active body plan."""
     expected = [str(item) for item in branch_plan.get("operators") or []]
+    guards_required = [str(item) for item in branch_plan.get("guardrails") or []]
     if not expected:
         raise PlanError(f"body branch {branch_name} has no operator sequence")
     if sequences and isinstance(sequences[0], list):
@@ -137,14 +151,32 @@ def _activate_body_plan(
         ]
         res.fields["execution_plan"] = validated
         res.fields["execution_plan_ids"] = [
-            plan_identity(branch_name, sequence) for sequence in validated
+            plan_identity(branch_name, sequence, guards_required) for sequence in validated
         ]
     else:
         validated = validate_body_sequence(branch_name, list(sequences), expected)
         res.fields["execution_plan"] = validated
-        res.fields["execution_plan_id"] = plan_identity(branch_name, validated)
+        res.fields["execution_plan_id"] = plan_identity(
+            branch_name, validated, guards_required
+        )
     res.fields["execution_plan_branch"] = branch_name
+    res.fields["execution_plan_guards"] = guards_required
+    res.require_guard(*guards_required)
     return validated
+
+
+def _enforce_guard_plan(res: CalcResult) -> None:
+    missing = [
+        guard_id for guard_id in res.required_guards if guard_id not in res.guards_executed
+    ]
+    if not missing:
+        return
+    res.payable = None
+    res.payable_scenarios = []
+    res.status = "GUARD_PLAN_INCOMPLETE"
+    res.reason = "required guard did not run: " + ", ".join(missing)
+    res.fields["missing_required_guards"] = missing
+    res.label("GUARD_PLAN_INCOMPLETE")
 
 
 # --------------------------------------------------------------------- helpers
@@ -156,6 +188,7 @@ def _rescue(case: Case, res: CalcResult, cap_base: Decimal) -> Decimal:
     res.fields["rescue_cap"] = operators.RESCUE_CAP_RATIO * cap_base if cap_base > 0 else Decimal(0)
     res.fields["allowable_rescue_transport"] = cap
     res.fields["rescue_claimed"] = actual
+    res.note_guard("G_RESCUE_CAP_CEILING")
     if actual > 0:
         res.note_rule("REG53_RESCUE_TRANSPORT_CAP")
         if cap < actual:
@@ -233,6 +266,9 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
             "the absolute franchise amount is missing from the applicable policy schedule",
             status="FRANCHISE_TERMS_REQUIRED",
         )
+    res.require_guard("G_NO_HARDCODED_FRANCHISE_RATE")
+    guards.check_franchise_source(case, mode, source)
+    res.note_guard("G_NO_HARDCODED_FRANCHISE_RATE")
     if source not in guards.SOURCED_FRANCHISE_SOURCES:
         res.fields["franchise_source"] = source or "UNKNOWN"
         res.fields["franchise_evidence_needed"] = (
@@ -243,7 +279,6 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
             "the franchise has no authorised policy, endorsement or insurer-manual source",
             status="FRANCHISE_AUTHORITY_REQUIRED",
         )
-    guards.check_franchise_source(case, mode, source)
 
     def _dec(value: Any) -> Decimal | None:
         return None if value is None else money.D(value)
@@ -322,12 +357,14 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
         if exclusion.get("type") != "NON_COMPENSABLE":
             continue
         if _exclusion_matches(case, exclusion):
+            res.require_guard("G_NO_ASSUMED_CAUSATION")
             outcome = exclusion["uninsured_outcome"]
             res.payable = money.D(outcome.get("payable", 0))
             res.reason = outcome.get("reason", "NON_COMPENSABLE")
             res.fields["exclusion_applied"] = exclusion["node_id"]
             res.fields["exclusion_state"] = "NON_COMPENSABLE"
             res.note_rule("REG53_ART6_NON_COMPENSABLE")
+            res.note_guard("G_NO_ASSUMED_CAUSATION")
             res.label("NON_COMPENSABLE")
             return True
 
@@ -341,9 +378,11 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
         res.fields["exclusion_state"] = "EXCLUDED_BUT_ENDORSABLE"
         res.note_rule("REG53_ART5_ENDORSABLE_EXCLUSIONS")
         if case.has_endorsement(list(exclusion.get("restorable_by") or [])):
+            res.require_guard("G_NO_GUESSED_ENDORSEMENT_TERMS")
             outcome = exclusion.get("insured_outcome") or {}
             res.payable = None
             res.status = outcome.get("status", "ENDORSEMENT_TERMS_REQUIRED")
+            res.note_guard("G_NO_GUESSED_ENDORSEMENT_TERMS")
             res.label("ENDORSEMENT_TERMS_REQUIRED")
             res.fields["endorsement_terms_needed"] = exclusion.get("endorsement_terms_needed", [])
             res.block("U02_FRANCHISE_BASE_SCHEDULES")
@@ -511,6 +550,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.fields["guard_ratio_twice"] = "PROHIBITED"
         res.note_rule("REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE")
         res.label("DO_NOT_APPLY_RATIO_TWICE")
+    res.note_guard("G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS")
 
     disposition = case.salvage_disposition
     if disposition == "UNRESOLVED":
@@ -535,6 +575,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         if salvage_to_deduct > 0:
             res.note_rule("CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE")
             res.label("SALVAGE_DEDUCTED_BEFORE_FRANCHISE")
+    res.note_guard("G_SALVAGE_XOR_TITLE_TRANSFER")
     res.fields["base_after_salvage"] = after_salvage
 
     repair = case.repair_total
@@ -565,6 +606,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     )
     if res.payable != max(Decimal(0), result_before_cap):
         res.label("INSURED_SUM_CEILING_APPLIED")
+    res.note_guard("G_INSURED_SUM_CEILING")
 
 
 def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
@@ -610,7 +652,9 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
 
 def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("GLASS_ONLY")
+    res.require_guard("G_NO_UNIVERSAL_GLASS_FRANCHISE")
     guards.check_universal_glass_franchise(case)
+    res.note_guard("G_NO_UNIVERSAL_GLASS_FRANCHISE")
 
     if case.glass_damage_from_base_peril:
         res.route = "PARTIAL_DAMAGE"
@@ -644,6 +688,7 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     rescue = _rescue(case, res, gross)
     franchise = _resolve_franchise(case, res, gross)
     ratio = _ratio(case, res)
+    res.note_guard("G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT")
     order = str(case.config.get("article10_partial_order", UNRESOLVED_ORDER)).upper()
     contractually_resolved = bool(case.config.get("glass_article10_order_resolved_by_endorsement"))
 
@@ -797,7 +842,9 @@ def calculate_third_party(case: Case, kb: Knowledge, res: CalcResult) -> None:
 
 def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("ARTICLE_8_NON_CONVENTIONAL")
+    res.require_guard("G_ARTICLE8_NO_WHOLE_CAR_RATIO")
     guards.check_article8_method(case)
+    res.note_guard("G_ARTICLE8_NO_WHOLE_CAR_RATIO")
 
     corresponding = case.corresponding_damage
     if corresponding is None:
@@ -828,13 +875,16 @@ def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.note_rule(
         "HIC_ARTICLE8_CORRESPONDING_DAMAGE", "TPL_LAW_1395_ART8_NON_CONVENTIONAL_LIMIT"
     )
+    res.require_guard("G_DUAL_LIABILITY_CAP")
     if insurer_payable < corresponding:
         res.label("DUAL_CAP_APPLIED")
+    res.note_guard("G_DUAL_LIABILITY_CAP")
 
     if res.variant == "DUAL_COVERAGE":
         res.fields["third_party"] = insurer_payable
         res.note_rule("CIC_CIRC_1404_06_10_ARTICLE8_EXCESS_OWN_BODY")
         if case.has_body_policy:
+            res.require_guard("G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE")
             if case.body_franchise_for_excess_disclosed:
                 res.fields["body_candidate_before_disclosed_terms"] = excess
                 res.label("APPLY_VALID_DISCLOSED_POLICY_TERM")
@@ -842,6 +892,7 @@ def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
                 res.fields["body_candidate_before_other_body_terms"] = excess
                 res.fields["regulatory_mandatory_franchise_on_this_excess"] = money.D(0)
                 res.note_rule("CIC_CIRC_1404_06_10_NO_MANDATORY_FRANCHISE_ON_ART8_EXCESS")
+            res.note_guard("G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE")
         res.payable = insurer_payable
         return
 
@@ -1141,6 +1192,7 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         if uncertainty.scenarios:
             res.fields["candidate_scenarios"] = uncertainty.scenarios
     except guards.GuardViolation as violation:
+        res.note_guard(violation.guard_id)
         res.payable = None
         res.status = violation.violation_status
         res.reason = str(violation)
@@ -1163,13 +1215,18 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         res.reason = str(error)
 
     try:
+        if res.branch in BODY_BRANCHES:
+            res.require_guard("G_UNCERTAINTY_MUST_SURFACE")
         guards.check_uncertainty_propagation(res)
+        res.note_guard("G_UNCERTAINTY_MUST_SURFACE")
     except guards.GuardViolation as violation:
+        res.note_guard(violation.guard_id)
         res.payable = None
         res.status = violation.violation_status
         res.reason = str(violation)
         res.fields["guard_violation"] = violation.guard_id
         res.label(violation.guard_id)
 
+    _enforce_guard_plan(res)
     _finalize(res, kb, case)
     return res

@@ -8,6 +8,7 @@ from decimal import Decimal
 import pytest
 
 from iran_auto_claim.engine import compute
+from iran_auto_claim.fixtures import evaluate_fixture, load_fixtures
 from iran_auto_claim.plans import (
     PlanError,
     graph_partial_payable,
@@ -66,12 +67,24 @@ def test_total_loss_graph_plan_matches_legacy_sum():
     ) == legacy_total_loss_payable(Decimal(1000), Decimal(100), Decimal(50), Decimal(2000))
 
 
-def test_plan_identity_binds_branch_and_sequence():
+def test_plan_identity_binds_sequence_and_guard_set():
     sequence = ["OP_UNDERINSURANCE_RATIO", "OP_FRANCHISE", "OP_RESCUE_CAP"]
-    identity = plan_identity("GLASS_ONLY", sequence)
+    guards = ["G_NO_HARDCODED_FRANCHISE_RATE"]
+    identity = plan_identity("GLASS_ONLY", sequence, guards)
     assert identity.startswith("sha256:")
-    assert identity != plan_identity("GLASS_ONLY", list(reversed(sequence)))
-    assert identity != plan_identity("PARTIAL_DAMAGE", sequence)
+    assert identity != plan_identity("GLASS_ONLY", list(reversed(sequence)), guards)
+    assert identity != plan_identity("GLASS_ONLY", sequence, guards + ["G_RESCUE_CAP_CEILING"])
+
+
+def test_body_fixture_plans_record_identity_and_complete_required_guards(kb):
+    for fixture in load_fixtures():
+        result, problems = evaluate_fixture(fixture, kb)
+        assert not problems, fixture["id"]
+        if "execution_plan" not in result.fields:
+            continue
+        assert result.fields.get("execution_plan_id") or result.fields.get("execution_plan_ids")
+        assert set(result.fields["execution_plan_guards"]) <= set(result.required_guards)
+        assert set(result.required_guards) <= set(result.guards_executed)
 
 
 @pytest.mark.parametrize(
