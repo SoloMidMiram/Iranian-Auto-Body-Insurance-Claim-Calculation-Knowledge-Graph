@@ -67,7 +67,8 @@ That contrast is the whole point of the model.
 
 ## Case review: from a claim file to the right parameters
 
-The engine computes an amount from a claim case. Before it may do that, someone has
+The engine computes an amount from a claim case, but only from one that has been
+authorized. Before that may happen, someone has
 to establish what happened, whether cover applies, and which parameters are sourced.
 That review layer is a gate-ordered questionnaire over the same graph:
 
@@ -95,6 +96,26 @@ architecture and calculation contract, and
 [`docs/BODY_CASE_REVIEW_MODEL.md`](docs/BODY_CASE_REVIEW_MODEL.md) for the generated
 questionnaire, parameter-selection matrix and worked traces;
 `python scripts/sync_review_docs.py --write` refreshes the generated tables inside it.
+
+## The authorization boundary
+
+The engine cannot be handed a claim. `compute()` accepts a
+`CalculationAuthorization` and refuses a raw payload, a `Case`, or anything else,
+so no script, feature or future caller can reach the arithmetic without an issuer
+having admitted the file:
+
+```
+raw claim → review gate → CalculationAuthorization → compute() → result
+```
+
+`Review.authorize()` is the only producer for a claim file and raises on `REFUSE`
+and `INSUFFICIENT_INFORMATION`, which makes those two outcomes structurally
+incapable of reaching the calculator. The authorization binds the exact emitted
+payload by SHA-256 hash, so a case edited after issuance is refused rather than
+recalculated. Synthetic fixtures, the mutation probe and `claim.py calc` go through
+the narrow named channel `engine_direct_authorize()`, which still enforces the
+schema and records `ENGINE_DIRECT` as the issuer. Every result carries that
+authorization provenance in `CalcResult.authorization`.
 
 ## Project delivery and safety status
 

@@ -48,6 +48,9 @@ Every supported calculation must satisfy all of these:
 8. Every source and policy term is effective for the event/policy snapshot.
 9. Repeating a calculation against the same frozen snapshot is deterministic.
 10. Invalid input and guard violations are machine-visible failures.
+11. No calculation runs without an authorization. `compute()` accepts a
+    `CalculationAuthorization` only; `REFUSE` and `INSUFFICIENT_INFORMATION`
+    cannot produce one, and a payload edited after issuance fails its hash check.
 
 Monetary calculations retain exact decimal intermediates. The engine rounds only
 final payable amounts and payable scenarios to the nearest IRR, using
@@ -144,6 +147,30 @@ and never changes a persisted or engine input.
   cover, expired does not.
 - Refusal, insufficiency and scenario-set decisions each have a worked file in `cases/`
   and a test that pins the outcome, not only the happy path.
+
+## Calculation admission boundary
+
+No amount may be produced without an authorization that names its issuer. The
+boundary is a type, so a caller that skips the review gate fails at the call site
+rather than silently computing:
+
+- `compute()` refuses a raw payload, a `Case`, and any object that is not a
+  `CalculationAuthorization`.
+- `Review.authorize()` raises `AuthorizationNotGranted` on `REFUSE` and
+  `INSUFFICIENT_INFORMATION`, so neither outcome can reach the engine.
+- The authorization binds the emitted payload by SHA-256 hash; editing the case
+  afterwards is refused instead of recalculated.
+- A forged decision token (`REFUSE`, `INSUFFICIENT_INFORMATION`, or any value
+  outside the authorized set) fails `verify()` before any arithmetic runs.
+- Every result reports `authorization` provenance: issuer, decision, claim hash,
+  reviewer, tier, classification record, snapshot id, live uncertainties.
+- An unresolved risk intensification blocks at the review gate on an asserted
+  `YES`, and the engine independently fails closed on
+  `coverage_gate.risk_intensified` for every body branch, returning
+  `RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED` with no payable and no scenario
+  collapse. The underinsurance ratio is never substituted for the premium ratio.
+- The fixture corpus, the mutation probe, and `claim.py calc` use the named
+  direct channel and report `ENGINE_DIRECT`; a review-issued result never does.
 
 ## Body calculation properties and mutation gate
 

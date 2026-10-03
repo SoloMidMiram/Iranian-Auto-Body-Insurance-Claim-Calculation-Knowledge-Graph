@@ -35,12 +35,34 @@ Evidence
   -> Result + provenance + confidence
 ```
 
-There are two execution layers:
+There are two execution layers, and the second one cannot be reached without a
+ticket issued by the first:
 
 | Layer | Responsibility | Must not do |
 |---|---|---|
 | Review/acceptance | Establish facts, evidence, cover, branch, and parameter completeness | Calculate with defaults or guess missing terms |
 | Calculation | Execute the selected branch and operators | Repair an incomplete file or silently change its branch |
+
+The boundary between them is a typed object, not a convention.
+`compute()` accepts a `CalculationAuthorization` (`src/iran_auto_claim/admission.py`)
+and refuses a raw case payload, a `Case`, or anything else:
+
+```text
+raw claim -> review gate -> CalculationAuthorization -> compute() -> result
+```
+
+- `Review.authorize()` is the only producer for a claim file. It raises
+  `AuthorizationNotGranted` on `REFUSE` and `INSUFFICIENT_INFORMATION`, so those
+  two outcomes cannot reach the calculator at all.
+- The authorization binds the exact emitted payload by SHA-256 content hash. A
+  case edited after issuance is refused at `compute()` rather than recalculated.
+- `engine_direct_authorize()` is a narrow, named channel for the synthetic
+  fixture corpus, the mutation probe, and direct `claim.py calc`. It still runs
+  the schema boundary and records `ENGINE_DIRECT` as the issuer, so a directly
+  calculated amount never looks review-admitted.
+- Every result carries `authorization` provenance: issuer, decision, claim hash,
+  issue timestamp, reviewer, tier, classification record, snapshot id, live
+  uncertainties and blocking conditions.
 
 The FAQ is an adapter over the review layer. It is not a second rule engine.
 
@@ -137,14 +159,15 @@ model does not assign either unnamed verdict a rule, formula, or precedence. Onc
 two documents are supplied, they should enter through the source/contradiction review
 path before they affect acceptance or arithmetic.
 
-## 6. The four critical safety gates
+## 6. The critical safety gates
 
 | Problem | Correct behavior | Current enforcement |
 |---|---|---|
-| Missing franchise terms | U02 with no single payable; never zero | Enforced at the shared engine boundary for direct calc, public `compute()`, and review-to-engine; explicit zero requires versioned, referenced policy evidence |
-| Missing production year where depreciation can apply | `INSUFFICIENT_INFORMATION`; never assume 0% | Review gate enforced and regression-tested; direct low-level `calc` remains an unsafe bypass |
+| Missing franchise terms | U02 with no single payable; never zero | Enforced at the shared engine boundary for the direct channel, review-to-engine, and the fixture corpus; explicit zero requires versioned, referenced policy evidence |
+| Missing production year where depreciation can apply | `INSUFFICIENT_INFORMATION`; never assume 0% | Review gate enforced and regression-tested. The claim schema also refuses an itemised-parts case with no `regulatory_snapshot.iranian_year` and no production year, so the direct channel cannot default it either |
 | Theft-clock anchor ambiguity | Return pending/anchor scenarios or request the dated source; never pick a clock silently | U13 blocks every whole-vehicle theft in review; no engine handoff until explicit clock inputs are modeled |
 | Underinsurance order unresolved | Return both approved scenarios; never choose or average | Enforced by `U01` and the partial-loss engine |
+| Unresolved risk intensification | No payable; never substitute the underinsurance ratio | `U15` blocks the review decision on an asserted `YES`, and the engine fails closed on `coverage_gate.risk_intensified` for every body branch. An omitted or `UNKNOWN` answer is still a gap (see below) |
 
 These gates separate two kinds of uncertainty:
 
@@ -266,31 +289,41 @@ documents are authentic or legally sufficient.
 
 ## 10. Current status and next engineering steps
 
-Validated on 2026-10-02:
+Validated on 2026-10-03:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 363 tests;
+- the complete automated suite passes: 452 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
 - missing franchise terms or authority stop every body settlement path on U02;
-- explicit zero franchise is accepted only from versioned, referenced policy evidence.
+- explicit zero franchise is accepted only from versioned, referenced policy evidence;
+- no calculation path reaches the engine without an authorization, and the
+  mutation gate kills a hash-bypass and a decision-bypass mutant (14/14).
 
 Remaining gaps, in priority order:
 
-1. Make structured event clocks first-class (`start_event`, `start_date`, `as_of`,
-   calendar, elapsed days) and calculate every material theft-clock scenario.
-2. Prevent direct calculation from defaulting missing production-year inputs where
-   replacement-part depreciation can apply.
+1. An omitted or `UNKNOWN` answer to the risk-intensification question (`Q-S3-07`)
+   still reaches `COMPUTE`, because that question is graded `blocking: "review"`
+   and only an asserted `YES` makes `U15` live. Closing it is a knowledge-graph
+   decision about the question's blocking level, not an engine change.
+2. Make structured event clocks first-class (`start_event`, `start_date`, `as_of`,
+   calendar, elapsed days) and calculate every material theft-clock scenario. The
+   engine still reads `days_vehicle_missing`, which is a derived output rather than
+   evidence, so the direct channel can be handed a day count with no anchor.
 3. The evidence id list's `if_absent` token is enforced. Document contents are still
    not verified: the gate trusts `evidence_present` rather than recording identity,
    issuer, date, version, and hash.
-4. Replace documented caller-supplied classification overrides with signed,
+4. Classification still derives the glass and base-peril signals from free-text
+   substring matching (`_looks_like_glass`, `glass_damage_from_base_peril`), which
+   is why the Phase 2 exit clause "no branch relies on uncontrolled free-text
+   classification" is not yet met.
+5. Replace documented caller-supplied classification overrides with signed,
    role-authorized artifacts when the authenticated workflow is built.
-5. Drive uncertainty liveness from graph predicates instead of duplicating it in
+6. Drive uncertainty liveness from graph predicates instead of duplicating it in
    Python.
-6. Ingest the two verdicts after their actual texts and metadata are available.
+7. Ingest the two verdicts after their actual texts and metadata are available.
 
 ### FAQ response contract
 
