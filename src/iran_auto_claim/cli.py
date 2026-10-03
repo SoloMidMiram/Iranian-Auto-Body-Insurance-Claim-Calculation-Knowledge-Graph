@@ -197,6 +197,11 @@ def _cmd_validate(args: argparse.Namespace, kb: Knowledge) -> int:
         print(f"  body authority findings: {len(findings)}")
         for finding in findings:
             print(f"    - {finding}")
+    source_findings = kb.source_integrity_findings()
+    if source_findings:
+        print(f"  source metadata findings: {len(source_findings)}")
+        for finding in source_findings:
+            print(f"    - {finding}")
     print(f"  nodes: {len(kb.all_ids)}")
     for cls, registry in sorted(kb._registry_by_class.items()):
         print(f"    {cls:<16}{len(registry)}")

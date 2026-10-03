@@ -24,6 +24,12 @@ The issue sync command is a dry run unless `--apply` is explicitly supplied.
 operator, rule, source, authority class, effective date, and branch scope.
 Source tiers are not rewritten. A missing reviewer or a `PRIMARY_MIRROR`
 source is printed as a finding and does not by itself fail the gate.
+Incomplete source metadata (locator, content hash, retrieval date, effective
+interval, revalidation date) is also printed as a finding. A past revalidation
+date does not fail the release gate in this phase.
+Incomplete source metadata (locator, content hash, retrieval date, effective
+interval, revalidation date) is also printed as a finding. A past revalidation
+date does not fail the release gate in this phase.
 
 ## Universal invariants
 
