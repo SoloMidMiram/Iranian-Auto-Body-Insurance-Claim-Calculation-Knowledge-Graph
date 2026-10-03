@@ -263,14 +263,13 @@ def _exclusion_matches(case: Case, exclusion: dict[str, Any]) -> bool:
         if value is not None and value == predicate.get("equals"):
             return True
 
-    keywords = predicate.get("cause_keywords")
-    if keywords:
-        haystack = " ".join(filter(None, [case.cause or "", case.peril or ""])).upper()
-        for keyword in keywords:
-            if keyword.upper() in haystack:
-                return True
-
-    return False
+    tokens = predicate.get("cause_in") or []
+    observed = {
+        str(value).casefold()
+        for value in (case.cause, case.peril)
+        if value not in (None, "")
+    }
+    return any(str(token).casefold() in observed for token in tokens)
 
 
 def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
