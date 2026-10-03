@@ -20,6 +20,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from .admission import engine_direct_authorize
 from .engine import CalcResult, compute
 from .knowledge import DEFAULT_ROOT, Knowledge
 from .money import D
@@ -140,7 +141,7 @@ def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult
             "source_version": "SYNTHETIC-FIXTURE-v1",
         }
         case_payload["policy"] = policy
-    result = compute(case_payload, kb)
+    result = compute(engine_direct_authorize(case_payload), kb)
     return result, check_expectations(fixture.get("expected", {}), result)
 
 

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
+from admission_shim import compute
 
-from iran_auto_claim.engine import compute
 from iran_auto_claim.money import D
 
 

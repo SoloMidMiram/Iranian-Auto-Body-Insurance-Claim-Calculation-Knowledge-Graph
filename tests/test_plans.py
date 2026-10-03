@@ -6,8 +6,8 @@ import copy
 from decimal import Decimal
 
 import pytest
+from admission_shim import compute
 
-from iran_auto_claim.engine import compute
 from iran_auto_claim.fixtures import evaluate_fixture, load_fixtures
 from iran_auto_claim.plans import (
     PlanError,

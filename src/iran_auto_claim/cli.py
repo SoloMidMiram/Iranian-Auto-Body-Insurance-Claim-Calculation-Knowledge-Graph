@@ -30,6 +30,12 @@ from pathlib import Path
 from typing import Any
 
 from . import money
+from .admission import (
+    AuthorizationError,
+    AuthorizationNotGranted,
+    CalculationAuthorization,
+    engine_direct_authorize,
+)
 from .case import Case
 from .classify import classify
 from .engine import compute, reconcile_classification
@@ -46,8 +52,6 @@ from .schema_input import (
     write_validated_claim,
 )
 from .review import (
-    DECISION_COMPUTE,
-    DECISION_SCENARIO,
     Review,
     ReviewInputError,
     ladder_markdown,
@@ -154,11 +158,27 @@ def main(argv: list[str] | None = None) -> int:
     except InputSchemaError as error:
         _print_schema_error(error)
         return 1
+    except AuthorizationError as error:
+        _print_schema_error(
+            InputSchemaError([SchemaIssue(CODE_UNAUTHORIZED, "$", str(error))])
+        )
+        return 1
 
 
 def _load_case(path: str) -> Case:
     payload = load_json_document(path)
     return validated_case(payload)
+
+
+def _authorize_direct(case: Case) -> CalculationAuthorization:
+    """Admit a standalone case file through the named direct channel.
+
+    ``calc`` and ``json`` read a calculation case, not a review questionnaire, so
+    there is no review decision to carry. The issuer is recorded as
+    ``ENGINE_DIRECT`` and appears in the result's authorization provenance, so a
+    directly calculated amount never looks review-admitted.
+    """
+    return engine_direct_authorize(case)
 
 
 def _cmd_fixtures(args: argparse.Namespace, kb: Knowledge) -> int:
@@ -212,14 +232,14 @@ def _cmd_validate(args: argparse.Namespace, kb: Knowledge) -> int:
 
 def _cmd_calc(args: argparse.Namespace, kb: Knowledge) -> int:
     case = _load_case(args.case)
-    result = compute(case, kb)
+    result = compute(_authorize_direct(case), kb)
     print(render_claim(result, kb, "million_toman"))
     return 0
 
 
 def _cmd_json(args: argparse.Namespace, kb: Knowledge) -> int:
     case = _load_case(args.case)
-    result = compute(case, kb)
+    result = compute(_authorize_direct(case), kb)
     print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
     return 0
 
@@ -486,19 +506,20 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
         return 1
 
     if args.emit_case:
-        decision = review.decision()["decision"]
-        if decision not in (DECISION_COMPUTE, DECISION_SCENARIO):
+        try:
+            authorization = review.authorize()
+        except AuthorizationNotGranted as error:
+            kind = review.decision()["decision"]
             raise InputSchemaError(
                 [
                     SchemaIssue(
                         CODE_UNAUTHORIZED,
                         "$",
-                        f"review decision {decision} does not authorize an engine case",
+                        f"review decision {kind} does not authorize an engine case: {error}",
                     )
                 ]
-            )
-        payload = review.case_payload()
-        write_validated_claim(args.emit_case, payload)
+            ) from error
+        write_validated_claim(args.emit_case, authorization.case.raw)
         print(f"wrote derived case to {args.emit_case}")
 
     if args.json:

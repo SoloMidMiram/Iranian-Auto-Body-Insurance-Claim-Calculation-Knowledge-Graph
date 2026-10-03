@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 
+from iran_auto_claim.admission import (
+    AuthorizationError,
+    engine_direct_authorize,
+)
+from iran_auto_claim.case import Case
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
 from iran_auto_claim.knowledge import Knowledge
 from iran_auto_claim.operators import (
@@ -95,17 +101,62 @@ def main() -> int:
     assert result.payable is None
     assert result.status == "GUARD_PLAN_INCOMPLETE"
 
-    missing_franchise = compute(
-        {
-            "claim_id": "mutation-probe",
-            "unit": "IRR",
-            "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
-            "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 1000},
-        },
-        Knowledge.load(),
+    probe_payload = {
+        "claim_id": "mutation-probe",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01"},
+        "damage": {"gross": 1000},
+    }
+    kb = Knowledge.load()
+    authorization = engine_direct_authorize(probe_payload)
+
+    try:
+        compute(probe_payload, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a raw claim payload reached compute without authorization")
+
+    tampered = Case(
+        {**probe_payload, "damage": {"gross": 999999}},
     )
+    try:
+        compute(replace(authorization, case=tampered), kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a payload edited after authorization passed the hash check")
+
+    refused = replace(authorization, decision="REFUSE")
+    try:
+        compute(refused, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a REFUSE decision reached the calculator")
+
+    insufficient = replace(authorization, decision="INSUFFICIENT_INFORMATION")
+    try:
+        compute(insufficient, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("an INSUFFICIENT_INFORMATION decision reached the calculator")
+
+    missing_franchise = compute(authorization, kb)
     assert missing_franchise.payable is None
+    assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" not in missing_franchise.blocking_uncertainties
+
+    intensified = compute(
+        engine_direct_authorize(
+            {**probe_payload, "coverage_gate": {"risk_intensified": True}}
+        ),
+        kb,
+    )
+    assert intensified.payable is None
+    assert intensified.status == "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED"
+    assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" in intensified.blocking_uncertainties
     return 0
 
 

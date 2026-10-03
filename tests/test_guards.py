@@ -5,10 +5,11 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from admission_shim import compute
 
 from iran_auto_claim import guards, operators
 from iran_auto_claim.case import Case
-from iran_auto_claim.engine import CalcResult, compute
+from iran_auto_claim.engine import CalcResult
 from iran_auto_claim.money import D
 
 

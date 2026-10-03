@@ -7,6 +7,10 @@ from pathlib import Path
 
 import pytest
 
+from iran_auto_claim.admission import (
+    AuthorizationError,
+    engine_direct_authorize,
+)
 from iran_auto_claim.cli import main
 from iran_auto_claim.engine import compute
 from iran_auto_claim.fixtures import load_fixtures
@@ -239,6 +243,10 @@ def test_cli_reports_malformed_json_with_a_stable_code(command, capsys, tmp_path
     assert body["errors"][0]["path"] == "$"
 
 
-def test_public_compute_rejects_before_arithmetic():
+def test_a_raw_claim_cannot_reach_compute_without_authorization():
+    """The boundary: no authorization object, no calculation - not even a refusal result."""
+    raw = {"claim_id": "X", "unit": "IRR", "damage": {"not_a_loss_figure": 1}}
+    with pytest.raises(AuthorizationError):
+        compute(raw)  # a dict is not a CalculationAuthorization
     with pytest.raises(InputSchemaError):
-        compute({"claim_id": "X", "unit": "IRR", "damage": {"not_a_loss_figure": 1}})
+        engine_direct_authorize(raw)  # the direct channel still enforces the schema

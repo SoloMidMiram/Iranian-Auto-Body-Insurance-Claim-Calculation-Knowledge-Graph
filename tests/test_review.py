@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 
+from iran_auto_claim.admission import engine_direct_authorize
 from iran_auto_claim.case import Case
 from iran_auto_claim.engine import compute
 from iran_auto_claim.schema_input import InputSchemaError
@@ -165,8 +166,10 @@ def test_the_derived_case_round_trips_through_the_engine(kb):
         "prior_compensation": 0,
     }
 
-    recomputed = compute(Case(copy.deepcopy(payload)), kb)
+    recomputed = compute(engine_direct_authorize(Case(copy.deepcopy(payload))), kb)
     assert recomputed.payable == review.calculate().payable
+    assert recomputed.authorization["issuer"] == "ENGINE_DIRECT"
+    assert review.calculate().authorization["issuer"] == "REVIEW_GATE"
 
 
 def test_questions_gated_off_by_earlier_answers_are_not_asked(kb):

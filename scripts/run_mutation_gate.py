@@ -36,6 +36,9 @@ MUTATIONS = (
     Mutation("M09", "src/iran_auto_claim/operators.py", "return combined > threshold, combined, threshold", "return combined >= threshold, combined, threshold", "strict total-loss boundary becomes inclusive"),
     Mutation("M10", "src/iran_auto_claim/operators.py", "if insured_sum >= market_value:\n        return Decimal(1)", "if insured_sum >= market_value:\n        return Decimal(0)", "fully insured claim receives a zero ratio"),
     Mutation("M11", "src/iran_auto_claim/engine.py", "if not missing:\n        return", "if missing:\n        return", "a bypassed required guard is accepted"),
+    Mutation("M12", "src/iran_auto_claim/admission.py", "if claim_hash(self.case.raw) != self.claim_hash:", "if False:", "the authorization hash no longer binds the payload, so an edited claim is calculated"),
+    Mutation("M13", "src/iran_auto_claim/admission.py", "if self.decision not in AUTHORIZED_DECISIONS:", "if False:", "a REFUSE or INSUFFICIENT_INFORMATION decision reaches the calculator"),
+    Mutation("M14", "src/iran_auto_claim/engine.py", "if not case.risk_intensified:\n        return", "if case.risk_intensified:\n        return", "risk intensification is settled at full amount instead of blocked on U15"),
 )
 
 THRESHOLD = 90.0
@@ -91,7 +94,8 @@ def _render(results: list[tuple[Mutation, bool]]) -> str:
         "This is a reproducible, curated high-risk mutation set for the deterministic",
         "body calculation boundary. It is not a claim of exhaustive mutation coverage.",
         "",
-        f"- Target modules: `plans.py`, `operators.py`, and the guard-plan gate in `engine.py`",
+        "- Target modules: `plans.py`, `operators.py`, the guard-plan gate in "
+        "`engine.py`, and the authorization boundary in `admission.py`",
         f"- Required score: **{THRESHOLD:.0f}%**",
         f"- Result: **{killed}/{total} killed ({score:.1f}%)**",
         "- Command: `python scripts/run_mutation_gate.py --check-report`",

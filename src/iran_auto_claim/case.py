@@ -330,6 +330,18 @@ class Case:
         return bool(self._find(("subrogation_impaired",)) or self.recovery_right_impaired)
 
     @property
+    def risk_intensified(self) -> bool:
+        """Unnotified intensification of risk, as the coverage gate records it.
+
+        The engine reads this only to fail closed: ``U15`` is a premium-ratio
+        operator this engine does not implement, so a true value blocks rather
+        than reducing an amount by a guessed ratio.
+        """
+        if self.coverage.get("risk_intensified"):
+            return True
+        return bool(self._find(("risk_intensified",)))
+
+    @property
     def franchise_raw(self) -> Any:
         return self._find(("franchise", "franchise_from_policy", "franchise_amount"))
 
