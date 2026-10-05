@@ -520,7 +520,7 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
                     )
                 ]
             ) from error
-        write_validated_claim(args.emit_case, authorization.case.raw)
+        write_validated_claim(args.emit_case, authorization.claim_payload())
         print(f"wrote derived case to {args.emit_case}")
 
     if args.json:

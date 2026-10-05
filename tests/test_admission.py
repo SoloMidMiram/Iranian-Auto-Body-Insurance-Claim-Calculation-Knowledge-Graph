@@ -118,19 +118,8 @@ def test_an_authorization_for_another_decision_cannot_be_forged_by_casting(kb):
 @pytest.mark.parametrize("issuer", [ISSUER_REVIEW, "FORGED_ISSUER"])
 def test_constructing_the_domain_object_directly_does_not_authorize(kb, issuer):
     """Only Review.authorize receives the private issuance capability."""
-    case = Case(
-        {
-            "claim_id": "forged-domain-object",
-            "unit": "IRR",
-            "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
-            "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 100},
-        }
-    )
     forged = CalculationAuthorization(
-        case=case,
         decision="COMPUTE",
-        claim_hash=claim_hash(case.raw),
         issuer=issuer,
     )
     with pytest.raises(AuthorizationError) as caught:
@@ -223,8 +212,8 @@ def test_only_the_two_issuing_decisions_are_authorized():
 # ----------------------------------------------------------- payload immutability
 
 
-def test_a_payload_edited_after_authorization_is_refused(kb):
-    """Authorize a small claim, then try to calculate a large one on that ticket."""
+def test_dataclasses_replace_cannot_retarget_an_authorization(kb):
+    """The exact reviewed claim cannot be replaced while retaining its capability."""
     base = {
         "claim_id": "tamper",
         "unit": "IRR",
@@ -244,13 +233,67 @@ def test_a_payload_edited_after_authorization_is_refused(kb):
     }
     authorization = _authorize_fixture_case(base, kb)
     inflated = copy.deepcopy(base)
+    inflated["claim_id"] = "retargeted"
     inflated["damage"]["gross"] = 999999
-    with pytest.raises(AuthorizationError) as caught:
-        compute(replace(authorization, case=Case(inflated)), kb)
-    assert "hash" in str(caught.value)
+    with pytest.raises((TypeError, ValueError)):
+        replace(
+            authorization,
+            case=Case(inflated),
+            claim_hash=claim_hash(inflated),
+        )
+
+    # Even an unchanged replace() call creates an unissued object because the
+    # private immutable grant is init=False and is not copied by dataclasses.
+    with pytest.raises(AuthorizationError):
+        compute(replace(authorization), kb)
 
     # the unedited payload is still admitted, and still gives the same answer
     assert compute(authorization, kb).payable == Decimal(1500)
+
+
+@pytest.mark.parametrize(
+    "view",
+    ["damage", "policy", "coverage", "classification", "evidence"],
+)
+def test_mutating_a_detached_case_view_cannot_change_the_authorized_calculation(kb, view):
+    authorization = Review.from_file(CASES / FULLCOVER, kb).authorize()
+    expected = compute(authorization, kb).to_dict()
+    detached = authorization.case
+
+    if view == "damage":
+        detached.damage["labor_irr"] = 1_400_000_000
+    elif view == "policy":
+        detached.policy["franchise"] = {
+            "mode": "ABSOLUTE",
+            "absolute_irr": 0,
+            "source": "POLICY",
+            "source_reference": "forged",
+            "source_version": "forged",
+        }
+    elif view == "coverage":
+        detached.coverage["risk_intensified"] = True
+    elif view == "classification":
+        detached.branch = "TOTAL_LOSS"
+        detached.classification_declaration["branch"] = "TOTAL_LOSS"
+    elif view == "evidence":
+        detached.evidence["EVT_POLICY_COPY"] = False
+
+    assert compute(authorization, kb).to_dict() == expected
+
+
+def test_mutating_a_case_supplied_at_issuance_cannot_change_the_snapshot(kb):
+    payload = Review.from_file(CASES / FULLCOVER, kb).case_payload()
+    supplied = Case(copy.deepcopy(payload))
+    authorization = _authorize_fixture_case(supplied, kb)
+    expected = compute(authorization, kb).to_dict()
+
+    supplied.raw["claim_id"] = "mutated-after-issue"
+    supplied.damage["labor_irr"] = 1_400_000_000
+    supplied.policy.clear()
+    supplied.coverage["risk_intensified"] = True
+    supplied.evidence.clear()
+
+    assert compute(authorization, kb).to_dict() == expected
 
 
 def test_the_authorization_hash_is_content_derived_and_order_insensitive():
@@ -370,6 +413,16 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
         ("PARTIAL_DAMAGE", {"gross": 1600}),
         ("TOTAL_LOSS", {"market": 2000, "insured": 2000, "repair": 1900}),
         ("GLASS_ONLY", {"gross": 1600}),
+        (
+            "THEFT",
+            {
+                "theft_type": "WHOLE_VEHICLE",
+                "days_missing": 65,
+                "market": 2000,
+                "insured": 2000,
+                "title_transferred": True,
+            },
+        ),
     )
     for branch, damage in cases:
         payload = {
@@ -476,6 +529,23 @@ def test_authorization_provenance_is_preserved_into_the_result(kb):
     assert result.authorization["issuer"] == ISSUER_REVIEW
 
 
+def test_authorization_provenance_is_an_immutable_snapshot(kb):
+    authorization = Review.from_file(CASES / FULLCOVER, kb).authorize()
+    expected = authorization.provenance_record()
+
+    detached = authorization.provenance_record()
+    detached["reviewer"] = "forged-reviewer"
+    detached["approved_overrides"].append({"forged": True})
+    detached["classification"]["outcome"] = "FORGED"
+    detached["policy_snapshot"]["franchise"]["rate"] = 1
+
+    property_copy = authorization.provenance
+    property_copy["reviewer"] = "another-forgery"
+
+    assert authorization.provenance_record() == expected
+    assert compute(authorization, kb).authorization == expected
+
+
 def test_the_reviewer_identity_is_carried_when_the_file_names_one(kb):
     payload = load(FULLCOVER)
     payload["reviewed_by"] = "adjuster-07"
@@ -512,7 +582,7 @@ def test_an_authorization_is_immutable(kb):
 
 
 def test_verify_is_called_before_any_arithmetic(kb):
-    """A stale hash must fail even when the payload would calculate cleanly."""
+    """A dataclass clone loses its private grant before arithmetic can run."""
     payload = {
         "claim_id": "stale",
         "unit": "IRR",
@@ -521,6 +591,6 @@ def test_verify_is_called_before_any_arithmetic(kb):
         "damage": {"gross": 1600},
     }
     authorization = _authorize_fixture_case(payload, kb)
-    stale = replace(authorization, claim_hash="sha256:" + "0" * 64)
+    stale = replace(authorization)
     with pytest.raises(AuthorizationError):
         compute(stale, kb)

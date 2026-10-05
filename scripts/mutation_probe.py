@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import replace
 from decimal import Decimal
 
@@ -9,9 +10,9 @@ from iran_auto_claim.admission import (
     ISSUER_REVIEW,
     AuthorizationError,
     CalculationAuthorization,
+    _canonical_json,
     claim_hash,
 )
-from iran_auto_claim.case import Case
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
 from iran_auto_claim.fixtures import _authorize_fixture_case
 from iran_auto_claim.knowledge import Knowledge
@@ -122,9 +123,7 @@ def main() -> int:
         raise AssertionError("a raw claim payload reached compute without authorization")
 
     forged = CalculationAuthorization(
-        case=Case(probe_payload),
         decision="COMPUTE",
-        claim_hash=claim_hash(probe_payload),
         issuer=ISSUER_REVIEW,
     )
     try:
@@ -134,17 +133,49 @@ def main() -> int:
     else:
         raise AssertionError("a directly constructed authorization passed the review seal")
 
-    tampered = Case(
-        {**probe_payload, "damage": {"gross": 999999}},
+    target_payload = {**probe_payload, "claim_id": "retargeted", "damage": {"gross": 999999}}
+    target_grant = replace(
+        authorization._grant,
+        claim_snapshot=_canonical_json(target_payload),
+        claim_hash=claim_hash(target_payload),
     )
     try:
-        compute(replace(authorization, case=tampered), kb)
+        retargeted = replace(authorization, _grant=target_grant)
+    except (TypeError, ValueError):
+        pass
+    else:
+        try:
+            compute(retargeted, kb)
+        except AuthorizationError:
+            pass
+        else:
+            raise AssertionError("dataclasses.replace transplanted the issuance capability")
+
+    corrupted = copy.copy(authorization)
+    object.__setattr__(
+        corrupted,
+        "_grant",
+        replace(authorization._grant, claim_snapshot=_canonical_json(target_payload)),
+    )
+    try:
+        compute(corrupted, kb)
     except AuthorizationError:
         pass
     else:
-        raise AssertionError("a payload edited after authorization passed the hash check")
+        raise AssertionError("a claim snapshot no longer matched its issued hash")
 
-    refused = replace(authorization, decision="REFUSE")
+    masquerade = copy.copy(authorization)
+    object.__setattr__(masquerade, "issuer", ISSUER_REVIEW)
+    try:
+        compute(masquerade, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("an internal authorization masqueraded as REVIEW_GATE")
+
+    refused = copy.copy(authorization)
+    object.__setattr__(refused, "decision", "REFUSE")
+    object.__setattr__(refused, "_grant", replace(authorization._grant, decision="REFUSE"))
     try:
         compute(refused, kb)
     except AuthorizationError:
@@ -152,7 +183,13 @@ def main() -> int:
     else:
         raise AssertionError("a REFUSE decision reached the calculator")
 
-    insufficient = replace(authorization, decision="INSUFFICIENT_INFORMATION")
+    insufficient = copy.copy(authorization)
+    object.__setattr__(insufficient, "decision", "INSUFFICIENT_INFORMATION")
+    object.__setattr__(
+        insufficient,
+        "_grant",
+        replace(authorization._grant, decision="INSUFFICIENT_INFORMATION"),
+    )
     try:
         compute(insufficient, kb)
     except AuthorizationError:

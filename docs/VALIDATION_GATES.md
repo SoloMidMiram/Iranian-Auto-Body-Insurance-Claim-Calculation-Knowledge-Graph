@@ -159,8 +159,13 @@ rather than silently computing:
   `CalculationAuthorization`.
 - `Review.authorize()` raises `AuthorizationNotGranted` on `REFUSE` and
   `INSUFFICIENT_INFORMATION`, so neither outcome can reach the engine.
-- The authorization binds the emitted payload by SHA-256 hash; editing the case
-  afterwards is refused instead of recalculated.
+- The authorization owns immutable canonical JSON snapshots of the validated claim
+  and provenance. Its private `init=False` factory grant is lost on
+  `dataclasses.replace()`, and `compute()` materializes a fresh validated `Case`
+  after verification instead of consuming any mutable pre-issuance view.
+- Returned claim and provenance values are detached copies. Mutating them cannot
+  change a later calculation or its emitted review record. This is an architectural
+  Python API boundary, not cryptographic hostile-process security.
 - A forged decision token (`REFUSE`, `INSUFFICIENT_INFORMATION`, or any value
   outside the authorized set) fails `verify()` before any arithmetic runs.
 - Every result reports `authorization` provenance: issuer, decision, claim hash,

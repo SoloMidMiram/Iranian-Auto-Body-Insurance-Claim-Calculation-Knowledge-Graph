@@ -110,8 +110,12 @@ raw claim → review gate → CalculationAuthorization → compute() → result
 `Review.authorize()` is the only normal claim-file authorization producer and
 raises on `REFUSE` and `INSUFFICIENT_INFORMATION`, which makes those two outcomes structurally
 incapable of reaching the calculator. The authorization binds the exact emitted
-payload by SHA-256 hash, so a case edited after issuance is refused rather than
-recalculated. `claim.py calc` and `json` now accept review-answer files and call
+payload and authorization provenance as immutable canonical JSON snapshots. Its
+private factory grant is not copied by `dataclasses.replace()`. `compute()` verifies
+that grant and materializes a fresh validated `Case` from the bound snapshot, so
+mutating an earlier `Case` or a returned provenance record cannot affect the run.
+This is an architectural in-process boundary, not cryptographic protection against
+hostile interpreter introspection. `claim.py calc` and `json` accept review-answer files and call
 `Review.authorize()`; they reject raw claim cases. The older calculation fixtures
 use a private, schema-validating internal helper whose capabilities and provenance
 are marked `INTERNAL_TEST_DIRECT`; it is not exported by the package API and no

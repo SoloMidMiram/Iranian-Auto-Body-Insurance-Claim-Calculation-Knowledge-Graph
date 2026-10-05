@@ -36,15 +36,22 @@ MUTATIONS = (
     Mutation("M09", "src/iran_auto_claim/operators.py", "return combined > threshold, combined, threshold", "return combined >= threshold, combined, threshold", "strict total-loss boundary becomes inclusive"),
     Mutation("M10", "src/iran_auto_claim/operators.py", "if insured_sum >= market_value:\n        return Decimal(1)", "if insured_sum >= market_value:\n        return Decimal(0)", "fully insured claim receives a zero ratio"),
     Mutation("M11", "src/iran_auto_claim/engine.py", "if not missing:\n        return", "if missing:\n        return", "a bypassed required guard is accepted"),
-    Mutation("M12", "src/iran_auto_claim/admission.py", "if claim_hash(self.case.raw) != self.claim_hash:", "if False:", "the authorization hash no longer binds the payload, so an edited claim is calculated"),
+    Mutation("M12", "src/iran_auto_claim/admission.py", "if _snapshot_hash(grant.claim_snapshot) != grant.claim_hash:", "if False:", "the immutable claim snapshot no longer has to match its issued hash"),
     Mutation("M13", "src/iran_auto_claim/admission.py", "if self.decision not in AUTHORIZED_DECISIONS:", "if False:", "a REFUSE or INSUFFICIENT_INFORMATION decision reaches the calculator"),
     Mutation("M14", "src/iran_auto_claim/engine.py", "if not case.risk_intensified:\n        return", "if case.risk_intensified:\n        return", "risk intensification is settled at full amount instead of blocked on U15"),
     Mutation(
         "M15",
         "src/iran_auto_claim/admission.py",
-        """if not (\n            (self._issuance_seal is _REVIEW_ISSUANCE_SEAL and self.issuer == ISSUER_REVIEW)\n            or (\n                self._issuance_seal is _INTERNAL_TEST_ISSUANCE_SEAL\n                and self.issuer == ISSUER_INTERNAL_TEST\n            )\n        ):""",
+        """if not (\n            (\n                grant.issuance_seal is _REVIEW_ISSUANCE_SEAL\n                and self.issuer == ISSUER_REVIEW\n            )\n            or (\n                grant.issuance_seal is _INTERNAL_TEST_ISSUANCE_SEAL\n                and self.issuer == ISSUER_INTERNAL_TEST\n            )\n        ) or not (\n            grant.decision == self.decision\n            and grant.issuer == self.issuer\n            and grant.issued_at == self.issued_at\n        ):""",
         "if False:",
-        "an unsealed or issuer-mismatched authorization is accepted as factory-issued",
+        "an internal or metadata-mismatched capability can masquerade as review-issued",
+    ),
+    Mutation(
+        "M16",
+        "src/iran_auto_claim/admission.py",
+        "_grant: _AuthorizationGrant | None = field(default=None, init=False, repr=False, compare=False)",
+        "_grant: _AuthorizationGrant | None = field(default=None, init=True, repr=False, compare=False)",
+        "dataclasses.replace can transplant a modified private grant onto another claim",
     ),
 )
 

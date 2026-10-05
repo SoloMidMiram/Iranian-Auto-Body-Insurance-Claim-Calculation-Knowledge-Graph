@@ -1162,8 +1162,9 @@ def compute(
 
     ``authorization`` is the only admissible input: a raw case payload or a
     ``Case`` cannot reach the engine without some issuer admitting it first.
-    The authorization binds the exact validated payload by content hash, so a
-    case edited after issuance is refused here rather than silently recalculated.
+    The authorization owns the exact validated payload as immutable canonical
+    JSON. A fresh ``Case`` is materialized only after verification, so mutable
+    objects that existed before issuance cannot affect this calculation.
     """
     if not isinstance(authorization, CalculationAuthorization):
         raise AuthorizationError(
@@ -1171,7 +1172,7 @@ def compute(
             "run the claim through the review gate before calculation"
         )
     authorization.verify()
-    case = validated_case(authorization.case)
+    case = validated_case(authorization.claim_payload())
     kb = kb or Knowledge.load()
 
     res = CalcResult(

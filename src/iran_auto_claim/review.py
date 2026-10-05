@@ -28,11 +28,9 @@ from typing import Any
 from . import money
 from .admission import (
     AUTHORIZED_DECISIONS,
-    ISSUER_REVIEW,
-    _REVIEW_ISSUANCE_SEAL,
+    _issue_review_authorization,
     AuthorizationNotGranted,
     CalculationAuthorization,
-    claim_hash,
     utc_now,
 )
 from .case import PART_CATEGORIES
@@ -968,9 +966,9 @@ class Review:
         terminal and raise instead of producing an authorization, so no path from
         a reviewed file can reach the calculator without the file first passing.
 
-        The authorization binds the exact emitted payload by content hash. Editing
-        the payload afterwards invalidates it at ``compute()``, which makes the
-        "authorize a good file, calculate a different one" attack impossible.
+        The authorization owns immutable canonical claim and provenance snapshots.
+        ``compute()`` materializes a fresh validated ``Case`` from that snapshot,
+        so no mutable review or ``Case`` object remains authoritative after issue.
         """
         decision = self.decision()
         kind = decision["decision"]
@@ -994,11 +992,9 @@ class Review:
         classification, _, _ = reconcile_classification(case, self.kb)
         snapshot = self.kb.resolve_snapshot(case.event_date, case.claim_year)
 
-        return CalculationAuthorization(
-            case=case,
+        return _issue_review_authorization(
+            payload,
             decision=kind,
-            claim_hash=claim_hash(payload),
-            issuer=ISSUER_REVIEW,
             issued_at=utc_now(),
             provenance={
                 "review_kind": self.authorization_kind,
@@ -1027,7 +1023,6 @@ class Review:
                     [classification["override"]] if classification.get("override") else []
                 ),
             },
-            _issuance_seal=_REVIEW_ISSUANCE_SEAL,
         )
 
     def calculate(self) -> CalcResult | None:
