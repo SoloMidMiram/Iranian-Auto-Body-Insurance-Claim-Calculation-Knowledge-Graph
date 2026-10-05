@@ -20,7 +20,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from .admission import engine_direct_authorize
+from .admission import CalculationAuthorization, _internal_test_direct_authorize
 from .engine import CalcResult, compute
 from .knowledge import DEFAULT_ROOT, Knowledge
 from .money import D
@@ -45,6 +45,21 @@ SCENARIO_KEYS = {
 EXACT_ATTR_KEYS = {"status": "status", "reason": "reason", "route": "route"}
 
 LABEL_KEYS = {"guard", "flag", "franchise"}
+
+
+def _authorize_fixture_case(
+    case_payload: dict[str, Any],
+    kb: Knowledge,
+    *,
+    decision: str = "COMPUTE",
+) -> CalculationAuthorization:
+    """Use the visibly non-production path for the authored fixture corpus."""
+    del kb  # kept in the signature for the existing fixture/test harness
+    return _internal_test_direct_authorize(
+        case_payload,
+        decision=decision,
+        purpose="P01-L50_SYNTHETIC_FIXTURE",
+    )
 
 
 def load_fixtures(path: Path | str | None = None) -> list[dict[str, Any]]:
@@ -141,7 +156,12 @@ def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult
             "source_version": "SYNTHETIC-FIXTURE-v1",
         }
         case_payload["policy"] = policy
-    result = compute(engine_direct_authorize(case_payload), kb)
+    decision = (
+        "SCENARIO_SET"
+        if any(key in SCENARIO_KEYS for key in fixture.get("expected", {}))
+        else "COMPUTE"
+    )
+    result = compute(_authorize_fixture_case(case_payload, kb, decision=decision), kb)
     return result, check_expectations(fixture.get("expected", {}), result)
 
 

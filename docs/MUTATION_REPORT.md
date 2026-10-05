@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **14/14 killed (100.0%)**
+- Result: **15/15 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -24,6 +24,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M12 | KILLED | the authorization hash no longer binds the payload, so an edited claim is calculated |
 | M13 | KILLED | a REFUSE or INSUFFICIENT_INFORMATION decision reaches the calculator |
 | M14 | KILLED | risk intensification is settled at full amount instead of blocked on U15 |
+| M15 | KILLED | an unsealed or issuer-mismatched authorization is accepted as factory-issued |
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

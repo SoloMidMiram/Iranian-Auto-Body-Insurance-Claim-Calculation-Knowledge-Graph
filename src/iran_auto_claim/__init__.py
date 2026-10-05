@@ -6,7 +6,6 @@ from .admission import (
     AuthorizationNotGranted,
     CalculationAuthorization,
     claim_hash,
-    engine_direct_authorize,
 )
 from .engine import compute, CalcResult
 from .knowledge import Knowledge, Node
@@ -24,6 +23,5 @@ __all__ = [
     "AuthorizationNotGranted",
     "AUTHORIZED_DECISIONS",
     "claim_hash",
-    "engine_direct_authorize",
 ]
 __version__ = "1.0.0"

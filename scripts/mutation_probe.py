@@ -6,11 +6,14 @@ from dataclasses import replace
 from decimal import Decimal
 
 from iran_auto_claim.admission import (
+    ISSUER_REVIEW,
     AuthorizationError,
-    engine_direct_authorize,
+    CalculationAuthorization,
+    claim_hash,
 )
 from iran_auto_claim.case import Case
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
+from iran_auto_claim.fixtures import _authorize_fixture_case
 from iran_auto_claim.knowledge import Knowledge
 from iran_auto_claim.operators import (
     allowable_rescue_transport,
@@ -109,7 +112,7 @@ def main() -> int:
         "damage": {"gross": 1000},
     }
     kb = Knowledge.load()
-    authorization = engine_direct_authorize(probe_payload)
+    authorization = _authorize_fixture_case(probe_payload, kb)
 
     try:
         compute(probe_payload, kb)
@@ -117,6 +120,19 @@ def main() -> int:
         pass
     else:
         raise AssertionError("a raw claim payload reached compute without authorization")
+
+    forged = CalculationAuthorization(
+        case=Case(probe_payload),
+        decision="COMPUTE",
+        claim_hash=claim_hash(probe_payload),
+        issuer=ISSUER_REVIEW,
+    )
+    try:
+        compute(forged, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a directly constructed authorization passed the review seal")
 
     tampered = Case(
         {**probe_payload, "damage": {"gross": 999999}},
@@ -149,8 +165,9 @@ def main() -> int:
     assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" not in missing_franchise.blocking_uncertainties
 
     intensified = compute(
-        engine_direct_authorize(
-            {**probe_payload, "coverage_gate": {"risk_intensified": True}}
+        _authorize_fixture_case(
+            {**probe_payload, "coverage_gate": {"risk_intensified": True}},
+            kb,
         ),
         kb,
     )

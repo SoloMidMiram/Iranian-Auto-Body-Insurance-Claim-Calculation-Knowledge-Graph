@@ -277,7 +277,7 @@ the evidence it demands and the rung it belongs to
 | Q-S3-04 | Do any of the remaining non-compensable conditions apply? | NONE, WAR_OR_NUCLEAR, UNAUTHORIZED_TOWING, OVERLOAD, INHERENT_ELECTRICAL, UNKNOWN | - | EVT_ASSESSMENT_REPORT | hard | T1 |
 | Q-S3-05 | Which endorsements does this policy actually carry? | NONE, HELD, UNKNOWN | PS_ENDORSEMENTS | EVT_POLICY_COPY, EVT_ENDORSEMENT_WORDING | amount | T1 |
 | Q-S3-06 | Was the vehicle moved or repaired before the insurer's consent or inspection? | NO, DONE_WITH_CONSENT, DONE_WITHOUT_CONSENT, POLICE_ORDERED_MOVE, UNKNOWN | - | EVT_REPAIR_CONSENT, EVT_PHOTOS | review | T1 |
-| Q-S3-07 | Did the risk or the use of the vehicle intensify without notifying the insurer? | NO, YES, UNKNOWN | PS_RISK_INTENSIFICATION | EVT_RISK_INTENSIFICATION_RECORD | review | T2 |
+| Q-S3-07 | Did the risk or the use of the vehicle intensify without notifying the insurer? | NO, YES, UNKNOWN | PS_RISK_INTENSIFICATION | EVT_RISK_INTENSIFICATION_RECORD | hard | T2 |
 | Q-S3-08 | Was the vehicle sold or transferred after an accident that had not been declared? | NO, YES, UNKNOWN | - | EVT_OWNERSHIP_DOCS | hard | T1 |
 | Q-S4-01 | Is the assessment itemised by component, or only an aggregate repair figure? _(asked when: `{"not": {"slot_present": "PS_DAYS_MISSING"}}`)_ | ITEMISED, AGGREGATE_ONLY, UNKNOWN | PS_GROSS_DAMAGE, PS_REPAIR_TOTAL | EVT_ASSESSMENT_REPORT, EVT_REPAIR_INVOICE | hard | T0 |
 | Q-S4-02 | What is the fair repair labour, separated from parts? _(asked when: `{"not": {"slot_present": "PS_DAYS_MISSING"}}`)_ | money | PS_LABOR | EVT_ASSESSMENT_REPORT, EVT_REPAIR_INVOICE | amount | T1 |

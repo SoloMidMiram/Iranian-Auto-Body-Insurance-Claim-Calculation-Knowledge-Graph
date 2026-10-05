@@ -8,16 +8,12 @@ from the printed procedure alone.
 
 from __future__ import annotations
 
-import copy
 import json
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
-from iran_auto_claim.admission import engine_direct_authorize
-from iran_auto_claim.case import Case
-from iran_auto_claim.engine import compute
 from iran_auto_claim.schema_input import InputSchemaError
 from iran_auto_claim.review import (
     DECISION_COMPUTE,
@@ -155,7 +151,7 @@ def test_the_full_cover_partial_file_issues_exactly_one_number(kb):
 
 
 def test_the_derived_case_round_trips_through_the_engine(kb):
-    """What `--emit-case` writes must be readable by `calc` and give the same answer."""
+    """The reviewed payload is exactly the payload bound to the authorization."""
     review = Review.from_file(CASES / "review_t1_fullcover_partial.json", kb)
     payload = review.case_payload()
     assert payload["classification"]["branch"] == "PARTIAL_DAMAGE"
@@ -166,10 +162,12 @@ def test_the_derived_case_round_trips_through_the_engine(kb):
         "prior_compensation": 0,
     }
 
-    recomputed = compute(engine_direct_authorize(Case(copy.deepcopy(payload))), kb)
-    assert recomputed.payable == review.calculate().payable
-    assert recomputed.authorization["issuer"] == "ENGINE_DIRECT"
-    assert review.calculate().authorization["issuer"] == "REVIEW_GATE"
+    authorization = review.authorize()
+    recomputed = review.calculate()
+    assert authorization.case.raw == payload
+    assert recomputed.payable == Decimal("1657000000")
+    assert recomputed.authorization["issuer"] == "REVIEW_GATE"
+    assert recomputed.authorization["claim_hash"] == authorization.claim_hash
 
 
 def test_questions_gated_off_by_earlier_answers_are_not_asked(kb):
@@ -485,7 +483,7 @@ def test_review_cli_states_the_decision_and_the_amount(capsys):
     assert "payable: 165.70 m-toman" in printed
 
 
-def test_review_cli_writes_a_case_the_engine_accepts(capsys, tmp_path):
+def test_review_cli_writes_the_authorized_payload_but_calc_requires_the_review(capsys, tmp_path):
     from iran_auto_claim.cli import main
 
     emitted = tmp_path / "emitted.json"
@@ -493,7 +491,9 @@ def test_review_cli_writes_a_case_the_engine_accepts(capsys, tmp_path):
     capsys.readouterr()
     payload = json.loads(emitted.read_text(encoding="utf-8"))
     assert payload["classification"]["domain"] == "BODY"
-    assert main(["calc", str(emitted)]) == 0
+    assert main(["calc", str(emitted)]) == 1
+    capsys.readouterr()
+    assert main(["calc", str(CASES / "review_t1_fullcover_partial.json")]) == 0
     assert "165.70" in capsys.readouterr().out
 
 

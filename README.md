@@ -41,8 +41,8 @@ python claim.py questionnaire --stage S4_DAMAGE_SCOPE
 python claim.py parameters --branch PARTIAL_DAMAGE
 python claim.py ladder                # the iterative completion rungs and their gates
 python claim.py flowchart             # the review-and-calculation flowchart, as mermaid
-python claim.py calc cases/example_partial_resolved.json
-python claim.py calc cases/example_partial_unresolved.json
+python claim.py calc cases/review_t1_fullcover_partial.json
+python claim.py calc cases/review_t3_underinsured_partial.json
 python claim.py unknowns              # every unresolved variable, with what resolves it
 python claim.py contradictions        # the contradiction matrix as data
 python claim.py queries               # the report's documented graph query patterns, answered
@@ -56,14 +56,13 @@ python claim.py ingest submissions/example_conflicting_educational.json
 The persistence and engine boundary accepts monetary values only as non-negative
 integer IRR. Toman and million-toman conversion is explicit presentation logic.
 
-Tests: `python -m pytest` (363 tests). Install development/test
+Tests: `python -m pytest` (458 tests). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 
-The two worked examples are the same claim under two configurations. With the
-operator order resolved you get one payable and confidence 0.95; with it
-unresolved you get two scenarios and confidence 0.55, plus an escalation prompt.
-That contrast is the whole point of the model.
+The resolved T1 review produces one payable; the underinsured T3 review produces
+two scenarios and an escalation prompt. That contrast is the whole point of the
+model.
 
 ## Case review: from a claim file to the right parameters
 
@@ -108,14 +107,16 @@ having admitted the file:
 raw claim → review gate → CalculationAuthorization → compute() → result
 ```
 
-`Review.authorize()` is the only producer for a claim file and raises on `REFUSE`
-and `INSUFFICIENT_INFORMATION`, which makes those two outcomes structurally
+`Review.authorize()` is the only normal claim-file authorization producer and
+raises on `REFUSE` and `INSUFFICIENT_INFORMATION`, which makes those two outcomes structurally
 incapable of reaching the calculator. The authorization binds the exact emitted
 payload by SHA-256 hash, so a case edited after issuance is refused rather than
-recalculated. Synthetic fixtures, the mutation probe and `claim.py calc` go through
-the narrow named channel `engine_direct_authorize()`, which still enforces the
-schema and records `ENGINE_DIRECT` as the issuer. Every result carries that
-authorization provenance in `CalcResult.authorization`.
+recalculated. `claim.py calc` and `json` now accept review-answer files and call
+`Review.authorize()`; they reject raw claim cases. The older calculation fixtures
+use a private, schema-validating internal helper whose capabilities and provenance
+are marked `INTERNAL_TEST_DIRECT`; it is not exported by the package API and no
+production path falls back to it. Every result carries its authorization
+provenance in `CalcResult.authorization`.
 
 ## Project delivery and safety status
 

@@ -25,16 +25,18 @@ import pytest
 
 from iran_auto_claim.admission import (
     AUTHORIZED_DECISIONS,
-    ISSUER_ENGINE_DIRECT,
+    ISSUER_INTERNAL_TEST,
     ISSUER_REVIEW,
     AuthorizationError,
     AuthorizationNotGranted,
+    CalculationAuthorization,
     claim_hash,
-    engine_direct_authorize,
 )
 from iran_auto_claim.case import Case
 from iran_auto_claim.engine import compute
+from iran_auto_claim.fixtures import _authorize_fixture_case
 from iran_auto_claim.review import Review
+from iran_auto_claim.schema_input import InputSchemaError
 
 REPO = Path(__file__).resolve().parents[1]
 CASES = REPO / "cases"
@@ -113,6 +115,56 @@ def test_an_authorization_for_another_decision_cannot_be_forged_by_casting(kb):
         compute(Impostor(), kb)
 
 
+@pytest.mark.parametrize("issuer", [ISSUER_REVIEW, "FORGED_ISSUER"])
+def test_constructing_the_domain_object_directly_does_not_authorize(kb, issuer):
+    """Only Review.authorize receives the private issuance capability."""
+    case = Case(
+        {
+            "claim_id": "forged-domain-object",
+            "unit": "IRR",
+            "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+            "event": {"event_date": "1405/06/01"},
+            "damage": {"gross": 100},
+        }
+    )
+    forged = CalculationAuthorization(
+        case=case,
+        decision="COMPUTE",
+        claim_hash=claim_hash(case.raw),
+        issuer=issuer,
+    )
+    with pytest.raises(AuthorizationError) as caught:
+        compute(forged, kb)
+    assert "Review.authorize" in str(caught.value)
+
+
+def test_internal_test_authorization_cannot_masquerade_as_review_gate(kb):
+    payload = {
+        "claim_id": "internal-issuer",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01"},
+        "damage": {"gross": 100},
+    }
+    authorization = _authorize_fixture_case(payload, kb)
+    assert authorization.issuer == ISSUER_INTERNAL_TEST
+    with pytest.raises(AuthorizationError):
+        compute(replace(authorization, issuer=ISSUER_REVIEW), kb)
+
+
+def test_internal_test_authorization_still_validates_the_claim_schema(kb):
+    with pytest.raises(InputSchemaError):
+        _authorize_fixture_case(
+            {
+                "claim_id": "invalid-internal-input",
+                "unit": "IRR",
+                "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+                "damage": {"gross": -1},
+            },
+            kb,
+        )
+
+
 # ---------------------------------------------------- refusal and insufficiency
 
 
@@ -149,14 +201,15 @@ def test_a_missing_blocking_document_stops_before_authorization(kb):
 
 def test_an_authorization_carrying_a_refused_decision_is_refused_by_the_engine(kb):
     """Defence in depth: a hand-built REFUSE token cannot pass verify()."""
-    authorization = engine_direct_authorize(
+    authorization = _authorize_fixture_case(
         {
             "claim_id": "forged",
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
             "event": {"event_date": "1405/06/01"},
             "damage": {"gross": 1600},
-        }
+        },
+        kb,
     )
     for decision in ("REFUSE", "INSUFFICIENT_INFORMATION", "NOT_A_DECISION"):
         with pytest.raises(AuthorizationError):
@@ -189,7 +242,7 @@ def test_a_payload_edited_after_authorization_is_refused(kb):
             },
         },
     }
-    authorization = engine_direct_authorize(base, kb)
+    authorization = _authorize_fixture_case(base, kb)
     inflated = copy.deepcopy(base)
     inflated["damage"]["gross"] = 999999
     with pytest.raises(AuthorizationError) as caught:
@@ -229,7 +282,7 @@ def test_an_unresolved_risk_intensification_blocks_at_the_review_gate(kb):
 
 
 def test_an_unresolved_risk_intensification_blocks_at_the_engine_too(kb):
-    """Defence in depth: the direct channel cannot settle an intensified risk."""
+    """Defence in depth: synthetic validation cannot settle an intensified risk."""
     payload = {
         "claim_id": "u15-direct",
         "unit": "IRR",
@@ -248,7 +301,7 @@ def test_an_unresolved_risk_intensification_blocks_at_the_engine_too(kb):
             },
         },
     }
-    result = compute(engine_direct_authorize(payload, kb), kb)
+    result = compute(_authorize_fixture_case(payload, kb), kb)
     assert result.payable is None
     assert result.payable_scenarios == []
     assert result.status == "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED"
@@ -269,16 +322,8 @@ def test_a_negative_risk_intensification_answer_does_not_block(kb):
     assert review.calculate().payable == T1_PAYABLE
 
 
-def test_an_unknown_risk_intensification_answer_binds_nothing(kb):
-    """UNKNOWN is a real answer that binds nothing, so no intensification is asserted.
-
-    KNOWN GAP (reported, not silently fixed): because ``Q-S3-07`` is
-    ``blocking: "review"``, an UNKNOWN or omitted answer leaves the file at
-    COMPUTE and the engine issues the full amount. Closing that needs a
-    knowledge-graph change to the question's blocking level plus a regeneration
-    of the procedure tables, which is a review-policy decision beyond this
-    boundary PR. The engine-side fail-closed only fires on an asserted ``true``.
-    """
+def test_an_unknown_risk_intensification_answer_blocks_authorization(kb):
+    """UNKNOWN binds no fact and therefore leaves a material hard gate open."""
     payload = load(FULLCOVER)
     payload["answers"]["Q-S3-07"] = "UNKNOWN"
     review = Review(payload, kb)
@@ -286,6 +331,22 @@ def test_an_unknown_risk_intensification_answer_binds_nothing(kb):
     assert review.slot_status("PS_RISK_INTENSIFICATION").status == "UNANSWERED"
     assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" not in review.open_uncertainties()
     assert review.case_payload()["coverage_gate"].get("risk_intensified") is not True
+    assert "Q-S3-07" in review.decision()["open_blocking_questions"]
+    assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_an_omitted_risk_intensification_answer_blocks_authorization(kb):
+    """Omission cannot be interpreted as a negative risk-intensification fact."""
+    payload = load(FULLCOVER)
+    del payload["answers"]["Q-S3-07"]
+    review = Review(payload, kb)
+
+    assert "Q-S3-07" in review.decision()["open_blocking_questions"]
+    assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
 
 
 def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
@@ -320,7 +381,7 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
             "coverage_gate": {"risk_intensified": True},
             "policy": policy(branch),
         }
-        result = compute(engine_direct_authorize(payload, kb), kb)
+        result = compute(_authorize_fixture_case(payload, kb), kb)
         assert result.status == "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED", branch
         assert result.payable is None, branch
         assert result.payable_scenarios == [], branch
@@ -360,17 +421,20 @@ def test_an_authorized_scenario_set_is_still_a_scenario_set(kb):
     assert "U01_ARTICLE10_PARTIAL_ORDER" in result.blocking_uncertainties
 
 
-def test_the_direct_channel_reproduces_the_review_payable(kb):
-    """Both producers must agree on the amount; only the issuer differs."""
+def test_synthetic_validation_reproduces_the_review_payable(kb):
+    """The segregated test producer preserves arithmetic and identifies itself."""
     review = Review.from_file(CASES / FULLCOVER, kb)
     payload = review.case_payload()
 
     reviewed = compute(review.authorize(), kb)
-    direct = compute(engine_direct_authorize(Case(copy.deepcopy(payload)), kb), kb)
+    synthetic = compute(_authorize_fixture_case(copy.deepcopy(payload), kb), kb)
 
-    assert direct.payable == reviewed.payable == T1_PAYABLE
+    assert synthetic.payable == reviewed.payable == T1_PAYABLE
     assert reviewed.authorization["issuer"] == ISSUER_REVIEW
-    assert direct.authorization["issuer"] == ISSUER_ENGINE_DIRECT
+    assert reviewed.authorization["review_kind"] == "CLAIM_FILE"
+    assert synthetic.authorization["issuer"] == ISSUER_INTERNAL_TEST
+    assert synthetic.authorization["authorization_kind"] == "INTERNAL_TEST_DIRECT"
+    assert synthetic.authorization["purpose"] == "P01-L50_SYNTHETIC_FIXTURE"
 
 
 def test_the_fixture_corpus_is_unchanged_by_the_boundary(kb):
@@ -382,7 +446,8 @@ def test_the_fixture_corpus_is_unchanged_by_the_boundary(kb):
         (entry["id"], entry["problems"]) for entry in report if not entry["ok"]
     ]
     for entry in report:
-        assert entry["result"].authorization["issuer"] == ISSUER_ENGINE_DIRECT
+        assert entry["result"].authorization["issuer"] == ISSUER_INTERNAL_TEST
+        assert entry["result"].authorization["authorization_kind"] == "INTERNAL_TEST_DIRECT"
 
 
 # ------------------------------------------------------------ provenance is kept
@@ -429,11 +494,19 @@ def test_the_serialized_result_includes_the_authorization(kb):
     json.dumps(document, default=str)
 
 
-def test_an_authorization_is_immutable():
+def test_an_authorization_is_immutable(kb):
     """A frozen dataclass cannot be reassigned, so a ticket cannot be upgraded in place."""
     from dataclasses import FrozenInstanceError
 
-    authorization = engine_direct_authorize({"claim_id": "X", "unit": "IRR"})
+    authorization = _authorize_fixture_case(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+            "damage": {"gross": 0},
+        },
+        kb,
+    )
     with pytest.raises(FrozenInstanceError):
         authorization.decision = "REFUSE"  # type: ignore[misc]
 
@@ -447,7 +520,7 @@ def test_verify_is_called_before_any_arithmetic(kb):
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": 1600},
     }
-    authorization = engine_direct_authorize(payload, kb)
+    authorization = _authorize_fixture_case(payload, kb)
     stale = replace(authorization, claim_hash="sha256:" + "0" * 64)
     with pytest.raises(AuthorizationError):
         compute(stale, kb)

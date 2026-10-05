@@ -1,23 +1,22 @@
 """Calculation admission boundary.
 
-The calculation engine may only run on a claim that some issuer has authorized.
-This module owns that contract:
+Normal claim processing may only run on a claim authorized by ``Review.authorize``:
 
-    raw claim -> review gate -> CalculationAuthorization -> compute()
+    review answers -> review decision -> CalculationAuthorization -> compute()
 
-Two producers exist, and both are explicit:
+``REFUSE`` and ``INSUFFICIENT_INFORMATION`` are terminal review decisions and
+cannot produce an authorization.  The authorization also binds the exact
+validated payload by content hash, so editing a case after review invalidates
+the authorization before arithmetic starts.
 
-* ``Review.authorize()`` is the producer for claim files. It refuses to issue
-  authorization for REFUSE and INSUFFICIENT_INFORMATION decisions, so those
-  outcomes can never reach the calculator.
-* ``engine_direct_authorize()`` is a narrow, named channel for the synthetic
-  fixture corpus, the mutation probe, and direct CLI calculation. It performs
-  schema validation only and records ``ENGINE_DIRECT`` as the issuer, so every
-  result states which boundary admitted it.
+Python cannot provide an unforgeable in-process capability to code that can
+mutate or introspect the interpreter.  Private issuance seals nevertheless make
+the supported boundary explicit and fail-closed: constructing the public domain
+object directly does not create an authorization accepted by the engine.
 
-The authorization binds the exact validated payload by content hash. A case
-edited after authorization no longer matches its hash and ``compute()``
-refuses it, which makes "authorize once, calculate something else" impossible.
+Normal claims use the review seal exclusively.  A separately marked internal
+seal exists only for fixtures, mutation probes, and isolated arithmetic tests;
+it cannot masquerade as ``REVIEW_GATE`` and is not exported by the package API.
 """
 
 from __future__ import annotations
@@ -29,10 +28,14 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .case import Case
-from .schema_input import validated_case
 
 ISSUER_REVIEW = "REVIEW_GATE"
-ISSUER_ENGINE_DIRECT = "ENGINE_DIRECT"
+ISSUER_INTERNAL_TEST = "INTERNAL_TEST_DIRECT"
+
+# Private capability used by Review.authorize().  It is intentionally not
+# exported from the package and is verified again at the engine boundary.
+_REVIEW_ISSUANCE_SEAL = object()
+_INTERNAL_TEST_ISSUANCE_SEAL = object()
 
 #: The only review decisions that permit calculation. REFUSE and
 #: INSUFFICIENT_INFORMATION are terminal and cannot be converted into an
@@ -85,9 +88,21 @@ class CalculationAuthorization:
     issuer: str
     issued_at: str | None = None
     provenance: dict[str, Any] = field(default_factory=dict)
+    _issuance_seal: object | None = field(default=None, repr=False, compare=False)
 
     def verify(self) -> None:
         """Fail closed unless the decision authorizes and the payload matches."""
+        if not (
+            (self._issuance_seal is _REVIEW_ISSUANCE_SEAL and self.issuer == ISSUER_REVIEW)
+            or (
+                self._issuance_seal is _INTERNAL_TEST_ISSUANCE_SEAL
+                and self.issuer == ISSUER_INTERNAL_TEST
+            )
+        ):
+            raise AuthorizationError(
+                "authorization was not issued by an approved factory; run normal "
+                "claims through Review.authorize() before calculation"
+            )
         if self.decision not in AUTHORIZED_DECISIONS:
             raise AuthorizationError(
                 f"decision {self.decision!r} does not authorize calculation; "
@@ -111,29 +126,43 @@ class CalculationAuthorization:
         return record
 
 
-def engine_direct_authorize(
-    case: Case | dict[str, Any],
-    kb: Any | None = None,
-) -> CalculationAuthorization:
-    """Authorize a case through the narrow direct channel.
-
-    For the synthetic fixture corpus, the mutation probe, property tests, and
-    direct CLI calculation, where no review questionnaire exists. The schema
-    boundary still runs; the issuer is recorded as ``ENGINE_DIRECT`` so the
-    result never looks review-admitted. ``kb`` is accepted for signature
-    parity with the review producer and is not consulted.
-    """
-    del kb  # the direct channel performs no graph queries
-    validated = validated_case(case)
-    return CalculationAuthorization(
-        case=validated,
-        decision="COMPUTE",
-        claim_hash=claim_hash(validated.raw),
-        issuer=ISSUER_ENGINE_DIRECT,
-        provenance={"branch": validated.branch},
-    )
-
-
 def utc_now() -> str:
     """UTC issue timestamp for an authorization."""
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _internal_test_direct_authorize(
+    payload: dict[str, Any] | Case,
+    *,
+    decision: str = "COMPUTE",
+    purpose: str,
+) -> CalculationAuthorization:
+    """Authorize an isolated calculation outside normal claim processing.
+
+    This private helper exists for authored fixtures, mutation probes, and
+    arithmetic unit tests only.  It still applies the public claim schema and
+    produces provenance that is visibly distinct from a review authorization.
+    Production commands never call it and there is no automatic fallback to it.
+    """
+    if decision not in AUTHORIZED_DECISIONS:
+        raise AuthorizationNotGranted(
+            f"internal test decision {decision!r} does not authorize calculation"
+        )
+
+    # Imported lazily to keep the admission domain independent of schema loading
+    # during module initialization.
+    from .schema_input import validated_case
+
+    case = validated_case(payload)
+    return CalculationAuthorization(
+        case=case,
+        decision=decision,
+        claim_hash=claim_hash(case.raw),
+        issuer=ISSUER_INTERNAL_TEST,
+        issued_at=utc_now(),
+        provenance={
+            "authorization_kind": "INTERNAL_TEST_DIRECT",
+            "purpose": purpose,
+        },
+        _issuance_seal=_INTERNAL_TEST_ISSUANCE_SEAL,
+    )

@@ -139,8 +139,9 @@ and never changes a persisted or engine input.
   come from a policy slot with a named source.
 - Every slot a body branch requires is reachable by a question, a declared supplier, or
   derivation from evidenced slots.
-- An authorized case emitted by `review --emit-case` is accepted by `calc` and produces
-  the same payable as the review itself; incomplete and refused reviews cannot export.
+- An authorized review's emitted case exactly matches the payload bound to its
+  authorization; `calc` accepts the review-answer file and rejects the raw emitted
+  case, while incomplete and refused reviews cannot export.
 - Ladder assignment excludes the `always` fallback rung, so a well-formed file is not
   reported as uncertified; every `example_cases` entry must exist in the corpus.
 - Licence state keeps its three-way distinction: void, wrong class and absent defeat
@@ -164,13 +165,17 @@ rather than silently computing:
   outside the authorized set) fails `verify()` before any arithmetic runs.
 - Every result reports `authorization` provenance: issuer, decision, claim hash,
   reviewer, tier, classification record, snapshot id, live uncertainties.
-- An unresolved risk intensification blocks at the review gate on an asserted
-  `YES`, and the engine independently fails closed on
+- Risk intensification is a hard review gate: `YES` activates blocking `U15`,
+  while `UNKNOWN` or omission leaves the material fact unresolved. The engine
+  independently fails closed on
   `coverage_gate.risk_intensified` for every body branch, returning
   `RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED` with no payable and no scenario
   collapse. The underinsurance ratio is never substituted for the premium ratio.
-- The fixture corpus, the mutation probe, and `claim.py calc` use the named
-  direct channel and report `ENGINE_DIRECT`; a review-issued result never does.
+- `claim.py calc` and `json` accept review-answer files and use
+  `Review.authorize()`. Raw claim cases are rejected. The fixture corpus and
+  mutation probe use the private, schema-validating internal path and report
+  issuer and authorization kind as `INTERNAL_TEST_DIRECT`; no production path
+  falls back to it.
 
 ## Body calculation properties and mutation gate
 

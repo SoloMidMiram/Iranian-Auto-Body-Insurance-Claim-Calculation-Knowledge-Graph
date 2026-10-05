@@ -2,8 +2,8 @@
 
     python claim.py fixtures
     python claim.py validate
-    python claim.py calc cases/example_partial.json
-    python claim.py json cases/example_partial.json
+    python claim.py calc cases/review_t1_fullcover_partial.json
+    python claim.py json cases/review_t3_underinsured_partial.json
     python claim.py classify cases/example_partial.json
     python claim.py unknowns
     python claim.py contradictions --topic ARTICLE_8_CALCULATION
@@ -33,8 +33,6 @@ from . import money
 from .admission import (
     AuthorizationError,
     AuthorizationNotGranted,
-    CalculationAuthorization,
-    engine_direct_authorize,
 )
 from .case import Case
 from .classify import classify
@@ -74,12 +72,19 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("validate", help="validate knowledge graph integrity")
 
     for name, help_text in (
-        ("calc", "calculate a claim and render the explanation"),
-        ("json", "calculate a claim and print the machine result"),
+        ("calc", "calculate an authorized review file and render the explanation"),
+        ("json", "calculate an authorized review file and print the machine result"),
         ("classify", "derive the branch for a case without calculating"),
     ):
         p = sub.add_parser(name, help=help_text)
-        p.add_argument("case", help="path to a case JSON file")
+        p.add_argument(
+            "case",
+            help=(
+                "path to a review answers JSON file"
+                if name in ("calc", "json")
+                else "path to a case JSON file"
+            ),
+        )
 
     p = sub.add_parser("unknowns", help="list unresolved variables")
     p.add_argument("--all", action="store_true", help="include non-blocking uncertainties")
@@ -170,15 +175,13 @@ def _load_case(path: str) -> Case:
     return validated_case(payload)
 
 
-def _authorize_direct(case: Case) -> CalculationAuthorization:
-    """Admit a standalone case file through the named direct channel.
-
-    ``calc`` and ``json`` read a calculation case, not a review questionnaire, so
-    there is no review decision to carry. The issuer is recorded as
-    ``ENGINE_DIRECT`` and appears in the result's authorization provenance, so a
-    directly calculated amount never looks review-admitted.
-    """
-    return engine_direct_authorize(case)
+def _load_review_authorization(path: str, kb: Knowledge):
+    """Load a review file and obtain its sole calculation capability."""
+    try:
+        review = Review.from_file(path, kb)
+        return review.authorize()
+    except ReviewInputError as error:
+        raise AuthorizationError(f"review could not authorize calculation: {error}") from error
 
 
 def _cmd_fixtures(args: argparse.Namespace, kb: Knowledge) -> int:
@@ -231,15 +234,13 @@ def _cmd_validate(args: argparse.Namespace, kb: Knowledge) -> int:
 
 
 def _cmd_calc(args: argparse.Namespace, kb: Knowledge) -> int:
-    case = _load_case(args.case)
-    result = compute(_authorize_direct(case), kb)
+    result = compute(_load_review_authorization(args.case, kb), kb)
     print(render_claim(result, kb, "million_toman"))
     return 0
 
 
 def _cmd_json(args: argparse.Namespace, kb: Knowledge) -> int:
-    case = _load_case(args.case)
-    result = compute(_authorize_direct(case), kb)
+    result = compute(_load_review_authorization(args.case, kb), kb)
     print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
     return 0
 

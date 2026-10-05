@@ -1167,8 +1167,8 @@ def compute(
     """
     if not isinstance(authorization, CalculationAuthorization):
         raise AuthorizationError(
-            "compute() requires a CalculationAuthorization; run Review.authorize() "
-            "for a claim file or engine_direct_authorize() for a synthetic case"
+            "compute() requires a CalculationAuthorization issued by Review.authorize(); "
+            "run the claim through the review gate before calculation"
         )
     authorization.verify()
     case = validated_case(authorization.case)

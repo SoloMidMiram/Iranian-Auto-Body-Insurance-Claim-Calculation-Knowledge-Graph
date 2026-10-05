@@ -27,8 +27,8 @@ COMMANDS = [
     ["operators"],
     ["sources"],
     ["queries"],
-    ["calc", str(REPO / "cases" / "example_partial_resolved.json")],
-    ["json", str(REPO / "cases" / "example_partial_unresolved.json")],
+    ["calc", str(REPO / "cases" / "review_t1_fullcover_partial.json")],
+    ["json", str(REPO / "cases" / "review_t3_underinsured_partial.json")],
     ["classify", str(REPO / "cases" / "example_partial_unresolved.json")],
 ]
 
@@ -48,7 +48,7 @@ def test_fixtures_command_reports_a_full_pass(capsys):
 
 
 def test_calc_renders_the_escalation_for_an_unresolved_case(capsys):
-    assert main(["calc", str(REPO / "cases" / "example_partial_unresolved.json")]) == 0
+    assert main(["calc", str(REPO / "cases" / "review_t3_underinsured_partial.json")]) == 0
     out = capsys.readouterr().out
     assert "ESCALATION" in out
     assert "U01_ARTICLE10_PARTIAL_ORDER" in out
@@ -57,10 +57,16 @@ def test_calc_renders_the_escalation_for_an_unresolved_case(capsys):
 
 
 def test_calc_renders_a_single_payable_for_a_resolved_case(capsys):
-    assert main(["calc", str(REPO / "cases" / "example_partial_resolved.json")]) == 0
+    assert main(["calc", str(REPO / "cases" / "review_t1_fullcover_partial.json")]) == 0
     out = capsys.readouterr().out
     assert "PAYABLE" in out
     assert "SCENARIOS" not in out
+
+
+def test_calc_rejects_a_raw_claim_that_has_not_passed_review(capsys):
+    assert main(["calc", str(REPO / "cases" / "example_partial_resolved.json")]) == 1
+    out = capsys.readouterr().out
+    assert "review_not_authorized" in out or "unknown_field" in out
 
 
 def test_unknown_node_is_reported(capsys):

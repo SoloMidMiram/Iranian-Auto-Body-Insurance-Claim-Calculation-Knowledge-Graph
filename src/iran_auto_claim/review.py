@@ -29,6 +29,7 @@ from . import money
 from .admission import (
     AUTHORIZED_DECISIONS,
     ISSUER_REVIEW,
+    _REVIEW_ISSUANCE_SEAL,
     AuthorizationNotGranted,
     CalculationAuthorization,
     claim_hash,
@@ -129,6 +130,8 @@ class SlotBinding:
 class Review:
     """A claim file under investigation: what is answered, what is still open, and
     whether an amount may be issued yet."""
+
+    authorization_kind = "CLAIM_FILE"
 
     def __init__(self, payload: dict[str, Any], kb: Knowledge | None = None) -> None:
         self.kb = kb or Knowledge.load()
@@ -998,6 +1001,7 @@ class Review:
             issuer=ISSUER_REVIEW,
             issued_at=utc_now(),
             provenance={
+                "review_kind": self.authorization_kind,
                 "claim_id": self.claim_id,
                 "branch": decision["branch"],
                 "tier": decision["tier"],
@@ -1023,6 +1027,7 @@ class Review:
                     [classification["override"]] if classification.get("override") else []
                 ),
             },
+            _issuance_seal=_REVIEW_ISSUANCE_SEAL,
         )
 
     def calculate(self) -> CalcResult | None:

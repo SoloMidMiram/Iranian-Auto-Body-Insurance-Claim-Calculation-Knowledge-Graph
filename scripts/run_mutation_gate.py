@@ -39,6 +39,13 @@ MUTATIONS = (
     Mutation("M12", "src/iran_auto_claim/admission.py", "if claim_hash(self.case.raw) != self.claim_hash:", "if False:", "the authorization hash no longer binds the payload, so an edited claim is calculated"),
     Mutation("M13", "src/iran_auto_claim/admission.py", "if self.decision not in AUTHORIZED_DECISIONS:", "if False:", "a REFUSE or INSUFFICIENT_INFORMATION decision reaches the calculator"),
     Mutation("M14", "src/iran_auto_claim/engine.py", "if not case.risk_intensified:\n        return", "if case.risk_intensified:\n        return", "risk intensification is settled at full amount instead of blocked on U15"),
+    Mutation(
+        "M15",
+        "src/iran_auto_claim/admission.py",
+        """if not (\n            (self._issuance_seal is _REVIEW_ISSUANCE_SEAL and self.issuer == ISSUER_REVIEW)\n            or (\n                self._issuance_seal is _INTERNAL_TEST_ISSUANCE_SEAL\n                and self.issuer == ISSUER_INTERNAL_TEST\n            )\n        ):""",
+        "if False:",
+        "an unsealed or issuer-mismatched authorization is accepted as factory-issued",
+    ),
 )
 
 THRESHOLD = 90.0
