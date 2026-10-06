@@ -56,8 +56,8 @@ more than two workstreams active and designate one integrator for the release.
 |---|---|---|---|
 | Oct 7 | Authority | `#7`, `#11` | Freeze the body-rule source inventory; record source class, effective dates, clause locators, hashes, and revalidation state. Name two human reviewers. Merge `#7` before `#11`. |
 | Oct 8 | Temporal | `#8` | Implement effective-dated snapshots and sourced occurrence, awareness, declaration, document, and as-of dates. Prove the 60-day derived clock. |
-| Oct 9 | Claim model | `#12` | Close the four-branch taxonomy and add 59/60/61-day theft boundary tests. Refuse contradictory or unmapped evidence. |
-| Oct 10 | Provenance | `#10` | Complete dependency-derived provenance and confidence, including review-returned and graph-selected evidence. No single payable survives blocking uncertainty. |
+| Oct 9 | Provenance | `#10` | Complete dependency-derived provenance and confidence, including review-returned and graph-selected evidence. No single payable survives blocking uncertainty. |
+| Oct 10 | Claim model | `#12` | Close the four-branch taxonomy and add 59/60/61-day theft boundary tests. Refuse contradictory or unmapped evidence. |
 | Oct 11 | Execution | `#13`, `#14` | Make graph operator order/config authoritative, then prove every public path invokes admission, computation, and consistency guards. |
 | Oct 12 | Validation | `#15` | Pass deterministic, property, mutation, and direct/graph parity suites; assemble the release manifest and evidence dossier. |
 | Oct 13 | Release | `#6` checklist | Independent re-review, clean repository gate, zero unresolved P0/P1 body-model blockers, merge freeze, and tag `v0.1-body-model` only if every hard gate passes. |
