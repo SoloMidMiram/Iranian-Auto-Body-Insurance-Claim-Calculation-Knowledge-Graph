@@ -160,21 +160,6 @@
       "validation": ["Known-year derivation tests", "Missing and expired annual-parameter tests"]
     },
     {
-      "id": "P1-04",
-      "title": "Complete provenance and confidence across every executable dependency",
-      "milestone": "Phase 1 - Authority and provenance",
-      "labels": ["priority:P1", "segment:authority", "segment:calculation"],
-      "dependencies": ["P1-02", "P1-03"],
-      "objective": "Include rules, operators, parameters, policy terms, classifier decisions, evidence, and uncertainties in the audit model.",
-      "acceptance": [
-        "Every executable node has a validated envelope or derived dependency chain",
-        "Result confidence includes every amount-affecting dependency",
-        "Formula confidence and evidence confidence are separately named",
-        "Missing provenance blocks certification of the result"
-      ],
-      "validation": ["Provenance completeness mutation tests", "Annual-parameter and classifier confidence regressions"]
-    },
-    {
       "id": "P1-05",
       "title": "Add source integrity hashes, locators, and revalidation enforcement",
       "milestone": "Phase 1 - Authority and provenance",
@@ -190,11 +175,26 @@
       "validation": ["Hash-change and expired-revalidation tests"]
     },
     {
+      "id": "P1-04",
+      "title": "Complete provenance and confidence across every executable dependency",
+      "milestone": "Phase 1 - Authority and provenance",
+      "labels": ["priority:P1", "segment:authority", "segment:calculation"],
+      "dependencies": ["P1-02", "P1-05"],
+      "objective": "Include rules, operators, parameters, policy terms, classifier decisions, evidence, and uncertainties in the audit model.",
+      "acceptance": [
+        "Every executable node has a validated envelope or derived dependency chain",
+        "Result confidence includes every amount-affecting dependency",
+        "Formula confidence and evidence confidence are separately named",
+        "Missing provenance blocks certification of the result"
+      ],
+      "validation": ["Provenance completeness mutation tests", "Annual-parameter and classifier confidence regressions"]
+    },
+    {
       "id": "P2-01",
       "title": "Finalize the closed claim, evidence, and override taxonomy",
       "milestone": "Phase 2 - Graph-driven engine",
       "labels": ["priority:P1", "segment:model"],
-      "dependencies": ["P1-02"],
+      "dependencies": ["P1-02", "P1-04"],
       "objective": "Replace ambiguous free-text signals with controlled evidence and explicit reviewed overrides.",
       "acceptance": [
         "Every branch has required evidence, predicates, allowed statuses, and override rules",

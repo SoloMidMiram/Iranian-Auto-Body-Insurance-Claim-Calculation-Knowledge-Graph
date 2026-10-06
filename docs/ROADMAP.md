@@ -15,6 +15,104 @@ Until Phase 6 is accepted, the project is **research and adjuster decision
 support only**. It must not be represented as an unattended production payment
 authority.
 
+## One-week body-model completion sprint — 2026-10-07 to 2026-10-13
+
+The achievable one-week target is `v0.1-body-model`: a reproducible,
+fail-closed research and adjuster decision-support release for
+`PARTIAL_DAMAGE`, `TOTAL_LOSS`, `GLASS_ONLY`, and `THEFT`. In this sprint,
+"complete" means that the body-model logic, authority records, provenance,
+graph execution, guards, and validation evidence are internally complete for
+those four branches. It does **not** mean insurer calibration, unattended
+payment authority, or production certification; those remain in Phases 3-6.
+
+### Scope lock
+
+In scope:
+
+- issues `#7`, `#8`, `#10`-`#15` and the release checklist in `#6`;
+- primary-source authority records and hashes for every executable body rule;
+- effective-dated snapshots and sourced theft-clock dates;
+- closed claim/evidence taxonomy for the four supported branches;
+- graph-authoritative plans, guard coverage, property/mutation tests, and
+  direct/graph parity;
+- a tagged release dossier that pins code, graph, source, and parameter
+  versions and states every unsupported scope.
+
+Explicitly out of scope for the week:
+
+- third-party liability and Article 8 expansion (`#4`, `#9`);
+- insurer/product calibration and assessor procedure packs (Phase 3);
+- independent field validation, APIs, monitoring, GraphRAG, and production
+  certification (Phases 4-6);
+- new claim branches, convenience features, or classifier broadening that are
+  not required by a listed release gate.
+
+### Dated execution plan
+
+Preparation may overlap, but merges preserve the dependency order. Keep no
+more than two workstreams active and designate one integrator for the release.
+
+| Date | Lane | Issues | Deliverable and exit evidence |
+|---|---|---|---|
+| Oct 7 | Authority | `#7`, `#11` | Freeze the body-rule source inventory; record source class, effective dates, clause locators, hashes, and revalidation state. Name two human reviewers. Merge `#7` before `#11`. |
+| Oct 8 | Temporal | `#8` | Implement effective-dated snapshots and sourced occurrence, awareness, declaration, document, and as-of dates. Prove the 60-day derived clock. |
+| Oct 9 | Claim model | `#12` | Close the four-branch taxonomy and add 59/60/61-day theft boundary tests. Refuse contradictory or unmapped evidence. |
+| Oct 10 | Provenance | `#10` | Complete dependency-derived provenance and confidence, including review-returned and graph-selected evidence. No single payable survives blocking uncertainty. |
+| Oct 11 | Execution | `#13`, `#14` | Make graph operator order/config authoritative, then prove every public path invokes admission, computation, and consistency guards. |
+| Oct 12 | Validation | `#15` | Pass deterministic, property, mutation, and direct/graph parity suites; assemble the release manifest and evidence dossier. |
+| Oct 13 | Release | `#6` checklist | Independent re-review, clean repository gate, zero unresolved P0/P1 body-model blockers, merge freeze, and tag `v0.1-body-model` only if every hard gate passes. |
+
+### Operating rules and hard gates
+
+- Use one pull request per dated deliverable; keep each PR reviewable in less
+  than half a day and require its issue acceptance evidence in the PR body.
+- Hold a 15-minute daily triage: blockers, changed assumptions, gate status,
+  and the next 24-hour owner. Do not add scope during the sprint.
+- A dependency may be prepared in parallel but may not merge before its
+  predecessor. Failed gates reopen the owning issue; they are not waived by
+  documentation alone.
+- By the end of Oct 7, `#7` must have two named reviewers and accessible source
+  artifacts. If either is missing, the week may end in an
+  `engineering-complete/authority-blocked` release candidate, but it must not
+  be tagged or described as complete.
+- Freeze feature work at the end of Oct 11. Oct 12-13 are reserved for defects,
+  evidence, reproducibility, and release review.
+- Any unexplained direct/graph difference, mutation survivor in a required
+  rule, missing source hash, or payable result with blocking uncertainty is a
+  release stop.
+
+### Definition of done for the week
+
+The sprint is complete only when all of the following are true:
+
+1. Issues `#7`, `#8`, and `#10`-`#15` meet their acceptance criteria and close
+   with reproducible evidence; `#6`'s release checklist is fully checked.
+2. All four supported branches have review-to-validated-case-to-engine
+   coverage and explicit unsupported-state behavior.
+3. Two human reviewers sign the authority pack; every executable body rule has
+   a clause locator, effective-date interval, source hash, and revalidation
+   status.
+4. The full repository gate passes from a clean checkout, including fixtures,
+   property tests, mutation assertions, and direct/graph parity.
+5. The release manifest pins code, graph, schema, parameter, and source
+   versions, and the tag states that the release is research/decision-support
+   only.
+
+### Practical roadmap after `v0.1-body-model`
+
+These ranges begin only after the one-week gate passes and are capacity
+estimates, not certification promises.
+
+| Horizon | Focus | Exit condition |
+|---|---|---|
+| Weeks 2-5 | Phase 3 insurer/product calibration | One signed adapter package, procedure/version maps, worked examples, and variance report. |
+| Weeks 4-9 | Phase 4 independent validation | Blinded replay dossier, discrepancy log, threshold tuning with provenance, and independent legal/domain sign-off. |
+| Weeks 8-13 | Phase 5 private pilot | Authenticated API, human escalation queue, monitoring, replayable decisions, rollback drill, and pilot acceptance. |
+| Weeks 14-16 | Phase 6 controlled release | Final legal/actuarial/security review, immutable release artifacts, runbooks, and documented operating limits. |
+
+Advancement remains evidence-gated. Calendar pressure never converts an unmet
+phase exit criterion into an accepted risk.
+
 ## Priority and impact scale
 
 | Score | Meaning |
