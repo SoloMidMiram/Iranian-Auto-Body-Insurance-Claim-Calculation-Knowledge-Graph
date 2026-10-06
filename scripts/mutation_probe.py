@@ -2,9 +2,19 @@
 
 from __future__ import annotations
 
+import copy
+from dataclasses import replace
 from decimal import Decimal
 
+from iran_auto_claim.admission import (
+    ISSUER_REVIEW,
+    AuthorizationError,
+    CalculationAuthorization,
+    _canonical_json,
+    claim_hash,
+)
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
+from iran_auto_claim.fixtures import _authorize_fixture_case
 from iran_auto_claim.knowledge import Knowledge
 from iran_auto_claim.operators import (
     allowable_rescue_transport,
@@ -95,17 +105,112 @@ def main() -> int:
     assert result.payable is None
     assert result.status == "GUARD_PLAN_INCOMPLETE"
 
-    missing_franchise = compute(
-        {
-            "claim_id": "mutation-probe",
-            "unit": "IRR",
-            "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
-            "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 1000},
-        },
-        Knowledge.load(),
+    probe_payload = {
+        "claim_id": "mutation-probe",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01"},
+        "damage": {"gross": 1000},
+    }
+    kb = Knowledge.load()
+    authorization = _authorize_fixture_case(probe_payload, kb)
+
+    try:
+        compute(probe_payload, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a raw claim payload reached compute without authorization")
+
+    forged = CalculationAuthorization(
+        decision="COMPUTE",
+        issuer=ISSUER_REVIEW,
     )
+    try:
+        compute(forged, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a directly constructed authorization passed the review seal")
+
+    target_payload = {**probe_payload, "claim_id": "retargeted", "damage": {"gross": 999999}}
+    target_grant = replace(
+        authorization._grant,
+        claim_snapshot=_canonical_json(target_payload),
+        claim_hash=claim_hash(target_payload),
+    )
+    try:
+        retargeted = replace(authorization, _grant=target_grant)
+    except (TypeError, ValueError):
+        pass
+    else:
+        try:
+            compute(retargeted, kb)
+        except AuthorizationError:
+            pass
+        else:
+            raise AssertionError("dataclasses.replace transplanted the issuance capability")
+
+    corrupted = copy.copy(authorization)
+    object.__setattr__(
+        corrupted,
+        "_grant",
+        replace(authorization._grant, claim_snapshot=_canonical_json(target_payload)),
+    )
+    try:
+        compute(corrupted, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a claim snapshot no longer matched its issued hash")
+
+    masquerade = copy.copy(authorization)
+    object.__setattr__(masquerade, "issuer", ISSUER_REVIEW)
+    try:
+        compute(masquerade, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("an internal authorization masqueraded as REVIEW_GATE")
+
+    refused = copy.copy(authorization)
+    object.__setattr__(refused, "decision", "REFUSE")
+    object.__setattr__(refused, "_grant", replace(authorization._grant, decision="REFUSE"))
+    try:
+        compute(refused, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("a REFUSE decision reached the calculator")
+
+    insufficient = copy.copy(authorization)
+    object.__setattr__(insufficient, "decision", "INSUFFICIENT_INFORMATION")
+    object.__setattr__(
+        insufficient,
+        "_grant",
+        replace(authorization._grant, decision="INSUFFICIENT_INFORMATION"),
+    )
+    try:
+        compute(insufficient, kb)
+    except AuthorizationError:
+        pass
+    else:
+        raise AssertionError("an INSUFFICIENT_INFORMATION decision reached the calculator")
+
+    missing_franchise = compute(authorization, kb)
     assert missing_franchise.payable is None
+    assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" not in missing_franchise.blocking_uncertainties
+
+    intensified = compute(
+        _authorize_fixture_case(
+            {**probe_payload, "coverage_gate": {"risk_intensified": True}},
+            kb,
+        ),
+        kb,
+    )
+    assert intensified.payable is None
+    assert intensified.status == "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED"
+    assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" in intensified.blocking_uncertainties
     return 0
 
 

@@ -5,7 +5,8 @@ from __future__ import annotations
 import random
 from decimal import Decimal
 
-from iran_auto_claim.engine import compute
+from admission_shim import compute
+
 from iran_auto_claim.money import D
 from iran_auto_claim.plans import graph_partial_payable, legacy_partial_payable
 

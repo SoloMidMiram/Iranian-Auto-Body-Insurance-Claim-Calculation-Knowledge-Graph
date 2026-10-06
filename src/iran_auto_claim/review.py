@@ -26,11 +26,18 @@ from pathlib import Path
 from typing import Any
 
 from . import money
+from .admission import (
+    AUTHORIZED_DECISIONS,
+    _issue_review_authorization,
+    AuthorizationNotGranted,
+    CalculationAuthorization,
+    utc_now,
+)
 from .case import PART_CATEGORIES
 from .classify import classify
-from .engine import CalcResult, compute
+from .engine import CalcResult, compute, reconcile_classification
 from .knowledge import Knowledge
-from .schema_input import load_json_document, validate_review
+from .schema_input import load_json_document, validate_review, validated_case
 
 # Answers that mean "this file does not say". They bind nothing.
 UNANSWERED_TOKENS = {"", None, "UNKNOWN", "NOT_STATED", "NOT_REVIEWED", "NOT_APPLICABLE_TO_BODY"}
@@ -121,6 +128,8 @@ class SlotBinding:
 class Review:
     """A claim file under investigation: what is answered, what is still open, and
     whether an amount may be issued yet."""
+
+    authorization_kind = "CLAIM_FILE"
 
     def __init__(self, payload: dict[str, Any], kb: Knowledge | None = None) -> None:
         self.kb = kb or Knowledge.load()
@@ -819,6 +828,22 @@ class Review:
             node["node_id"] for node in self.kb.uncertainties.values() if self.uncertainty_is_live(node["node_id"])
         )
 
+    def _risk_intensification_resolved(self) -> bool:
+        """Whether the premium-ratio reduction demanded by U15 can be applied.
+
+        The regulation reduces payment by the ratio of the premium charged to the
+        premium appropriate to the intensified risk. No parameter slot or claim-case
+        field carries either premium, and no insurer adapter supplies one, so the
+        operator is unresolvable today. ``U15`` records
+        ``NOT_IMPLEMENTED_DO_NOT_SUBSTITUTE``: escalating is correct, approximating
+        it with the underinsurance ratio is not.
+
+        This is the extension point for the first insurer adapter - once the
+        charged and tariff premiums become sourced slots, resolve them here and
+        the file may proceed to calculation.
+        """
+        return False
+
     def decision(self) -> dict[str, Any]:
         """What the pipeline may issue now. This is the only gate that answers it."""
         classification = self.classification()
@@ -837,6 +862,10 @@ class Review:
             blocking_conditions.append("POLICY_CANCELLATION_STATUS_UNRESOLVED")
         if self.uncertainty_is_live("U13_THEFT_CLOCK_ANCHOR"):
             blocking_conditions.append("THEFT_CLOCK_ANCHOR_UNRESOLVED")
+        if self.uncertainty_is_live("U15_RISK_INTENSIFICATION_PREMIUM_RATIO") and not (
+            self._risk_intensification_resolved()
+        ):
+            blocking_conditions.append("RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED")
 
         if refused_by:
             kind = DECISION_REFUSE
@@ -930,18 +959,77 @@ class Review:
 
     # ------------------------------------------------------------------- engine
 
+    def authorize(self) -> CalculationAuthorization:
+        """Issue the only authorization a claim file can obtain.
+
+        The review decision is the gate: REFUSE and INSUFFICIENT_INFORMATION are
+        terminal and raise instead of producing an authorization, so no path from
+        a reviewed file can reach the calculator without the file first passing.
+
+        The authorization owns immutable canonical claim and provenance snapshots.
+        ``compute()`` materializes a fresh validated ``Case`` from that snapshot,
+        so no mutable review or ``Case`` object remains authoritative after issue.
+        """
+        decision = self.decision()
+        kind = decision["decision"]
+        if kind not in AUTHORIZED_DECISIONS:
+            raise AuthorizationNotGranted(
+                f"review decision {kind} does not authorize calculation"
+                + (
+                    f"; refused by {decision['refused_by']}"
+                    if decision["refused_by"]
+                    else ""
+                )
+                + (
+                    f"; unresolved: {', '.join(decision['blocking_conditions'])}"
+                    if decision["blocking_conditions"]
+                    else ""
+                )
+            )
+
+        payload = self.case_payload()
+        case = validated_case(payload)
+        classification, _, _ = reconcile_classification(case, self.kb)
+        snapshot = self.kb.resolve_snapshot(case.event_date, case.claim_year)
+
+        return _issue_review_authorization(
+            payload,
+            decision=kind,
+            issued_at=utc_now(),
+            provenance={
+                "review_kind": self.authorization_kind,
+                "claim_id": self.claim_id,
+                "branch": decision["branch"],
+                "tier": decision["tier"],
+                "reviewer": str(self.payload.get("reviewed_by") or self.answer("Q-S10-01") or ""),
+                "review_as_of": str(self.payload.get("as_of") or "") or None,
+                "classification": classification,
+                "snapshot_id": (snapshot or {}).get("snapshot_id"),
+                "live_uncertainties": list(decision["live_uncertainties"]),
+                "blocking_conditions": list(decision["blocking_conditions"]),
+                "missing_evidence": list(decision["missing_evidence"]),
+                "evidence_confidence_cap": (
+                    str(self.evidence_confidence_cap())
+                    if self.evidence_confidence_cap() is not None
+                    else None
+                ),
+                "policy_snapshot": {
+                    "policy_version": case.policy.get("policy_version"),
+                    "insurer": case.policy.get("insurer"),
+                    "endorsements": sorted(case.endorsement_tokens()),
+                    "franchise": case.policy_franchise,
+                },
+                "approved_overrides": (
+                    [classification["override"]] if classification.get("override") else []
+                ),
+            },
+        )
+
     def calculate(self) -> CalcResult | None:
-        kind = self.decision()["decision"]
-        if kind in (DECISION_REFUSE, DECISION_INSUFFICIENT):
+        """Run the engine only when this file authorizes calculation."""
+        if self.decision()["decision"] not in AUTHORIZED_DECISIONS:
             return None
-        result = compute(self.case_payload(), self.kb)
-        cap = self.evidence_confidence_cap()
-        if cap is not None and result.formula_confidence is not None:
-            current = money.D(str(result.formula_confidence))
-            if cap < current:
-                result.formula_confidence = float(cap)
-                result.label("EVIDENCE_CONFIDENCE_REDUCED")
-        return result
+        return compute(self.authorize(), self.kb)
 
     # ------------------------------------------------------------------ report
 

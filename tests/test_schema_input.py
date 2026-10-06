@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from iran_auto_claim.admission import AuthorizationError
 from iran_auto_claim.cli import main
 from iran_auto_claim.engine import compute
 from iran_auto_claim.fixtures import load_fixtures
@@ -226,7 +227,10 @@ def test_public_calc_rejects_a_malformed_case(capsys, tmp_path):
     assert main(["calc", str(target)]) == 1
     body = json.loads(capsys.readouterr().out)
     assert body["ok"] is False
-    assert body["errors"][0]["code"] == "invalid_enum"
+    assert any(
+        item["code"] == "invalid_enum" and item["path"] == "unit"
+        for item in body["errors"]
+    )
 
 
 @pytest.mark.parametrize("command", ["calc", "review"])
@@ -239,6 +243,8 @@ def test_cli_reports_malformed_json_with_a_stable_code(command, capsys, tmp_path
     assert body["errors"][0]["path"] == "$"
 
 
-def test_public_compute_rejects_before_arithmetic():
-    with pytest.raises(InputSchemaError):
-        compute({"claim_id": "X", "unit": "IRR", "damage": {"not_a_loss_figure": 1}})
+def test_a_raw_claim_cannot_reach_compute_without_authorization():
+    """The boundary: no authorization object, no calculation - not even a refusal result."""
+    raw = {"claim_id": "X", "unit": "IRR", "damage": {"not_a_loss_figure": 1}}
+    with pytest.raises(AuthorizationError):
+        compute(raw)  # a dict is not a CalculationAuthorization

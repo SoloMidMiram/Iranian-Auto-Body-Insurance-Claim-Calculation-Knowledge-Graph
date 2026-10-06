@@ -28,6 +28,10 @@ from decimal import Decimal
 from typing import Any, Callable
 
 from . import guards, money, operators
+from .admission import (
+    AuthorizationError,
+    CalculationAuthorization,
+)
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
 from .classify import classify
 from .knowledge import Knowledge
@@ -42,6 +46,7 @@ from .plans import (
     sequences_with_ratio,
     validate_body_sequence,
 )
+from .schema_input import validated_case
 
 UNRESOLVED_ORDER = "UNRESOLVED"
 RESOLVED_PARTIAL_ORDERS = frozenset(
@@ -70,6 +75,7 @@ class CalcResult:
     provenance: list[dict[str, Any]] = field(default_factory=list)
     required_guards: list[str] = field(default_factory=list)
     guards_executed: list[str] = field(default_factory=list)
+    authorization: dict[str, Any] = field(default_factory=dict)
 
     def label(self, *names: str) -> None:
         for name in names:
@@ -120,6 +126,7 @@ class CalcResult:
             "provenance": _out(self.provenance),
             "required_guards": list(self.required_guards),
             "guards_executed": list(self.guards_executed),
+            "authorization": dict(self.authorization),
         }
 
 
@@ -400,6 +407,43 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
         res.label("SUBROGATION_IMPAIRMENT_REVIEW")
         res.note_rule("REG53_ART14_SUBROGATION")
     return False
+
+
+# ------------------------------------------------- risk intensification (U15)
+
+
+def check_risk_intensification(case: Case, kb: Knowledge) -> None:
+    """Fail closed when an unnotified risk intensification reaches the arithmetic.
+
+    ``U15_RISK_INTENSIFICATION_PREMIUM_RATIO`` reduces payment by the ratio of
+    the premium charged to the premium appropriate to the intensified risk. That
+    is a premium-ratio operator, not underinsurance, and this engine does not
+    implement it - the uncertainty node records ``NOT_IMPLEMENTED_DO_NOT_SUBSTITUTE``.
+    No claim-case field carries the charged or tariff premium, so the condition
+    can never be resolved at the calculation boundary today.
+
+    Raising here means a file that records intensification cannot be settled at
+    the full amount by an authorization that was issued through the direct
+    channel. It surfaces as a blocked uncertainty with no single payable.
+
+    The candidate scenarios are read from the graph node rather than restated in
+    code: `validate()` already requires every blocking uncertainty to declare
+    them, so duplicating the wording here would let the two drift apart.
+    """
+    if not case.risk_intensified:
+        return
+    node = kb.uncertainty("U15_RISK_INTENSIFICATION_PREMIUM_RATIO") or {}
+    raise operators.UncertaintyRequired(
+        "U15_RISK_INTENSIFICATION_PREMIUM_RATIO",
+        (
+            "the risk intensified without notification, and payment must be reduced by the "
+            "ratio of the premium charged to the premium appropriate to that risk; this engine "
+            "does not implement that premium-ratio operator and will not substitute the "
+            "underinsurance ratio for it"
+        ),
+        status="RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED",
+        scenarios=[str(item) for item in node.get("scenarios") or []],
+    )
 
 
 # ------------------------------------------------------------- partial damage
@@ -1084,6 +1128,24 @@ def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
     res.provenance = provenance
 
 
+def _apply_authorization_confidence_cap(res: CalcResult) -> None:
+    """Apply an evidence cap bound into immutable review provenance.
+
+    CLI callers invoke ``Review.authorize()`` followed directly by ``compute()``.
+    Enforcing the cap here keeps that supported path identical to
+    ``Review.calculate()`` and prevents callers from bypassing a review-issued
+    evidence constraint.
+    """
+    raw_cap = res.authorization.get("evidence_confidence_cap")
+    if raw_cap is None or res.formula_confidence is None:
+        return
+    cap = money.D(raw_cap)
+    current = money.D(str(res.formula_confidence))
+    if cap < current:
+        res.formula_confidence = float(cap)
+        res.label("EVIDENCE_CONFIDENCE_REDUCED")
+
+
 def _flat_plan(plan: Any) -> list[str]:
     if not isinstance(plan, list):
         return []
@@ -1110,10 +1172,25 @@ def _bind_body_snapshot(case: Case, kb: Knowledge, res: CalcResult) -> bool:
     return True
 
 
-def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcResult:
-    from .schema_input import validated_case
+def compute(
+    authorization: CalculationAuthorization,
+    kb: Knowledge | None = None,
+) -> CalcResult:
+    """Run one authorized claim.
 
-    case = validated_case(case)
+    ``authorization`` is the only admissible input: a raw case payload or a
+    ``Case`` cannot reach the engine without some issuer admitting it first.
+    The authorization owns the exact validated payload as immutable canonical
+    JSON. A fresh ``Case`` is materialized only after verification, so mutable
+    objects that existed before issuance cannot affect this calculation.
+    """
+    if not isinstance(authorization, CalculationAuthorization):
+        raise AuthorizationError(
+            "compute() requires a CalculationAuthorization issued by Review.authorize(); "
+            "run the claim through the review gate before calculation"
+        )
+    authorization.verify()
+    case = validated_case(authorization.claim_payload())
     kb = kb or Knowledge.load()
 
     res = CalcResult(
@@ -1122,6 +1199,7 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         domain=case.domain,
         claim_id=case.claim_id,
         unit=case.unit,
+        authorization=authorization.provenance_record(),
     )
 
     reconcile_body = res.branch in BODY_BRANCHES or (
@@ -1177,6 +1255,8 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
         ):
             classification_blocked = True
         if not classification_blocked and not evaluate_coverage_gate(case, kb, res):
+            if res.branch in BODY_BRANCHES:
+                check_risk_intensification(case, kb)
             handler = DISPATCH.get(res.branch)
             if handler is None:
                 res.payable = None
@@ -1229,4 +1309,5 @@ def compute(case: Case | dict[str, Any], kb: Knowledge | None = None) -> CalcRes
 
     _enforce_guard_plan(res)
     _finalize(res, kb, case)
+    _apply_authorization_confidence_cap(res)
     return res

@@ -48,6 +48,9 @@ Every supported calculation must satisfy all of these:
 8. Every source and policy term is effective for the event/policy snapshot.
 9. Repeating a calculation against the same frozen snapshot is deterministic.
 10. Invalid input and guard violations are machine-visible failures.
+11. No calculation runs without an authorization. `compute()` accepts a
+    `CalculationAuthorization` only; `REFUSE` and `INSUFFICIENT_INFORMATION`
+    cannot produce one, and a payload edited after issuance fails its hash check.
 
 Monetary calculations retain exact decimal intermediates. The engine rounds only
 final payable amounts and payable scenarios to the nearest IRR, using
@@ -136,14 +139,48 @@ and never changes a persisted or engine input.
   come from a policy slot with a named source.
 - Every slot a body branch requires is reachable by a question, a declared supplier, or
   derivation from evidenced slots.
-- An authorized case emitted by `review --emit-case` is accepted by `calc` and produces
-  the same payable as the review itself; incomplete and refused reviews cannot export.
+- An authorized review's emitted case exactly matches the payload bound to its
+  authorization; `calc` accepts the review-answer file and rejects the raw emitted
+  case, while incomplete and refused reviews cannot export.
 - Ladder assignment excludes the `always` fallback rung, so a well-formed file is not
   reported as uncertified; every `example_cases` entry must exist in the corpus.
 - Licence state keeps its three-way distinction: void, wrong class and absent defeat
   cover, expired does not.
 - Refusal, insufficiency and scenario-set decisions each have a worked file in `cases/`
   and a test that pins the outcome, not only the happy path.
+
+## Calculation admission boundary
+
+No amount may be produced without an authorization that names its issuer. The
+boundary is a type, so a caller that skips the review gate fails at the call site
+rather than silently computing:
+
+- `compute()` refuses a raw payload, a `Case`, and any object that is not a
+  `CalculationAuthorization`.
+- `Review.authorize()` raises `AuthorizationNotGranted` on `REFUSE` and
+  `INSUFFICIENT_INFORMATION`, so neither outcome can reach the engine.
+- The authorization owns immutable canonical JSON snapshots of the validated claim
+  and provenance. Its private `init=False` factory grant is lost on
+  `dataclasses.replace()`, and `compute()` materializes a fresh validated `Case`
+  after verification instead of consuming any mutable pre-issuance view.
+- Returned claim and provenance values are detached copies. Mutating them cannot
+  change a later calculation or its emitted review record. This is an architectural
+  Python API boundary, not cryptographic hostile-process security.
+- A forged decision token (`REFUSE`, `INSUFFICIENT_INFORMATION`, or any value
+  outside the authorized set) fails `verify()` before any arithmetic runs.
+- Every result reports `authorization` provenance: issuer, decision, claim hash,
+  reviewer, tier, classification record, snapshot id, live uncertainties.
+- Risk intensification is a hard review gate: `YES` activates blocking `U15`,
+  while `UNKNOWN` or omission leaves the material fact unresolved. The engine
+  independently fails closed on
+  `coverage_gate.risk_intensified` for every body branch, returning
+  `RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED` with no payable and no scenario
+  collapse. The underinsurance ratio is never substituted for the premium ratio.
+- `claim.py calc` and `json` accept review-answer files and use
+  `Review.authorize()`. Raw claim cases are rejected. The fixture corpus and
+  mutation probe use the private, schema-validating internal path and report
+  issuer and authorization kind as `INTERNAL_TEST_DIRECT`; no production path
+  falls back to it.
 
 ## Body calculation properties and mutation gate
 

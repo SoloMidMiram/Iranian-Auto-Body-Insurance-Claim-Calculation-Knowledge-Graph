@@ -41,8 +41,8 @@ python claim.py questionnaire --stage S4_DAMAGE_SCOPE
 python claim.py parameters --branch PARTIAL_DAMAGE
 python claim.py ladder                # the iterative completion rungs and their gates
 python claim.py flowchart             # the review-and-calculation flowchart, as mermaid
-python claim.py calc cases/example_partial_resolved.json
-python claim.py calc cases/example_partial_unresolved.json
+python claim.py calc cases/review_t1_fullcover_partial.json
+python claim.py calc cases/review_t3_underinsured_partial.json
 python claim.py unknowns              # every unresolved variable, with what resolves it
 python claim.py contradictions        # the contradiction matrix as data
 python claim.py queries               # the report's documented graph query patterns, answered
@@ -56,18 +56,18 @@ python claim.py ingest submissions/example_conflicting_educational.json
 The persistence and engine boundary accepts monetary values only as non-negative
 integer IRR. Toman and million-toman conversion is explicit presentation logic.
 
-Tests: `python -m pytest` (363 tests). Install development/test
+Tests: `python -m pytest` (467 tests). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 
-The two worked examples are the same claim under two configurations. With the
-operator order resolved you get one payable and confidence 0.95; with it
-unresolved you get two scenarios and confidence 0.55, plus an escalation prompt.
-That contrast is the whole point of the model.
+The resolved T1 review produces one payable; the underinsured T3 review produces
+two scenarios and an escalation prompt. That contrast is the whole point of the
+model.
 
 ## Case review: from a claim file to the right parameters
 
-The engine computes an amount from a claim case. Before it may do that, someone has
+The engine computes an amount from a claim case, but only from one that has been
+authorized. Before that may happen, someone has
 to establish what happened, whether cover applies, and which parameters are sourced.
 That review layer is a gate-ordered questionnaire over the same graph:
 
@@ -95,6 +95,32 @@ architecture and calculation contract, and
 [`docs/BODY_CASE_REVIEW_MODEL.md`](docs/BODY_CASE_REVIEW_MODEL.md) for the generated
 questionnaire, parameter-selection matrix and worked traces;
 `python scripts/sync_review_docs.py --write` refreshes the generated tables inside it.
+
+## The authorization boundary
+
+The engine cannot be handed a claim. `compute()` accepts a
+`CalculationAuthorization` and refuses a raw payload, a `Case`, or anything else,
+so no script, feature or future caller can reach the arithmetic without an issuer
+having admitted the file:
+
+```
+raw claim → review gate → CalculationAuthorization → compute() → result
+```
+
+`Review.authorize()` is the only normal claim-file authorization producer and
+raises on `REFUSE` and `INSUFFICIENT_INFORMATION`, which makes those two outcomes structurally
+incapable of reaching the calculator. The authorization binds the exact emitted
+payload and authorization provenance as immutable canonical JSON snapshots. Its
+private factory grant is not copied by `dataclasses.replace()`. `compute()` verifies
+that grant and materializes a fresh validated `Case` from the bound snapshot, so
+mutating an earlier `Case` or a returned provenance record cannot affect the run.
+This is an architectural in-process boundary, not cryptographic protection against
+hostile interpreter introspection. `claim.py calc` and `json` accept review-answer files and call
+`Review.authorize()`; they reject raw claim cases. The older calculation fixtures
+use a private, schema-validating internal helper whose capabilities and provenance
+are marked `INTERNAL_TEST_DIRECT`; it is not exported by the package API and no
+production path falls back to it. Every result carries its authorization
+provenance in `CalcResult.authorization`.
 
 ## Project delivery and safety status
 
@@ -240,6 +266,12 @@ confidence = min( confidence of every cited rule,
 So a clean full-cover partial claim lands at 0.99, one that cites the rescue rule
 (v0.95) lands at 0.95, and one with an unresolved operator order lands at 0.55 —
 the same 0.55 the report assigns to that topic. Tests assert these values.
+
+A review authorization may also bind an `evidence_confidence_cap` when evidence
+configured as `REDUCE_CONFIDENCE` is missing. `compute()` applies the lower of that
+immutable review-issued cap and the trace-derived confidence and labels the result
+`EVIDENCE_CONFIDENCE_REDUCED`. This enforcement lives at the shared authorization
+boundary, so `Review.calculate()`, `claim.py calc`, and `claim.py json` cannot diverge.
 
 ## Deliberate deviations from the report text
 

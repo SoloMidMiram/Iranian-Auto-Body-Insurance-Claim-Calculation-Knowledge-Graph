@@ -2,8 +2,8 @@
 
     python claim.py fixtures
     python claim.py validate
-    python claim.py calc cases/example_partial.json
-    python claim.py json cases/example_partial.json
+    python claim.py calc cases/review_t1_fullcover_partial.json
+    python claim.py json cases/review_t3_underinsured_partial.json
     python claim.py classify cases/example_partial.json
     python claim.py unknowns
     python claim.py contradictions --topic ARTICLE_8_CALCULATION
@@ -30,6 +30,10 @@ from pathlib import Path
 from typing import Any
 
 from . import money
+from .admission import (
+    AuthorizationError,
+    AuthorizationNotGranted,
+)
 from .case import Case
 from .classify import classify
 from .engine import compute, reconcile_classification
@@ -46,8 +50,6 @@ from .schema_input import (
     write_validated_claim,
 )
 from .review import (
-    DECISION_COMPUTE,
-    DECISION_SCENARIO,
     Review,
     ReviewInputError,
     ladder_markdown,
@@ -70,12 +72,19 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("validate", help="validate knowledge graph integrity")
 
     for name, help_text in (
-        ("calc", "calculate a claim and render the explanation"),
-        ("json", "calculate a claim and print the machine result"),
+        ("calc", "calculate an authorized review file and render the explanation"),
+        ("json", "calculate an authorized review file and print the machine result"),
         ("classify", "derive the branch for a case without calculating"),
     ):
         p = sub.add_parser(name, help=help_text)
-        p.add_argument("case", help="path to a case JSON file")
+        p.add_argument(
+            "case",
+            help=(
+                "path to a review answers JSON file"
+                if name in ("calc", "json")
+                else "path to a case JSON file"
+            ),
+        )
 
     p = sub.add_parser("unknowns", help="list unresolved variables")
     p.add_argument("--all", action="store_true", help="include non-blocking uncertainties")
@@ -154,11 +163,25 @@ def main(argv: list[str] | None = None) -> int:
     except InputSchemaError as error:
         _print_schema_error(error)
         return 1
+    except AuthorizationError as error:
+        _print_schema_error(
+            InputSchemaError([SchemaIssue(CODE_UNAUTHORIZED, "$", str(error))])
+        )
+        return 1
 
 
 def _load_case(path: str) -> Case:
     payload = load_json_document(path)
     return validated_case(payload)
+
+
+def _load_review_authorization(path: str, kb: Knowledge):
+    """Load a review file and obtain its sole calculation capability."""
+    try:
+        review = Review.from_file(path, kb)
+        return review.authorize()
+    except ReviewInputError as error:
+        raise AuthorizationError(f"review could not authorize calculation: {error}") from error
 
 
 def _cmd_fixtures(args: argparse.Namespace, kb: Knowledge) -> int:
@@ -211,15 +234,13 @@ def _cmd_validate(args: argparse.Namespace, kb: Knowledge) -> int:
 
 
 def _cmd_calc(args: argparse.Namespace, kb: Knowledge) -> int:
-    case = _load_case(args.case)
-    result = compute(case, kb)
+    result = compute(_load_review_authorization(args.case, kb), kb)
     print(render_claim(result, kb, "million_toman"))
     return 0
 
 
 def _cmd_json(args: argparse.Namespace, kb: Knowledge) -> int:
-    case = _load_case(args.case)
-    result = compute(case, kb)
+    result = compute(_load_review_authorization(args.case, kb), kb)
     print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
     return 0
 
@@ -486,19 +507,20 @@ def _cmd_review(args: argparse.Namespace, kb: Knowledge) -> int:
         return 1
 
     if args.emit_case:
-        decision = review.decision()["decision"]
-        if decision not in (DECISION_COMPUTE, DECISION_SCENARIO):
+        try:
+            authorization = review.authorize()
+        except AuthorizationNotGranted as error:
+            kind = review.decision()["decision"]
             raise InputSchemaError(
                 [
                     SchemaIssue(
                         CODE_UNAUTHORIZED,
                         "$",
-                        f"review decision {decision} does not authorize an engine case",
+                        f"review decision {kind} does not authorize an engine case: {error}",
                     )
                 ]
-            )
-        payload = review.case_payload()
-        write_validated_claim(args.emit_case, payload)
+            ) from error
+        write_validated_claim(args.emit_case, authorization.claim_payload())
         print(f"wrote derived case to {args.emit_case}")
 
     if args.json:

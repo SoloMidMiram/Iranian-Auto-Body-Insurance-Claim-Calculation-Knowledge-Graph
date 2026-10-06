@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
+from iran_auto_claim.engine import CalcResult, _enforce_guard_plan
+
+from admission_shim import compute
 from iran_auto_claim.money import D
 
 
