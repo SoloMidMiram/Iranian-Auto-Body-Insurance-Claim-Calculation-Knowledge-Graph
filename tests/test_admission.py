@@ -529,6 +529,24 @@ def test_authorization_provenance_is_preserved_into_the_result(kb):
     assert result.authorization["issuer"] == ISSUER_REVIEW
 
 
+def test_compute_applies_the_review_issued_evidence_confidence_cap(kb):
+    payload = load(FULLCOVER)
+    payload["evidence_present"].remove("EVT_PHOTOS")
+    review = Review(payload, kb)
+    authorization = review.authorize()
+
+    assert authorization.provenance_record()["evidence_confidence_cap"] == "0.8"
+    result = compute(authorization, kb)
+
+    assert result.payable == T1_PAYABLE
+    assert result.formula_confidence == 0.8
+    assert "EVIDENCE_CONFIDENCE_REDUCED" in result.labels
+    reviewed = review.calculate()
+    assert reviewed.payable == result.payable
+    assert reviewed.formula_confidence == result.formula_confidence
+    assert reviewed.labels == result.labels
+
+
 def test_authorization_provenance_is_an_immutable_snapshot(kb):
     authorization = Review.from_file(CASES / FULLCOVER, kb).authorize()
     expected = authorization.provenance_record()
@@ -538,12 +556,19 @@ def test_authorization_provenance_is_an_immutable_snapshot(kb):
     detached["approved_overrides"].append({"forged": True})
     detached["classification"]["outcome"] = "FORGED"
     detached["policy_snapshot"]["franchise"]["rate"] = 1
+    detached["issuer"] = ISSUER_INTERNAL_TEST
+    detached["decision"] = "REFUSE"
+    detached["claim_hash"] = "sha256:" + "0" * 64
 
     property_copy = authorization.provenance
     property_copy["reviewer"] = "another-forgery"
 
     assert authorization.provenance_record() == expected
-    assert compute(authorization, kb).authorization == expected
+    emitted = compute(authorization, kb).authorization
+    assert emitted == expected
+    assert emitted["issuer"] == ISSUER_REVIEW
+    assert emitted["decision"] == "COMPUTE"
+    assert emitted["claim_hash"] == authorization.claim_hash
 
 
 def test_the_reviewer_identity_is_carried_when_the_file_names_one(kb):

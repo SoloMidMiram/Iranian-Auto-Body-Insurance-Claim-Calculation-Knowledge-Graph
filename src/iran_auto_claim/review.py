@@ -1029,14 +1029,7 @@ class Review:
         """Run the engine only when this file authorizes calculation."""
         if self.decision()["decision"] not in AUTHORIZED_DECISIONS:
             return None
-        result = compute(self.authorize(), self.kb)
-        cap = self.evidence_confidence_cap()
-        if cap is not None and result.formula_confidence is not None:
-            current = money.D(str(result.formula_confidence))
-            if cap < current:
-                result.formula_confidence = float(cap)
-                result.label("EVIDENCE_CONFIDENCE_REDUCED")
-        return result
+        return compute(self.authorize(), self.kb)
 
     # ------------------------------------------------------------------ report
 

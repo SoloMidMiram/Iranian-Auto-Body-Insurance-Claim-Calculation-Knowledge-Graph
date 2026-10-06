@@ -56,7 +56,7 @@ python claim.py ingest submissions/example_conflicting_educational.json
 The persistence and engine boundary accepts monetary values only as non-negative
 integer IRR. Toman and million-toman conversion is explicit presentation logic.
 
-Tests: `python -m pytest` (458 tests). Install development/test
+Tests: `python -m pytest` (467 tests). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 
@@ -266,6 +266,12 @@ confidence = min( confidence of every cited rule,
 So a clean full-cover partial claim lands at 0.99, one that cites the rescue rule
 (v0.95) lands at 0.95, and one with an unresolved operator order lands at 0.55 —
 the same 0.55 the report assigns to that topic. Tests assert these values.
+
+A review authorization may also bind an `evidence_confidence_cap` when evidence
+configured as `REDUCE_CONFIDENCE` is missing. `compute()` applies the lower of that
+immutable review-issued cap and the trace-derived confidence and labels the result
+`EVIDENCE_CONFIDENCE_REDUCED`. This enforcement lives at the shared authorization
+boundary, so `Review.calculate()`, `claim.py calc`, and `claim.py json` cannot diverge.
 
 ## Deliberate deviations from the report text
 

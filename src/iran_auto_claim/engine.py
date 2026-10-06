@@ -1128,6 +1128,24 @@ def _finalize(res: CalcResult, kb: Knowledge, case: Case) -> None:
     res.provenance = provenance
 
 
+def _apply_authorization_confidence_cap(res: CalcResult) -> None:
+    """Apply an evidence cap bound into immutable review provenance.
+
+    CLI callers invoke ``Review.authorize()`` followed directly by ``compute()``.
+    Enforcing the cap here keeps that supported path identical to
+    ``Review.calculate()`` and prevents callers from bypassing a review-issued
+    evidence constraint.
+    """
+    raw_cap = res.authorization.get("evidence_confidence_cap")
+    if raw_cap is None or res.formula_confidence is None:
+        return
+    cap = money.D(raw_cap)
+    current = money.D(str(res.formula_confidence))
+    if cap < current:
+        res.formula_confidence = float(cap)
+        res.label("EVIDENCE_CONFIDENCE_REDUCED")
+
+
 def _flat_plan(plan: Any) -> list[str]:
     if not isinstance(plan, list):
         return []
@@ -1291,4 +1309,5 @@ def compute(
 
     _enforce_guard_plan(res)
     _finalize(res, kb, case)
+    _apply_authorization_confidence_cap(res)
     return res

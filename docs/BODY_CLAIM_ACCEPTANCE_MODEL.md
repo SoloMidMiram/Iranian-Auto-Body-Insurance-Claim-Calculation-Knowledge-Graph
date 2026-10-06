@@ -299,14 +299,14 @@ Validated on 2026-10-05:
 
 - knowledge graph integrity passes: 261 registered nodes;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 458 tests;
+- the complete automated suite passes: 467 tests;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
 - missing franchise terms or authority stop every body settlement path on U02;
 - explicit zero franchise is accepted only from versioned, referenced policy evidence;
 - no calculation path reaches the engine without an authorization, and the
-  mutation gate kills hash, decision, and review-issuance bypass mutants (15/15).
+  mutation gate kills hash, decision, and review-issuance bypass mutants (16/16).
 
 Remaining gaps, in priority order:
 
