@@ -33,6 +33,9 @@ calibration, and unattended production settlement are outside this release.
 
 ## 2. End-to-end flowchart
 
+Standalone Mermaid source:
+[02_end_to_end_authorized_flow.mmd](diagrams/02_end_to_end_authorized_flow.mmd).
+
 ```mermaid
 flowchart TD
   START["Claim file and evidence"] --> SCOPE{"Body-policy vehicle damage?"}

@@ -1,0 +1,80 @@
+%% Iranian Auto Body Model — recognition, acceptance, authorization, calculation
+%% Companion to docs/BODY_MODEL_OVERVIEW.md
+%%{init: {"theme": "base", "flowchart": {"htmlLabels": true, "curve": "basis"}} }%%
+flowchart TD
+  START(["Claim file and evidence"]) --> SCOPE{"Body-policy<br/>vehicle damage?"}
+  SCOPE -- "No" --> OOS["OUT OF SCOPE<br/>split or route the other case"]
+  SCOPE -- "Yes" --> NORM["Normalize facts, dates, evidence,<br/>policy and vehicle"]
+
+  subgraph RECOGNITION["1 · RECOGNITION"]
+    NORM --> DERIVE["Derive branch from<br/>controlled evidence"]
+    DERIVE --> RECON{"Declared and derived<br/>branch reconcile?"}
+    RECON -- "Conflict or evidence gap" --> CLASSSTOP["INSUFFICIENT INFORMATION<br/>or reviewed override"]
+    RECON -- "Match, no declaration,<br/>or authorized override" --> FILE
+  end
+
+  subgraph ACCEPTANCE["2 · ACCEPTANCE"]
+    FILE["FILE<br/>identifiable event and applicable policy"] --> COVER{"COVER<br/>covered cause and no defeating condition?"}
+    COVER -- "Defeating fact established" --> REFUSE["REFUSE<br/>name the reason; no arithmetic"]
+    COVER -- "Unresolved fact or document" --> INSUF["INSUFFICIENT INFORMATION<br/>request only what is missing"]
+    COVER -- "Pass" --> BRANCH["BRANCH<br/>evidence-derived route locked"]
+    BRANCH --> PARAMS{"PARAMETERS<br/>all amount-affecting inputs sourced?"}
+    PARAMS -- "Missing fact, evidence,<br/>term or date" --> INSUF
+    PARAMS -- "Complete facts;<br/>approved interpretations remain" --> SCEN["SCENARIO SET<br/>preserve every approved interpretation"]
+    PARAMS -- "Complete and resolved" --> COMP["COMPUTE"]
+  end
+
+  subgraph AUTHORIZATION["3 · AUTHORIZATION BOUNDARY"]
+    COMP --> AUTH["Review.authorize()<br/>bind immutable claim and provenance"]
+    SCEN --> AUTH
+    AUTH --> VERIFY{"compute() verifies issuer,<br/>decision, hash and grant"}
+    VERIFY -- "Invalid" --> FAIL["FAIL CLOSED<br/>authorization error"]
+    VERIFY -- "Valid" --> FRESH["Materialize fresh<br/>schema-validated Case"]
+  end
+
+  subgraph CALCULATION["4 · CALCULATION"]
+    FRESH --> PLAN["Load graph branch plan<br/>and required guards"]
+    PLAN --> ROUTE{"Selected body branch"}
+    ROUTE --> PARTIAL["PARTIAL DAMAGE<br/>parts · depreciation · ratio · franchise · rescue"]
+    ROUTE --> TOTAL["TOTAL LOSS<br/>>75% threshold · value · salvage/title · cap"]
+    ROUTE --> GLASS["GLASS ONLY<br/>endorsement · zero depreciation · policy terms"]
+    ROUTE --> THEFT["THEFT<br/>clock · title · total or partial route"]
+    PARTIAL --> FINAL
+    TOTAL --> FINAL
+    GLASS --> FINAL
+    THEFT --> FINAL["Apply caps and finalize<br/>provenance and confidence"]
+  end
+
+  FINAL --> RESULT{"5 · SAFE RESULT"}
+  RESULT --> ONE["One payable<br/>or zero with reason"]
+  RESULT --> MANY["Scenario set<br/>never average or silently select"]
+  RESULT --> PENDING["Pending or required action<br/>no payable"]
+
+  REFUSE --> TRACE["Trace · reasons · evidence<br/>uncertainties · next action"]
+  INSUF --> TRACE
+  CLASSSTOP --> TRACE
+  OOS --> TRACE
+  FAIL --> TRACE
+  ONE --> TRACE
+  MANY --> TRACE
+  PENDING --> TRACE
+
+  classDef intake fill:#ede9fe,stroke:#6d28d9,color:#2e1065,stroke-width:1.5px
+  classDef process fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:1.5px
+  classDef gate fill:#fef3c7,stroke:#d97706,color:#451a03,stroke-width:1.5px
+  classDef stop fill:#fee2e2,stroke:#dc2626,color:#450a0a,stroke-width:1.5px
+  classDef scenario fill:#ffedd5,stroke:#ea580c,color:#431407,stroke-width:1.5px
+  classDef auth fill:#e0e7ff,stroke:#4f46e5,color:#1e1b4b,stroke-width:1.5px
+  classDef calc fill:#dcfce7,stroke:#16a34a,color:#052e16,stroke-width:1.5px
+  classDef output fill:#ccfbf1,stroke:#0f766e,color:#042f2e,stroke-width:1.5px
+  classDef trace fill:#e5e7eb,stroke:#4b5563,color:#111827,stroke-width:1.5px
+
+  class START,NORM intake
+  class DERIVE,FILE,BRANCH process
+  class SCOPE,RECON,COVER,PARAMS,VERIFY,ROUTE,RESULT gate
+  class OOS,CLASSSTOP,REFUSE,INSUF,FAIL stop
+  class SCEN,MANY scenario
+  class COMP,AUTH,FRESH auth
+  class PLAN,PARTIAL,TOTAL,GLASS,THEFT,FINAL calc
+  class ONE,PENDING output
+  class TRACE trace
