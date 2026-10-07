@@ -130,6 +130,9 @@ plan, phase gates, and import-ready GitHub backlog are maintained in:
 
 * [`docs/ROADMAP.md`](docs/ROADMAP.md) — investigation, implementation, phase
   ordering, preparation for the next phase, and release discipline.
+* [`docs/BODY_MODEL_OVERVIEW.md`](docs/BODY_MODEL_OVERVIEW.md) — one end-to-end
+  flowchart plus the recognition, acceptance, authorization, calculation, and
+  response patterns.
 * [`docs/VALIDATION_GATES.md`](docs/VALIDATION_GATES.md) — universal invariants,
   branch-specific boundary cases, and phase acceptance evidence.
 * [`planning/issues.json`](planning/issues.json) — stable roadmap issue IDs,

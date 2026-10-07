@@ -5,6 +5,9 @@ Status: research and adjuster decision support; not an unattended payment author
 This is the compact operational architecture for a FAQ or conversational intake.
 The complete questionnaire, parameter matrix, generated diagrams, and worked traces
 remain in [BODY_CASE_REVIEW_MODEL.md](BODY_CASE_REVIEW_MODEL.md).
+For a single end-to-end flowchart and concise recognition, acceptance,
+authorization, calculation, and response patterns, see
+[BODY_MODEL_OVERVIEW.md](BODY_MODEL_OVERVIEW.md).
 
 ## 1. Purpose, scope, and governing principle
 
