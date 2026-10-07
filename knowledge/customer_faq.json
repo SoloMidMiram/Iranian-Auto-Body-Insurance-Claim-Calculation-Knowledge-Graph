@@ -1,0 +1,873 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "status": "RESEARCH_AND_ADJUSTER_DECISION_SUPPORT",
+    "scope": "BODY_ONLY",
+    "mode": "EXPLANATORY_ONLY",
+    "may_bind_claim_parameters": false,
+    "may_calculate": false
+  },
+  "priority_scales": {
+    "categories": [
+      {"priority": "P0", "meaning": "Read first: misunderstanding can change whether a customer should rely on or continue the process."},
+      {"priority": "P1", "meaning": "Read when understanding the amount, evidence, scenarios, or branch-specific outcome."},
+      {"priority": "P2", "meaning": "Read for preparation, review, disagreement, and unsupported-scope follow-up."}
+    ],
+    "questions": [
+      {"priority": "P0", "meaning": "Essential safety, scope, recognition, or acceptance question."},
+      {"priority": "P1", "meaning": "Important calculation, evidence, or result-interpretation question."},
+      {"priority": "P2", "meaning": "Helpful operational or next-step question."}
+    ]
+  },
+  "hierarchy": [
+    {"rank": 1, "category_id": "CAT-01_START_SCOPE", "priority": "P0", "depends_on": []},
+    {"rank": 2, "category_id": "CAT-02_RECOGNITION", "priority": "P0", "depends_on": ["CAT-01_START_SCOPE"]},
+    {"rank": 3, "category_id": "CAT-03_ACCEPTANCE", "priority": "P0", "depends_on": ["CAT-02_RECOGNITION"]},
+    {"rank": 4, "category_id": "CAT-04_CALCULATION", "priority": "P1", "depends_on": ["CAT-03_ACCEPTANCE"]},
+    {"rank": 5, "category_id": "CAT-05_RESULTS_UNCERTAINTY", "priority": "P1", "depends_on": ["CAT-04_CALCULATION"]},
+    {"rank": 6, "category_id": "CAT-06_EVIDENCE_DOCUMENTS", "priority": "P1", "depends_on": ["CAT-03_ACCEPTANCE"]},
+    {"rank": 7, "category_id": "CAT-07_NEXT_STEPS", "priority": "P2", "depends_on": ["CAT-05_RESULTS_UNCERTAINTY", "CAT-06_EVIDENCE_DOCUMENTS"]}
+  ],
+  "english": {
+    "language": "en",
+    "direction": "ltr",
+    "categories": [
+      {
+        "category_id": "CAT-01_START_SCOPE",
+        "rank": 1,
+        "priority": "P0",
+        "title": "Start here: purpose, scope, and limits",
+        "purpose": "Establish what the body model can explain before a customer relies on any amount.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-SCOPE-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Which claims can this body model help explain?",
+            "answer_summary": "It explains monetary damage to the insured vehicle under body insurance.",
+            "answer": "The current supported body scope covers partial damage, total loss, standalone glass, and theft. Bodily injury, third-party financial liability, Article 8 calculations, and legal recovery must be separated into their own cases and rules.",
+            "customer_action": "Confirm that the question concerns damage to the insured vehicle itself; ask for a separate file if another liability or recovery claim is involved.",
+            "knowledge_refs": ["S0_INTAKE", "S7_BRANCH_SELECTION", "PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"]
+          },
+          {
+            "faq_id": "FAQ-STATUS-001",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Is the model's answer an official insurer payment decision?",
+            "answer_summary": "No. It is research and adjuster decision support, not unattended payment authority.",
+            "answer": "The model can organize facts, identify the likely branch, explain formulas, and expose missing evidence or unresolved rules. A real settlement still requires the applicable insurer process, authenticated documents, and authorized human review.",
+            "customer_action": "Use the result to prepare questions and documents, then obtain confirmation from the insurer or qualified reviewer before relying on a payment amount.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "T6"]
+          },
+          {
+            "faq_id": "FAQ-PROCESS-001",
+            "order": 3,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Why does the model not give a payment amount immediately?",
+            "answer_summary": "It must recognize and accept the case before calculation is safe.",
+            "answer": "Coverage, cause, exclusions, branch, policy wording, dates, valuation, franchise, and other amount-affecting inputs must be resolved first. Guessing any of them can select the wrong formula or create false precision.",
+            "customer_action": "Complete the missing recognition and acceptance information before asking for arithmetic.",
+            "knowledge_refs": ["S3_EXCLUSION_GATE", "S4_DAMAGE_SCOPE", "S6_CONTRACT_ECONOMICS", "S10_QUALITY_GATE"]
+          },
+          {
+            "faq_id": "FAQ-UNIT-001",
+            "order": 4,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "Which currency unit does the calculation use?",
+            "answer_summary": "All stored and calculated amounts use non-negative integer Iranian rial (IRR).",
+            "answer": "Toman and million-toman values are presentation conversions only. Mixing rial, toman, and million toman inside one claim can change an amount by factors of ten or one million, so the unit must be explicit at every boundary.",
+            "customer_action": "Label every amount with its unit and convert it to IRR before comparing inputs or results.",
+            "knowledge_refs": ["PS_GROSS_DAMAGE", "PS_MARKET_VALUE", "PS_INSURED_SUM"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-02_RECOGNITION",
+        "rank": 2,
+        "priority": "P0",
+        "title": "Case recognition and branch selection",
+        "purpose": "Explain how evidence, rather than a customer-entered label, selects the calculation route.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-RECOG-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "How does the model recognize what kind of body claim I have?",
+            "answer_summary": "It derives the branch from event, cause, damage, theft, valuation, and endorsement evidence.",
+            "answer": "The model first establishes what happened and what caused the damage, then tests coverage and branch boundaries. The derived branch is reconciled with any branch declared in the file; a declaration alone is not proof.",
+            "customer_action": "Describe the event and damage accurately and provide the supporting report, photographs, and policy documents instead of choosing a branch only by name.",
+            "knowledge_refs": ["S2_EVENT_CAUSATION", "S4_DAMAGE_SCOPE", "S7_BRANCH_SELECTION"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "What are the four supported body-claim branches?",
+            "answer_summary": "Partial damage, total loss, standalone glass, and theft.",
+            "answer": "Each branch has different evidence, thresholds, operators, and possible outcomes. Attempted-theft damage usually routes to partial damage, while whole-vehicle theft has its own clock and title-transfer conditions.",
+            "customer_action": "Use the branch explanation only as orientation; let the evidence-derived recognition record select the actual route.",
+            "knowledge_refs": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-003",
+            "order": 3,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "What happens if the branch written on my claim conflicts with the evidence?",
+            "answer_summary": "Calculation stops unless a documented, authorized override resolves the conflict.",
+            "answer": "The reconciliation outcome becomes a conflict or insufficient evidence, so no branch arithmetic is allowed. An override is acceptable only when it records the responsible actor, reason, time, and supporting source.",
+            "customer_action": "Ask the reviewer to explain the derived branch and correct the evidence or record a properly authorized override.",
+            "knowledge_refs": ["S7_BRANCH_SELECTION", "S10_QUALITY_GATE", "G_NO_ASSUMED_CAUSATION"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-004",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
+            "question": "When does repair damage become a total loss?",
+            "answer_summary": "Only when repair and replacement cost plus threshold rescue is strictly greater than 75% of event-day market value.",
+            "answer": "Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date, and the threshold test is separate from the later settlement formula.",
+            "customer_action": "Obtain the event-day market valuation and itemized repair/replacement assessment; check the strict greater-than comparison.",
+            "knowledge_refs": ["REG53_ART19_TOTAL_LOSS_THRESHOLD", "PS_REPAIR_TOTAL", "PS_MARKET_VALUE"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-005",
+            "order": 5,
+            "priority": "P0",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY", "THEFT"],
+            "question": "Why are glass damage and theft split into several routes?",
+            "answer_summary": "Cause and theft type change the applicable branch and evidence.",
+            "answer": "Glass broken with another covered event belongs to partial damage; only independent glass breakage can use standalone glass cover. Whole theft, attempted theft, partial-parts theft, and parts stolen after an accident also have different outcomes and endorsement requirements.",
+            "customer_action": "Identify whether glass was damaged alone and select the exact theft situation shown by the police and assessment records.",
+            "knowledge_refs": ["PS_GLASS_CAUSE_PRECEDENCE", "PS_THEFT_TYPE", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "REG53_ART5_ENDORSABLE_EXCLUSIONS"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-03_ACCEPTANCE",
+        "rank": 3,
+        "priority": "P0",
+        "title": "Acceptance: whether calculation is allowed",
+        "purpose": "Separate a recognized claim from a claim that is sufficiently supported to calculate.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-ACCEPT-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "What decisions can the review layer issue?",
+            "answer_summary": "COMPUTE, SCENARIO_SET, REFUSE, or INSUFFICIENT_INFORMATION.",
+            "answer": "COMPUTE permits one resolved calculation. SCENARIO_SET permits every approved interpretation. REFUSE means a defeating condition is established, while INSUFFICIENT_INFORMATION means a required fact, document, date, valuation, or policy term is missing.",
+            "customer_action": "Read the decision before the amount and follow the listed missing-information or review action.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "G_UNCERTAINTY_MUST_SURFACE"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "What is the difference between refusal and insufficient information?",
+            "answer_summary": "Refusal establishes a defeating condition; insufficiency means the decision cannot yet be made.",
+            "answer": "A supported non-compensable cause or uncovered endorsed risk may defeat payment. A missing report, unknown exclusion state, unread policy term, or unresolved date is not proof of refusal and must remain insufficient instead.",
+            "customer_action": "For insufficiency, obtain the named item; for refusal, request the exact provision and evidence supporting it.",
+            "knowledge_refs": ["S3_EXCLUSION_GATE", "REG53_ART5_ENDORSABLE_EXCLUSIONS", "REG53_ART6_NON_COMPENSABLE"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-003",
+            "order": 3,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "What does COMPUTE mean?",
+            "answer_summary": "The recognized branch and all required amount-affecting inputs are complete enough for one authorized calculation.",
+            "answer": "A COMPUTE decision creates an immutable authorization for the exact validated claim snapshot. It does not certify document authenticity or convert this research system into an official payment authority.",
+            "customer_action": "Check the bound branch, inputs, source versions, rule trace, and reviewer before relying on the calculated figure.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "T0"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-004",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "When is a scenario set allowed?",
+            "answer_summary": "Only when facts and monetary inputs are complete but authoritative operator order has multiple defensible interpretations.",
+            "answer": "A scenario set is not a substitute for a missing franchise, vehicle year, valuation, document, or endorsement. Every scenario must name the operator order that produced it, and the system must not average or silently choose one.",
+            "customer_action": "Ask the insurer for the worksheet, endorsement, or official clarification that resolves the order.",
+            "knowledge_refs": ["U01_ARTICLE10_PARTIAL_ORDER", "U11_GLASS_ARTICLE10_EXEMPTION", "G_UNCERTAINTY_MUST_SURFACE"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-005",
+            "order": 5,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Which missing inputs most often stop a body calculation?",
+            "answer_summary": "Policy franchise terms, applicable dates, production year, valuation, endorsement wording, and sourced theft-clock facts.",
+            "answer": "These inputs can change the branch, deductions, ratio, or whether payment is due at all. The model records them as missing or uncertain rather than replacing them with zero, the current year, or a remembered market practice.",
+            "customer_action": "Provide the policy schedule and endorsements, event and notice dates, vehicle year, assessment, market valuation, and theft records as applicable.",
+            "knowledge_refs": ["PS_FRANCHISE", "PS_EVENT_DATE", "PS_PRODUCTION_YEAR", "PS_MARKET_VALUE", "PS_ENDORSEMENTS", "U13_THEFT_CLOCK_ANCHOR"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-04_CALCULATION",
+        "rank": 4,
+        "priority": "P1",
+        "title": "How the amount is calculated",
+        "purpose": "Explain the main body operators without turning customer answers into calculation authority.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-CALC-001",
+            "order": 1,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE"],
+            "question": "What is the basic partial-damage calculation pattern?",
+            "answer_summary": "Eligible parts and labor are reduced by applicable depreciation, then policy ratio/franchise order is applied, and allowable rescue is added.",
+            "answer": "Special component caps are applied per item, replacement-part depreciation is calculated, and labor is included. Underinsurance and franchise are then executed in the graph-approved order, rescue is capped, and the final amount is floored at zero.",
+            "customer_action": "Ask for an itemized assessment showing parts, categories, labor, depreciation, franchise terms, ratio, rescue, and operator order.",
+            "knowledge_refs": ["PARTIAL_DAMAGE", "REG53_ART19B_PARTIAL_LOSS_BASE", "OP_SPECIAL_PART_CAP", "OP_DEPRECIATION_REPLACEMENT_PART", "OP_UNDERINSURANCE_RATIO", "OP_FRANCHISE", "OP_RESCUE_CAP"]
+          },
+          {
+            "faq_id": "FAQ-CALC-002",
+            "order": 2,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "How does replacement-part depreciation work?",
+            "answer_summary": "It applies to replaced parts by vehicle-year index, with glass and lamp glass exempt and the rate capped at 25%.",
+            "answer": "The model uses zero before the fifth production-year index, then 5% per year up to 25%. Repair-only labor is not replacement-part depreciation, and battery/tyre cap interaction on older vehicles may remain uncertain.",
+            "customer_action": "Verify the production year, event year, part category, new-part price where relevant, and whether the item was replaced or repaired.",
+            "knowledge_refs": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
+          },
+          {
+            "faq_id": "FAQ-CALC-003",
+            "order": 3,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "What is the underinsurance ratio?",
+            "answer_summary": "It is min(1, insured sum divided by event-day market value), not a fixed deduction.",
+            "answer": "When the vehicle is insured below its event-day value, the ratio can reduce a partial or endorsement-based payment. In total loss, the settlement base already uses the lower of market value and insured sum, so the ratio must not be applied a second time.",
+            "customer_action": "Compare the policy insured sum with supported market value on the event date and ask where the ratio is applied relative to franchise.",
+            "knowledge_refs": ["REG53_ART20_NOTE2_UNDERINSURANCE_RATIO", "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO", "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS"]
+          },
+          {
+            "faq_id": "FAQ-CALC-004",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Is there one universal franchise rate for all body claims?",
+            "answer_summary": "No. Franchise must come from the applicable policy, endorsement, product, claim sequence, and source version.",
+            "answer": "The regulation does not create one universal body or glass percentage. A percentage also needs a calculation base and any minimum; using a remembered rate from another insurer or policy version is unsafe.",
+            "customer_action": "Request the policy declarations page, private conditions, endorsement schedule, and the exact franchise base and minimum.",
+            "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "U02_FRANCHISE_BASE_SCHEDULES", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_UNIVERSAL_GLASS_FRANCHISE"]
+          },
+          {
+            "faq_id": "FAQ-CALC-005",
+            "order": 5,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
+            "question": "How are rescue and transport costs treated?",
+            "answer_summary": "Reasonable actual cost is added only up to 20% of the sourced cap base.",
+            "answer": "The engine records the actual amount, selected denominator, ceiling, and allowed amount. The meaning of total damage used as the denominator can be material and remains an explicit uncertainty in edge cases.",
+            "customer_action": "Keep invoices and ask the reviewer to identify whether assessed gross, eligible gross, or settlement base was used for the ceiling.",
+            "knowledge_refs": ["REG53_RESCUE_TRANSPORT_CAP", "G_RESCUE_CAP_CEILING", "U05_RESCUE_DENOMINATOR", "PS_RESCUE_ACTUAL", "PS_RESCUE_CAP_BASE"]
+          },
+          {
+            "faq_id": "FAQ-CALC-006",
+            "order": 6,
+            "priority": "P1",
+            "applies_to": ["TOTAL_LOSS", "THEFT"],
+            "question": "How is a total-loss or eligible whole-theft settlement calculated?",
+            "answer_summary": "The starting settlement base is the lower of event-day market value and insured sum.",
+            "answer": "For total loss, salvage is deducted once if the insured keeps it; if the insurer takes title, salvage must not also be deducted. The sourced franchise and allowed additions are applied in the validated plan, the result is floored at zero, and the insured-sum ceiling is enforced.",
+            "customer_action": "Verify market value, insured sum, salvage valuation/disposition, title status, franchise, and the final insured-sum cap.",
+            "knowledge_refs": ["REG53_ART19_TOTAL_LOSS_VALUATION", "REG53_ART19_INSURER_TAKES_TITLE", "G_SALVAGE_XOR_TITLE_TRANSFER", "G_INSURED_SUM_CEILING", "U12_SALVAGE_DISPOSITION"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-05_RESULTS_UNCERTAINTY",
+        "rank": 5,
+        "priority": "P1",
+        "title": "Branch outcomes, scenarios, and confidence",
+        "purpose": "Help customers distinguish a payable from a scenario, pending state, zero, refusal, or incomplete case.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-RESULT-001",
+            "order": 1,
+            "priority": "P1",
+            "applies_to": ["GLASS_ONLY"],
+            "question": "How is standalone glass handled?",
+            "answer_summary": "It requires independent glass damage and the applicable endorsement; glass depreciation is zero.",
+            "answer": "Glass caused by another covered body peril routes to partial damage. Without standalone cover the result is zero with reason; with cover, franchise and underinsurance behavior come from the endorsement and may require scenarios if the wording is unresolved.",
+            "customer_action": "Provide the endorsement wording and evidence showing whether the glass broke independently or with another event.",
+            "knowledge_refs": ["GLASS_ONLY", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION", "U14_GLASS_INSURED_AT_VALUE_CONDITION"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["THEFT"],
+            "question": "When can whole-vehicle theft reach settlement?",
+            "answer_summary": "Only after the sourced 60-day condition and required title transfer are established.",
+            "answer": "Before the condition is met, the outcome is pending; after it is met without title transfer, title transfer is required. The current model does not treat a stored elapsed-day number as proof of the legal clock anchor, so an unsourced anchor blocks review authorization.",
+            "customer_action": "Provide theft occurrence/awareness/declaration records, the non-discovery enquiry, evaluation date, and title-transfer proof.",
+            "knowledge_refs": ["THEFT", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "U13_THEFT_CLOCK_ANCHOR", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_TITLE_TRANSFER_PROOF"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-003",
+            "order": 3,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "Why did I receive two amounts instead of one?",
+            "answer_summary": "The facts are complete, but the authoritative order of underinsurance and franchise is unresolved.",
+            "answer": "Both amounts are calculated from approved operator sequences and are kept separate. Averaging them or selecting the larger or smaller one without authority would hide the unresolved rule.",
+            "customer_action": "Request the insurer worksheet or endorsement clause that identifies the accepted operator order.",
+            "knowledge_refs": ["U01_ARTICLE10_PARTIAL_ORDER", "G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT", "T3"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-004",
+            "order": 4,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "How do zero, pending, refusal, and insufficient information differ?",
+            "answer_summary": "They are different legal and operational outcomes and must not be shown as the same blank amount.",
+            "answer": "Zero is a calculated or covered-route outcome with a reason; pending means a condition has not matured; refusal means a defeating fact is established; insufficiency means required information is missing. Each must retain its own reason and next action.",
+            "customer_action": "Ask for the status code and reason, not only the payable field.",
+            "knowledge_refs": ["T2", "T4", "S10_QUALITY_GATE"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-005",
+            "order": 5,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "What does result confidence mean?",
+            "answer_summary": "It reflects the weakest cited formula dependency and the quality/completeness of required evidence.",
+            "answer": "Confidence is computed from the rules actually used and can be reduced by live uncertainty or missing configured evidence. It does not prove that a submitted document is genuine or that an authority will accept it.",
+            "customer_action": "Review formula, evidence, and authority confidence separately and read every provenance finding.",
+            "knowledge_refs": ["G_UNCERTAINTY_MUST_SURFACE", "S10_QUALITY_GATE", "EVT_ASSESSMENT_REPORT", "EVT_POLICY_COPY"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-06_EVIDENCE_DOCUMENTS",
+        "rank": 6,
+        "priority": "P1",
+        "title": "Documents, evidence, and policy terms",
+        "purpose": "Show which records support recognition and calculation and what the model does not authenticate.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-EVID-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Which documents should I prepare first?",
+            "answer_summary": "Start with the claim form, complete policy and endorsements, assessment, market-value evidence, photographs, licence, and event-specific authority reports.",
+            "answer": "The exact list changes by branch. Theft needs police/non-discovery and title records; total loss needs salvage evidence; repair claims need itemized invoices or estimates; standalone glass needs the endorsement wording.",
+            "customer_action": "Use the branch's missing-evidence list and supply complete dated copies, not only document names.",
+            "knowledge_refs": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_ENDORSEMENT_WORDING", "EVT_ASSESSMENT_REPORT", "EVT_MARKET_VALUE_EVIDENCE", "EVT_PHOTOS", "EVT_LICENCE"]
+          },
+          {
+            "faq_id": "FAQ-EVID-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "Why is the full policy wording important?",
+            "answer_summary": "Franchise, endorsement scope, limits, minimums, valuation conditions, and product version can change the result.",
+            "answer": "A policy number or insurer name alone does not establish the applicable economics. The model refuses to copy a rate or glass/theft condition from another company, product, claim sequence, or policy vintage.",
+            "customer_action": "Provide the declarations page, private conditions, franchise schedule, and every relevant endorsement with version/effective dates.",
+            "knowledge_refs": ["EVT_POLICY_COPY", "EVT_ENDORSEMENT_WORDING", "U02_FRANCHISE_BASE_SCHEDULES", "U03_GLASS_ONLY_ENDORSEMENT_WORDING"]
+          },
+          {
+            "faq_id": "FAQ-EVID-003",
+            "order": 3,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "Does listing a document mean the model verified that it is authentic and sufficient?",
+            "answer_summary": "No. The current gate records evidence presence, not full identity, issuer, version, hash, or legal sufficiency.",
+            "answer": "A human reviewer must still check authenticity, completeness, relevance, dates, and conflicts. The roadmap requires stronger document metadata and source-integrity controls before production certification.",
+            "customer_action": "Ask the reviewer to identify the document, issuer, date, version, and the exact fact or rule it supports.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "EVT_POLICY_COPY", "EVT_ASSESSMENT_REPORT"]
+          },
+          {
+            "faq_id": "FAQ-EVID-004",
+            "order": 4,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "Can a blog, market table, or another insurer's FAQ set my rate?",
+            "answer_summary": "No. Lower-authority material may identify a question but cannot create or override an executable policy term.",
+            "answer": "The model prioritizes applicable statute, regulation, circular, policy/endorsement, and dated insurer procedure. Educational material or mirrors must not invent a franchise, clock anchor, formula, or operator order.",
+            "customer_action": "Request the official instrument or your own applicable policy document and keep uncertain material marked as unresolved.",
+            "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_GUESSED_ENDORSEMENT_TERMS"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-07_NEXT_STEPS",
+        "rank": 7,
+        "priority": "P2",
+        "title": "Preparation, disagreement, and next steps",
+        "purpose": "Turn the explanation into a safe, reviewable customer action.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-NEXT-001",
+            "order": 1,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "How can I prepare my case for a useful review?",
+            "answer_summary": "Create a dated event summary and organize policy, evidence, valuations, and claimed amounts by source.",
+            "answer": "Separate what you know, what a document proves, what remains unknown, and what the insurer or assessor supplied. Do not fill a missing rate, date, or policy term from memory.",
+            "customer_action": "Prepare a timeline, document index, itemized amount list in IRR, and a list of unanswered questions before review.",
+            "knowledge_refs": ["S0_INTAKE", "S2_EVENT_CAUSATION", "S5_VALUATION_BASE", "S6_CONTRACT_ECONOMICS"]
+          },
+          {
+            "faq_id": "FAQ-NEXT-002",
+            "order": 2,
+            "priority": "P2",
+            "applies_to": ["ALL"],
+            "question": "What should I ask for if I disagree with the branch or amount?",
+            "answer_summary": "Ask for the classification basis, formula inputs, operator order, policy clauses, rule trace, and missing-evidence list.",
+            "answer": "A reviewable result should show why the branch was selected, each deduction/addition, every applied cap and guard, the authority used, and any unresolved scenario. A bare number is not enough to diagnose disagreement.",
+            "customer_action": "Compare the disclosed trace with your documents and request correction of a specific fact, source, branch, or operator rather than only disputing the final number.",
+            "knowledge_refs": ["S7_BRANCH_SELECTION", "S8_PARAMETER_LOCK", "S10_QUALITY_GATE", "G_UNCERTAINTY_MUST_SURFACE"]
+          },
+          {
+            "faq_id": "FAQ-NEXT-003",
+            "order": 3,
+            "priority": "P2",
+            "applies_to": ["ALL"],
+            "question": "What happens when my case is outside the certified model?",
+            "answer_summary": "It should be marked not certified or escalated, not forced into the nearest branch.",
+            "answer": "A new peril, insurer product, policy version, missing annual source, or unsupported rule belongs in the human-review and knowledge-governance process. Reaching that state is safer than presenting an invented payment.",
+            "customer_action": "Request the exact unsupported scope and the document, authority, adapter, or review needed to add it safely.",
+            "knowledge_refs": ["T6", "S10_QUALITY_GATE"]
+          }
+        ]
+      }
+    ]
+  },
+  "persian": {
+    "language": "fa",
+    "direction": "rtl",
+    "categories": [
+      {
+        "category_id": "CAT-01_START_SCOPE",
+        "rank": 1,
+        "priority": "P0",
+        "title": "از اینجا شروع کنید: هدف، دامنه و محدودیت‌ها",
+        "purpose": "پیش از اتکا به هر مبلغ، روشن می‌کند مدل بیمه بدنه چه چیزی را می‌تواند توضیح دهد.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-SCOPE-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "این مدل برای توضیح چه نوع خسارت‌هایی مناسب است؟",
+            "answer_summary": "برای خسارت مالی وارد به خودروی بیمه‌شده تحت پوشش بیمه بدنه است.",
+            "answer": "دامنه فعلی شامل خسارت جزئی، خسارت کلی، شکست مستقل شیشه و سرقت است. خسارت بدنی، مسئولیت مالی شخص ثالث، محاسبات ماده ۸ و رجوع حقوقی باید در پرونده و قواعد جداگانه بررسی شوند.",
+            "customer_action": "ابتدا مطمئن شوید پرسش درباره خسارت خودروی بیمه‌شده است؛ اگر مسئولیت ثالث یا رجوع حقوقی هم وجود دارد، پرونده جداگانه بخواهید.",
+            "knowledge_refs": ["S0_INTAKE", "S7_BRANCH_SELECTION", "PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"]
+          },
+          {
+            "faq_id": "FAQ-STATUS-001",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "آیا پاسخ مدل، تصمیم رسمی شرکت بیمه برای پرداخت است؟",
+            "answer_summary": "خیر؛ این سامانه ابزار پژوهشی و پشتیبان تصمیم کارشناس است، نه مرجع پرداخت خودکار.",
+            "answer": "مدل می‌تواند اطلاعات را مرتب کند، شاخه محتمل را تشخیص دهد، فرمول را توضیح دهد و نقص مدرک یا ابهام قاعده را نشان دهد. تسویه واقعی همچنان به فرایند شرکت بیمه، مدارک اصیل و بازبینی انسان مجاز نیاز دارد.",
+            "customer_action": "از نتیجه برای آماده‌سازی پرسش‌ها و مدارک استفاده کنید و پیش از اتکا به مبلغ، تأیید شرکت بیمه یا بازبین واجد صلاحیت را بگیرید.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "T6"]
+          },
+          {
+            "faq_id": "FAQ-PROCESS-001",
+            "order": 3,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "چرا مدل بلافاصله مبلغ خسارت را اعلام نمی‌کند؟",
+            "answer_summary": "زیرا پیش از محاسبه باید نوع پرونده تشخیص داده و پذیرش آن کامل شود.",
+            "answer": "پوشش، علت، استثناها، شاخه، متن بیمه‌نامه، تاریخ‌ها، ارزش‌گذاری، فرانشیز و سایر ورودی‌های مؤثر بر مبلغ باید ابتدا مشخص شوند. حدس هرکدام ممکن است فرمول نادرست یا دقت کاذب ایجاد کند.",
+            "customer_action": "پیش از درخواست محاسبه، اطلاعات ناقص مرحله تشخیص و پذیرش را تکمیل کنید.",
+            "knowledge_refs": ["S3_EXCLUSION_GATE", "S4_DAMAGE_SCOPE", "S6_CONTRACT_ECONOMICS", "S10_QUALITY_GATE"]
+          },
+          {
+            "faq_id": "FAQ-UNIT-001",
+            "order": 4,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "واحد پول در محاسبات چیست؟",
+            "answer_summary": "همه مبالغ ذخیره و محاسبه‌شده، ریال ایران و به‌صورت عدد صحیح نامنفی هستند.",
+            "answer": "تومان و میلیون تومان فقط برای نمایش به کار می‌روند. مخلوط کردن ریال، تومان و میلیون تومان می‌تواند مبلغ را ده برابر یا یک میلیون برابر تغییر دهد؛ بنابراین واحد باید در همه مراحل صریح باشد.",
+            "customer_action": "واحد هر مبلغ را بنویسید و پیش از مقایسه ورودی یا نتیجه، آن را به ریال تبدیل کنید.",
+            "knowledge_refs": ["PS_GROSS_DAMAGE", "PS_MARKET_VALUE", "PS_INSURED_SUM"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-02_RECOGNITION",
+        "rank": 2,
+        "priority": "P0",
+        "title": "تشخیص پرونده و انتخاب شاخه",
+        "purpose": "توضیح می‌دهد چگونه مدارک، نه برچسب انتخابی مشتری، مسیر محاسبه را تعیین می‌کنند.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-RECOG-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "مدل چگونه نوع پرونده بیمه بدنه را تشخیص می‌دهد؟",
+            "answer_summary": "شاخه را از رویداد، علت، نوع آسیب، وضعیت سرقت، ارزش‌گذاری و مدارک الحاقیه استخراج می‌کند.",
+            "answer": "مدل ابتدا مشخص می‌کند چه اتفاقی افتاده و علت خسارت چیست، سپس پوشش و مرزهای شاخه‌ها را می‌سنجد. شاخه استخراج‌شده با شاخه اعلامی پرونده تطبیق داده می‌شود و صرف اعلام یک عنوان، دلیل محسوب نمی‌شود.",
+            "customer_action": "رویداد و خسارت را دقیق شرح دهید و گزارش، عکس و اسناد بیمه‌نامه را ارائه کنید؛ فقط نام یک شاخه را انتخاب نکنید.",
+            "knowledge_refs": ["S2_EVENT_CAUSATION", "S4_DAMAGE_SCOPE", "S7_BRANCH_SELECTION"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "چهار شاخه پشتیبانی‌شده بیمه بدنه کدام‌اند؟",
+            "answer_summary": "خسارت جزئی، خسارت کلی، شکست شیشه به‌تنهایی و سرقت.",
+            "answer": "هر شاخه مدارک، آستانه‌ها، عملگرها و نتایج ممکن متفاوتی دارد. خسارت ناشی از تلاش برای سرقت معمولاً به خسارت جزئی می‌رود، اما سرقت کامل خودرو شرط زمانی و انتقال سند ویژه دارد.",
+            "customer_action": "توضیح شاخه‌ها را برای آشنایی بخوانید، اما مسیر واقعی را به نتیجه تشخیص مبتنی بر مدرک بسپارید.",
+            "knowledge_refs": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-003",
+            "order": 3,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "اگر شاخه نوشته‌شده در پرونده با مدارک ناسازگار باشد چه می‌شود؟",
+            "answer_summary": "محاسبه متوقف می‌شود، مگر اینکه تغییر شاخه با مجوز و مستندات کامل ثبت شود.",
+            "answer": "نتیجه تطبیق، تعارض یا کمبود مدرک خواهد بود و محاسبه شاخه مجاز نیست. تغییر مجاز فقط زمانی پذیرفتنی است که شخص مسئول، دلیل، زمان و منبع پشتیبان ثبت شده باشد.",
+            "customer_action": "از بازبین بخواهید مبنای شاخه استخراج‌شده را توضیح دهد و مدرک را اصلاح یا تغییر مجاز را رسمی ثبت کند.",
+            "knowledge_refs": ["S7_BRANCH_SELECTION", "S10_QUALITY_GATE", "G_NO_ASSUMED_CAUSATION"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-004",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
+            "question": "چه زمانی خسارت تعمیر به خسارت کلی تبدیل می‌شود؟",
+            "answer_summary": "فقط وقتی هزینه تعمیر و تعویض به‌علاوه هزینه نجات مربوط به آزمون، بیش از ۷۵٪ ارزش روز حادثه باشد.",
+            "answer": "برابری دقیق با ۷۵٪ خسارت کلی نیست. ارزش خودرو باید ارزش معاملاتی در تاریخ حادثه باشد و آزمون آستانه از فرمول نهایی تسویه جدا است.",
+            "customer_action": "ارزش روز حادثه و برآورد ریز تعمیر و تعویض را بگیرید و شرط «بیشتر از» را بررسی کنید.",
+            "knowledge_refs": ["REG53_ART19_TOTAL_LOSS_THRESHOLD", "PS_REPAIR_TOTAL", "PS_MARKET_VALUE"]
+          },
+          {
+            "faq_id": "FAQ-RECOG-005",
+            "order": 5,
+            "priority": "P0",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY", "THEFT"],
+            "question": "چرا خسارت شیشه و سرقت به چند مسیر تقسیم می‌شوند؟",
+            "answer_summary": "علت خسارت و نوع سرقت، شاخه و مدارک لازم را تغییر می‌دهد.",
+            "answer": "شیشه‌ای که همراه حادثه تحت پوشش دیگری شکسته باشد در خسارت جزئی قرار می‌گیرد؛ فقط شکست مستقل می‌تواند از پوشش شیشه استفاده کند. سرقت کامل، تلاش برای سرقت، سرقت قطعات و سرقت قطعات پس از حادثه نیز نتایج و نیازهای الحاقیه متفاوت دارند.",
+            "customer_action": "مشخص کنید شیشه به‌تنهایی شکسته یا همراه حادثه بوده و نوع دقیق سرقت را بر اساس گزارش پلیس و ارزیابی انتخاب کنید.",
+            "knowledge_refs": ["PS_GLASS_CAUSE_PRECEDENCE", "PS_THEFT_TYPE", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "REG53_ART5_ENDORSABLE_EXCLUSIONS"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-03_ACCEPTANCE",
+        "rank": 3,
+        "priority": "P0",
+        "title": "پذیرش: آیا محاسبه مجاز است؟",
+        "purpose": "پرونده تشخیص‌داده‌شده را از پرونده‌ای که برای محاسبه مدارک کافی دارد جدا می‌کند.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-ACCEPT-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "لایه بازبینی چه تصمیم‌هایی می‌تواند صادر کند؟",
+            "answer_summary": "COMPUTE، SCENARIO_SET، REFUSE یا INSUFFICIENT_INFORMATION.",
+            "answer": "COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SET همه تفسیرهای مجاز را نگه می‌دارد. REFUSE یعنی مانع پوشش اثبات شده و INSUFFICIENT_INFORMATION یعنی واقعیت، مدرک، تاریخ، ارزش‌گذاری یا شرط بیمه‌نامه لازم موجود نیست.",
+            "customer_action": "پیش از مبلغ، نوع تصمیم را بخوانید و اقدام مربوط به اطلاعات ناقص یا بازبینی را انجام دهید.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "G_UNCERTAINTY_MUST_SURFACE"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "تفاوت رد خسارت با ناکافی بودن اطلاعات چیست؟",
+            "answer_summary": "رد یعنی مانع پرداخت اثبات شده؛ ناکافی بودن یعنی هنوز امکان تصمیم وجود ندارد.",
+            "answer": "علت غیرقابل جبران اثبات‌شده یا خطر بدون الحاقیه می‌تواند پرداخت را منتفی کند. نبود گزارش، نامشخص بودن استثنا، نخواندن شرط بیمه‌نامه یا تاریخ حل‌نشده دلیل رد نیست و باید ناکافی باقی بماند.",
+            "customer_action": "برای اطلاعات ناکافی، مورد خواسته‌شده را تهیه کنید؛ برای رد، ماده و مدرک دقیق را مطالبه کنید.",
+            "knowledge_refs": ["S3_EXCLUSION_GATE", "REG53_ART5_ENDORSABLE_EXCLUSIONS", "REG53_ART6_NON_COMPENSABLE"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-003",
+            "order": 3,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "تصمیم COMPUTE چه معنایی دارد؟",
+            "answer_summary": "شاخه و همه ورودی‌های مؤثر بر مبلغ برای یک محاسبه مجاز، کامل هستند.",
+            "answer": "تصمیم COMPUTE برای نسخه دقیق و اعتبارسنجی‌شده پرونده، مجوز تغییرناپذیر ایجاد می‌کند. این تصمیم اصالت مدارک را تضمین نمی‌کند و سامانه پژوهشی را به مرجع رسمی پرداخت تبدیل نمی‌کند.",
+            "customer_action": "پیش از اتکا به عدد، شاخه، ورودی‌ها، نسخه منابع، ردپای قواعد و نام بازبین را کنترل کنید.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "T0"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-004",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "چه زمانی مجموعه سناریو مجاز است؟",
+            "answer_summary": "فقط وقتی واقعیت‌ها و مبالغ کامل‌اند اما ترتیب عملگرها بیش از یک تفسیر معتبر دارد.",
+            "answer": "مجموعه سناریو جایگزین فرانشیز، سال ساخت، ارزش‌گذاری، مدرک یا الحاقیه مفقود نیست. هر سناریو باید ترتیب عملگر خود را اعلام کند و سامانه نباید میانگین بگیرد یا یکی را پنهانی انتخاب کند.",
+            "customer_action": "کاربرگ شرکت بیمه، متن الحاقیه یا توضیح رسمی تعیین‌کننده ترتیب را درخواست کنید.",
+            "knowledge_refs": ["U01_ARTICLE10_PARTIAL_ORDER", "U11_GLASS_ARTICLE10_EXEMPTION", "G_UNCERTAINTY_MUST_SURFACE"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-005",
+            "order": 5,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "کدام ورودی‌های مفقود بیشتر باعث توقف محاسبه می‌شوند؟",
+            "answer_summary": "شرایط فرانشیز، تاریخ‌های لازم، سال ساخت، ارزش‌گذاری، متن الحاقیه و تاریخ‌های مستند سرقت.",
+            "answer": "این ورودی‌ها می‌توانند شاخه، کسورات، نسبت یا اصل زمان پرداخت را تغییر دهند. مدل آنها را به‌صورت مفقود یا مبهم ثبت می‌کند و با صفر، سال جاری یا رویه به‌یادمانده جایگزین نمی‌کند.",
+            "customer_action": "حسب مورد جدول بیمه‌نامه و الحاقیه، تاریخ حادثه و اعلام، سال خودرو، گزارش ارزیابی، ارزش بازار و اسناد سرقت را ارائه کنید.",
+            "knowledge_refs": ["PS_FRANCHISE", "PS_EVENT_DATE", "PS_PRODUCTION_YEAR", "PS_MARKET_VALUE", "PS_ENDORSEMENTS", "U13_THEFT_CLOCK_ANCHOR"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-04_CALCULATION",
+        "rank": 4,
+        "priority": "P1",
+        "title": "مبلغ چگونه محاسبه می‌شود؟",
+        "purpose": "عملگرهای اصلی بیمه بدنه را توضیح می‌دهد، بدون آنکه پاسخ مشتری را به مرجع محاسبه تبدیل کند.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-CALC-001",
+            "order": 1,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE"],
+            "question": "الگوی پایه محاسبه خسارت جزئی چیست؟",
+            "answer_summary": "قطعات قابل قبول و اجرت با استهلاک مجاز تعدیل می‌شوند، سپس ترتیب نسبت و فرانشیز اجرا و هزینه نجات مجاز افزوده می‌شود.",
+            "answer": "سقف قطعات خاص برای هر قلم اعمال و استهلاک قطعات تعویضی محاسبه می‌شود و اجرت نیز افزوده می‌شود. قاعده نسبی و فرانشیز طبق ترتیب تأییدشده گراف اجرا، هزینه نجات محدود و نتیجه حداقل صفر می‌شود.",
+            "customer_action": "ارزیابی ریزشده شامل قطعات، گروه قطعه، اجرت، استهلاک، شرایط فرانشیز، نسبت، نجات و ترتیب عملگرها را درخواست کنید.",
+            "knowledge_refs": ["PARTIAL_DAMAGE", "REG53_ART19B_PARTIAL_LOSS_BASE", "OP_SPECIAL_PART_CAP", "OP_DEPRECIATION_REPLACEMENT_PART", "OP_UNDERINSURANCE_RATIO", "OP_FRANCHISE", "OP_RESCUE_CAP"]
+          },
+          {
+            "faq_id": "FAQ-CALC-002",
+            "order": 2,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "استهلاک قطعات تعویضی چگونه اعمال می‌شود؟",
+            "answer_summary": "بر اساس شاخص سال خودرو محاسبه می‌شود؛ شیشه و چراغ از آن معاف‌اند و نرخ حداکثر ۲۵٪ است.",
+            "answer": "مدل پیش از شاخص سال پنجم صفر و سپس سالانه ۵٪ تا سقف ۲۵٪ اعمال می‌کند. اجرت تعمیر، استهلاک قطعه تعویضی نیست و تداخل سقف باتری/لاستیک با استهلاک در خودروهای قدیمی ممکن است مبهم بماند.",
+            "customer_action": "سال ساخت، سال حادثه، گروه قطعه، قیمت قطعه نو و تعویض یا تعمیر بودن آن را کنترل کنید.",
+            "knowledge_refs": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
+          },
+          {
+            "faq_id": "FAQ-CALC-003",
+            "order": 3,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "قاعده نسبی کم‌بیمه‌گی چیست؟",
+            "answer_summary": "برابر است با کمینه ۱ و نسبت سرمایه بیمه‌شده به ارزش روز حادثه؛ کسر ثابت نیست.",
+            "answer": "وقتی خودرو کمتر از ارزش روز بیمه شده باشد، این نسبت می‌تواند خسارت جزئی یا پوشش الحاقی را کاهش دهد. در خسارت کلی، مبنا از قبل کمینه ارزش بازار و سرمایه بیمه‌شده است؛ بنابراین نسبت نباید دوباره اعمال شود.",
+            "customer_action": "سرمایه مندرج در بیمه‌نامه را با ارزش مستند روز حادثه مقایسه و محل اعمال نسبت نسبت به فرانشیز را سؤال کنید.",
+            "knowledge_refs": ["REG53_ART20_NOTE2_UNDERINSURANCE_RATIO", "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO", "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS"]
+          },
+          {
+            "faq_id": "FAQ-CALC-004",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "آیا برای همه خسارت‌های بدنه یک نرخ فرانشیز عمومی وجود دارد؟",
+            "answer_summary": "خیر؛ فرانشیز باید از بیمه‌نامه، الحاقیه، محصول، سابقه خسارت و نسخه منبع مربوط گرفته شود.",
+            "answer": "مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی همچنین به مبنای محاسبه و حداقل احتمالی نیاز دارد؛ استفاده از نرخ بیمه‌گر یا نسخه دیگر ناامن است.",
+            "customer_action": "صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و مبنا و حداقل دقیق را درخواست کنید.",
+            "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "U02_FRANCHISE_BASE_SCHEDULES", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_UNIVERSAL_GLASS_FRANCHISE"]
+          },
+          {
+            "faq_id": "FAQ-CALC-005",
+            "order": 5,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
+            "question": "هزینه نجات و حمل چگونه محاسبه می‌شود؟",
+            "answer_summary": "هزینه واقعی متعارف فقط تا سقف ۲۰٪ مبنای مستند پذیرفته و افزوده می‌شود.",
+            "answer": "موتور مبلغ واقعی، مخرج انتخاب‌شده، سقف و مبلغ مجاز را ثبت می‌کند. معنای «کل خسارت» به‌عنوان مخرج در موارد مرزی می‌تواند مؤثر و همچنان ابهام صریح باشد.",
+            "customer_action": "فاکتورها را نگه دارید و بپرسید مخرج سقف، خسارت ارزیابی‌شده، خسارت قابل قبول یا مبنای تسویه بوده است.",
+            "knowledge_refs": ["REG53_RESCUE_TRANSPORT_CAP", "G_RESCUE_CAP_CEILING", "U05_RESCUE_DENOMINATOR", "PS_RESCUE_ACTUAL", "PS_RESCUE_CAP_BASE"]
+          },
+          {
+            "faq_id": "FAQ-CALC-006",
+            "order": 6,
+            "priority": "P1",
+            "applies_to": ["TOTAL_LOSS", "THEFT"],
+            "question": "تسویه خسارت کلی یا سرقت کامل واجد شرایط چگونه محاسبه می‌شود؟",
+            "answer_summary": "مبنای اولیه، کمینه ارزش روز حادثه و سرمایه بیمه‌شده است.",
+            "answer": "در خسارت کلی، اگر بیمه‌گذار لاشه را نگه دارد ارزش آن یک بار کسر می‌شود؛ اگر سند به بیمه‌گر منتقل شود، نباید دوباره کسر شود. فرانشیز و اضافات مجاز طبق برنامه معتبر اعمال، نتیجه حداقل صفر و سقف سرمایه بیمه‌شده رعایت می‌شود.",
+            "customer_action": "ارزش بازار، سرمایه بیمه‌شده، ارزش و وضعیت لاشه، وضعیت سند، فرانشیز و سقف نهایی را کنترل کنید.",
+            "knowledge_refs": ["REG53_ART19_TOTAL_LOSS_VALUATION", "REG53_ART19_INSURER_TAKES_TITLE", "G_SALVAGE_XOR_TITLE_TRANSFER", "G_INSURED_SUM_CEILING", "U12_SALVAGE_DISPOSITION"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-05_RESULTS_UNCERTAINTY",
+        "rank": 5,
+        "priority": "P1",
+        "title": "نتایج شاخه‌ها، سناریوها و اطمینان",
+        "purpose": "کمک می‌کند مبلغ قابل پرداخت از سناریو، انتظار، صفر، رد یا پرونده ناقص تفکیک شود.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-RESULT-001",
+            "order": 1,
+            "priority": "P1",
+            "applies_to": ["GLASS_ONLY"],
+            "question": "شکست شیشه به‌تنهایی چگونه بررسی می‌شود؟",
+            "answer_summary": "به شکست مستقل و الحاقیه مربوط نیاز دارد و استهلاک شیشه صفر است.",
+            "answer": "شیشه‌ای که بر اثر خطر اصلی بیمه بدنه آسیب دیده به خسارت جزئی می‌رود. بدون پوشش مستقل، نتیجه صفر با دلیل است؛ با پوشش، فرانشیز و کم‌بیمه‌گی تابع الحاقیه است و در صورت ابهام متن ممکن است چند سناریو لازم باشد.",
+            "customer_action": "متن الحاقیه و مدرکی ارائه کنید که نشان دهد شیشه مستقل یا همراه حادثه دیگری شکسته است.",
+            "knowledge_refs": ["GLASS_ONLY", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "U03_GLASS_ONLY_ENDORSEMENT_WORDING", "U11_GLASS_ARTICLE10_EXEMPTION", "U14_GLASS_INSURED_AT_VALUE_CONDITION"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["THEFT"],
+            "question": "سرقت کامل خودرو چه زمانی می‌تواند به تسویه برسد؟",
+            "answer_summary": "پس از احراز شرط شصت‌روزه با مبدأ مستند و انتقال سند لازم.",
+            "answer": "پیش از تحقق شرط، نتیجه در انتظار است؛ پس از تحقق شرط و بدون انتقال سند، انتقال سند لازم است. مدل فعلی عدد روز سپری‌شده را به‌تنهایی دلیل مبدأ قانونی ساعت نمی‌داند و مبدأ نامستند، مجوز محاسبه را متوقف می‌کند.",
+            "customer_action": "اسناد وقوع، اطلاع و اعلام سرقت، استعلام عدم کشف، تاریخ ارزیابی و مدرک انتقال سند را ارائه کنید.",
+            "knowledge_refs": ["THEFT", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "U13_THEFT_CLOCK_ANCHOR", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_TITLE_TRANSFER_PROOF"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-003",
+            "order": 3,
+            "priority": "P1",
+            "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
+            "question": "چرا به‌جای یک مبلغ، دو مبلغ دریافت کرده‌ام؟",
+            "answer_summary": "اطلاعات کامل است اما ترتیب معتبر قاعده نسبی و فرانشیز هنوز حل نشده است.",
+            "answer": "هر دو مبلغ از ترتیب‌های عملگر مجاز محاسبه و جدا نگه داشته می‌شوند. میانگین‌گیری یا انتخاب مبلغ بیشتر یا کمتر بدون مرجع، ابهام قاعده را پنهان می‌کند.",
+            "customer_action": "کاربرگ بیمه‌گر یا بند الحاقیه تعیین‌کننده ترتیب را درخواست کنید.",
+            "knowledge_refs": ["U01_ARTICLE10_PARTIAL_ORDER", "G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT", "T3"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-004",
+            "order": 4,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "تفاوت صفر، در انتظار، رد و اطلاعات ناکافی چیست؟",
+            "answer_summary": "اینها نتایج حقوقی و عملیاتی متفاوت‌اند و نباید همگی به‌صورت مبلغ خالی نمایش داده شوند.",
+            "answer": "صفر نتیجه محاسبه یا مسیر پوشش با دلیل است؛ در انتظار یعنی شرط هنوز کامل نشده؛ رد یعنی مانع اثبات شده؛ اطلاعات ناکافی یعنی داده لازم موجود نیست. هرکدام باید دلیل و اقدام بعدی جداگانه داشته باشد.",
+            "customer_action": "علاوه بر مبلغ، کد وضعیت و دلیل را مطالبه کنید.",
+            "knowledge_refs": ["T2", "T4", "S10_QUALITY_GATE"]
+          },
+          {
+            "faq_id": "FAQ-RESULT-005",
+            "order": 5,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "اطمینان نتیجه چه معنایی دارد؟",
+            "answer_summary": "ضعیف‌ترین وابستگی فرمول و کیفیت یا کامل بودن مدارک لازم را بازتاب می‌دهد.",
+            "answer": "اطمینان از قواعد واقعاً استفاده‌شده محاسبه می‌شود و ممکن است با ابهام زنده یا مدرک پیکربندی‌شده مفقود کاهش یابد. این عدد اصالت سند یا پذیرش آن توسط مرجع را تضمین نمی‌کند.",
+            "customer_action": "اطمینان فرمول، مدرک و مرجع را جدا بررسی و همه یافته‌های منشأ را بخوانید.",
+            "knowledge_refs": ["G_UNCERTAINTY_MUST_SURFACE", "S10_QUALITY_GATE", "EVT_ASSESSMENT_REPORT", "EVT_POLICY_COPY"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-06_EVIDENCE_DOCUMENTS",
+        "rank": 6,
+        "priority": "P1",
+        "title": "مدارک، شواهد و شرایط بیمه‌نامه",
+        "purpose": "اسناد لازم برای تشخیص و محاسبه و مواردی را که مدل اصالت‌سنجی نمی‌کند مشخص می‌کند.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-EVID-001",
+            "order": 1,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "ابتدا چه مدارکی را آماده کنم؟",
+            "answer_summary": "فرم خسارت، بیمه‌نامه و الحاقیه کامل، ارزیابی، مدرک ارزش بازار، عکس‌ها، گواهینامه و گزارش مرجع مرتبط.",
+            "answer": "فهرست دقیق با شاخه تغییر می‌کند. سرقت به گزارش پلیس، عدم کشف و سند نیاز دارد؛ خسارت کلی به ارزش لاشه؛ تعمیر به فاکتور یا برآورد ریز؛ و شیشه مستقل به متن الحاقیه نیاز دارد.",
+            "customer_action": "از فهرست مدارک مفقود شاخه استفاده و نسخه‌های کامل و تاریخ‌دار را ارائه کنید، نه فقط نام سند را.",
+            "knowledge_refs": ["EVT_CLAIM_FORM", "EVT_POLICY_COPY", "EVT_ENDORSEMENT_WORDING", "EVT_ASSESSMENT_REPORT", "EVT_MARKET_VALUE_EVIDENCE", "EVT_PHOTOS", "EVT_LICENCE"]
+          },
+          {
+            "faq_id": "FAQ-EVID-002",
+            "order": 2,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "چرا متن کامل بیمه‌نامه اهمیت دارد؟",
+            "answer_summary": "فرانشیز، دامنه الحاقیه، سقف‌ها، حداقل‌ها، شرایط ارزش‌گذاری و نسخه محصول می‌تواند نتیجه را تغییر دهد.",
+            "answer": "شماره بیمه‌نامه یا نام شرکت به‌تنهایی شرایط مالی را اثبات نمی‌کند. مدل نرخ یا شرط شیشه و سرقت را از شرکت، محصول، سابقه خسارت یا نسخه دیگری کپی نمی‌کند.",
+            "customer_action": "صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و همه الحاقیه‌های مرتبط همراه تاریخ و نسخه را ارائه کنید.",
+            "knowledge_refs": ["EVT_POLICY_COPY", "EVT_ENDORSEMENT_WORDING", "U02_FRANCHISE_BASE_SCHEDULES", "U03_GLASS_ONLY_ENDORSEMENT_WORDING"]
+          },
+          {
+            "faq_id": "FAQ-EVID-003",
+            "order": 3,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "آیا ثبت یک سند یعنی مدل اصالت و کفایت آن را تأیید کرده است؟",
+            "answer_summary": "خیر؛ دروازه فعلی وجود سند را ثبت می‌کند، نه تمام هویت، صادرکننده، نسخه، هش یا کفایت حقوقی آن را.",
+            "answer": "بازبین انسانی باید اصالت، کامل بودن، ارتباط، تاریخ‌ها و تعارض‌ها را بررسی کند. نقشه راه پیش از گواهی تولید، فراداده قوی‌تر سند و کنترل تمامیت منبع را لازم می‌داند.",
+            "customer_action": "از بازبین بخواهید هویت سند، صادرکننده، تاریخ، نسخه و واقعیت یا قاعده‌ای را که اثبات می‌کند مشخص کند.",
+            "knowledge_refs": ["S10_QUALITY_GATE", "EVT_POLICY_COPY", "EVT_ASSESSMENT_REPORT"]
+          },
+          {
+            "faq_id": "FAQ-EVID-004",
+            "order": 4,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "آیا وبلاگ، جدول بازار یا پرسش متداول شرکت دیگر می‌تواند نرخ مرا تعیین کند؟",
+            "answer_summary": "خیر؛ منبع کم‌اعتبار می‌تواند پرسش ایجاد کند اما شرط بیمه‌نامه اجرایی را ایجاد یا نقض نمی‌کند.",
+            "answer": "مدل قانون، آیین‌نامه، بخشنامه، بیمه‌نامه و الحاقیه قابل اعمال و رویه تاریخ‌دار بیمه‌گر را اولویت می‌دهد. محتوای آموزشی یا نسخه آینه‌ای نباید فرانشیز، مبدأ ساعت، فرمول یا ترتیب عملگر بسازد.",
+            "customer_action": "سند رسمی یا بیمه‌نامه قابل اعمال خود را مطالبه کنید و موارد نامطمئن را حل‌نشده نگه دارید.",
+            "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_GUESSED_ENDORSEMENT_TERMS"]
+          }
+        ]
+      },
+      {
+        "category_id": "CAT-07_NEXT_STEPS",
+        "rank": 7,
+        "priority": "P2",
+        "title": "آماده‌سازی، اختلاف و اقدام بعدی",
+        "purpose": "توضیح مدل را به اقدام امن و قابل بازبینی مشتری تبدیل می‌کند.",
+        "faqs": [
+          {
+            "faq_id": "FAQ-NEXT-001",
+            "order": 1,
+            "priority": "P1",
+            "applies_to": ["ALL"],
+            "question": "چگونه پرونده را برای بازبینی مفید آماده کنم؟",
+            "answer_summary": "خلاصه زمانی تهیه و بیمه‌نامه، مدارک، ارزش‌گذاری و مبالغ را بر اساس منبع مرتب کنید.",
+            "answer": "آنچه می‌دانید، آنچه سند اثبات می‌کند، موارد نامعلوم و اطلاعات ارائه‌شده توسط بیمه‌گر یا ارزیاب را جدا کنید. نرخ، تاریخ یا شرط مفقود را از حافظه پر نکنید.",
+            "customer_action": "پیش از بازبینی، خط زمانی، فهرست اسناد، جدول مبالغ ریزشده به ریال و پرسش‌های بی‌پاسخ را آماده کنید.",
+            "knowledge_refs": ["S0_INTAKE", "S2_EVENT_CAUSATION", "S5_VALUATION_BASE", "S6_CONTRACT_ECONOMICS"]
+          },
+          {
+            "faq_id": "FAQ-NEXT-002",
+            "order": 2,
+            "priority": "P2",
+            "applies_to": ["ALL"],
+            "question": "اگر با شاخه یا مبلغ مخالف باشم چه اطلاعاتی درخواست کنم؟",
+            "answer_summary": "مبنای طبقه‌بندی، ورودی‌های فرمول، ترتیب عملگر، بندهای بیمه‌نامه، ردپای قواعد و فهرست مدارک مفقود را بخواهید.",
+            "answer": "نتیجه قابل بازبینی باید دلیل انتخاب شاخه، هر کسر و اضافه، همه سقف‌ها و کنترل‌ها، مرجع استفاده‌شده و سناریوی حل‌نشده را نشان دهد. یک عدد تنها برای تشخیص اختلاف کافی نیست.",
+            "customer_action": "ردپا را با اسناد خود مقایسه و اصلاح یک واقعیت، منبع، شاخه یا عملگر مشخص را درخواست کنید، نه فقط مخالفت با عدد نهایی.",
+            "knowledge_refs": ["S7_BRANCH_SELECTION", "S8_PARAMETER_LOCK", "S10_QUALITY_GATE", "G_UNCERTAINTY_MUST_SURFACE"]
+          },
+          {
+            "faq_id": "FAQ-NEXT-003",
+            "order": 3,
+            "priority": "P2",
+            "applies_to": ["ALL"],
+            "question": "اگر پرونده خارج از دامنه تأییدشده مدل باشد چه می‌شود؟",
+            "answer_summary": "باید «تأییدنشده» یا نیازمند ارجاع ثبت شود، نه اینکه به نزدیک‌ترین شاخه تحمیل شود.",
+            "answer": "خطر جدید، محصول جدید بیمه‌گر، نسخه جدید بیمه‌نامه، منبع سالانه مفقود یا قاعده پشتیبانی‌نشده باید وارد فرایند بازبینی انسانی و حاکمیت دانش شود. این وضعیت امن‌تر از ارائه مبلغ ساختگی است.",
+            "customer_action": "دامنه پشتیبانی‌نشده و سند، مرجع، آداپتور یا بازبینی لازم برای افزودن امن آن را درخواست کنید.",
+            "knowledge_refs": ["T6", "S10_QUALITY_GATE"]
+          }
+        ]
+      }
+    ]
+  }
+}

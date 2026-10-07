@@ -16,6 +16,9 @@ questionnaire and graph-generated diagrams remain in
 [BODY_CASE_REVIEW_MODEL.md](BODY_CASE_REVIEW_MODEL.md); the full legal and
 calculation explanation remains in
 [BODY_CLAIM_ACCEPTANCE_MODEL.md](BODY_CLAIM_ACCEPTANCE_MODEL.md).
+The prioritized bilingual customer explanation is in
+[CUSTOMER_FAQ.md](CUSTOMER_FAQ.md), generated from
+[`knowledge/customer_faq.json`](../knowledge/customer_faq.json).
 
 ## 1. General summary
 

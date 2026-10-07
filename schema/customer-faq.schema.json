@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/iran-auto-claim/customer-faq.schema.json",
+  "title": "Bilingual customer FAQ",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["metadata", "priority_scales", "hierarchy", "english", "persian"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "status", "scope", "mode", "may_bind_claim_parameters", "may_calculate"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "status": {"const": "RESEARCH_AND_ADJUSTER_DECISION_SUPPORT"},
+        "scope": {"const": "BODY_ONLY"},
+        "mode": {"const": "EXPLANATORY_ONLY"},
+        "may_bind_claim_parameters": {"const": false},
+        "may_calculate": {"const": false}
+      }
+    },
+    "priority_scales": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["categories", "questions"],
+      "properties": {
+        "categories": {"$ref": "#/$defs/priorityScale"},
+        "questions": {"$ref": "#/$defs/priorityScale"}
+      }
+    },
+    "hierarchy": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "category_id", "priority", "depends_on"],
+        "properties": {
+          "rank": {"type": "integer", "minimum": 1},
+          "category_id": {"type": "string", "pattern": "^CAT-[0-9]{2}_[A-Z_]+$"},
+          "priority": {"enum": ["P0", "P1", "P2"]},
+          "depends_on": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "english": {"$ref": "#/$defs/language"},
+    "persian": {"$ref": "#/$defs/language"}
+  },
+  "$defs": {
+    "priorityScale": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["priority", "meaning"],
+        "properties": {
+          "priority": {"enum": ["P0", "P1", "P2"]},
+          "meaning": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "faq": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["faq_id", "order", "priority", "applies_to", "question", "answer_summary", "answer", "customer_action", "knowledge_refs"],
+      "properties": {
+        "faq_id": {"type": "string", "pattern": "^FAQ-[A-Z]+-[0-9]{3}$"},
+        "order": {"type": "integer", "minimum": 1},
+        "priority": {"enum": ["P0", "P1", "P2"]},
+        "applies_to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"enum": ["ALL", "PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"]}
+        },
+        "question": {"type": "string", "minLength": 1},
+        "answer_summary": {"type": "string", "minLength": 1},
+        "answer": {"type": "string", "minLength": 1},
+        "customer_action": {"type": "string", "minLength": 1},
+        "knowledge_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "category": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category_id", "rank", "priority", "title", "purpose", "faqs"],
+      "properties": {
+        "category_id": {"type": "string"},
+        "rank": {"type": "integer", "minimum": 1},
+        "priority": {"enum": ["P0", "P1", "P2"]},
+        "title": {"type": "string", "minLength": 1},
+        "purpose": {"type": "string", "minLength": 1},
+        "faqs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/faq"}}
+      }
+    },
+    "language": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "direction", "categories"],
+      "properties": {
+        "language": {"enum": ["en", "fa"]},
+        "direction": {"enum": ["ltr", "rtl"]},
+        "categories": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/category"}}
+      }
+    }
+  }
+}

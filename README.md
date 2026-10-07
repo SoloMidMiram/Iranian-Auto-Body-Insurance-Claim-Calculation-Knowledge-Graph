@@ -133,6 +133,9 @@ plan, phase gates, and import-ready GitHub backlog are maintained in:
 * [`docs/BODY_MODEL_OVERVIEW.md`](docs/BODY_MODEL_OVERVIEW.md) — one end-to-end
   flowchart plus the recognition, acceptance, authorization, calculation, and
   response patterns.
+* [`docs/CUSTOMER_FAQ.md`](docs/CUSTOMER_FAQ.md) — prioritized customer-facing
+  recognition and calculation questions in English followed by corresponding
+  Persian answers; generated from `knowledge/customer_faq.json`.
 * [`docs/VALIDATION_GATES.md`](docs/VALIDATION_GATES.md) — universal invariants,
   branch-specific boundary cases, and phase acceptance evidence.
 * [`planning/issues.json`](planning/issues.json) — stable roadmap issue IDs,
