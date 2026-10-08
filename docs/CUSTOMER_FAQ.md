@@ -13,21 +13,21 @@ evidence, and `P2` categories explain follow-up and escalation.
 | Rank | Category | Priority | Depends on |
 |---:|---|---|---|
 | 1 | Start here: purpose, scope, and limits (`CAT-01_START_SCOPE`) | P0 | — |
-| 2 | Case recognition and branch selection (`CAT-02_RECOGNITION`) | P0 | `CAT-01_START_SCOPE` |
-| 3 | Acceptance: whether calculation is allowed (`CAT-03_ACCEPTANCE`) | P0 | `CAT-02_RECOGNITION` |
-| 4 | How the amount is calculated (`CAT-04_CALCULATION`) | P1 | `CAT-03_ACCEPTANCE` |
-| 5 | Branch outcomes, scenarios, and confidence (`CAT-05_RESULTS_UNCERTAINTY`) | P1 | `CAT-04_CALCULATION` |
-| 6 | Documents, evidence, and policy terms (`CAT-06_EVIDENCE_DOCUMENTS`) | P1 | `CAT-03_ACCEPTANCE` |
-| 7 | Preparation, disagreement, and next steps (`CAT-07_NEXT_STEPS`) | P2 | `CAT-05_RESULTS_UNCERTAINTY`, `CAT-06_EVIDENCE_DOCUMENTS` |
+| 2 | Prepare the file: documents, evidence, and policy terms (`CAT-06_EVIDENCE_DOCUMENTS`) | P0 | `CAT-01_START_SCOPE` |
+| 3 | Case recognition and branch selection (`CAT-02_RECOGNITION`) | P0 | `CAT-06_EVIDENCE_DOCUMENTS` |
+| 4 | Acceptance: whether calculation is allowed (`CAT-03_ACCEPTANCE`) | P0 | `CAT-02_RECOGNITION` |
+| 5 | How the amount is calculated (`CAT-04_CALCULATION`) | P1 | `CAT-03_ACCEPTANCE` |
+| 6 | Branch outcomes, scenarios, and confidence (`CAT-05_RESULTS_UNCERTAINTY`) | P1 | `CAT-04_CALCULATION` |
+| 7 | Preparation, disagreement, and next steps (`CAT-07_NEXT_STEPS`) | P2 | `CAT-05_RESULTS_UNCERTAINTY` |
 
 ```text
 Start and scope
-└─ Recognition
-   └─ Acceptance
-      ├─ Calculation
-      │  └─ Results, scenarios, and confidence
-      └─ Evidence and documents
-         └─ Next steps and review
+└─ Evidence and documents
+   └─ Recognition
+      └─ Acceptance
+         └─ Calculation
+            └─ Results, scenarios, and confidence
+               └─ Next steps and review
 ```
 
 ## English FAQ
@@ -76,7 +76,51 @@ Toman and million-toman values are presentation conversions only. Mixing rial, t
 
 **Knowledge-model links:** `PS_GROSS_DAMAGE`, `PS_MARKET_VALUE`, `PS_INSURED_SUM`
 
-### 2. Case recognition and branch selection — P0
+### 2. Prepare the file: documents, evidence, and policy terms — P0
+
+Collect the records needed for recognition and acceptance before interpreting any calculation.
+
+#### FAQ-EVID-001 · P0 · Which documents should I prepare first?
+
+**Short answer:** Start with the claim form, complete policy and endorsements, assessment, market-value evidence, photographs, licence, and event-specific authority reports.
+
+The exact list changes by branch. Theft needs police/non-discovery and title records; total loss needs salvage evidence; repair claims need itemized invoices or estimates; standalone glass needs the endorsement wording.
+
+**Customer action:** Use the branch's missing-evidence list and supply complete dated copies, not only document names.
+
+**Knowledge-model links:** `EVT_CLAIM_FORM`, `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `EVT_ASSESSMENT_REPORT`, `EVT_MARKET_VALUE_EVIDENCE`, `EVT_PHOTOS`, `EVT_LICENCE`
+
+#### FAQ-EVID-002 · P0 · Why is the full policy wording important?
+
+**Short answer:** Franchise, endorsement scope, limits, minimums, valuation conditions, and product version can change the result.
+
+A policy number or insurer name alone does not establish the applicable economics. The model refuses to copy a rate or glass/theft condition from another company, product, claim sequence, or policy vintage.
+
+**Customer action:** Provide the declarations page, private conditions, franchise schedule, and every relevant endorsement with version/effective dates.
+
+**Knowledge-model links:** `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `U02_FRANCHISE_BASE_SCHEDULES`, `U03_GLASS_ONLY_ENDORSEMENT_WORDING`
+
+#### FAQ-EVID-003 · P1 · Does listing a document mean the model verified that it is authentic and sufficient?
+
+**Short answer:** No. The current gate records evidence presence, not full identity, issuer, version, hash, or legal sufficiency.
+
+A human reviewer must still check authenticity, completeness, relevance, dates, and conflicts. The roadmap requires stronger document metadata and source-integrity controls before production certification.
+
+**Customer action:** Ask the reviewer to identify the document, issuer, date, version, and the exact fact or rule it supports.
+
+**Knowledge-model links:** `S10_QUALITY_GATE`, `EVT_POLICY_COPY`, `EVT_ASSESSMENT_REPORT`
+
+#### FAQ-EVID-004 · P1 · Can a blog, market table, or another insurer's FAQ set my rate?
+
+**Short answer:** No. Lower-authority material may identify a question but cannot create or override an executable policy term.
+
+The model prioritizes applicable statute, regulation, circular, policy/endorsement, and dated insurer procedure. Educational material or mirrors must not invent a franchise, clock anchor, formula, or operator order.
+
+**Customer action:** Request the official instrument or your own applicable policy document and keep uncertain material marked as unresolved.
+
+**Knowledge-model links:** `REG53_POLICY_DEFINED_FRANCHISE`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_GUESSED_ENDORSEMENT_TERMS`
+
+### 3. Case recognition and branch selection — P0
 
 Explain how evidence, rather than a customer-entered label, selects the calculation route.
 
@@ -130,7 +174,7 @@ Glass broken with another covered event belongs to partial damage; only independ
 
 **Knowledge-model links:** `PS_GLASS_CAUSE_PRECEDENCE`, `PS_THEFT_TYPE`, `REG53_ART19_THEFT_TOTAL_LOSS_60D`, `REG53_ART5_ENDORSABLE_EXCLUSIONS`
 
-### 3. Acceptance: whether calculation is allowed — P0
+### 4. Acceptance: whether calculation is allowed — P0
 
 Separate a recognized claim from a claim that is sufficiently supported to calculate.
 
@@ -154,6 +198,16 @@ A supported non-compensable cause or uncovered endorsed risk may defeat payment.
 
 **Knowledge-model links:** `S3_EXCLUSION_GATE`, `REG53_ART5_ENDORSABLE_EXCLUSIONS`, `REG53_ART6_NON_COMPENSABLE`
 
+#### FAQ-ACCEPT-005 · P0 · Which missing inputs most often stop a body calculation?
+
+**Short answer:** Policy franchise terms, applicable dates, production year, valuation, endorsement wording, and sourced theft-clock facts.
+
+These inputs can change the branch, deductions, ratio, or whether payment is due at all. The model records them as missing or uncertain rather than replacing them with zero, the current year, or a remembered market practice.
+
+**Customer action:** Provide the policy schedule and endorsements, event and notice dates, vehicle year, assessment, market valuation, and theft records as applicable.
+
+**Knowledge-model links:** `PS_FRANCHISE`, `PS_EVENT_DATE`, `PS_PRODUCTION_YEAR`, `PS_MARKET_VALUE`, `PS_ENDORSEMENTS`, `U13_THEFT_CLOCK_ANCHOR`
+
 #### FAQ-ACCEPT-003 · P0 · What does COMPUTE mean?
 
 **Short answer:** The recognized branch and all required amount-affecting inputs are complete enough for one authorized calculation.
@@ -174,19 +228,19 @@ A scenario set is not a substitute for a missing franchise, vehicle year, valuat
 
 **Knowledge-model links:** `U01_ARTICLE10_PARTIAL_ORDER`, `U11_GLASS_ARTICLE10_EXEMPTION`, `G_UNCERTAINTY_MUST_SURFACE`
 
-#### FAQ-ACCEPT-005 · P0 · Which missing inputs most often stop a body calculation?
-
-**Short answer:** Policy franchise terms, applicable dates, production year, valuation, endorsement wording, and sourced theft-clock facts.
-
-These inputs can change the branch, deductions, ratio, or whether payment is due at all. The model records them as missing or uncertain rather than replacing them with zero, the current year, or a remembered market practice.
-
-**Customer action:** Provide the policy schedule and endorsements, event and notice dates, vehicle year, assessment, market valuation, and theft records as applicable.
-
-**Knowledge-model links:** `PS_FRANCHISE`, `PS_EVENT_DATE`, `PS_PRODUCTION_YEAR`, `PS_MARKET_VALUE`, `PS_ENDORSEMENTS`, `U13_THEFT_CLOCK_ANCHOR`
-
-### 4. How the amount is calculated — P1
+### 5. How the amount is calculated — P1
 
 Explain the main body operators without turning customer answers into calculation authority.
+
+#### FAQ-CALC-004 · P0 · Is there one universal franchise rate for all body claims?
+
+**Short answer:** No. Franchise must come from the applicable policy, endorsement, product, claim sequence, and source version.
+
+The regulation does not create one universal body or glass percentage. A percentage also needs a calculation base and any minimum; using a remembered rate from another insurer or policy version is unsafe.
+
+**Customer action:** Request the policy declarations page, private conditions, endorsement schedule, and the exact franchise base and minimum.
+
+**Knowledge-model links:** `REG53_POLICY_DEFINED_FRANCHISE`, `U02_FRANCHISE_BASE_SCHEDULES`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_UNIVERSAL_GLASS_FRANCHISE`
 
 #### FAQ-CALC-001 · P1 · What is the basic partial-damage calculation pattern?
 
@@ -218,16 +272,6 @@ When the vehicle is insured below its event-day value, the ratio can reduce a pa
 
 **Knowledge-model links:** `REG53_ART20_NOTE2_UNDERINSURANCE_RATIO`, `ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO`, `G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS`
 
-#### FAQ-CALC-004 · P0 · Is there one universal franchise rate for all body claims?
-
-**Short answer:** No. Franchise must come from the applicable policy, endorsement, product, claim sequence, and source version.
-
-The regulation does not create one universal body or glass percentage. A percentage also needs a calculation base and any minimum; using a remembered rate from another insurer or policy version is unsafe.
-
-**Customer action:** Request the policy declarations page, private conditions, endorsement schedule, and the exact franchise base and minimum.
-
-**Knowledge-model links:** `REG53_POLICY_DEFINED_FRANCHISE`, `U02_FRANCHISE_BASE_SCHEDULES`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_UNIVERSAL_GLASS_FRANCHISE`
-
 #### FAQ-CALC-005 · P1 · How are rescue and transport costs treated?
 
 **Short answer:** Reasonable actual cost is added only up to 20% of the sourced cap base.
@@ -248,9 +292,39 @@ For total loss, salvage is deducted once if the insured keeps it; if the insurer
 
 **Knowledge-model links:** `REG53_ART19_TOTAL_LOSS_VALUATION`, `REG53_ART19_INSURER_TAKES_TITLE`, `G_SALVAGE_XOR_TITLE_TRANSFER`, `G_INSURED_SUM_CEILING`, `U12_SALVAGE_DISPOSITION`
 
-### 5. Branch outcomes, scenarios, and confidence — P1
+### 6. Branch outcomes, scenarios, and confidence — P1
 
 Help customers distinguish a payable from a scenario, pending state, zero, refusal, or incomplete case.
+
+#### FAQ-RESULT-004 · P0 · How do zero, pending, refusal, and insufficient information differ?
+
+**Short answer:** They are different legal and operational outcomes and must not be shown as the same blank amount.
+
+Zero is a calculated or covered-route outcome with a reason; pending means a condition has not matured; refusal means a defeating fact is established; insufficiency means required information is missing. Each must retain its own reason and next action.
+
+**Customer action:** Ask for the status code and reason, not only the payable field.
+
+**Knowledge-model links:** `T2`, `T4`, `S10_QUALITY_GATE`
+
+#### FAQ-RESULT-003 · P1 · Why did I receive two amounts instead of one?
+
+**Short answer:** The facts are complete, but the authoritative order of underinsurance and franchise is unresolved.
+
+Both amounts are calculated from approved operator sequences and are kept separate. Averaging them or selecting the larger or smaller one without authority would hide the unresolved rule.
+
+**Customer action:** Request the insurer worksheet or endorsement clause that identifies the accepted operator order.
+
+**Knowledge-model links:** `U01_ARTICLE10_PARTIAL_ORDER`, `G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT`, `T3`
+
+#### FAQ-RESULT-005 · P1 · What does result confidence mean?
+
+**Short answer:** It is a decision-support signal, not proof that every amount-affecting dependency or document has been validated.
+
+The current result starts from traced rule confidence and can be capped by live uncertainty or missing configured evidence. The validation audit found that policy terms, assessor inputs, annual parameters, classification, and other dependencies are not yet represented completely, so confidence must not be read as certification or document authenticity.
+
+**Customer action:** Treat confidence as one warning signal; inspect the rule trace, missing dependencies, evidence status, and validation findings before relying on the amount.
+
+**Knowledge-model links:** `G_UNCERTAINTY_MUST_SURFACE`, `S10_QUALITY_GATE`, `EVT_ASSESSMENT_REPORT`, `EVT_POLICY_COPY`
 
 #### FAQ-RESULT-001 · P1 · How is standalone glass handled?
 
@@ -271,80 +345,6 @@ Before the condition is met, the outcome is pending; after it is met without tit
 **Customer action:** Provide theft occurrence/awareness/declaration records, the non-discovery enquiry, evaluation date, and title-transfer proof.
 
 **Knowledge-model links:** `THEFT`, `REG53_ART19_THEFT_TOTAL_LOSS_60D`, `U13_THEFT_CLOCK_ANCHOR`, `EVT_POLICE_STATION_REPORT`, `EVT_NON_DISCOVERY_ENQUIRY`, `EVT_TITLE_TRANSFER_PROOF`
-
-#### FAQ-RESULT-003 · P1 · Why did I receive two amounts instead of one?
-
-**Short answer:** The facts are complete, but the authoritative order of underinsurance and franchise is unresolved.
-
-Both amounts are calculated from approved operator sequences and are kept separate. Averaging them or selecting the larger or smaller one without authority would hide the unresolved rule.
-
-**Customer action:** Request the insurer worksheet or endorsement clause that identifies the accepted operator order.
-
-**Knowledge-model links:** `U01_ARTICLE10_PARTIAL_ORDER`, `G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT`, `T3`
-
-#### FAQ-RESULT-004 · P1 · How do zero, pending, refusal, and insufficient information differ?
-
-**Short answer:** They are different legal and operational outcomes and must not be shown as the same blank amount.
-
-Zero is a calculated or covered-route outcome with a reason; pending means a condition has not matured; refusal means a defeating fact is established; insufficiency means required information is missing. Each must retain its own reason and next action.
-
-**Customer action:** Ask for the status code and reason, not only the payable field.
-
-**Knowledge-model links:** `T2`, `T4`, `S10_QUALITY_GATE`
-
-#### FAQ-RESULT-005 · P1 · What does result confidence mean?
-
-**Short answer:** It reflects the weakest cited formula dependency and the quality/completeness of required evidence.
-
-Confidence is computed from the rules actually used and can be reduced by live uncertainty or missing configured evidence. It does not prove that a submitted document is genuine or that an authority will accept it.
-
-**Customer action:** Review formula, evidence, and authority confidence separately and read every provenance finding.
-
-**Knowledge-model links:** `G_UNCERTAINTY_MUST_SURFACE`, `S10_QUALITY_GATE`, `EVT_ASSESSMENT_REPORT`, `EVT_POLICY_COPY`
-
-### 6. Documents, evidence, and policy terms — P1
-
-Show which records support recognition and calculation and what the model does not authenticate.
-
-#### FAQ-EVID-001 · P0 · Which documents should I prepare first?
-
-**Short answer:** Start with the claim form, complete policy and endorsements, assessment, market-value evidence, photographs, licence, and event-specific authority reports.
-
-The exact list changes by branch. Theft needs police/non-discovery and title records; total loss needs salvage evidence; repair claims need itemized invoices or estimates; standalone glass needs the endorsement wording.
-
-**Customer action:** Use the branch's missing-evidence list and supply complete dated copies, not only document names.
-
-**Knowledge-model links:** `EVT_CLAIM_FORM`, `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `EVT_ASSESSMENT_REPORT`, `EVT_MARKET_VALUE_EVIDENCE`, `EVT_PHOTOS`, `EVT_LICENCE`
-
-#### FAQ-EVID-002 · P0 · Why is the full policy wording important?
-
-**Short answer:** Franchise, endorsement scope, limits, minimums, valuation conditions, and product version can change the result.
-
-A policy number or insurer name alone does not establish the applicable economics. The model refuses to copy a rate or glass/theft condition from another company, product, claim sequence, or policy vintage.
-
-**Customer action:** Provide the declarations page, private conditions, franchise schedule, and every relevant endorsement with version/effective dates.
-
-**Knowledge-model links:** `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `U02_FRANCHISE_BASE_SCHEDULES`, `U03_GLASS_ONLY_ENDORSEMENT_WORDING`
-
-#### FAQ-EVID-003 · P1 · Does listing a document mean the model verified that it is authentic and sufficient?
-
-**Short answer:** No. The current gate records evidence presence, not full identity, issuer, version, hash, or legal sufficiency.
-
-A human reviewer must still check authenticity, completeness, relevance, dates, and conflicts. The roadmap requires stronger document metadata and source-integrity controls before production certification.
-
-**Customer action:** Ask the reviewer to identify the document, issuer, date, version, and the exact fact or rule it supports.
-
-**Knowledge-model links:** `S10_QUALITY_GATE`, `EVT_POLICY_COPY`, `EVT_ASSESSMENT_REPORT`
-
-#### FAQ-EVID-004 · P1 · Can a blog, market table, or another insurer's FAQ set my rate?
-
-**Short answer:** No. Lower-authority material may identify a question but cannot create or override an executable policy term.
-
-The model prioritizes applicable statute, regulation, circular, policy/endorsement, and dated insurer procedure. Educational material or mirrors must not invent a franchise, clock anchor, formula, or operator order.
-
-**Customer action:** Request the official instrument or your own applicable policy document and keep uncertain material marked as unresolved.
-
-**Knowledge-model links:** `REG53_POLICY_DEFINED_FRANCHISE`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_GUESSED_ENDORSEMENT_TERMS`
 
 ### 7. Preparation, disagreement, and next steps — P2
 
@@ -370,9 +370,9 @@ A reviewable result should show why the branch was selected, each deduction/addi
 
 **Knowledge-model links:** `S7_BRANCH_SELECTION`, `S8_PARAMETER_LOCK`, `S10_QUALITY_GATE`, `G_UNCERTAINTY_MUST_SURFACE`
 
-#### FAQ-NEXT-003 · P2 · What happens when my case is outside the certified model?
+#### FAQ-NEXT-003 · P2 · What happens when my case is outside the model's current supported scope?
 
-**Short answer:** It should be marked not certified or escalated, not forced into the nearest branch.
+**Short answer:** It should be marked unsupported or escalated, not forced into the nearest branch.
 
 A new peril, insurer product, policy version, missing annual source, or unsupported rule belongs in the human-review and knowledge-governance process. Reaching that state is safer than presenting an invented payment.
 
@@ -428,7 +428,51 @@ A new peril, insurer product, policy version, missing annual source, or unsuppor
 
 **پیوند به مدل دانش:** `PS_GROSS_DAMAGE`, `PS_MARKET_VALUE`, `PS_INSURED_SUM`
 
-### 2. تشخیص پرونده و انتخاب شاخه — P0
+### 2. آماده‌سازی پرونده: مدارک، شواهد و شرایط بیمه‌نامه — P0
+
+پیش از تفسیر هر محاسبه، اسناد لازم برای تشخیص و پذیرش پرونده را گردآوری می‌کند.
+
+#### FAQ-EVID-001 · P0 · ابتدا چه مدارکی را آماده کنم؟
+
+**پاسخ کوتاه:** فرم خسارت، بیمه‌نامه و الحاقیه کامل، ارزیابی، مدرک ارزش بازار، عکس‌ها، گواهینامه و گزارش مرجع مرتبط.
+
+فهرست دقیق با شاخه تغییر می‌کند. سرقت به گزارش پلیس، عدم کشف و سند نیاز دارد؛ خسارت کلی به ارزش لاشه؛ تعمیر به فاکتور یا برآورد ریز؛ و شیشه مستقل به متن الحاقیه نیاز دارد.
+
+**اقدام بعدی مشتری:** از فهرست مدارک مفقود شاخه استفاده و نسخه‌های کامل و تاریخ‌دار را ارائه کنید، نه فقط نام سند را.
+
+**پیوند به مدل دانش:** `EVT_CLAIM_FORM`, `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `EVT_ASSESSMENT_REPORT`, `EVT_MARKET_VALUE_EVIDENCE`, `EVT_PHOTOS`, `EVT_LICENCE`
+
+#### FAQ-EVID-002 · P0 · چرا متن کامل بیمه‌نامه اهمیت دارد؟
+
+**پاسخ کوتاه:** فرانشیز، دامنه الحاقیه، سقف‌ها، حداقل‌ها، شرایط ارزش‌گذاری و نسخه محصول می‌تواند نتیجه را تغییر دهد.
+
+شماره بیمه‌نامه یا نام شرکت به‌تنهایی شرایط مالی را اثبات نمی‌کند. مدل نرخ یا شرط شیشه و سرقت را از شرکت، محصول، سابقه خسارت یا نسخه دیگری کپی نمی‌کند.
+
+**اقدام بعدی مشتری:** صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و همه الحاقیه‌های مرتبط همراه تاریخ و نسخه را ارائه کنید.
+
+**پیوند به مدل دانش:** `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `U02_FRANCHISE_BASE_SCHEDULES`, `U03_GLASS_ONLY_ENDORSEMENT_WORDING`
+
+#### FAQ-EVID-003 · P1 · آیا ثبت یک سند یعنی مدل اصالت و کفایت آن را تأیید کرده است؟
+
+**پاسخ کوتاه:** خیر؛ دروازه فعلی وجود سند را ثبت می‌کند، نه تمام هویت، صادرکننده، نسخه، هش یا کفایت حقوقی آن را.
+
+بازبین انسانی باید اصالت، کامل بودن، ارتباط، تاریخ‌ها و تعارض‌ها را بررسی کند. نقشه راه پیش از گواهی تولید، فراداده قوی‌تر سند و کنترل تمامیت منبع را لازم می‌داند.
+
+**اقدام بعدی مشتری:** از بازبین بخواهید هویت سند، صادرکننده، تاریخ، نسخه و واقعیت یا قاعده‌ای را که اثبات می‌کند مشخص کند.
+
+**پیوند به مدل دانش:** `S10_QUALITY_GATE`, `EVT_POLICY_COPY`, `EVT_ASSESSMENT_REPORT`
+
+#### FAQ-EVID-004 · P1 · آیا وبلاگ، جدول بازار یا پرسش متداول شرکت دیگر می‌تواند نرخ مرا تعیین کند؟
+
+**پاسخ کوتاه:** خیر؛ منبع کم‌اعتبار می‌تواند پرسش ایجاد کند اما شرط بیمه‌نامه اجرایی را ایجاد یا نقض نمی‌کند.
+
+مدل قانون، آیین‌نامه، بخشنامه، بیمه‌نامه و الحاقیه قابل اعمال و رویه تاریخ‌دار بیمه‌گر را اولویت می‌دهد. محتوای آموزشی یا نسخه آینه‌ای نباید فرانشیز، مبدأ ساعت، فرمول یا ترتیب عملگر بسازد.
+
+**اقدام بعدی مشتری:** سند رسمی یا بیمه‌نامه قابل اعمال خود را مطالبه کنید و موارد نامطمئن را حل‌نشده نگه دارید.
+
+**پیوند به مدل دانش:** `REG53_POLICY_DEFINED_FRANCHISE`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_GUESSED_ENDORSEMENT_TERMS`
+
+### 3. تشخیص پرونده و انتخاب شاخه — P0
 
 توضیح می‌دهد چگونه مدارک، نه برچسب انتخابی مشتری، مسیر محاسبه را تعیین می‌کنند.
 
@@ -482,7 +526,7 @@ A new peril, insurer product, policy version, missing annual source, or unsuppor
 
 **پیوند به مدل دانش:** `PS_GLASS_CAUSE_PRECEDENCE`, `PS_THEFT_TYPE`, `REG53_ART19_THEFT_TOTAL_LOSS_60D`, `REG53_ART5_ENDORSABLE_EXCLUSIONS`
 
-### 3. پذیرش: آیا محاسبه مجاز است؟ — P0
+### 4. پذیرش: آیا محاسبه مجاز است؟ — P0
 
 پرونده تشخیص‌داده‌شده را از پرونده‌ای که برای محاسبه مدارک کافی دارد جدا می‌کند.
 
@@ -506,6 +550,16 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پیوند به مدل دانش:** `S3_EXCLUSION_GATE`, `REG53_ART5_ENDORSABLE_EXCLUSIONS`, `REG53_ART6_NON_COMPENSABLE`
 
+#### FAQ-ACCEPT-005 · P0 · کدام ورودی‌های مفقود بیشتر باعث توقف محاسبه می‌شوند؟
+
+**پاسخ کوتاه:** شرایط فرانشیز، تاریخ‌های لازم، سال ساخت، ارزش‌گذاری، متن الحاقیه و تاریخ‌های مستند سرقت.
+
+این ورودی‌ها می‌توانند شاخه، کسورات، نسبت یا اصل زمان پرداخت را تغییر دهند. مدل آنها را به‌صورت مفقود یا مبهم ثبت می‌کند و با صفر، سال جاری یا رویه به‌یادمانده جایگزین نمی‌کند.
+
+**اقدام بعدی مشتری:** حسب مورد جدول بیمه‌نامه و الحاقیه، تاریخ حادثه و اعلام، سال خودرو، گزارش ارزیابی، ارزش بازار و اسناد سرقت را ارائه کنید.
+
+**پیوند به مدل دانش:** `PS_FRANCHISE`, `PS_EVENT_DATE`, `PS_PRODUCTION_YEAR`, `PS_MARKET_VALUE`, `PS_ENDORSEMENTS`, `U13_THEFT_CLOCK_ANCHOR`
+
 #### FAQ-ACCEPT-003 · P0 · تصمیم COMPUTE چه معنایی دارد؟
 
 **پاسخ کوتاه:** شاخه و همه ورودی‌های مؤثر بر مبلغ برای یک محاسبه مجاز، کامل هستند.
@@ -526,19 +580,19 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پیوند به مدل دانش:** `U01_ARTICLE10_PARTIAL_ORDER`, `U11_GLASS_ARTICLE10_EXEMPTION`, `G_UNCERTAINTY_MUST_SURFACE`
 
-#### FAQ-ACCEPT-005 · P0 · کدام ورودی‌های مفقود بیشتر باعث توقف محاسبه می‌شوند؟
-
-**پاسخ کوتاه:** شرایط فرانشیز، تاریخ‌های لازم، سال ساخت، ارزش‌گذاری، متن الحاقیه و تاریخ‌های مستند سرقت.
-
-این ورودی‌ها می‌توانند شاخه، کسورات، نسبت یا اصل زمان پرداخت را تغییر دهند. مدل آنها را به‌صورت مفقود یا مبهم ثبت می‌کند و با صفر، سال جاری یا رویه به‌یادمانده جایگزین نمی‌کند.
-
-**اقدام بعدی مشتری:** حسب مورد جدول بیمه‌نامه و الحاقیه، تاریخ حادثه و اعلام، سال خودرو، گزارش ارزیابی، ارزش بازار و اسناد سرقت را ارائه کنید.
-
-**پیوند به مدل دانش:** `PS_FRANCHISE`, `PS_EVENT_DATE`, `PS_PRODUCTION_YEAR`, `PS_MARKET_VALUE`, `PS_ENDORSEMENTS`, `U13_THEFT_CLOCK_ANCHOR`
-
-### 4. مبلغ چگونه محاسبه می‌شود؟ — P1
+### 5. مبلغ چگونه محاسبه می‌شود؟ — P1
 
 عملگرهای اصلی بیمه بدنه را توضیح می‌دهد، بدون آنکه پاسخ مشتری را به مرجع محاسبه تبدیل کند.
+
+#### FAQ-CALC-004 · P0 · آیا برای همه خسارت‌های بدنه یک نرخ فرانشیز عمومی وجود دارد؟
+
+**پاسخ کوتاه:** خیر؛ فرانشیز باید از بیمه‌نامه، الحاقیه، محصول، سابقه خسارت و نسخه منبع مربوط گرفته شود.
+
+مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی همچنین به مبنای محاسبه و حداقل احتمالی نیاز دارد؛ استفاده از نرخ بیمه‌گر یا نسخه دیگر ناامن است.
+
+**اقدام بعدی مشتری:** صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و مبنا و حداقل دقیق را درخواست کنید.
+
+**پیوند به مدل دانش:** `REG53_POLICY_DEFINED_FRANCHISE`, `U02_FRANCHISE_BASE_SCHEDULES`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_UNIVERSAL_GLASS_FRANCHISE`
 
 #### FAQ-CALC-001 · P1 · الگوی پایه محاسبه خسارت جزئی چیست؟
 
@@ -570,16 +624,6 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پیوند به مدل دانش:** `REG53_ART20_NOTE2_UNDERINSURANCE_RATIO`, `ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO`, `G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS`
 
-#### FAQ-CALC-004 · P0 · آیا برای همه خسارت‌های بدنه یک نرخ فرانشیز عمومی وجود دارد؟
-
-**پاسخ کوتاه:** خیر؛ فرانشیز باید از بیمه‌نامه، الحاقیه، محصول، سابقه خسارت و نسخه منبع مربوط گرفته شود.
-
-مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی همچنین به مبنای محاسبه و حداقل احتمالی نیاز دارد؛ استفاده از نرخ بیمه‌گر یا نسخه دیگر ناامن است.
-
-**اقدام بعدی مشتری:** صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و مبنا و حداقل دقیق را درخواست کنید.
-
-**پیوند به مدل دانش:** `REG53_POLICY_DEFINED_FRANCHISE`, `U02_FRANCHISE_BASE_SCHEDULES`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_UNIVERSAL_GLASS_FRANCHISE`
-
 #### FAQ-CALC-005 · P1 · هزینه نجات و حمل چگونه محاسبه می‌شود؟
 
 **پاسخ کوتاه:** هزینه واقعی متعارف فقط تا سقف ۲۰٪ مبنای مستند پذیرفته و افزوده می‌شود.
@@ -600,9 +644,39 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پیوند به مدل دانش:** `REG53_ART19_TOTAL_LOSS_VALUATION`, `REG53_ART19_INSURER_TAKES_TITLE`, `G_SALVAGE_XOR_TITLE_TRANSFER`, `G_INSURED_SUM_CEILING`, `U12_SALVAGE_DISPOSITION`
 
-### 5. نتایج شاخه‌ها، سناریوها و اطمینان — P1
+### 6. نتایج شاخه‌ها، سناریوها و اطمینان — P1
 
 کمک می‌کند مبلغ قابل پرداخت از سناریو، انتظار، صفر، رد یا پرونده ناقص تفکیک شود.
+
+#### FAQ-RESULT-004 · P0 · تفاوت صفر، در انتظار، رد و اطلاعات ناکافی چیست؟
+
+**پاسخ کوتاه:** اینها نتایج حقوقی و عملیاتی متفاوت‌اند و نباید همگی به‌صورت مبلغ خالی نمایش داده شوند.
+
+صفر نتیجه محاسبه یا مسیر پوشش با دلیل است؛ در انتظار یعنی شرط هنوز کامل نشده؛ رد یعنی مانع اثبات شده؛ اطلاعات ناکافی یعنی داده لازم موجود نیست. هرکدام باید دلیل و اقدام بعدی جداگانه داشته باشد.
+
+**اقدام بعدی مشتری:** علاوه بر مبلغ، کد وضعیت و دلیل را مطالبه کنید.
+
+**پیوند به مدل دانش:** `T2`, `T4`, `S10_QUALITY_GATE`
+
+#### FAQ-RESULT-003 · P1 · چرا به‌جای یک مبلغ، دو مبلغ دریافت کرده‌ام؟
+
+**پاسخ کوتاه:** اطلاعات کامل است اما ترتیب معتبر قاعده نسبی و فرانشیز هنوز حل نشده است.
+
+هر دو مبلغ از ترتیب‌های عملگر مجاز محاسبه و جدا نگه داشته می‌شوند. میانگین‌گیری یا انتخاب مبلغ بیشتر یا کمتر بدون مرجع، ابهام قاعده را پنهان می‌کند.
+
+**اقدام بعدی مشتری:** کاربرگ بیمه‌گر یا بند الحاقیه تعیین‌کننده ترتیب را درخواست کنید.
+
+**پیوند به مدل دانش:** `U01_ARTICLE10_PARTIAL_ORDER`, `G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT`, `T3`
+
+#### FAQ-RESULT-005 · P1 · اطمینان نتیجه چه معنایی دارد؟
+
+**پاسخ کوتاه:** یک نشانه پشتیبان تصمیم است، نه اثبات کامل بودن همه وابستگی‌های مبلغ یا اعتبار همه اسناد.
+
+اطمینان فعلی از قواعد موجود در ردپا آغاز می‌شود و ممکن است با ابهام زنده یا مدرک پیکربندی‌شده مفقود محدود شود. ممیزی اعتبارسنجی نشان داده است که شرایط بیمه‌نامه، ورودی ارزیاب، پارامتر سالانه، طبقه‌بندی و بعضی وابستگی‌های دیگر هنوز کامل در آن نمایان نیستند؛ بنابراین این عدد گواهی یا اصالت‌سنجی سند نیست.
+
+**اقدام بعدی مشتری:** اطمینان را فقط یک هشدار بدانید و پیش از اتکا به مبلغ، ردپای قواعد، وابستگی‌های مفقود، وضعیت مدارک و یافته‌های اعتبارسنجی را بررسی کنید.
+
+**پیوند به مدل دانش:** `G_UNCERTAINTY_MUST_SURFACE`, `S10_QUALITY_GATE`, `EVT_ASSESSMENT_REPORT`, `EVT_POLICY_COPY`
 
 #### FAQ-RESULT-001 · P1 · شکست شیشه به‌تنهایی چگونه بررسی می‌شود؟
 
@@ -623,80 +697,6 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 **اقدام بعدی مشتری:** اسناد وقوع، اطلاع و اعلام سرقت، استعلام عدم کشف، تاریخ ارزیابی و مدرک انتقال سند را ارائه کنید.
 
 **پیوند به مدل دانش:** `THEFT`, `REG53_ART19_THEFT_TOTAL_LOSS_60D`, `U13_THEFT_CLOCK_ANCHOR`, `EVT_POLICE_STATION_REPORT`, `EVT_NON_DISCOVERY_ENQUIRY`, `EVT_TITLE_TRANSFER_PROOF`
-
-#### FAQ-RESULT-003 · P1 · چرا به‌جای یک مبلغ، دو مبلغ دریافت کرده‌ام؟
-
-**پاسخ کوتاه:** اطلاعات کامل است اما ترتیب معتبر قاعده نسبی و فرانشیز هنوز حل نشده است.
-
-هر دو مبلغ از ترتیب‌های عملگر مجاز محاسبه و جدا نگه داشته می‌شوند. میانگین‌گیری یا انتخاب مبلغ بیشتر یا کمتر بدون مرجع، ابهام قاعده را پنهان می‌کند.
-
-**اقدام بعدی مشتری:** کاربرگ بیمه‌گر یا بند الحاقیه تعیین‌کننده ترتیب را درخواست کنید.
-
-**پیوند به مدل دانش:** `U01_ARTICLE10_PARTIAL_ORDER`, `G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT`, `T3`
-
-#### FAQ-RESULT-004 · P1 · تفاوت صفر، در انتظار، رد و اطلاعات ناکافی چیست؟
-
-**پاسخ کوتاه:** اینها نتایج حقوقی و عملیاتی متفاوت‌اند و نباید همگی به‌صورت مبلغ خالی نمایش داده شوند.
-
-صفر نتیجه محاسبه یا مسیر پوشش با دلیل است؛ در انتظار یعنی شرط هنوز کامل نشده؛ رد یعنی مانع اثبات شده؛ اطلاعات ناکافی یعنی داده لازم موجود نیست. هرکدام باید دلیل و اقدام بعدی جداگانه داشته باشد.
-
-**اقدام بعدی مشتری:** علاوه بر مبلغ، کد وضعیت و دلیل را مطالبه کنید.
-
-**پیوند به مدل دانش:** `T2`, `T4`, `S10_QUALITY_GATE`
-
-#### FAQ-RESULT-005 · P1 · اطمینان نتیجه چه معنایی دارد؟
-
-**پاسخ کوتاه:** ضعیف‌ترین وابستگی فرمول و کیفیت یا کامل بودن مدارک لازم را بازتاب می‌دهد.
-
-اطمینان از قواعد واقعاً استفاده‌شده محاسبه می‌شود و ممکن است با ابهام زنده یا مدرک پیکربندی‌شده مفقود کاهش یابد. این عدد اصالت سند یا پذیرش آن توسط مرجع را تضمین نمی‌کند.
-
-**اقدام بعدی مشتری:** اطمینان فرمول، مدرک و مرجع را جدا بررسی و همه یافته‌های منشأ را بخوانید.
-
-**پیوند به مدل دانش:** `G_UNCERTAINTY_MUST_SURFACE`, `S10_QUALITY_GATE`, `EVT_ASSESSMENT_REPORT`, `EVT_POLICY_COPY`
-
-### 6. مدارک، شواهد و شرایط بیمه‌نامه — P1
-
-اسناد لازم برای تشخیص و محاسبه و مواردی را که مدل اصالت‌سنجی نمی‌کند مشخص می‌کند.
-
-#### FAQ-EVID-001 · P0 · ابتدا چه مدارکی را آماده کنم؟
-
-**پاسخ کوتاه:** فرم خسارت، بیمه‌نامه و الحاقیه کامل، ارزیابی، مدرک ارزش بازار، عکس‌ها، گواهینامه و گزارش مرجع مرتبط.
-
-فهرست دقیق با شاخه تغییر می‌کند. سرقت به گزارش پلیس، عدم کشف و سند نیاز دارد؛ خسارت کلی به ارزش لاشه؛ تعمیر به فاکتور یا برآورد ریز؛ و شیشه مستقل به متن الحاقیه نیاز دارد.
-
-**اقدام بعدی مشتری:** از فهرست مدارک مفقود شاخه استفاده و نسخه‌های کامل و تاریخ‌دار را ارائه کنید، نه فقط نام سند را.
-
-**پیوند به مدل دانش:** `EVT_CLAIM_FORM`, `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `EVT_ASSESSMENT_REPORT`, `EVT_MARKET_VALUE_EVIDENCE`, `EVT_PHOTOS`, `EVT_LICENCE`
-
-#### FAQ-EVID-002 · P0 · چرا متن کامل بیمه‌نامه اهمیت دارد؟
-
-**پاسخ کوتاه:** فرانشیز، دامنه الحاقیه، سقف‌ها، حداقل‌ها، شرایط ارزش‌گذاری و نسخه محصول می‌تواند نتیجه را تغییر دهد.
-
-شماره بیمه‌نامه یا نام شرکت به‌تنهایی شرایط مالی را اثبات نمی‌کند. مدل نرخ یا شرط شیشه و سرقت را از شرکت، محصول، سابقه خسارت یا نسخه دیگری کپی نمی‌کند.
-
-**اقدام بعدی مشتری:** صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و همه الحاقیه‌های مرتبط همراه تاریخ و نسخه را ارائه کنید.
-
-**پیوند به مدل دانش:** `EVT_POLICY_COPY`, `EVT_ENDORSEMENT_WORDING`, `U02_FRANCHISE_BASE_SCHEDULES`, `U03_GLASS_ONLY_ENDORSEMENT_WORDING`
-
-#### FAQ-EVID-003 · P1 · آیا ثبت یک سند یعنی مدل اصالت و کفایت آن را تأیید کرده است؟
-
-**پاسخ کوتاه:** خیر؛ دروازه فعلی وجود سند را ثبت می‌کند، نه تمام هویت، صادرکننده، نسخه، هش یا کفایت حقوقی آن را.
-
-بازبین انسانی باید اصالت، کامل بودن، ارتباط، تاریخ‌ها و تعارض‌ها را بررسی کند. نقشه راه پیش از گواهی تولید، فراداده قوی‌تر سند و کنترل تمامیت منبع را لازم می‌داند.
-
-**اقدام بعدی مشتری:** از بازبین بخواهید هویت سند، صادرکننده، تاریخ، نسخه و واقعیت یا قاعده‌ای را که اثبات می‌کند مشخص کند.
-
-**پیوند به مدل دانش:** `S10_QUALITY_GATE`, `EVT_POLICY_COPY`, `EVT_ASSESSMENT_REPORT`
-
-#### FAQ-EVID-004 · P1 · آیا وبلاگ، جدول بازار یا پرسش متداول شرکت دیگر می‌تواند نرخ مرا تعیین کند؟
-
-**پاسخ کوتاه:** خیر؛ منبع کم‌اعتبار می‌تواند پرسش ایجاد کند اما شرط بیمه‌نامه اجرایی را ایجاد یا نقض نمی‌کند.
-
-مدل قانون، آیین‌نامه، بخشنامه، بیمه‌نامه و الحاقیه قابل اعمال و رویه تاریخ‌دار بیمه‌گر را اولویت می‌دهد. محتوای آموزشی یا نسخه آینه‌ای نباید فرانشیز، مبدأ ساعت، فرمول یا ترتیب عملگر بسازد.
-
-**اقدام بعدی مشتری:** سند رسمی یا بیمه‌نامه قابل اعمال خود را مطالبه کنید و موارد نامطمئن را حل‌نشده نگه دارید.
-
-**پیوند به مدل دانش:** `REG53_POLICY_DEFINED_FRANCHISE`, `G_NO_HARDCODED_FRANCHISE_RATE`, `G_NO_GUESSED_ENDORSEMENT_TERMS`
 
 ### 7. آماده‌سازی، اختلاف و اقدام بعدی — P2
 
@@ -722,9 +722,9 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پیوند به مدل دانش:** `S7_BRANCH_SELECTION`, `S8_PARAMETER_LOCK`, `S10_QUALITY_GATE`, `G_UNCERTAINTY_MUST_SURFACE`
 
-#### FAQ-NEXT-003 · P2 · اگر پرونده خارج از دامنه تأییدشده مدل باشد چه می‌شود؟
+#### FAQ-NEXT-003 · P2 · اگر پرونده خارج از دامنه فعلی پشتیبانی‌شده مدل باشد چه می‌شود؟
 
-**پاسخ کوتاه:** باید «تأییدنشده» یا نیازمند ارجاع ثبت شود، نه اینکه به نزدیک‌ترین شاخه تحمیل شود.
+**پاسخ کوتاه:** باید «پشتیبانی‌نشده» یا نیازمند ارجاع ثبت شود، نه اینکه به نزدیک‌ترین شاخه تحمیل شود.
 
 خطر جدید، محصول جدید بیمه‌گر، نسخه جدید بیمه‌نامه، منبع سالانه مفقود یا قاعده پشتیبانی‌نشده باید وارد فرایند بازبینی انسانی و حاکمیت دانش شود. این وضعیت امن‌تر از ارائه مبلغ ساختگی است.
 

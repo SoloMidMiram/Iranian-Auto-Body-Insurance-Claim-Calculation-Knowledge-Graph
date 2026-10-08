@@ -346,3 +346,21 @@ Suggested PR note
   calculation defects. RMV-001 through RMV-006 must be repaired, independently
   tested, or removed from supported scope before v0.1-body-model can pass its
   release gate.
+
+FAQ journey review — 2026-10-08
+================================
+
+- Reordered the customer journey to: scope -> evidence preparation ->
+  recognition -> acceptance -> calculation -> result interpretation -> next
+  action. Evidence is now a P0 prerequisite rather than a post-result appendix.
+- Reordered acceptance questions so missing blockers are understood before
+  COMPUTE and SCENARIO_SET; reordered calculation so the no-universal-franchise
+  warning precedes branch formulas; reordered results so status, scenarios, and
+  confidence precede branch-specific glass and theft outcomes.
+- Corrected the confidence answer so it does not imply complete dependency
+  provenance, and replaced "certified model" with "current supported scope."
+- Kept English and Persian IDs, priorities, applicability, references, and order
+  synchronized; bumped FAQ data to 1.1.0 and regenerated the Markdown view.
+- Made category and question order explicit data, added dependency-order checks,
+  rejected duplicate JSON keys, and added regression tests for the customer
+  journey and the three reordered question groups.

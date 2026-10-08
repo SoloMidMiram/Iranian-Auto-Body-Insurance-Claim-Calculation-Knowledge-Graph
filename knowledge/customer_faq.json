@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "status": "RESEARCH_AND_ADJUSTER_DECISION_SUPPORT",
     "scope": "BODY_ONLY",
     "mode": "EXPLANATORY_ONLY",
@@ -21,12 +21,12 @@
   },
   "hierarchy": [
     {"rank": 1, "category_id": "CAT-01_START_SCOPE", "priority": "P0", "depends_on": []},
-    {"rank": 2, "category_id": "CAT-02_RECOGNITION", "priority": "P0", "depends_on": ["CAT-01_START_SCOPE"]},
-    {"rank": 3, "category_id": "CAT-03_ACCEPTANCE", "priority": "P0", "depends_on": ["CAT-02_RECOGNITION"]},
-    {"rank": 4, "category_id": "CAT-04_CALCULATION", "priority": "P1", "depends_on": ["CAT-03_ACCEPTANCE"]},
-    {"rank": 5, "category_id": "CAT-05_RESULTS_UNCERTAINTY", "priority": "P1", "depends_on": ["CAT-04_CALCULATION"]},
-    {"rank": 6, "category_id": "CAT-06_EVIDENCE_DOCUMENTS", "priority": "P1", "depends_on": ["CAT-03_ACCEPTANCE"]},
-    {"rank": 7, "category_id": "CAT-07_NEXT_STEPS", "priority": "P2", "depends_on": ["CAT-05_RESULTS_UNCERTAINTY", "CAT-06_EVIDENCE_DOCUMENTS"]}
+    {"rank": 2, "category_id": "CAT-06_EVIDENCE_DOCUMENTS", "priority": "P0", "depends_on": ["CAT-01_START_SCOPE"]},
+    {"rank": 3, "category_id": "CAT-02_RECOGNITION", "priority": "P0", "depends_on": ["CAT-06_EVIDENCE_DOCUMENTS"]},
+    {"rank": 4, "category_id": "CAT-03_ACCEPTANCE", "priority": "P0", "depends_on": ["CAT-02_RECOGNITION"]},
+    {"rank": 5, "category_id": "CAT-04_CALCULATION", "priority": "P1", "depends_on": ["CAT-03_ACCEPTANCE"]},
+    {"rank": 6, "category_id": "CAT-05_RESULTS_UNCERTAINTY", "priority": "P1", "depends_on": ["CAT-04_CALCULATION"]},
+    {"rank": 7, "category_id": "CAT-07_NEXT_STEPS", "priority": "P2", "depends_on": ["CAT-05_RESULTS_UNCERTAINTY"]}
   ],
   "english": {
     "language": "en",
@@ -87,7 +87,7 @@
       },
       {
         "category_id": "CAT-02_RECOGNITION",
-        "rank": 2,
+        "rank": 3,
         "priority": "P0",
         "title": "Case recognition and branch selection",
         "purpose": "Explain how evidence, rather than a customer-entered label, selects the calculation route.",
@@ -151,7 +151,7 @@
       },
       {
         "category_id": "CAT-03_ACCEPTANCE",
-        "rank": 3,
+        "rank": 4,
         "priority": "P0",
         "title": "Acceptance: whether calculation is allowed",
         "purpose": "Separate a recognized claim from a claim that is sufficiently supported to calculate.",
@@ -180,7 +180,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-003",
-            "order": 3,
+            "order": 4,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "What does COMPUTE mean?",
@@ -191,7 +191,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-004",
-            "order": 4,
+            "order": 5,
             "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "When is a scenario set allowed?",
@@ -202,7 +202,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-005",
-            "order": 5,
+            "order": 3,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "Which missing inputs most often stop a body calculation?",
@@ -215,14 +215,14 @@
       },
       {
         "category_id": "CAT-04_CALCULATION",
-        "rank": 4,
+        "rank": 5,
         "priority": "P1",
         "title": "How the amount is calculated",
         "purpose": "Explain the main body operators without turning customer answers into calculation authority.",
         "faqs": [
           {
             "faq_id": "FAQ-CALC-001",
-            "order": 1,
+            "order": 2,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE"],
             "question": "What is the basic partial-damage calculation pattern?",
@@ -233,7 +233,7 @@
           },
           {
             "faq_id": "FAQ-CALC-002",
-            "order": 2,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "How does replacement-part depreciation work?",
@@ -244,7 +244,7 @@
           },
           {
             "faq_id": "FAQ-CALC-003",
-            "order": 3,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "What is the underinsurance ratio?",
@@ -255,7 +255,7 @@
           },
           {
             "faq_id": "FAQ-CALC-004",
-            "order": 4,
+            "order": 1,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "Is there one universal franchise rate for all body claims?",
@@ -290,14 +290,14 @@
       },
       {
         "category_id": "CAT-05_RESULTS_UNCERTAINTY",
-        "rank": 5,
+        "rank": 6,
         "priority": "P1",
         "title": "Branch outcomes, scenarios, and confidence",
         "purpose": "Help customers distinguish a payable from a scenario, pending state, zero, refusal, or incomplete case.",
         "faqs": [
           {
             "faq_id": "FAQ-RESULT-001",
-            "order": 1,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["GLASS_ONLY"],
             "question": "How is standalone glass handled?",
@@ -308,7 +308,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-002",
-            "order": 2,
+            "order": 5,
             "priority": "P0",
             "applies_to": ["THEFT"],
             "question": "When can whole-vehicle theft reach settlement?",
@@ -319,7 +319,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-003",
-            "order": 3,
+            "order": 2,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "Why did I receive two amounts instead of one?",
@@ -330,8 +330,8 @@
           },
           {
             "faq_id": "FAQ-RESULT-004",
-            "order": 4,
-            "priority": "P1",
+            "order": 1,
+            "priority": "P0",
             "applies_to": ["ALL"],
             "question": "How do zero, pending, refusal, and insufficient information differ?",
             "answer_summary": "They are different legal and operational outcomes and must not be shown as the same blank amount.",
@@ -341,23 +341,23 @@
           },
           {
             "faq_id": "FAQ-RESULT-005",
-            "order": 5,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["ALL"],
             "question": "What does result confidence mean?",
-            "answer_summary": "It reflects the weakest cited formula dependency and the quality/completeness of required evidence.",
-            "answer": "Confidence is computed from the rules actually used and can be reduced by live uncertainty or missing configured evidence. It does not prove that a submitted document is genuine or that an authority will accept it.",
-            "customer_action": "Review formula, evidence, and authority confidence separately and read every provenance finding.",
+            "answer_summary": "It is a decision-support signal, not proof that every amount-affecting dependency or document has been validated.",
+            "answer": "The current result starts from traced rule confidence and can be capped by live uncertainty or missing configured evidence. The validation audit found that policy terms, assessor inputs, annual parameters, classification, and other dependencies are not yet represented completely, so confidence must not be read as certification or document authenticity.",
+            "customer_action": "Treat confidence as one warning signal; inspect the rule trace, missing dependencies, evidence status, and validation findings before relying on the amount.",
             "knowledge_refs": ["G_UNCERTAINTY_MUST_SURFACE", "S10_QUALITY_GATE", "EVT_ASSESSMENT_REPORT", "EVT_POLICY_COPY"]
           }
         ]
       },
       {
         "category_id": "CAT-06_EVIDENCE_DOCUMENTS",
-        "rank": 6,
-        "priority": "P1",
-        "title": "Documents, evidence, and policy terms",
-        "purpose": "Show which records support recognition and calculation and what the model does not authenticate.",
+        "rank": 2,
+        "priority": "P0",
+        "title": "Prepare the file: documents, evidence, and policy terms",
+        "purpose": "Collect the records needed for recognition and acceptance before interpreting any calculation.",
         "faqs": [
           {
             "faq_id": "FAQ-EVID-001",
@@ -439,8 +439,8 @@
             "order": 3,
             "priority": "P2",
             "applies_to": ["ALL"],
-            "question": "What happens when my case is outside the certified model?",
-            "answer_summary": "It should be marked not certified or escalated, not forced into the nearest branch.",
+            "question": "What happens when my case is outside the model's current supported scope?",
+            "answer_summary": "It should be marked unsupported or escalated, not forced into the nearest branch.",
             "answer": "A new peril, insurer product, policy version, missing annual source, or unsupported rule belongs in the human-review and knowledge-governance process. Reaching that state is safer than presenting an invented payment.",
             "customer_action": "Request the exact unsupported scope and the document, authority, adapter, or review needed to add it safely.",
             "knowledge_refs": ["T6", "S10_QUALITY_GATE"]
@@ -508,7 +508,7 @@
       },
       {
         "category_id": "CAT-02_RECOGNITION",
-        "rank": 2,
+        "rank": 3,
         "priority": "P0",
         "title": "تشخیص پرونده و انتخاب شاخه",
         "purpose": "توضیح می‌دهد چگونه مدارک، نه برچسب انتخابی مشتری، مسیر محاسبه را تعیین می‌کنند.",
@@ -572,7 +572,7 @@
       },
       {
         "category_id": "CAT-03_ACCEPTANCE",
-        "rank": 3,
+        "rank": 4,
         "priority": "P0",
         "title": "پذیرش: آیا محاسبه مجاز است؟",
         "purpose": "پرونده تشخیص‌داده‌شده را از پرونده‌ای که برای محاسبه مدارک کافی دارد جدا می‌کند.",
@@ -601,7 +601,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-003",
-            "order": 3,
+            "order": 4,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "تصمیم COMPUTE چه معنایی دارد؟",
@@ -612,7 +612,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-004",
-            "order": 4,
+            "order": 5,
             "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "چه زمانی مجموعه سناریو مجاز است؟",
@@ -623,7 +623,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-005",
-            "order": 5,
+            "order": 3,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "کدام ورودی‌های مفقود بیشتر باعث توقف محاسبه می‌شوند؟",
@@ -636,14 +636,14 @@
       },
       {
         "category_id": "CAT-04_CALCULATION",
-        "rank": 4,
+        "rank": 5,
         "priority": "P1",
         "title": "مبلغ چگونه محاسبه می‌شود؟",
         "purpose": "عملگرهای اصلی بیمه بدنه را توضیح می‌دهد، بدون آنکه پاسخ مشتری را به مرجع محاسبه تبدیل کند.",
         "faqs": [
           {
             "faq_id": "FAQ-CALC-001",
-            "order": 1,
+            "order": 2,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE"],
             "question": "الگوی پایه محاسبه خسارت جزئی چیست؟",
@@ -654,7 +654,7 @@
           },
           {
             "faq_id": "FAQ-CALC-002",
-            "order": 2,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "استهلاک قطعات تعویضی چگونه اعمال می‌شود؟",
@@ -665,7 +665,7 @@
           },
           {
             "faq_id": "FAQ-CALC-003",
-            "order": 3,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "قاعده نسبی کم‌بیمه‌گی چیست؟",
@@ -676,7 +676,7 @@
           },
           {
             "faq_id": "FAQ-CALC-004",
-            "order": 4,
+            "order": 1,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "آیا برای همه خسارت‌های بدنه یک نرخ فرانشیز عمومی وجود دارد؟",
@@ -711,14 +711,14 @@
       },
       {
         "category_id": "CAT-05_RESULTS_UNCERTAINTY",
-        "rank": 5,
+        "rank": 6,
         "priority": "P1",
         "title": "نتایج شاخه‌ها، سناریوها و اطمینان",
         "purpose": "کمک می‌کند مبلغ قابل پرداخت از سناریو، انتظار، صفر، رد یا پرونده ناقص تفکیک شود.",
         "faqs": [
           {
             "faq_id": "FAQ-RESULT-001",
-            "order": 1,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["GLASS_ONLY"],
             "question": "شکست شیشه به‌تنهایی چگونه بررسی می‌شود؟",
@@ -729,7 +729,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-002",
-            "order": 2,
+            "order": 5,
             "priority": "P0",
             "applies_to": ["THEFT"],
             "question": "سرقت کامل خودرو چه زمانی می‌تواند به تسویه برسد؟",
@@ -740,7 +740,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-003",
-            "order": 3,
+            "order": 2,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "چرا به‌جای یک مبلغ، دو مبلغ دریافت کرده‌ام؟",
@@ -751,8 +751,8 @@
           },
           {
             "faq_id": "FAQ-RESULT-004",
-            "order": 4,
-            "priority": "P1",
+            "order": 1,
+            "priority": "P0",
             "applies_to": ["ALL"],
             "question": "تفاوت صفر، در انتظار، رد و اطلاعات ناکافی چیست؟",
             "answer_summary": "اینها نتایج حقوقی و عملیاتی متفاوت‌اند و نباید همگی به‌صورت مبلغ خالی نمایش داده شوند.",
@@ -762,23 +762,23 @@
           },
           {
             "faq_id": "FAQ-RESULT-005",
-            "order": 5,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["ALL"],
             "question": "اطمینان نتیجه چه معنایی دارد؟",
-            "answer_summary": "ضعیف‌ترین وابستگی فرمول و کیفیت یا کامل بودن مدارک لازم را بازتاب می‌دهد.",
-            "answer": "اطمینان از قواعد واقعاً استفاده‌شده محاسبه می‌شود و ممکن است با ابهام زنده یا مدرک پیکربندی‌شده مفقود کاهش یابد. این عدد اصالت سند یا پذیرش آن توسط مرجع را تضمین نمی‌کند.",
-            "customer_action": "اطمینان فرمول، مدرک و مرجع را جدا بررسی و همه یافته‌های منشأ را بخوانید.",
+            "answer_summary": "یک نشانه پشتیبان تصمیم است، نه اثبات کامل بودن همه وابستگی‌های مبلغ یا اعتبار همه اسناد.",
+            "answer": "اطمینان فعلی از قواعد موجود در ردپا آغاز می‌شود و ممکن است با ابهام زنده یا مدرک پیکربندی‌شده مفقود محدود شود. ممیزی اعتبارسنجی نشان داده است که شرایط بیمه‌نامه، ورودی ارزیاب، پارامتر سالانه، طبقه‌بندی و بعضی وابستگی‌های دیگر هنوز کامل در آن نمایان نیستند؛ بنابراین این عدد گواهی یا اصالت‌سنجی سند نیست.",
+            "customer_action": "اطمینان را فقط یک هشدار بدانید و پیش از اتکا به مبلغ، ردپای قواعد، وابستگی‌های مفقود، وضعیت مدارک و یافته‌های اعتبارسنجی را بررسی کنید.",
             "knowledge_refs": ["G_UNCERTAINTY_MUST_SURFACE", "S10_QUALITY_GATE", "EVT_ASSESSMENT_REPORT", "EVT_POLICY_COPY"]
           }
         ]
       },
       {
         "category_id": "CAT-06_EVIDENCE_DOCUMENTS",
-        "rank": 6,
-        "priority": "P1",
-        "title": "مدارک، شواهد و شرایط بیمه‌نامه",
-        "purpose": "اسناد لازم برای تشخیص و محاسبه و مواردی را که مدل اصالت‌سنجی نمی‌کند مشخص می‌کند.",
+        "rank": 2,
+        "priority": "P0",
+        "title": "آماده‌سازی پرونده: مدارک، شواهد و شرایط بیمه‌نامه",
+        "purpose": "پیش از تفسیر هر محاسبه، اسناد لازم برای تشخیص و پذیرش پرونده را گردآوری می‌کند.",
         "faqs": [
           {
             "faq_id": "FAQ-EVID-001",
@@ -860,8 +860,8 @@
             "order": 3,
             "priority": "P2",
             "applies_to": ["ALL"],
-            "question": "اگر پرونده خارج از دامنه تأییدشده مدل باشد چه می‌شود؟",
-            "answer_summary": "باید «تأییدنشده» یا نیازمند ارجاع ثبت شود، نه اینکه به نزدیک‌ترین شاخه تحمیل شود.",
+            "question": "اگر پرونده خارج از دامنه فعلی پشتیبانی‌شده مدل باشد چه می‌شود؟",
+            "answer_summary": "باید «پشتیبانی‌نشده» یا نیازمند ارجاع ثبت شود، نه اینکه به نزدیک‌ترین شاخه تحمیل شود.",
             "answer": "خطر جدید، محصول جدید بیمه‌گر، نسخه جدید بیمه‌نامه، منبع سالانه مفقود یا قاعده پشتیبانی‌نشده باید وارد فرایند بازبینی انسانی و حاکمیت دانش شود. این وضعیت امن‌تر از ارائه مبلغ ساختگی است.",
             "customer_action": "دامنه پشتیبانی‌نشده و سند، مرجع، آداپتور یا بازبینی لازم برای افزودن امن آن را درخواست کنید.",
             "knowledge_refs": ["T6", "S10_QUALITY_GATE"]

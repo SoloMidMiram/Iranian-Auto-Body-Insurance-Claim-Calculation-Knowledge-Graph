@@ -20,17 +20,29 @@ PRIORITIES = ("P0", "P1", "P2")
 BODY_SCOPES = {"ALL", "PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"}
 
 
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def load_faq(root: Path = ROOT) -> dict[str, Any]:
-    return json.loads((root / "knowledge" / "customer_faq.json").read_text(encoding="utf-8"))
+    return json.loads(
+        (root / "knowledge" / "customer_faq.json").read_text(encoding="utf-8"),
+        object_pairs_hook=_unique_object,
+    )
 
 
 def _language_index(section: dict[str, Any]) -> tuple[list[str], list[str], dict[str, dict[str, Any]]]:
     category_ids: list[str] = []
     faq_ids: list[str] = []
     faqs: dict[str, dict[str, Any]] = {}
-    for category in section.get("categories") or []:
+    for category in sorted(section.get("categories") or [], key=lambda item: item.get("rank", 0)):
         category_ids.append(str(category.get("category_id")))
-        for faq in category.get("faqs") or []:
+        for faq in sorted(category.get("faqs") or [], key=lambda item: item.get("order", 0)):
             faq_id = str(faq.get("faq_id"))
             faq_ids.append(faq_id)
             faqs[faq_id] = faq
@@ -59,19 +71,25 @@ def validate_faq(data: dict[str, Any], kb: Knowledge) -> list[str]:
     if len(hierarchy_ids) != len(set(hierarchy_ids)):
         issues.append("hierarchy contains duplicate category ids")
     known_categories = set(hierarchy_ids)
+    rank_by_category = {str(item.get("category_id")): item.get("rank") for item in hierarchy}
     for item in hierarchy:
         if item.get("priority") not in PRIORITIES:
             issues.append(f"hierarchy {item.get('category_id')}: unknown priority")
         for dependency in item.get("depends_on") or []:
             if dependency not in known_categories:
                 issues.append(f"hierarchy {item.get('category_id')}: unknown dependency {dependency}")
+            elif rank_by_category[dependency] >= item.get("rank", 0):
+                issues.append(
+                    f"hierarchy {item.get('category_id')}: dependency {dependency} "
+                    "must appear earlier in the customer journey"
+                )
 
     indices: dict[str, tuple[list[str], list[str], dict[str, dict[str, Any]]]] = {}
     for language, expected_direction in (("english", "ltr"), ("persian", "rtl")):
         section = data.get(language) or {}
         if section.get("direction") != expected_direction:
             issues.append(f"{language}.direction must be {expected_direction}")
-        categories = section.get("categories") or []
+        categories = sorted(section.get("categories") or [], key=lambda item: item.get("rank", 0))
         category_ids, faq_ids, faqs = _language_index(section)
         indices[language] = (category_ids, faq_ids, faqs)
         if category_ids != hierarchy_ids:
@@ -85,8 +103,8 @@ def validate_faq(data: dict[str, Any], kb: Knowledge) -> list[str]:
             if category.get("priority") != hierarchy_item.get("priority"):
                 issues.append(f"{language} {category_id}: priority differs from hierarchy")
             orders = [faq.get("order") for faq in category.get("faqs") or []]
-            if orders != list(range(1, len(orders) + 1)):
-                issues.append(f"{language} {category_id}: FAQ order must be contiguous from 1")
+            if sorted(orders) != list(range(1, len(orders) + 1)):
+                issues.append(f"{language} {category_id}: FAQ order must be unique and contiguous from 1")
             for faq in category.get("faqs") or []:
                 faq_id = faq.get("faq_id", "<missing>")
                 for field in ("question", "answer_summary", "answer", "customer_action"):
@@ -124,7 +142,7 @@ def _render_language(title: str, section: dict[str, Any], *, rtl: bool) -> list[
     lines = [f"## {title}", ""]
     if rtl:
         lines.extend(["<div dir=\"rtl\">", ""])
-    for category in section["categories"]:
+    for category in sorted(section["categories"], key=lambda item: item["rank"]):
         lines.extend(
             [
                 f"### {category['rank']}. {category['title']} — {category['priority']}",
@@ -133,7 +151,7 @@ def _render_language(title: str, section: dict[str, Any], *, rtl: bool) -> list[
                 "",
             ]
         )
-        for faq in category["faqs"]:
+        for faq in sorted(category["faqs"], key=lambda item: item["order"]):
             lines.extend(
                 [
                     f"#### {faq['faq_id']} · {faq['priority']} · {faq['question']}",
@@ -184,12 +202,12 @@ def render_faq(data: dict[str, Any]) -> str:
             "",
             "```text",
             "Start and scope",
-            "└─ Recognition",
-            "   └─ Acceptance",
-            "      ├─ Calculation",
-            "      │  └─ Results, scenarios, and confidence",
-            "      └─ Evidence and documents",
-            "         └─ Next steps and review",
+            "└─ Evidence and documents",
+            "   └─ Recognition",
+            "      └─ Acceptance",
+            "         └─ Calculation",
+            "            └─ Results, scenarios, and confidence",
+            "               └─ Next steps and review",
             "```",
             "",
         ]
