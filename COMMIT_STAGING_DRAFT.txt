@@ -3,8 +3,10 @@ Updated: 2026-10-08
 Local branch: docs/body-model-validation
 Remote branch: docs/body-model-validation
 Consolidation base: PR #46 head 5b1d06e2cd97c5e1832ccc4d830c703a954e6a50
-New PR: pending publication
-Status: READY TO PUBLISH
+New PR: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/pull/47
+Local content commit: 6fc40928a734610ed88dd67327a94363bfc988f4
+Initial remote content commit: d82a2b6d0d96790a4273c400b0d2673059fc40d9
+Status: OPEN; REPOSITORY GATE PENDING
 
 Branch organization
 ===================
@@ -16,7 +18,11 @@ Branch organization
 - Runtime source changes are intentionally absent. The audit documents defects;
   it does not present them as repaired.
 - `.qwen/` and `tests/# Objective.md` are local workspace/task artifacts and are
-  intentionally excluded from the commit.
+  intentionally excluded from the commit and ignored by the repository.
+- The terminal Git remote has no HTTPS credentials. The connected GitHub
+  integration published the remote branch from PR #46's exact head. The local
+  branch carries the same consolidated work but has independent commit history
+  and no upstream configured; do not force-push it over the remote branch.
 
 ## Outcome
 
