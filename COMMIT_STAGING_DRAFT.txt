@@ -2,19 +2,27 @@ Body-runtime blocker repair draft
 Updated: 2026-10-08
 Local branch: fix/body-runtime-blockers
 Remote branch: fix/body-runtime-blockers
-Stacked base: docs/body-model-validation (PR #47)
+PR base: main at 37b1765af89121bf04ef590f729f1cd861e3c254
 PR: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/pull/48
 Local content commit: 5f68176f429c11e83842f9d58f2c802a7888310f
 Remote content commit: 466a1fd70d899b1d0da4ca5aa0249d7a6f9d242a
 Shared content tree: e4fadb034139f0084bb64fb3752db46cf3021fb6
-Repository gate: PASS — run 37769582813
-Status: OPEN; MERGEABLE; LOCAL AND REMOTE GATES PASSED
+Local remediation commit: d1e980c8ac5a48a093f162990500b8eb8ba78403
+Remote remediation commit: f476b0457ff4e6fa9aabfc5573d105a26218d59d
+Shared remediation tree: 2356b0c0263fda9af24ffec755f8e06c45417735
+PR #47 merge commit: 37b1765af89121bf04ef590f729f1cd861e3c254
+Active release tracker: #49
+Repository gate: PASS — run 37804524791
+Status: OPEN; MERGEABLE; NOT MERGED; PENDING HUMAN/DOMAIN ACCEPTANCE REVIEW
 
 Runtime outcome
 ===============
 
 - RMV-004: percentage franchises now require a typed calculation base, execute
-  against the named branch operand, and record the selected base/value.
+  against the named branch operand, and record the selected base/value. For
+  total loss, SETTLEMENT_BASE is min(market, insured) before salvage, while
+  AFTER_SALVAGE subtracts applicable salvage. With retained salvage of 300, the
+  discriminating 10% regression produces franchise amounts 200 and 170.
 - RMV-006: missing Article 10 anchors, aggregate depreciation, materially
   different rescue denominator, and salvage disposition fail closed instead of
   acquiring benign defaults. Legacy fixtures now state their assumptions.
@@ -29,8 +37,10 @@ Runtime outcome
   bare intoxication token cannot deny without the causal authority finding.
 - RMV-008 (theft-clock slice): whole-theft calculations bind start event/date,
   as-of date, GREGORIAN/SHAMSI calendar, source, and derived whole days. Missing
-  or mismatched clocks block. Broader regulatory/policy effective dating stays
-  open under issue #8.
+  or mismatched clocks block. Shamsi arithmetic now validates leap-year Esfand
+  30 and covers 59/60/61-day, cross-year, reverse-date, malformed, and calendar
+  mismatch cases. Broader regulatory/policy effective dating stays open under
+  issue #8.
 - Customer FAQ v1.2 preserves the dependency-safe category hierarchy and makes
   the within-category journey explicit: branch map before recognition method,
   calculation overview before individual deductions, and both P0 result states
@@ -41,29 +51,36 @@ Runtime outcome
 Verification
 ============
 
-- Full pytest suite: 486/486 passed.
+- Full pytest suite: 501/501 passed.
 - Synthetic fixture corpus: 50/50 passed.
-- Curated high-risk mutation gate: 21/21 killed (100.0%).
+- Curated high-risk mutation gate: 23/23 killed (100.0%).
 - Knowledge validation: structurally OK; the pre-existing 22 body-authority and
   48 source-metadata findings remain documented release work.
 - Generated review and customer-FAQ documentation: current.
 - Compilation, JSON parsing, and git diff whitespace checks: passed.
-- GitHub Actions `repository-gate`: passed on remote content commit
-  466a1fd70d899b1d0da4ca5aa0249d7a6f9d242a (run 37769582813).
+- GitHub Actions `repository-gate`: passed on remote remediation commit
+  f476b0457ff4e6fa9aabfc5573d105a26218d59d (run 37804524791).
 
 Publication and review audit
 ============================
 
-- Opened PR #48 against `docs/body-model-validation`; its parent is PR #47's
-  exact remote head, so the documentation/runtime stack is linear.
+- Closed PR #46 as superseded without merging it.
+- Corrected PR #47's final head/gate metadata and merge-committed it to main as
+  37b1765af89121bf04ef590f729f1cd861e3c254.
+- Retargeted PR #48 to main without rebasing; its changed-file set remained the
+  intended 29-file runtime/documentation delta.
 - Local and remote content commits have different identities but the same tree,
-  `e4fadb034139f0084bb64fb3752db46cf3021fb6`.
-- Review-thread audit: 0 threads on each open PR #46, #47, and #48.
-- Commented on PR #47 with the runtime follow-up and FAQ v1.2 evidence.
-- Commented on PR #46 with the recommendation to close it as superseded by #47
-  after review history is no longer needed; do not merge both documentation PRs.
+  and the local/remote remediation commits likewise share tree
+  `2356b0c0263fda9af24ffec755f8e06c45417735`.
+- Created active release tracker #49 by copying the unchecked v0.1 checklist.
+  Closed issue #6 remains unchanged historical baseline evidence; only a link
+  comment was added.
+- Updated active roadmap and open #7-#15 release-gate references to #49 while
+  retaining #6's historical role.
+- Review-thread audit: 0 unresolved threads on PR #48.
 - Added scoped progress comments to issues #4, #8, #10, #12, #14, #15, #17,
-  #20, and #21. No roadmap issue was closed.
+  #20, and #21. Added authority-review targets to #7 and #11. No roadmap issue
+  was closed.
 
 Issue and PR mapping
 ====================
@@ -85,13 +102,16 @@ Issue and PR mapping
   remain open.
 - #21 / P3-06: recorded all candidate battery/tyre modes and conditional U05 behavior as
   executable; authoritative insurer resolution remains open.
-- PR #47 remains the documentation base; PR #48 is stacked on its exact head.
+- PR #47 is merged. PR #48 is based on main and remains open pending a later
+  human/domain acceptance review; it must not be merged in this run.
 
 Workspace exclusions
 ====================
 
 - `docs/Research → repository comparison.md` is an untracked user-owned file
   and is intentionally excluded from this branch and commit.
+- `tests/OBJECTIVE.md` is the untracked task brief and is intentionally excluded
+  from the branch and commits.
 
 Prior documentation draft
 =========================
