@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **21/21 killed (100.0%)**
+- Result: **23/23 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -31,6 +31,8 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M19 | KILLED | depreciate-then-cap deducts scheduled depreciation a second time |
 | M20 | KILLED | percentage franchise ignores its named calculation base |
 | M21 | KILLED | a review-live uncertainty disappears from the deterministic result |
+| M22 | KILLED | total-loss settlement base is silently aliased to the post-salvage base |
+| M23 | KILLED | a non-leap Shamsi year accepts Esfand 30 |
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

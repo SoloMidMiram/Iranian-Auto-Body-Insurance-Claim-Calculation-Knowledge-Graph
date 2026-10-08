@@ -704,7 +704,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         {
             "ASSESSED_GROSS": repair if repair is not None else base,
             "ELIGIBLE_GROSS": base,
-            "SETTLEMENT_BASE": after_salvage,
+            "SETTLEMENT_BASE": base,
         },
     )
     franchise = _resolve_franchise(
@@ -712,7 +712,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res,
         {
             "AFTER_SALVAGE": after_salvage,
-            "SETTLEMENT_BASE": after_salvage,
+            "SETTLEMENT_BASE": base,
             "GROSS_ELIGIBLE": base,
         },
     )
@@ -894,27 +894,81 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
 # --------------------------------------------------------------------- theft
 
 
+# Borkowski/Jalaali break table, used by the established deterministic
+# JalCal algorithm. The bounded range is deliberate: an unsupported year must
+# fail closed instead of silently switching to an approximate 33-year cycle.
+_SHAMSI_BREAK_YEARS = (
+    -61,
+    9,
+    38,
+    199,
+    426,
+    686,
+    756,
+    818,
+    1111,
+    1181,
+    1210,
+    1635,
+    2060,
+    2097,
+    2192,
+    2262,
+    2324,
+    2394,
+    2456,
+    3178,
+)
+
+
+def _is_shamsi_leap_year(year: int) -> bool:
+    """Return JalCal's leap-year result for a supported Shamsi year."""
+    if year < 1 or year >= _SHAMSI_BREAK_YEARS[-1]:
+        raise operators.OperatorError(f"unsupported SHAMSI theft-clock year {year!r}")
+
+    previous_break = _SHAMSI_BREAK_YEARS[0]
+    jump = 0
+    for current_break in _SHAMSI_BREAK_YEARS[1:]:
+        jump = current_break - previous_break
+        if year < current_break:
+            break
+        previous_break = current_break
+
+    offset = year - previous_break
+    if jump - offset < 6:
+        offset = offset - jump + ((jump + 4) // 33) * 33
+    leap_index = (((offset + 1) % 33) - 1) % 4
+    return leap_index == 0
+
+
+def _shamsi_ordinal(value: str) -> int:
+    """Return a consistent day ordinal after validating a Shamsi date."""
+    try:
+        year, month, day = (int(part) for part in value.split("-"))
+    except (AttributeError, TypeError, ValueError):
+        raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
+
+    if month < 1 or month > 12:
+        raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
+    if month <= 6:
+        max_day = 31
+        days_before_month = (month - 1) * 31
+    elif month <= 11:
+        max_day = 30
+        days_before_month = 186 + (month - 7) * 30
+    else:
+        max_day = 30 if _is_shamsi_leap_year(year) else 29
+        days_before_month = 336
+    if day < 1 or day > max_day:
+        raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
+
+    completed_years = year - 1
+    leap_days = sum(1 for item in range(1, year) if _is_shamsi_leap_year(item))
+    return completed_years * 365 + leap_days + days_before_month + day
+
+
 def _dated_theft_clock_days(clock: dict[str, Any]) -> int:
     """Derive an elapsed whole-day count from a bound calendar snapshot."""
-
-    def shamsi_ordinal(value: str) -> int:
-        try:
-            year, month, day = (int(part) for part in value.split("-"))
-        except (TypeError, ValueError):
-            raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
-        max_day = 31 if month <= 6 else 30
-        if year < 1 or month < 1 or month > 12 or day < 1 or day > max_day:
-            raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
-        epbase = year - 474
-        epyear = 474 + (epbase % 2820)
-        month_days = (month - 1) * 31 if month <= 7 else (month - 1) * 30 + 6
-        return (
-            day
-            + month_days
-            + ((epyear * 682 - 110) // 2816)
-            + (epyear - 1) * 365
-            + (epbase // 2820) * 1029983
-        )
 
     start = str(clock.get("start_date") or "")
     as_of = str(clock.get("as_of_date") or "")
@@ -923,7 +977,7 @@ def _dated_theft_clock_days(clock: dict[str, Any]) -> int:
         if calendar == "GREGORIAN":
             elapsed = (date.fromisoformat(as_of) - date.fromisoformat(start)).days
         elif calendar == "SHAMSI":
-            elapsed = shamsi_ordinal(as_of) - shamsi_ordinal(start)
+            elapsed = _shamsi_ordinal(as_of) - _shamsi_ordinal(start)
         else:
             raise operators.OperatorError(f"unsupported theft-clock calendar {calendar!r}")
     except ValueError as error:

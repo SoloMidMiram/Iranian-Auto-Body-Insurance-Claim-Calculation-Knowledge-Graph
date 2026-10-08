@@ -94,6 +94,20 @@ MUTATIONS = (
         "missing = [item for item in authorized if item not in res.blocking_uncertainties]\n    if missing:\n        return",
         "a review-live uncertainty disappears from the deterministic result",
     ),
+    Mutation(
+        "M22",
+        "src/iran_auto_claim/engine.py",
+        '"AFTER_SALVAGE": after_salvage,\n            "SETTLEMENT_BASE": base,\n            "GROSS_ELIGIBLE": base,',
+        '"AFTER_SALVAGE": after_salvage,\n            "SETTLEMENT_BASE": after_salvage,\n            "GROSS_ELIGIBLE": base,',
+        "total-loss settlement base is silently aliased to the post-salvage base",
+    ),
+    Mutation(
+        "M23",
+        "src/iran_auto_claim/engine.py",
+        "max_day = 30 if _is_shamsi_leap_year(year) else 29",
+        "max_day = 30",
+        "a non-leap Shamsi year accepts Esfand 30",
+    ),
 )
 
 THRESHOLD = 90.0

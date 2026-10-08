@@ -8,6 +8,7 @@ import pytest
 from admission_shim import compute
 
 from iran_auto_claim.classify import classify
+from iran_auto_claim.engine import _dated_theft_clock_days
 from iran_auto_claim.money import D
 from iran_auto_claim.schema_input import InputSchemaError
 
@@ -305,6 +306,132 @@ def test_whole_theft_requires_a_bound_clock_and_matching_day_count(kb):
     assert "does not match the bound theft clock" in mismatch.reason
 
 
+def _whole_theft_with_clock(
+    *, start: str, as_of: str, days: int, calendar: str = "SHAMSI"
+) -> dict:
+    payload = _case(
+        "THEFT",
+        theft_type="WHOLE_VEHICLE",
+        days_missing=days,
+        market=2200,
+        insured=2200,
+        franchise=220,
+        title_transferred=True,
+    )
+    payload["event"] = {
+        "theft_clock": {
+            "start_event": "THEFT_OCCURRENCE",
+            "start_date": start,
+            "as_of_date": as_of,
+            "calendar": calendar,
+            "source": "synthetic dated police record",
+        }
+    }
+    return payload
+
+
+def test_shamsi_leap_year_accepts_esfand_30(kb):
+    result = compute(
+        _whole_theft_with_clock(
+            start="1403-12-30", as_of="1404-01-01", days=1
+        ),
+        kb,
+    )
+    assert result.status == "PENDING_60_DAY_CRITERION"
+    assert result.fields["theft_clock"]["derived_days"] == 1
+
+
+def test_shamsi_non_leap_year_rejects_esfand_30(kb):
+    result = compute(
+        _whole_theft_with_clock(
+            start="1402-12-30", as_of="1403-01-01", days=1
+        ),
+        kb,
+    )
+    assert result.status == "INPUT_ERROR"
+    assert "invalid SHAMSI theft-clock date" in result.reason
+
+
+@pytest.mark.parametrize(
+    ("days", "as_of", "status", "payable"),
+    [
+        (59, "1403-02-29", "PENDING_60_DAY_CRITERION", None),
+        (60, "1403-02-30", None, D(1980)),
+        (61, "1403-02-31", None, D(1980)),
+    ],
+)
+def test_shamsi_theft_clock_59_60_61_day_boundaries(
+    kb, days, as_of, status, payable
+):
+    result = compute(
+        _whole_theft_with_clock(start="1403-01-01", as_of=as_of, days=days),
+        kb,
+    )
+    assert result.fields["theft_clock"]["derived_days"] == days
+    assert result.status == status
+    assert result.payable == payable
+
+
+def test_cross_year_shamsi_interval_matches_equivalent_gregorian_interval():
+    shamsi = _dated_theft_clock_days(
+        {
+            "start_date": "1403-12-29",
+            "as_of_date": "1404-01-01",
+            "calendar": "SHAMSI",
+        }
+    )
+    gregorian = _dated_theft_clock_days(
+        {
+            "start_date": "2025-03-19",
+            "as_of_date": "2025-03-21",
+            "calendar": "GREGORIAN",
+        }
+    )
+    assert shamsi == gregorian == 2
+
+
+def test_shamsi_theft_clock_rejects_stored_day_mismatch(kb):
+    result = compute(
+        _whole_theft_with_clock(
+            start="1403-01-01", as_of="1403-02-31", days=60
+        ),
+        kb,
+    )
+    assert result.status == "INPUT_ERROR"
+    assert "does not match the bound theft clock (61)" in result.reason
+
+
+def test_shamsi_theft_clock_rejects_as_of_before_start(kb):
+    result = compute(
+        _whole_theft_with_clock(
+            start="1403-02-01", as_of="1403-01-31", days=0
+        ),
+        kb,
+    )
+    assert result.status == "INPUT_ERROR"
+    assert "precedes its start_date" in result.reason
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "code"),
+    [
+        ("start_date", "1403/01/01", "invalid_type"),
+        ("calendar", "LUNAR", "invalid_enum"),
+    ],
+)
+def test_theft_clock_schema_rejects_malformed_date_or_calendar(kb, field, value, code):
+    payload = _whole_theft_with_clock(
+        start="1403-01-01", as_of="1403-02-30", days=60
+    )
+    payload["event"]["theft_clock"][field] = value
+    with pytest.raises(InputSchemaError) as caught:
+        compute(payload, kb)
+    assert any(
+        item.path == f"event.theft_clock.{field}" and item.code == code
+        for item in caught.value.errors
+    )
+
+
 # --------------------------------------------------------------- confidence
 
 
@@ -424,6 +551,85 @@ def test_missing_percentage_franchise_base_is_rejected_instead_of_using_branch_d
             "source_version": "TEST-v1",
         },
     }
+    with pytest.raises(InputSchemaError) as caught:
+        compute(payload, kb)
+    assert any(
+        item.path == "policy.franchise.calculation_base" and item.code == "missing_field"
+        for item in caught.value.errors
+    )
+
+
+def _total_loss_with_percentage_franchise(calculation_base: str | None) -> dict:
+    payload = _case(
+        "TOTAL_LOSS",
+        market=2000,
+        insured=2000,
+        repair=1600,
+        salvage=300,
+        salvage_disposition="INSURED_RETAINS",
+    )
+    franchise = {
+        "mode": "PERCENT",
+        "rate": 0.1,
+        "source": "POLICY",
+        "source_reference": "total-loss test schedule",
+        "source_version": "TEST-v1",
+    }
+    if calculation_base is not None:
+        franchise["calculation_base"] = calculation_base
+    payload["policy"] = {"policy_version": "TEST-v1", "franchise": franchise}
+    return payload
+
+
+def test_total_loss_percentage_franchise_distinguishes_settlement_base_from_after_salvage(kb):
+    settlement_base = compute(
+        _total_loss_with_percentage_franchise("SETTLEMENT_BASE"), kb
+    )
+    after_salvage = compute(
+        _total_loss_with_percentage_franchise("AFTER_SALVAGE"), kb
+    )
+
+    assert settlement_base.fields["settlement_base"] == D(2000)
+    assert settlement_base.fields["base_after_salvage"] == D(1700)
+    assert settlement_base.fields["franchise_calculation_base"] == D(2000)
+    assert settlement_base.fields["franchise"] == D(200)
+    assert settlement_base.payable == D(1500)
+
+    assert after_salvage.fields["settlement_base"] == D(2000)
+    assert after_salvage.fields["base_after_salvage"] == D(1700)
+    assert after_salvage.fields["franchise_calculation_base"] == D(1700)
+    assert after_salvage.fields["franchise"] == D(170)
+    assert after_salvage.payable == D(1530)
+
+    assert settlement_base.fields["franchise"] != after_salvage.fields["franchise"]
+
+
+@pytest.mark.parametrize("calculation_base", ["SETTLEMENT_BASE", "AFTER_SALVAGE"])
+def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_base):
+    payload = _total_loss_with_percentage_franchise(calculation_base)
+    payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    result = compute(payload, kb)
+
+    assert result.fields["salvage_deduction"] == D(0)
+    assert result.fields["settlement_base"] == D(2000)
+    assert result.fields["base_after_salvage"] == D(2000)
+    assert result.fields["franchise_calculation_base"] == D(2000)
+    assert result.fields["franchise"] == D(200)
+    assert result.payable == D(1800)
+
+
+def test_total_loss_percentage_franchise_rejects_an_unsupported_base(kb):
+    payload = _total_loss_with_percentage_franchise("AFTER_UNDERINSURANCE")
+    with pytest.raises(InputSchemaError) as caught:
+        compute(payload, kb)
+    assert any(
+        item.path == "policy.franchise.calculation_base" and item.code == "invalid_enum"
+        for item in caught.value.errors
+    )
+
+
+def test_total_loss_percentage_franchise_requires_a_named_base(kb):
+    payload = _total_loss_with_percentage_franchise(None)
     with pytest.raises(InputSchemaError) as caught:
         compute(payload, kb)
     assert any(

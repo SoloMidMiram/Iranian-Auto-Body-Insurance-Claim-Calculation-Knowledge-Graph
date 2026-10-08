@@ -14,10 +14,16 @@ from iran_auto_claim.admission import (
     _issue_review_authorization,
     claim_hash,
 )
-from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
+from iran_auto_claim.engine import (
+    CalcResult,
+    _dated_theft_clock_days,
+    _enforce_guard_plan,
+    compute,
+)
 from iran_auto_claim.fixtures import _authorize_fixture_case
 from iran_auto_claim.knowledge import Knowledge
 from iran_auto_claim.operators import (
+    OperatorError,
     allowable_rescue_transport,
     eligible_part_loss,
     is_total_loss,
@@ -267,6 +273,59 @@ def main() -> int:
     percentage_result = compute(_authorize_fixture_case(percentage, kb), kb)
     assert percentage_result.fields["franchise"] == Decimal(8)
     assert percentage_result.payable == Decimal(72)
+
+    # Total-loss SETTLEMENT_BASE is the pre-salvage min(market, insured), while
+    # AFTER_SALVAGE is a genuinely different typed base when salvage is retained.
+    total = {
+        "claim_id": "total-loss-franchise-base-probe",
+        "unit": "IRR",
+        "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
+        "damage": {
+            "market": 2000,
+            "insured": 2000,
+            "repair": 1600,
+            "salvage": 300,
+            "salvage_disposition": "INSURED_RETAINS",
+        },
+        "policy": {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "PERCENT",
+                "rate": 0.1,
+                "calculation_base": "SETTLEMENT_BASE",
+                "source": "POLICY",
+                "source_reference": "mutation probe schedule",
+                "source_version": "TEST-v1",
+            },
+        },
+    }
+    total_settlement_base = compute(_authorize_fixture_case(total, kb), kb)
+    assert total_settlement_base.fields["franchise"] == Decimal(200)
+    total["policy"]["franchise"]["calculation_base"] = "AFTER_SALVAGE"
+    total_after_salvage = compute(_authorize_fixture_case(total, kb), kb)
+    assert total_after_salvage.fields["franchise"] == Decimal(170)
+
+    # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
+    # year; a permissive month-12 check would change theft eligibility.
+    assert _dated_theft_clock_days(
+        {
+            "start_date": "1403-12-30",
+            "as_of_date": "1404-01-01",
+            "calendar": "SHAMSI",
+        }
+    ) == 1
+    try:
+        _dated_theft_clock_days(
+            {
+                "start_date": "1402-12-30",
+                "as_of_date": "1403-01-01",
+                "calendar": "SHAMSI",
+            }
+        )
+    except OperatorError:
+        pass
+    else:
+        raise AssertionError("non-leap Esfand 30 was accepted")
 
     # RMV-001: explicit zero is a real amount and caps Article 8 at zero.
     article8 = {
