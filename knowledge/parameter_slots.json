@@ -3,7 +3,7 @@
   "note": "A value the calculation consumes. This file is the answer to 'how do I select the right parameters for this case': every slot states who is allowed to supply it (`supplied_via`), which authority governs it, which operator reads it, what happens when it is absent, and which uncertainty or guardrail fires. A slot never carries a formula: formulas live in knowledge/operators.json and are selected through branches. The questionnaire can only fill slots, so an intake form can never invent a calculation rule.",
   "authorities": ["REGULATION", "CIRCULAR", "POLICY", "INSURER_PROCEDURE", "ASSESSOR", "ADJUSTER_CONFIG", "DERIVED", "EVENT_FACT"],
   "supply_channels": ["INSURED_ANSWER", "POLICY_SCHEDULE", "ENDORSEMENT_WORDING", "INSURER_MANUAL", "ASSESSOR_REPORT", "AUTHORITY_REPORT", "JUDICIAL_ORDER", "MARKET_EVIDENCE", "DERIVED_FROM_OTHER_SLOTS", "ANNUAL_PARAMETER", "ADJUSTER_CONFIG"],
-  "missing_behaviours": ["DEFAULT_ONE", "TREAT_AS_ZERO", "REFUSE", "SCENARIO_SET", "ASSESSOR_REQUIRED", "ESCALATE_INSURER", "NOT_APPLICABLE", "REVIEW_GATE"],
+  "missing_behaviours": ["DEFAULT_ONE", "TREAT_AS_ZERO", "REFUSE", "SCENARIO_SET", "ASSESSOR_REQUIRED", "ESCALATE_INSURER", "NOT_APPLICABLE", "REVIEW_GATE", "BLOCK_IF_MATERIAL"],
   "slots": [
     {
       "node_id": "PS_EVENT_DATE",
@@ -289,9 +289,9 @@
       "supplied_by": ["Q-S8-03"],
       "supplied_via": ["ADJUSTER_CONFIG", "INSURER_MANUAL"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
-      "missing_behavior": "DEFAULT_ONE",
+      "missing_behavior": "BLOCK_IF_MATERIAL",
       "blocking_uncertainty": "U05_RESCUE_DENOMINATOR",
-      "select": "The regulation says 20% of total damage without defining the denominator. Default is the assessed gross; record the choice, because depreciation, the ratio and total-loss classification each produce a different base."
+      "select": "The regulation says 20% of total damage without defining the denominator. Record the selected base. If no base is supplied, continue only when every candidate base produces the same capped rescue amount; otherwise surface U05."
     },
     {
       "node_id": "PS_REPAIR_TOTAL",
@@ -506,4 +506,3 @@
     }
   ]
 }
-

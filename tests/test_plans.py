@@ -121,7 +121,12 @@ def test_compute_refuses_a_broken_active_body_sequence(kb, mutation):
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
             "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 1000, "market": 2000, "insured": 1000},
+            "damage": {
+                "gross": 1000,
+                "depreciation": 0,
+                "market": 2000,
+                "insured": 1000,
+            },
             "policy": {
                 "policy_version": "TEST-v1",
                 "franchise": {

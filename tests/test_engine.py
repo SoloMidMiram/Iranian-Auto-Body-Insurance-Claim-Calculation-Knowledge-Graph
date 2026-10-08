@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
+from datetime import date, timedelta
 
 import pytest
 from admission_shim import compute
@@ -13,6 +13,34 @@ from iran_auto_claim.schema_input import InputSchemaError
 
 
 def _case(branch=None, **inputs):
+    if branch in ("PARTIAL_DAMAGE", "THEFT_PARTIAL_DAMAGE"):
+        if not any(key in inputs for key in ("market", "market_value", "insured", "insured_sum")):
+            inputs["market"] = 10**12
+            inputs["insured"] = 10**12
+        if not any(
+            key in inputs
+            for key in (
+                "depreciation",
+                "assessed_depreciation_irr",
+                "depreciable_parts",
+                "parts",
+                "replacement_parts",
+                "battery_loss",
+                "tire_loss",
+                "lamp_glass",
+                "other_replacement_part",
+            )
+        ):
+            inputs["depreciation"] = 0
+    if branch == "GLASS_ONLY" and not any(
+        key in inputs for key in ("market", "market_value", "insured", "insured_sum")
+    ):
+        inputs["market"] = 10**12
+        inputs["insured"] = 10**12
+    if branch in ("TOTAL_LOSS", "TOTAL_LOSS_TEST") and any(
+        key in inputs for key in ("salvage", "salvage_value")
+    ):
+        inputs.setdefault("salvage_disposition", "INSURED_RETAINS")
     franchise = inputs.pop("franchise", None)
     payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs}
     if franchise is not None:
@@ -28,6 +56,17 @@ def _case(branch=None, **inputs):
         }
     if branch:
         payload["classification"] = {"branch": branch}
+    if branch in ("THEFT", "TOTAL_THEFT") and inputs.get("theft_type") == "WHOLE_VEHICLE":
+        days = int(inputs.get("days_missing", inputs.get("days_vehicle_missing", 0)))
+        payload["event"] = {
+            "theft_clock": {
+                "start_event": "THEFT_OCCURRENCE",
+                "start_date": "2026-01-01",
+                "as_of_date": (date(2026, 1, 1) + timedelta(days=days)).isoformat(),
+                "calendar": "GREGORIAN",
+                "source": "synthetic test police report",
+            }
+        }
     return payload
 
 
@@ -74,6 +113,26 @@ def test_free_text_that_mentions_a_peril_does_not_exclude_cover(kb):
     excluded = compute(coded, kb)
     assert excluded.payable == D(0)
     assert excluded.reason == "EXCLUDED_WITHOUT_ENDORSEMENT"
+
+
+def test_intoxication_exclusion_requires_both_coded_cause_and_causal_finding(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        gross=100,
+        depreciation=0,
+        market=100,
+        insured=100,
+        franchise=10,
+        cause="ALCOHOL",
+    )
+    not_confirmed = compute(payload, kb)
+    assert not_confirmed.payable == D(90)
+    assert "exclusion_applied" not in not_confirmed.fields
+
+    payload["event"] = {"intoxication_causally_confirmed": True}
+    confirmed = compute(payload, kb)
+    assert confirmed.payable == D(0)
+    assert confirmed.fields["exclusion_applied"] == "EX_INTOXICATION"
 
 
 def test_a_body_claim_without_a_resolvable_snapshot_does_not_run_operators(kb):
@@ -152,10 +211,59 @@ def test_missing_market_value_alongside_an_insured_sum_is_an_input_error(kb):
     assert result.status == "INPUT_ERROR"
 
 
+def test_missing_both_article10_value_anchors_does_not_default_ratio_to_one(kb):
+    payload = {
+        "claim_id": "missing-economic-anchors",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE"},
+        "damage": {"gross": 100, "depreciation": 0},
+        "policy": {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": 10,
+                "source": "POLICY",
+                "source_reference": "test schedule",
+                "source_version": "TEST-v1",
+            },
+        },
+    }
+    result = compute(payload, kb)
+    assert result.status == "INPUT_ERROR"
+    assert result.payable is None
+    assert "market value and insured sum" in result.reason
+
+
+def test_aggregate_partial_damage_does_not_default_missing_depreciation_to_zero(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE", gross=100, market=100, insured=100, franchise=10
+    )
+    payload["damage"].pop("depreciation")
+    result = compute(payload, kb)
+    assert result.status == "INPUT_ERROR"
+    assert result.payable is None
+    assert "explicit assessed depreciation" in result.reason
+
+
 def test_total_loss_settlement_requires_both_figures(kb):
     payload = _case("TOTAL_LOSS", market=2000, repair=1600, salvage_value=300, franchise=100)
     result = compute(payload, kb)
     assert result.status == "INPUT_ERROR"
+
+
+def test_salvage_value_without_disposition_blocks_total_loss_settlement(kb):
+    payload = _case(
+        "TOTAL_LOSS",
+        market=2000,
+        insured=2000,
+        repair=1600,
+        salvage=300,
+        franchise=100,
+    )
+    payload["damage"].pop("salvage_disposition")
+    result = compute(payload, kb)
+    assert result.status == "SALVAGE_DISPOSITION_UNRESOLVED"
+    assert result.blocking_uncertainties == ["U12_SALVAGE_DISPOSITION"]
 
 
 def test_title_transfer_is_required_before_a_theft_total_settlement(kb):
@@ -173,6 +281,28 @@ def test_title_transfer_is_required_before_a_theft_total_settlement(kb):
     )
     assert result.payable is None
     assert result.status == "TITLE_TRANSFER_REQUIRED"
+
+
+def test_whole_theft_requires_a_bound_clock_and_matching_day_count(kb):
+    payload = _case(
+        "THEFT",
+        theft_type="WHOLE_VEHICLE",
+        days_missing=65,
+        market=2200,
+        insured=2200,
+        franchise=220,
+        title_transferred=True,
+    )
+    clock = payload.pop("event")
+    unanchored = compute(payload, kb)
+    assert unanchored.status == "THEFT_CLOCK_ANCHOR_UNRESOLVED"
+    assert unanchored.blocking_uncertainties == ["U13_THEFT_CLOCK_ANCHOR"]
+
+    payload["event"] = clock
+    payload["damage"]["days_missing"] = 64
+    mismatch = compute(payload, kb)
+    assert mismatch.status == "INPUT_ERROR"
+    assert "does not match the bound theft clock" in mismatch.reason
 
 
 # --------------------------------------------------------------- confidence
@@ -239,6 +369,69 @@ def test_rescue_cap_base_is_recorded_and_configurable(kb):
     assert result.fields["rescue_cap"] == D(40)
 
 
+def test_material_rescue_denominator_difference_blocks_when_base_is_missing(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        gross=1000,
+        depreciation=900,
+        market=1000,
+        insured=1000,
+        actual_rescue=100,
+        franchise=0,
+    )
+    result = compute(payload, kb)
+    assert result.payable is None
+    assert result.status == "RESCUE_DENOMINATOR_UNRESOLVED"
+    assert result.blocking_uncertainties == ["U05_RESCUE_DENOMINATOR"]
+
+
+def test_percentage_franchise_uses_the_named_base(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE", gross=100, depreciation=20, market=100, insured=100
+    )
+    payload["policy"] = {
+        "policy_version": "TEST-v1",
+        "franchise": {
+            "mode": "PERCENT",
+            "rate": 0.1,
+            "calculation_base": "ASSESSED_GROSS",
+            "source": "POLICY",
+            "source_reference": "test schedule",
+            "source_version": "TEST-v1",
+        },
+    }
+    assessed = compute(payload, kb)
+    assert assessed.fields["franchise"] == D(10)
+    assert assessed.payable == D(70)
+
+    payload["policy"]["franchise"]["calculation_base"] = "AFTER_DEPRECIATION"
+    after_depreciation = compute(payload, kb)
+    assert after_depreciation.fields["franchise"] == D(8)
+    assert after_depreciation.payable == D(72)
+
+
+def test_missing_percentage_franchise_base_is_rejected_instead_of_using_branch_default(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE", gross=100, depreciation=0, market=100, insured=100
+    )
+    payload["policy"] = {
+        "policy_version": "TEST-v1",
+        "franchise": {
+            "mode": "PERCENT",
+            "rate": 0.1,
+            "source": "POLICY",
+            "source_reference": "test schedule",
+            "source_version": "TEST-v1",
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        compute(payload, kb)
+    assert any(
+        item.path == "policy.franchise.calculation_base" and item.code == "missing_field"
+        for item in caught.value.errors
+    )
+
+
 def test_dual_coverage_reports_the_body_candidate_without_a_mandatory_franchise(kb):
     result = compute(
         _case(
@@ -255,6 +448,21 @@ def test_dual_coverage_reports_the_body_candidate_without_a_mandatory_franchise(
     assert result.fields["third_party"] == D(180)
     assert result.fields["body_candidate_before_other_body_terms"] == D(120)
     assert result.fields["regulatory_mandatory_franchise_on_this_excess"] == D(0)
+
+
+def test_article8_zero_actual_damage_is_not_replaced_by_the_corresponding_cap(kb):
+    result = compute(
+        _case(
+            "ARTICLE_8_NON_CONVENTIONAL",
+            vehicle_value=2500,
+            actual_damage=0,
+            corresponding_damage=180,
+            tp_limit=200,
+        ),
+        kb,
+    )
+    assert result.fields["actual_damage"] == D(0)
+    assert result.payable == D(0)
 
 
 def test_interest_of_the_insured_is_reported_for_a_single_payable_result(kb):

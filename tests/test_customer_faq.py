@@ -52,6 +52,13 @@ def test_customer_journey_and_questions_render_in_declared_order():
         "CAT-07_NEXT_STEPS",
     ]
     expected_questions = {
+        "CAT-02_RECOGNITION": [
+            "FAQ-RECOG-002",
+            "FAQ-RECOG-001",
+            "FAQ-RECOG-003",
+            "FAQ-RECOG-004",
+            "FAQ-RECOG-005",
+        ],
         "CAT-03_ACCEPTANCE": [
             "FAQ-ACCEPT-001",
             "FAQ-ACCEPT-002",
@@ -60,8 +67,8 @@ def test_customer_journey_and_questions_render_in_declared_order():
             "FAQ-ACCEPT-004",
         ],
         "CAT-04_CALCULATION": [
-            "FAQ-CALC-004",
             "FAQ-CALC-001",
+            "FAQ-CALC-004",
             "FAQ-CALC-002",
             "FAQ-CALC-003",
             "FAQ-CALC-005",
@@ -69,10 +76,10 @@ def test_customer_journey_and_questions_render_in_declared_order():
         ],
         "CAT-05_RESULTS_UNCERTAINTY": [
             "FAQ-RESULT-004",
+            "FAQ-RESULT-002",
             "FAQ-RESULT-003",
             "FAQ-RESULT-005",
             "FAQ-RESULT-001",
-            "FAQ-RESULT-002",
         ],
     }
     for language in ("english", "persian"):

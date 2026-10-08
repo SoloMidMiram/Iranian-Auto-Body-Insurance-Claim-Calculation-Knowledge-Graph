@@ -1,3 +1,78 @@
+Body-runtime blocker repair draft
+Updated: 2026-10-08
+Local branch: fix/body-runtime-blockers
+Stacked base: docs/body-model-validation (PR #47)
+Proposed commit: fix(runtime): close body calculation blockers
+Proposed PR base: docs/body-model-validation
+Status: IMPLEMENTED; LOCAL GATES PASSED; REMOTE PR/CI PENDING
+
+Runtime outcome
+===============
+
+- RMV-004: percentage franchises now require a typed calculation base, execute
+  against the named branch operand, and record the selected base/value.
+- RMV-006: missing Article 10 anchors, aggregate depreciation, materially
+  different rescue denominator, and salvage disposition fail closed instead of
+  acquiring benign defaults. Legacy fixtures now state their assumptions.
+- RMV-003: battery/tyre CAP_THEN_DEPRECIATE, DEPRECIATE_THEN_CAP, and CAP_ONLY
+  apply one-pass formulas; the discriminating regression returns 75/90/100.
+- RMV-005: authorization-live uncertainties are reconciled before uncertainty
+  guard enforcement. Any missing runtime uncertainty clears unsupported output
+  and produces AUTHORIZED_UNCERTAINTY_UNRESOLVED.
+- RMV-001: Article 8 preserves explicit zero and caps payment with
+  min(actual, corresponding, policy limit).
+- RMV-002: clauses within an exclusion predicate combine conjunctively, so a
+  bare intoxication token cannot deny without the causal authority finding.
+- RMV-008 (theft-clock slice): whole-theft calculations bind start event/date,
+  as-of date, GREGORIAN/SHAMSI calendar, source, and derived whole days. Missing
+  or mismatched clocks block. Broader regulatory/policy effective dating stays
+  open under issue #8.
+- Customer FAQ v1.2 preserves the dependency-safe category hierarchy and makes
+  the within-category journey explicit: branch map before recognition method,
+  calculation overview before individual deductions, and both P0 result states
+  before scenario/confidence details. English and Persian remain ID-aligned.
+- FAQ explanations now match executable behavior for named percentage-franchise
+  bases, one-pass battery/tyre interaction, and source-bound theft-day derivation.
+
+Verification
+============
+
+- Full pytest suite: 486/486 passed.
+- Synthetic fixture corpus: 50/50 passed.
+- Curated high-risk mutation gate: 21/21 killed (100.0%).
+- Knowledge validation: structurally OK; the pre-existing 22 body-authority and
+  48 source-metadata findings remain documented release work.
+- Generated review and customer-FAQ documentation: current.
+- Compilation, JSON parsing, and git diff whitespace checks: passed.
+
+Issue and PR mapping
+====================
+
+- #8 / P1-02: record the sourced theft-clock implementation as partial progress;
+  keep open for regulatory/policy effective-date and amendment-boundary work.
+- #10 / P1-04: record authorization uncertainty reconciliation as partial
+  progress; keep open for full dependency-derived provenance/confidence.
+- #12 / P2-01: record causal conjunction and theft-clock predicates as partial
+  progress; keep open for the full closed taxonomy and decision table.
+- #14 / P2-03 and #15 / P2-04: link the new fail-closed and defect-signature
+  regressions; keep open until their complete guard/mutation/parity gates pass.
+- #17 / P3-02: typed franchise-base execution is infrastructure progress, not a
+  governed insurer adapter; keep open.
+- #20 / P3-05: Article 8 cap is repaired, but assessor mappings remain open.
+- #21 / P3-06: all candidate battery/tyre modes and conditional U05 behavior are
+  executable; authoritative insurer resolution remains open.
+- PR #47 remains the documentation base. The runtime PR should be stacked on
+  #47, not mixed into or force-pushed over its independently published history.
+
+Workspace exclusions
+====================
+
+- `docs/Research → repository comparison.md` is an untracked user-owned file
+  and is intentionally excluded from this branch and commit.
+
+Prior documentation draft
+=========================
+
 Body-model documentation consolidation and report/model validation draft
 Updated: 2026-10-08
 Local branch: docs/body-model-validation

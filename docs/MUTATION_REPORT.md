@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **16/16 killed (100.0%)**
+- Result: **21/21 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -26,6 +26,11 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M14 | KILLED | risk intensification is settled at full amount instead of blocked on U15 |
 | M15 | KILLED | an internal or metadata-mismatched capability can masquerade as review-issued |
 | M16 | KILLED | dataclasses.replace can transplant a modified private grant onto another claim |
+| M17 | KILLED | Article 8 explicit zero is replaced by the corresponding-damage cap |
+| M18 | KILLED | one exclusion clause can replace the required causal conjunction |
+| M19 | KILLED | depreciate-then-cap deducts scheduled depreciation a second time |
+| M20 | KILLED | percentage franchise ignores its named calculation base |
+| M21 | KILLED | a review-live uncertainty disappears from the deterministic result |
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

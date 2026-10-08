@@ -215,7 +215,7 @@ class Case:
         given = self._find(("salvage_disposition",))
         if given:
             return str(given)
-        return "INSURED_RETAINS" if self.salvage is not None else "NOT_APPLICABLE"
+        return "UNRESOLVED" if self.salvage is not None else "NOT_APPLICABLE"
 
     @property
     def title_transferred(self) -> bool:
@@ -283,6 +283,11 @@ class Case:
     @property
     def days_missing(self) -> int | None:
         return _num(self._find(("days_missing", "days_vehicle_missing")))
+
+    @property
+    def theft_clock(self) -> dict[str, Any] | None:
+        value = self.event.get("theft_clock")
+        return dict(value) if isinstance(value, dict) else None
 
     @property
     def intoxication_causally_confirmed(self) -> bool:

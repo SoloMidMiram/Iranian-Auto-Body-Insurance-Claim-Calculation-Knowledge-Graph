@@ -98,22 +98,30 @@ The sprint is complete only when all of the following are true:
    versions, and the tag states that the release is research/decision-support
    only.
 
-### Research/model validation checkpoint — 2026-10-08
+### Research/model validation and runtime-repair checkpoint — 2026-10-08
 
 The cross-check in
 [`RESEARCH_REPORT_MODEL_VALIDATION.md`](RESEARCH_REPORT_MODEL_VALIDATION.md)
-found four amount/eligibility defects that precede the remaining sprint work:
+found four amount/eligibility defects that preceded the remaining sprint work:
 
 - Article 8 does not yet cap by actual loss and treats explicit zero as absent;
 - a causation-required exclusion can fire from a bare cause token;
 - configured `DEPRECIATE_THEN_CAP` applies battery/tyre depreciation twice;
 - percentage-franchise base semantics are collected but not executed.
 
-It also found that review-authorized live uncertainties are not universally
-reconciled with the result's blocking-uncertainty set. Treat RMV-001 through
-RMV-006 in that audit as release stops. They refine the existing P0/P2/P3 issue
-scope and must be repaired or explicitly removed from supported scope before the
-Oct 11 feature freeze; passing the original 50 fixtures does not close them.
+The focused `fix/body-runtime-blockers` follow-up now repairs RMV-001 through
+RMV-006 and the theft-clock portion of RMV-008. Percentage franchises execute a
+typed named base; missing ratio/depreciation/salvage facts fail closed; rescue
+denominator omission blocks only when material; battery/tyre modes apply
+depreciation once; authorization-live uncertainties are reconciled; Article 8
+uses `min(actual, corresponding, limit)`; causal exclusions are conjunctive; and
+whole-theft day counts are derived from a sourced calendar snapshot.
+
+These code repairs do not close the broader roadmap issues by themselves.
+RMV-007 and the regulatory/policy effective-date parts of RMV-008 remain release
+stops, as do the complete provenance, taxonomy, guard-mutation, and independent
+authority-review gates. The original 50 fixtures plus the full regression suite
+must stay green on the runtime PR and its eventual merge commit.
 
 ### Practical roadmap after `v0.1-body-model`
 

@@ -138,6 +138,22 @@ These are mostly safety improvements, but only the L49 spelling correction is li
 
 ## Prioritized fix register
 
+### Runtime implementation follow-up — 2026-10-08
+
+| RMV | Current implementation state | Verification |
+|---|---|---|
+| RMV-001 | Fixed: Article 8 preserves explicit zero and caps insurer payment by actual, corresponding, and policy-limit amounts. | Zero-loss regression plus existing below/equal/above fixtures. |
+| RMV-002 | Fixed: clauses inside an exclusion predicate are conjunctive; intoxication needs both the coded cause and causal authority finding. | Bare-token and confirmed-causal regressions. |
+| RMV-003 | Fixed: cap-then-depreciate, depreciate-then-cap, and cap-only compute independent one-pass results. | Discriminating 75/90/100 operator regression. |
+| RMV-004 | Fixed at the shared engine boundary: percentage modes require a typed supported base and record the selected base/value. | Schema rejection for omitted base and amount-sensitive assessed-vs-after-depreciation regression. |
+| RMV-005 | Fixed: authorization-live uncertainties missing from runtime output force a blocked result and clear any unsupported payable/scenario set. | Review-issued authorization reconciliation regression. |
+| RMV-006 | Fixed for the named defaults: missing Article 10 anchors, aggregate depreciation, material rescue denominator, and salvage disposition fail closed. | Missing-input and materially different denominator regressions; 50/50 updated explicit fixtures. |
+| RMV-008 | Partially fixed: whole-theft clocks now bind start event/date, as-of date, calendar, source, and derived whole days; missing/mismatched clocks block. Regulatory and policy effective-date completion remains in #8. | Gregorian/Shamsi derivation probes plus missing/mismatched clock regressions. |
+
+The implementation remains decision support. These fixes do not supply insurer
+manuals, primary authority artifacts, independent reviewers, or governed
+product/version adapters.
+
 ### P0 — fix before describing any affected path as calculation-ready
 
 | ID | Fix | Existing issue coverage | Implementation acceptance |
@@ -237,10 +253,11 @@ The deterministic defect repair can fit inside the existing body-model sprint; l
 |---|---|
 | `python3 claim.py validate` | Graph structurally OK; 22 body-authority and 48 source-metadata findings. |
 | `python3 claim.py fixtures` | 50/50 pass. |
-| Article 8 diagnostic | Actual loss `0`, corresponding `80`, limit `200` returned `80`; actual `50` also returned `80`. Confirms RMV-001. |
-| Causation diagnostic | Cause token `INTOXICATION` without causal confirmation returned zero/non-compensable. Confirms RMV-002. |
-| Battery/tyre diagnostic | On a discriminating input, configured `DEPRECIATE_THEN_CAP` produced net `56.25` instead of the one-pass `75`; confirms RMV-003. |
-| Full pytest suite | Not run in this workspace because the available Python environments do not contain `pytest`; do not infer a current full-suite pass from this audit. |
+| Article 8 diagnostic | Original reproduction returned `80` for explicit zero; the follow-up regression now returns `0` and preserves the zero in result fields. |
+| Causation diagnostic | Original reproduction denied from a bare token; the follow-up requires both token and causal finding. |
+| Battery/tyre diagnostic | Original `DEPRECIATE_THEN_CAP` result double-deducted; the follow-up discriminating case returns 75/90/100 for the three configured modes. |
+| Fixture corpus | 50/50 pass after legacy fixture assumptions were made explicit. |
+| Full pytest suite | Passed locally with the existing Python 3.11 pytest environment after the runtime repair and defect-signature regressions. |
 
 ## Release conclusion
 

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "status": "RESEARCH_AND_ADJUSTER_DECISION_SUPPORT",
     "scope": "BODY_ONLY",
     "mode": "EXPLANATORY_ONLY",
@@ -94,7 +94,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RECOG-001",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "How does the model recognize what kind of body claim I have?",
@@ -105,7 +105,7 @@
           },
           {
             "faq_id": "FAQ-RECOG-002",
-            "order": 2,
+            "order": 1,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "What are the four supported body-claim branches?",
@@ -222,8 +222,8 @@
         "faqs": [
           {
             "faq_id": "FAQ-CALC-001",
-            "order": 2,
-            "priority": "P1",
+            "order": 1,
+            "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE"],
             "question": "What is the basic partial-damage calculation pattern?",
             "answer_summary": "Eligible parts and labor are reduced by applicable depreciation, then policy ratio/franchise order is applied, and allowable rescue is added.",
@@ -238,8 +238,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "How does replacement-part depreciation work?",
             "answer_summary": "It applies to replaced parts by vehicle-year index, with glass and lamp glass exempt and the rate capped at 25%.",
-            "answer": "The model uses zero before the fifth production-year index, then 5% per year up to 25%. Repair-only labor is not replacement-part depreciation, and battery/tyre cap interaction on older vehicles may remain uncertain.",
-            "customer_action": "Verify the production year, event year, part category, new-part price where relevant, and whether the item was replaced or repaired.",
+            "answer": "The model uses zero before the fifth production-year index, then 5% per year up to 25%. Repair-only labor is not replacement-part depreciation. For a battery or tyre, the sourced policy interpretation must choose one supported cap/depreciation interaction; the model does not deduct both paths or silently stack depreciation twice.",
+            "customer_action": "Verify the production year, event year, part category, new-part price, whether the item was replaced or repaired, and the sourced battery/tyre interaction rule where applicable.",
             "knowledge_refs": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
           },
           {
@@ -255,13 +255,13 @@
           },
           {
             "faq_id": "FAQ-CALC-004",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "Is there one universal franchise rate for all body claims?",
             "answer_summary": "No. Franchise must come from the applicable policy, endorsement, product, claim sequence, and source version.",
-            "answer": "The regulation does not create one universal body or glass percentage. A percentage also needs a calculation base and any minimum; using a remembered rate from another insurer or policy version is unsafe.",
-            "customer_action": "Request the policy declarations page, private conditions, endorsement schedule, and the exact franchise base and minimum.",
+            "answer": "The regulation does not create one universal body or glass percentage. A percentage also needs a named calculation base and any minimum because the same rate can produce a different deduction against gross loss, loss after depreciation, or another authorized stage. Using a remembered rate or an unnamed base is unsafe.",
+            "customer_action": "Request the policy declarations page, private conditions, endorsement schedule, exact franchise rate, named calculation base, minimum, and source version.",
             "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "U02_FRANCHISE_BASE_SCHEDULES", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_UNIVERSAL_GLASS_FRANCHISE"]
           },
           {
@@ -297,7 +297,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RESULT-001",
-            "order": 4,
+            "order": 5,
             "priority": "P1",
             "applies_to": ["GLASS_ONLY"],
             "question": "How is standalone glass handled?",
@@ -308,18 +308,18 @@
           },
           {
             "faq_id": "FAQ-RESULT-002",
-            "order": 5,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["THEFT"],
             "question": "When can whole-vehicle theft reach settlement?",
             "answer_summary": "Only after the sourced 60-day condition and required title transfer are established.",
-            "answer": "Before the condition is met, the outcome is pending; after it is met without title transfer, title transfer is required. The current model does not treat a stored elapsed-day number as proof of the legal clock anchor, so an unsourced anchor blocks review authorization.",
-            "customer_action": "Provide theft occurrence/awareness/declaration records, the non-discovery enquiry, evaluation date, and title-transfer proof.",
+            "answer": "Before the sourced 60-day condition is met, the outcome is pending; after it is met without title transfer, title transfer is required. The model derives completed days from a named start event and date through an as-of date in the stated Gregorian or Shamsi calendar. A bare elapsed-day number, a missing source, or a mismatch between stored and derived days blocks calculation.",
+            "customer_action": "Provide the theft occurrence, awareness, and declaration records; identify the legally applicable clock start; provide the start date, as-of date, calendar, source reference, non-discovery enquiry, and title-transfer proof.",
             "knowledge_refs": ["THEFT", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "U13_THEFT_CLOCK_ANCHOR", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_TITLE_TRANSFER_PROOF"]
           },
           {
             "faq_id": "FAQ-RESULT-003",
-            "order": 2,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "Why did I receive two amounts instead of one?",
@@ -341,7 +341,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-005",
-            "order": 3,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["ALL"],
             "question": "What does result confidence mean?",
@@ -515,7 +515,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RECOG-001",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "مدل چگونه نوع پرونده بیمه بدنه را تشخیص می‌دهد؟",
@@ -526,7 +526,7 @@
           },
           {
             "faq_id": "FAQ-RECOG-002",
-            "order": 2,
+            "order": 1,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "چهار شاخه پشتیبانی‌شده بیمه بدنه کدام‌اند؟",
@@ -643,8 +643,8 @@
         "faqs": [
           {
             "faq_id": "FAQ-CALC-001",
-            "order": 2,
-            "priority": "P1",
+            "order": 1,
+            "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE"],
             "question": "الگوی پایه محاسبه خسارت جزئی چیست؟",
             "answer_summary": "قطعات قابل قبول و اجرت با استهلاک مجاز تعدیل می‌شوند، سپس ترتیب نسبت و فرانشیز اجرا و هزینه نجات مجاز افزوده می‌شود.",
@@ -659,8 +659,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "استهلاک قطعات تعویضی چگونه اعمال می‌شود؟",
             "answer_summary": "بر اساس شاخص سال خودرو محاسبه می‌شود؛ شیشه و چراغ از آن معاف‌اند و نرخ حداکثر ۲۵٪ است.",
-            "answer": "مدل پیش از شاخص سال پنجم صفر و سپس سالانه ۵٪ تا سقف ۲۵٪ اعمال می‌کند. اجرت تعمیر، استهلاک قطعه تعویضی نیست و تداخل سقف باتری/لاستیک با استهلاک در خودروهای قدیمی ممکن است مبهم بماند.",
-            "customer_action": "سال ساخت، سال حادثه، گروه قطعه، قیمت قطعه نو و تعویض یا تعمیر بودن آن را کنترل کنید.",
+            "answer": "مدل پیش از شاخص سال پنجم صفر و سپس سالانه ۵٪ تا سقف ۲۵٪ اعمال می‌کند. اجرت تعمیر، استهلاک قطعه تعویضی نیست. برای باتری یا لاستیک، تفسیر مستند بیمه‌نامه باید یکی از روش‌های پشتیبانی‌شده تعامل سقف و استهلاک را انتخاب کند؛ مدل دو مسیر را با هم کسر نمی‌کند و استهلاک را دوبار اعمال نمی‌کند.",
+            "customer_action": "سال ساخت، سال حادثه، گروه قطعه، قیمت قطعه نو، تعویضی یا تعمیری بودن و در صورت لزوم قاعده مستند تعامل سقف باتری/لاستیک را بررسی کنید.",
             "knowledge_refs": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
           },
           {
@@ -676,13 +676,13 @@
           },
           {
             "faq_id": "FAQ-CALC-004",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "آیا برای همه خسارت‌های بدنه یک نرخ فرانشیز عمومی وجود دارد؟",
             "answer_summary": "خیر؛ فرانشیز باید از بیمه‌نامه، الحاقیه، محصول، سابقه خسارت و نسخه منبع مربوط گرفته شود.",
-            "answer": "مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی همچنین به مبنای محاسبه و حداقل احتمالی نیاز دارد؛ استفاده از نرخ بیمه‌گر یا نسخه دیگر ناامن است.",
-            "customer_action": "صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و مبنا و حداقل دقیق را درخواست کنید.",
+            "answer": "مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی به مبنای محاسبه نام‌گذاری‌شده و حداقل احتمالی نیاز دارد، زیرا همان نرخ روی خسارت ناخالص، خسارت پس از استهلاک یا مرحله مجاز دیگری مبلغ متفاوتی می‌دهد. استفاده از نرخ حفظ‌شده در ذهن یا مبنای نامشخص ناامن است.",
+            "customer_action": "صفحه مشخصات، شرایط خصوصی، جدول الحاقیه، نرخ دقیق فرانشیز، مبنای محاسبه نام‌گذاری‌شده، حداقل و نسخه منبع را درخواست کنید.",
             "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "U02_FRANCHISE_BASE_SCHEDULES", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_UNIVERSAL_GLASS_FRANCHISE"]
           },
           {
@@ -718,7 +718,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RESULT-001",
-            "order": 4,
+            "order": 5,
             "priority": "P1",
             "applies_to": ["GLASS_ONLY"],
             "question": "شکست شیشه به‌تنهایی چگونه بررسی می‌شود؟",
@@ -729,18 +729,18 @@
           },
           {
             "faq_id": "FAQ-RESULT-002",
-            "order": 5,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["THEFT"],
             "question": "سرقت کامل خودرو چه زمانی می‌تواند به تسویه برسد؟",
             "answer_summary": "پس از احراز شرط شصت‌روزه با مبدأ مستند و انتقال سند لازم.",
-            "answer": "پیش از تحقق شرط، نتیجه در انتظار است؛ پس از تحقق شرط و بدون انتقال سند، انتقال سند لازم است. مدل فعلی عدد روز سپری‌شده را به‌تنهایی دلیل مبدأ قانونی ساعت نمی‌داند و مبدأ نامستند، مجوز محاسبه را متوقف می‌کند.",
-            "customer_action": "اسناد وقوع، اطلاع و اعلام سرقت، استعلام عدم کشف، تاریخ ارزیابی و مدرک انتقال سند را ارائه کنید.",
+            "answer": "پیش از تحقق شرط شصت‌روزه مستند، نتیجه در انتظار است؛ پس از تحقق شرط و بدون انتقال سند، انتقال سند لازم است. مدل تعداد روزهای کامل را از رویداد و تاریخ شروع نام‌گذاری‌شده تا تاریخ ارزیابی و بر اساس تقویم میلادی یا شمسی اعلام‌شده استخراج می‌کند. عدد روزِ بدون منبع، منبع مفقود یا ناسازگاری روز ذخیره‌شده با روز استخراج‌شده، محاسبه را متوقف می‌کند.",
+            "customer_action": "اسناد وقوع، اطلاع و اعلام سرقت را ارائه کنید؛ مبدأ قانونی ساعت، تاریخ شروع، تاریخ ارزیابی، تقویم، مرجع منبع، استعلام عدم کشف و مدرک انتقال سند را مشخص کنید.",
             "knowledge_refs": ["THEFT", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "U13_THEFT_CLOCK_ANCHOR", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_TITLE_TRANSFER_PROOF"]
           },
           {
             "faq_id": "FAQ-RESULT-003",
-            "order": 2,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "چرا به‌جای یک مبلغ، دو مبلغ دریافت کرده‌ام؟",
@@ -762,7 +762,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-005",
-            "order": 3,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["ALL"],
             "question": "اطمینان نتیجه چه معنایی دارد؟",

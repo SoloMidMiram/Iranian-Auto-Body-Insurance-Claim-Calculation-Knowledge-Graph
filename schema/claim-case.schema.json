@@ -201,8 +201,7 @@
             "INSURED_RETAINS",
             "INSURER_TAKES_TITLE",
             "UNRESOLVED"
-          ],
-          "default": "NOT_APPLICABLE"
+          ]
         },
         "title_transferred_to_insurer": {
           "type": [
@@ -244,10 +243,48 @@
         },
         "days_vehicle_missing": {
           "type": [
-            "number",
+            "integer",
             "null"
           ],
           "minimum": 0
+        },
+        "theft_clock": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start_event",
+            "start_date",
+            "as_of_date",
+            "calendar",
+            "source"
+          ],
+          "properties": {
+            "start_event": {
+              "enum": [
+                "THEFT_OCCURRENCE",
+                "AWARENESS",
+                "DECLARATION"
+              ]
+            },
+            "start_date": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "as_of_date": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "calendar": {
+              "enum": [
+                "GREGORIAN",
+                "SHAMSI"
+              ]
+            },
+            "source": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
         "fault_status": {
           "enum": [
@@ -832,9 +869,13 @@
               "minimum": 0
             },
             "calculation_base": {
-              "type": [
-                "string",
-                "null"
+              "enum": [
+                "ASSESSED_GROSS",
+                "GROSS_ELIGIBLE",
+                "AFTER_DEPRECIATION",
+                "AFTER_SALVAGE",
+                "SETTLEMENT_BASE",
+                null
               ]
             },
             "claim_sequence_rule": {
@@ -869,7 +910,35 @@
                 "null"
               ]
             }
-          }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "enum": [
+                      "PERCENT",
+                      "PERCENT_WITH_MINIMUM"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "rate",
+                  "calculation_base"
+                ],
+                "properties": {
+                  "rate": {
+                    "type": "number"
+                  },
+                  "calculation_base": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     },
@@ -968,8 +1037,7 @@
             "ASSESSED_GROSS",
             "ELIGIBLE_GROSS",
             "SETTLEMENT_BASE"
-          ],
-          "default": "ASSESSED_GROSS"
+          ]
         },
         "franchise_rate": {
           "type": [

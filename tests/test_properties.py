@@ -19,7 +19,7 @@ def _partial(
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": gross, "market": market, "insured": insured},
+        "damage": {"gross": gross, "depreciation": 0, "market": market, "insured": insured},
         "policy": {
             "policy_version": "TEST-v1",
             "franchise": {
@@ -92,6 +92,7 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
                     "source_version": "TEST-v1",
                 },
             },
+            "calculation_config": {"rescue_cap_base": "ASSESSED_GROSS"},
         },
         kb,
     )
@@ -172,6 +173,7 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                         "source_version": "TEST-v1",
                     },
                 },
+                "calculation_config": {"rescue_cap_base": "ASSESSED_GROSS"},
             },
             kb,
         )

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import copy
+
 import pytest
+from admission_shim import compute as admitted_compute
 
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan
-
-from admission_shim import compute
 from iran_auto_claim.money import D
 
 
@@ -40,7 +41,39 @@ def _policy(
         spec["absolute_irr"] = franchise
     else:
         spec["rate"] = "0.10"
+        spec["calculation_base"] = "AFTER_DEPRECIATION"
     return {"policy_version": "TEST-v1", "franchise": spec}
+
+
+def compute(payload, kb):
+    """Make the guard-focused synthetic assumptions explicit."""
+    payload = copy.deepcopy(payload)
+    branch = (payload.get("classification") or {}).get("branch")
+    damage = payload.setdefault("damage", {})
+    if branch == "PARTIAL_DAMAGE":
+        if not any(key in damage for key in ("market", "insured")):
+            damage["market"] = 10**12
+            damage["insured"] = 10**12
+        if not any(
+            key in damage
+            for key in ("depreciation", "depreciable_parts", "parts", "replacement_parts")
+        ):
+            damage["depreciation"] = 0
+    if branch == "TOTAL_LOSS" and any(
+        key in damage for key in ("salvage", "salvage_value")
+    ):
+        damage.setdefault("salvage_disposition", "INSURED_RETAINS")
+    franchise = ((payload.get("policy") or {}).get("franchise") or {})
+    if str(franchise.get("mode") or "").startswith("PERCENT"):
+        franchise.setdefault("calculation_base", "AFTER_DEPRECIATION")
+    if (damage.get("rescue_payable") or damage.get("actual_rescue")) and branch in (
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+    ):
+        payload.setdefault("calculation_config", {}).setdefault(
+            "rescue_cap_base", "ASSESSED_GROSS"
+        )
+    return admitted_compute(payload, kb)
 
 
 @pytest.mark.parametrize("guard_id", ALL_GUARDS, ids=ALL_GUARDS)
@@ -326,6 +359,7 @@ def test_causation_token_excludes_and_narrative_text_does_not(kb):
             "event": {
                 "event_date": "1405/06/01",
                 "cause": "DRIVER_INTOXICATION_CAUSALLY_CONFIRMED",
+                "intoxication_causally_confirmed": True,
             },
             "damage": {"gross": 1000},
             "policy": _policy(10),

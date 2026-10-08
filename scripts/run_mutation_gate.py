@@ -35,7 +35,13 @@ MUTATIONS = (
     Mutation("M08", "src/iran_auto_claim/operators.py", "return min(actual_cost, RESCUE_CAP_RATIO * cap_base)", "return max(actual_cost, RESCUE_CAP_RATIO * cap_base)", "rescue cap becomes a floor"),
     Mutation("M09", "src/iran_auto_claim/operators.py", "return combined > threshold, combined, threshold", "return combined >= threshold, combined, threshold", "strict total-loss boundary becomes inclusive"),
     Mutation("M10", "src/iran_auto_claim/operators.py", "if insured_sum >= market_value:\n        return Decimal(1)", "if insured_sum >= market_value:\n        return Decimal(0)", "fully insured claim receives a zero ratio"),
-    Mutation("M11", "src/iran_auto_claim/engine.py", "if not missing:\n        return", "if missing:\n        return", "a bypassed required guard is accepted"),
+    Mutation(
+        "M11",
+        "src/iran_auto_claim/engine.py",
+        "def _enforce_guard_plan(res: CalcResult) -> None:\n    missing = [\n        guard_id for guard_id in res.required_guards if guard_id not in res.guards_executed\n    ]\n    if not missing:\n        return",
+        "def _enforce_guard_plan(res: CalcResult) -> None:\n    missing = [\n        guard_id for guard_id in res.required_guards if guard_id not in res.guards_executed\n    ]\n    if missing:\n        return",
+        "a bypassed required guard is accepted",
+    ),
     Mutation("M12", "src/iran_auto_claim/admission.py", "if _snapshot_hash(grant.claim_snapshot) != grant.claim_hash:", "if False:", "the immutable claim snapshot no longer has to match its issued hash"),
     Mutation("M13", "src/iran_auto_claim/admission.py", "if self.decision not in AUTHORIZED_DECISIONS:", "if False:", "a REFUSE or INSUFFICIENT_INFORMATION decision reaches the calculator"),
     Mutation("M14", "src/iran_auto_claim/engine.py", "if not case.risk_intensified:\n        return", "if case.risk_intensified:\n        return", "risk intensification is settled at full amount instead of blocked on U15"),
@@ -52,6 +58,41 @@ MUTATIONS = (
         "_grant: _AuthorizationGrant | None = field(default=None, init=False, repr=False, compare=False)",
         "_grant: _AuthorizationGrant | None = field(default=None, init=True, repr=False, compare=False)",
         "dataclasses.replace can transplant a modified private grant onto another claim",
+    ),
+    Mutation(
+        "M17",
+        "src/iran_auto_claim/engine.py",
+        "insurer_payable = min(actual, corresponding, limit)",
+        "insurer_payable = min(corresponding, limit)",
+        "Article 8 explicit zero is replaced by the corresponding-damage cap",
+    ),
+    Mutation(
+        "M18",
+        "src/iran_auto_claim/engine.py",
+        "return bool(checks) and all(checks)",
+        "return bool(checks) and any(checks)",
+        "one exclusion clause can replace the required causal conjunction",
+    ),
+    Mutation(
+        "M19",
+        "src/iran_auto_claim/operators.py",
+        "effective_depreciation = capped - after_depreciation",
+        "effective_depreciation = scheduled_depreciation",
+        "depreciate-then-cap deducts scheduled depreciation a second time",
+    ),
+    Mutation(
+        "M20",
+        "src/iran_auto_claim/engine.py",
+        "selected_base = bases.get(str(calculation_base).upper()) if calculation_base else None",
+        "selected_base = next(iter(bases.values())) if calculation_base else None",
+        "percentage franchise ignores its named calculation base",
+    ),
+    Mutation(
+        "M21",
+        "src/iran_auto_claim/engine.py",
+        "missing = [item for item in authorized if item not in res.blocking_uncertainties]\n    if not missing:\n        return",
+        "missing = [item for item in authorized if item not in res.blocking_uncertainties]\n    if missing:\n        return",
+        "a review-live uncertainty disappears from the deterministic result",
     ),
 )
 
@@ -108,8 +149,10 @@ def _render(results: list[tuple[Mutation, bool]]) -> str:
         "This is a reproducible, curated high-risk mutation set for the deterministic",
         "body calculation boundary. It is not a claim of exhaustive mutation coverage.",
         "",
-        "- Target modules: `plans.py`, `operators.py`, the guard-plan gate in "
-        "`engine.py`, and the authorization boundary in `admission.py`",
+        (
+            "- Target modules: `plans.py`, `operators.py`, the guard-plan gate in "
+            "`engine.py`, and the authorization boundary in `admission.py`"
+        ),
         f"- Required score: **{THRESHOLD:.0f}%**",
         f"- Result: **{killed}/{total} killed ({score:.1f}%)**",
         "- Command: `python scripts/run_mutation_gate.py --check-report`",

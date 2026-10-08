@@ -30,6 +30,7 @@ from iran_auto_claim.admission import (
     AuthorizationError,
     AuthorizationNotGranted,
     CalculationAuthorization,
+    _issue_review_authorization,
     claim_hash,
 )
 from iran_auto_claim.case import Case
@@ -65,7 +66,7 @@ def test_a_raw_payload_cannot_reach_compute(kb):
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": 1600},
+        "damage": {"gross": 1600, "depreciation": 0, "market": 2000, "insured": 2000},
         "policy": {
             "policy_version": "TEST-v1",
             "franchise": {
@@ -219,7 +220,7 @@ def test_dataclasses_replace_cannot_retarget_an_authorization(kb):
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": 1600},
+        "damage": {"gross": 1600, "depreciation": 0, "market": 2000, "insured": 2000},
         "policy": {
             "policy_version": "TEST-v1",
             "franchise": {
@@ -249,6 +250,45 @@ def test_dataclasses_replace_cannot_retarget_an_authorization(kb):
 
     # the unedited payload is still admitted, and still gives the same answer
     assert compute(authorization, kb).payable == Decimal(1500)
+
+
+def test_review_live_uncertainty_cannot_disappear_into_a_single_payable(kb):
+    payload = {
+        "claim_id": "authorization-uncertainty-reconciliation",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01"},
+        "damage": {
+            "gross": 100,
+            "depreciation": 0,
+            "market": 100,
+            "insured": 100,
+        },
+        "policy": {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": 10,
+                "source": "POLICY",
+                "source_reference": "test schedule",
+                "source_version": "TEST-v1",
+            },
+        },
+    }
+    authorization = _issue_review_authorization(
+        payload,
+        decision="SCENARIO_SET",
+        issued_at="2026-10-08T00:00:00+00:00",
+        provenance={"live_uncertainties": ["U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]},
+    )
+    result = compute(authorization, kb)
+    assert result.payable is None
+    assert result.payable_scenarios == []
+    assert result.status == "AUTHORIZED_UNCERTAINTY_UNRESOLVED"
+    assert result.blocking_uncertainties == ["U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
+    assert result.fields["authorization_uncertainties_added"] == [
+        "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+    ]
 
 
 @pytest.mark.parametrize(

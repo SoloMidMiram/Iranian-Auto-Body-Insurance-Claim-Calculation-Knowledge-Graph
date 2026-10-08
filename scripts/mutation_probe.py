@@ -11,6 +11,7 @@ from iran_auto_claim.admission import (
     AuthorizationError,
     CalculationAuthorization,
     _canonical_json,
+    _issue_review_authorization,
     claim_hash,
 )
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan, compute
@@ -18,6 +19,7 @@ from iran_auto_claim.fixtures import _authorize_fixture_case
 from iran_auto_claim.knowledge import Knowledge
 from iran_auto_claim.operators import (
     allowable_rescue_transport,
+    eligible_part_loss,
     is_total_loss,
     underinsurance_ratio,
 )
@@ -211,6 +213,88 @@ def main() -> int:
     assert intensified.payable is None
     assert intensified.status == "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED"
     assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" in intensified.blocking_uncertainties
+
+    # RMV-003: the effective depreciation is the change from capped eligible
+    # loss to the selected one-pass result, not the scheduled amount deducted a
+    # second time by the branch calculation.
+    tire = {"category": "TIRE", "assessed_loss": Decimal(120), "new_price": Decimal(200)}
+    tire_result = eligible_part_loss(
+        tire,
+        1392,
+        1405,
+        {"battery_tire_depreciation_interaction": "DEPRECIATE_THEN_CAP"},
+    )
+    assert tire_result["loss_after_depreciation"] == Decimal(90)
+    assert tire_result["depreciation_amount"] == Decimal(10)
+
+    sourced_absolute = {
+        "mode": "ABSOLUTE",
+        "absolute_irr": 10,
+        "source": "POLICY",
+        "source_reference": "mutation probe schedule",
+        "source_version": "TEST-v1",
+    }
+    partial = {
+        "claim_id": "runtime-defect-probe",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01", "cause": "ALCOHOL"},
+        "damage": {
+            "gross": 100,
+            "depreciation": 20,
+            "market": 100,
+            "insured": 100,
+        },
+        "policy": {"policy_version": "TEST-v1", "franchise": sourced_absolute},
+    }
+
+    # RMV-002: a coded intoxication cause without the causal authority flag is
+    # insufficient to activate the non-compensable exclusion.
+    causal = compute(_authorize_fixture_case(partial, kb), kb)
+    assert causal.payable == Decimal(70)
+    assert "exclusion_applied" not in causal.fields
+
+    # RMV-004: AFTER_DEPRECIATION selects 80, not assessed gross 100.
+    percentage = copy.deepcopy(partial)
+    percentage["policy"]["franchise"] = {
+        "mode": "PERCENT",
+        "rate": 0.1,
+        "calculation_base": "AFTER_DEPRECIATION",
+        "source": "POLICY",
+        "source_reference": "mutation probe schedule",
+        "source_version": "TEST-v1",
+    }
+    percentage_result = compute(_authorize_fixture_case(percentage, kb), kb)
+    assert percentage_result.fields["franchise"] == Decimal(8)
+    assert percentage_result.payable == Decimal(72)
+
+    # RMV-001: explicit zero is a real amount and caps Article 8 at zero.
+    article8 = {
+        "claim_id": "article8-zero-probe",
+        "unit": "IRR",
+        "classification": {"branch": "ARTICLE_8_NON_CONVENTIONAL"},
+        "damage": {
+            "vehicle_value": 2500,
+            "actual_damage": 0,
+            "corresponding_damage": 180,
+            "policy_financial_limit": 200,
+        },
+    }
+    article8_result = compute(_authorize_fixture_case(article8, kb), kb)
+    assert article8_result.payable == Decimal(0)
+    assert article8_result.fields["actual_damage"] == Decimal(0)
+
+    # RMV-005: an authorization-live uncertainty may not disappear when the
+    # arithmetic path itself does not rediscover it.
+    review_authorization = _issue_review_authorization(
+        partial,
+        decision="SCENARIO_SET",
+        issued_at="2026-10-08T00:00:00+00:00",
+        provenance={"live_uncertainties": ["U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]},
+    )
+    reconciled = compute(review_authorization, kb)
+    assert reconciled.payable is None
+    assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" in reconciled.blocking_uncertainties
     return 0
 
 

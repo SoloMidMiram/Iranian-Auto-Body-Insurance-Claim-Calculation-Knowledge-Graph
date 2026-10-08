@@ -422,7 +422,7 @@ class Review:
         if franchise.get("source") not in ("POLICY", "ENDORSEMENT", "INSURER_MANUAL"):
             return False
         if mode.startswith("PERCENT"):
-            if franchise.get("rate") is None:
+            if franchise.get("rate") is None or franchise.get("calculation_base") is None:
                 return False
             if mode == "PERCENT_WITH_MINIMUM" and franchise.get(
                 "minimum_irr", franchise.get("minimum")

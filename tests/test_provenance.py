@@ -14,7 +14,7 @@ def _partial(gross: int = 1600, franchise: int = 100) -> dict:
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": gross},
+        "damage": {"gross": gross, "depreciation": 0, "market": 2000, "insured": 2000},
         "policy": {
             "policy_version": "TEST-v1",
             "franchise": {

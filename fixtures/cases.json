@@ -40,6 +40,8 @@
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 2000000000,
         "depreciable_parts": 1200000000,
         "depreciation_rate": 0.05,
@@ -56,6 +58,8 @@
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 3000000000,
         "depreciable_parts": 1800000000,
         "depreciation_rate": 0.1,
@@ -72,6 +76,8 @@
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 4000000000,
         "depreciable_parts": 2500000000,
         "depreciation_rate": 0.15,
@@ -88,6 +94,8 @@
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 5000000000,
         "depreciable_parts": 3000000000,
         "depreciation_rate": 0.2,
@@ -104,6 +112,8 @@
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 6000000000,
         "depreciable_parts": 4000000000,
         "depreciation_rate": 0.25,
@@ -126,6 +136,8 @@
         "production_year_shamsi": 1405
       },
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 800000000,
         "replacement_parts": [
           {
@@ -151,6 +163,8 @@
         "production_year_shamsi": 1405
       },
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "battery_new_price": 400000000,
         "battery_loss": 400000000,
         "franchise": 20000000
@@ -172,6 +186,8 @@
         "production_year_shamsi": 1405
       },
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "tires_new_price": 1000000000,
         "tire_loss": 1000000000,
         "franchise": 50000000
@@ -224,7 +240,10 @@
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 2000000000,
+        "depreciation": 0,
         "franchise": 200000000,
         "actual_rescue": 600000000
       },
@@ -265,6 +284,9 @@
       "id": "P15",
       "branch": "PARTIAL_DAMAGE",
       "unit": "IRR",
+      "event": {
+        "intoxication_causally_confirmed": true
+      },
       "inputs": {
         "cause": "DRIVER_INTOXICATION_CAUSALLY_CONFIRMED",
         "gross": 2500000000
@@ -284,6 +306,7 @@
         "repair": 16000000000,
         "rescue_for_threshold": 500000000,
         "salvage": 3000000000,
+        "salvage_disposition": "INSURED_RETAINS",
         "franchise": 1000000000,
         "rescue_payable": 500000000
       },
@@ -316,6 +339,7 @@
         "repair": 14800000000,
         "rescue_for_threshold": 300000000,
         "salvage": 3000000000,
+        "salvage_disposition": "INSURED_RETAINS",
         "franchise": 1000000000,
         "rescue_payable": 300000000
       },
@@ -333,6 +357,7 @@
         "insured": 24000000000,
         "repair": 23000000000,
         "salvage": 4000000000,
+        "salvage_disposition": "INSURED_RETAINS",
         "franchise": 1200000000,
         "rescue_payable": 500000000
       },
@@ -352,6 +377,7 @@
         "insured": 25000000000,
         "repair": 16000000000,
         "salvage": 3000000000,
+        "salvage_disposition": "INSURED_RETAINS",
         "franchise": 1000000000,
         "rescue_payable": 200000000
       },
@@ -381,6 +407,15 @@
       "id": "T22",
       "branch": "TOTAL_THEFT",
       "unit": "IRR",
+      "event": {
+        "theft_clock": {
+          "start_event": "THEFT_OCCURRENCE",
+          "start_date": "2026-01-01",
+          "as_of_date": "2026-03-01",
+          "calendar": "GREGORIAN",
+          "source": "synthetic police report"
+        }
+      },
       "inputs": {
         "theft_type": "WHOLE_VEHICLE",
         "days_missing": 59,
@@ -396,13 +431,23 @@
       "id": "T23",
       "branch": "TOTAL_THEFT",
       "unit": "IRR",
+      "event": {
+        "theft_clock": {
+          "start_event": "THEFT_OCCURRENCE",
+          "start_date": "2026-01-01",
+          "as_of_date": "2026-03-02",
+          "calendar": "GREGORIAN",
+          "source": "synthetic police report"
+        }
+      },
       "inputs": {
         "theft_type": "WHOLE_VEHICLE",
         "days_missing": 60,
         "market": 18000000000,
         "insured": 18000000000,
         "franchise": 1800000000,
-        "title_transferred": true
+        "title_transferred": true,
+        "salvage_disposition": "INSURER_TAKES_TITLE"
       },
       "expected": {
         "total_loss_criterion": true,
@@ -445,7 +490,10 @@
       "unit": "IRR",
       "inputs": {
         "cause": "COLLISION",
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 500000000,
+        "depreciation": 0,
         "franchise": 50000000
       },
       "expected": {
@@ -482,6 +530,8 @@
         "production_year_shamsi": 1405
       },
       "inputs": {
+        "market": 30000000000,
+        "insured": 30000000000,
         "lamp_glass": 200000000,
         "other_replacement_part": 400000000,
         "other_part_depreciation_rate": 0.05,
@@ -497,6 +547,15 @@
       "id": "TH29",
       "branch": "THEFT",
       "unit": "IRR",
+      "event": {
+        "theft_clock": {
+          "start_event": "THEFT_OCCURRENCE",
+          "start_date": "2026-01-01",
+          "as_of_date": "2026-01-31",
+          "calendar": "GREGORIAN",
+          "source": "synthetic police report"
+        }
+      },
       "inputs": {
         "theft_type": "WHOLE_VEHICLE",
         "days_missing": 30
@@ -509,13 +568,23 @@
       "id": "TH30",
       "branch": "THEFT",
       "unit": "IRR",
+      "event": {
+        "theft_clock": {
+          "start_event": "THEFT_OCCURRENCE",
+          "start_date": "2026-01-01",
+          "as_of_date": "2026-03-07",
+          "calendar": "GREGORIAN",
+          "source": "synthetic police report"
+        }
+      },
       "inputs": {
         "theft_type": "WHOLE_VEHICLE",
         "days_missing": 65,
         "market": 22000000000,
         "insured": 22000000000,
         "franchise": 2200000000,
-        "title_transferred": true
+        "title_transferred": true,
+        "salvage_disposition": "INSURER_TAKES_TITLE"
       },
       "expected": {
         "route": "THEFT_TOTAL_SETTLEMENT",
@@ -528,7 +597,10 @@
       "unit": "IRR",
       "inputs": {
         "theft_type": "ATTEMPTED_VEHICLE_THEFT_DAMAGE",
+        "market": 30000000000,
+        "insured": 30000000000,
         "gross": 500000000,
+        "depreciation": 0,
         "franchise": 50000000
       },
       "expected": {
