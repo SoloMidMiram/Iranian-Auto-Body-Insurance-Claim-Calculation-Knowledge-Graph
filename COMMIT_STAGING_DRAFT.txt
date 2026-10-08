@@ -1,10 +1,14 @@
 Body-runtime blocker repair draft
 Updated: 2026-10-08
 Local branch: fix/body-runtime-blockers
+Remote branch: fix/body-runtime-blockers
 Stacked base: docs/body-model-validation (PR #47)
-Proposed commit: fix(runtime): close body calculation blockers
-Proposed PR base: docs/body-model-validation
-Status: IMPLEMENTED; LOCAL GATES PASSED; REMOTE PR/CI PENDING
+PR: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/pull/48
+Local content commit: 5f68176f429c11e83842f9d58f2c802a7888310f
+Remote content commit: 466a1fd70d899b1d0da4ca5aa0249d7a6f9d242a
+Shared content tree: e4fadb034139f0084bb64fb3752db46cf3021fb6
+Repository gate: PASS — run 37769582813
+Status: OPEN; MERGEABLE; LOCAL AND REMOTE GATES PASSED
 
 Runtime outcome
 ===============
@@ -44,25 +48,44 @@ Verification
   48 source-metadata findings remain documented release work.
 - Generated review and customer-FAQ documentation: current.
 - Compilation, JSON parsing, and git diff whitespace checks: passed.
+- GitHub Actions `repository-gate`: passed on remote content commit
+  466a1fd70d899b1d0da4ca5aa0249d7a6f9d242a (run 37769582813).
+
+Publication and review audit
+============================
+
+- Opened PR #48 against `docs/body-model-validation`; its parent is PR #47's
+  exact remote head, so the documentation/runtime stack is linear.
+- Local and remote content commits have different identities but the same tree,
+  `e4fadb034139f0084bb64fb3752db46cf3021fb6`.
+- Review-thread audit: 0 threads on each open PR #46, #47, and #48.
+- Commented on PR #47 with the runtime follow-up and FAQ v1.2 evidence.
+- Commented on PR #46 with the recommendation to close it as superseded by #47
+  after review history is no longer needed; do not merge both documentation PRs.
+- Added scoped progress comments to issues #4, #8, #10, #12, #14, #15, #17,
+  #20, and #21. No roadmap issue was closed.
 
 Issue and PR mapping
 ====================
 
-- #8 / P1-02: record the sourced theft-clock implementation as partial progress;
+- #4 / P0-04: recorded the Article 8 actual/zero repair as partial progress;
+  keep open for dual-coverage/legal-recovery completion and closure evidence.
+- #8 / P1-02: recorded the sourced theft-clock implementation as partial progress;
   keep open for regulatory/policy effective-date and amendment-boundary work.
-- #10 / P1-04: record authorization uncertainty reconciliation as partial
+- #10 / P1-04: recorded authorization uncertainty reconciliation as partial
   progress; keep open for full dependency-derived provenance/confidence.
-- #12 / P2-01: record causal conjunction and theft-clock predicates as partial
+- #12 / P2-01: recorded causal conjunction and theft-clock predicates as partial
   progress; keep open for the full closed taxonomy and decision table.
-- #14 / P2-03 and #15 / P2-04: link the new fail-closed and defect-signature
+- #14 / P2-03 and #15 / P2-04: linked the new fail-closed and defect-signature
   regressions; keep open until their complete guard/mutation/parity gates pass.
-- #17 / P3-02: typed franchise-base execution is infrastructure progress, not a
+- #17 / P3-02: recorded typed franchise-base execution as infrastructure progress,
+  not a
   governed insurer adapter; keep open.
-- #20 / P3-05: Article 8 cap is repaired, but assessor mappings remain open.
-- #21 / P3-06: all candidate battery/tyre modes and conditional U05 behavior are
+- #20 / P3-05: recorded the repaired Article 8 downstream cap; assessor mappings
+  remain open.
+- #21 / P3-06: recorded all candidate battery/tyre modes and conditional U05 behavior as
   executable; authoritative insurer resolution remains open.
-- PR #47 remains the documentation base. The runtime PR should be stacked on
-  #47, not mixed into or force-pushed over its independently published history.
+- PR #47 remains the documentation base; PR #48 is stacked on its exact head.
 
 Workspace exclusions
 ====================
