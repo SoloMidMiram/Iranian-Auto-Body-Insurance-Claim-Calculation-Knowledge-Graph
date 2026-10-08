@@ -6,7 +6,8 @@ Consolidation base: PR #46 head 5b1d06e2cd97c5e1832ccc4d830c703a954e6a50
 New PR: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/pull/47
 Local content commit: 6fc40928a734610ed88dd67327a94363bfc988f4
 Initial remote content commit: d82a2b6d0d96790a4273c400b0d2673059fc40d9
-Status: OPEN; REPOSITORY GATE PENDING
+Remote metadata commit verified by CI: 485462be50de26e3488ba838d1a149842947e087
+Status: OPEN; REPOSITORY GATE PASSED (run 37735246995)
 
 Branch organization
 ===================
@@ -329,6 +330,9 @@ Verification
   python3 -m pytest -q
       NOT RUN: pytest is not installed in either available local Python
       environment. No current full-suite pass is claimed by this audit.
+
+  GitHub Actions repository-gate (PR #47, run 37735246995)
+      PASS: consolidated remote branch at 485462be50de26e3488ba838d1a149842947e087
 
 Suggested commit
 ----------------
