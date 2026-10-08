@@ -41,6 +41,11 @@ Runtime outcome
   30 and covers 59/60/61-day, cross-year, reverse-date, malformed, and calendar
   mismatch cases. Broader regulatory/policy effective dating stays open under
   issue #8.
+- Codex review follow-up: the supported Review questionnaire now supplies five
+  governed theft-clock slots (start event/date, as-of date, calendar, source),
+  emits `event.theft_clock`, and clears U13 only when the group is complete. A
+  full 60-day Shamsi review now reaches the theft settlement engine end to end;
+  incomplete clock groups remain blocked.
 - Customer FAQ v1.2 preserves the dependency-safe category hierarchy and makes
   the within-category journey explicit: branch map before recognition method,
   calculation overview before individual deductions, and both P0 result states
@@ -51,7 +56,7 @@ Runtime outcome
 Verification
 ============
 
-- Full pytest suite: 501/501 passed.
+- Full pytest suite: 502/502 passed.
 - Synthetic fixture corpus: 50/50 passed.
 - Curated high-risk mutation gate: 23/23 killed (100.0%).
 - Knowledge validation: structurally OK; the pre-existing 22 body-authority and

@@ -159,7 +159,7 @@ These are mostly safety improvements, but only the L49 spelling correction is li
 | RMV-004 | Fixed at the shared engine boundary: percentage modes require a typed supported base and record the selected base/value. Total-loss `SETTLEMENT_BASE` is the pre-salvage `min(market, insured)` and is distinct from `AFTER_SALVAGE`. | Schema rejection for omitted/unsupported bases plus amount-sensitive partial and nonzero-salvage total-loss regressions. |
 | RMV-005 | Fixed: authorization-live uncertainties missing from runtime output force a blocked result and clear any unsupported payable/scenario set. | Review-issued authorization reconciliation regression. |
 | RMV-006 | Fixed for the named defaults: missing Article 10 anchors, aggregate depreciation, material rescue denominator, and salvage disposition fail closed. | Missing-input and materially different denominator regressions; 50/50 updated explicit fixtures. |
-| RMV-008 | Partially fixed: whole-theft clocks now bind start event/date, as-of date, calendar, source, and derived whole days; missing/mismatched clocks block. Shamsi validation distinguishes leap-year Esfand 30 and covers 59/60/61-day and cross-year intervals. Regulatory and policy effective-date completion remains in #8. | Gregorian/Shamsi equivalence, leap/common-year, boundary, reverse-date, malformed-input, and stored/derived mismatch regressions. |
+| RMV-008 | Partially fixed: the normal review questionnaire now binds and emits the whole-theft start event/date, as-of date, calendar, and source; U13 clears only for a complete group and the engine derives/verifies whole days. Shamsi validation distinguishes leap-year Esfand 30 and covers 59/60/61-day and cross-year intervals. Regulatory and policy effective-date completion remains in #8. | Review-to-engine reachability plus Gregorian/Shamsi equivalence, leap/common-year, boundary, reverse-date, malformed-input, and stored/derived mismatch regressions. |
 
 The implementation remains decision support. These fixes do not supply insurer
 manuals, primary authority artifacts, independent reviewers, or governed
@@ -275,7 +275,7 @@ The deterministic defect repair can fit inside the existing body-model sprint; l
 | Causation diagnostic | Original reproduction denied from a bare token; the follow-up requires both token and causal finding. |
 | Battery/tyre diagnostic | Original `DEPRECIATE_THEN_CAP` result double-deducted; the follow-up discriminating case returns 75/90/100 for the three configured modes. |
 | Fixture corpus | 50/50 pass after legacy fixture assumptions were made explicit. |
-| Full pytest suite | 501/501 passed locally after the runtime and date-semantics remediation. |
+| Full pytest suite | 502/502 passed locally after the runtime, date-semantics, and review-to-engine theft-clock remediation. |
 | Curated mutation gate | 23/23 killed (100%), including settlement-base aliasing and non-leap Esfand 30 mutants. |
 
 ## Release conclusion

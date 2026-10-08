@@ -397,7 +397,10 @@ class Review:
         if uncertainty_id == "U12_SALVAGE_DISPOSITION":
             return str(slot("PS_SALVAGE_DISPOSITION") or "") == "UNRESOLVED"
         if uncertainty_id == "U13_THEFT_CLOCK_ANCHOR":
-            return str(slot("PS_THEFT_TYPE") or "") == "WHOLE_VEHICLE"
+            return (
+                str(slot("PS_THEFT_TYPE") or "") == "WHOLE_VEHICLE"
+                and self._theft_clock() is None
+            )
         if uncertainty_id == "U14_GLASS_INSURED_AT_VALUE_CONDITION":
             return branch == "GLASS_ONLY" and str(slot("PS_GLASS_VALUATION_CONDITION") or "") == (
                 "REQUIRES_INSURED_AT_MARKET_VALUE"
@@ -440,6 +443,23 @@ class Review:
                 and franchise.get("source_version")
             )
         return True
+
+    def _theft_clock(self) -> dict[str, Any] | None:
+        """Return the complete, source-bound whole-theft clock or no clock.
+
+        A partial group must never reach the case schema: the review remains
+        blocked by its unanswered questions and U13 until all five fields exist.
+        """
+        fields = {
+            "start_event": self._bound.get("PS_THEFT_CLOCK_START_EVENT"),
+            "start_date": self._bound.get("PS_THEFT_CLOCK_START_DATE"),
+            "as_of_date": self._bound.get("PS_THEFT_CLOCK_AS_OF_DATE"),
+            "calendar": self._bound.get("PS_THEFT_CLOCK_CALENDAR"),
+            "source": self._bound.get("PS_THEFT_CLOCK_SOURCE"),
+        }
+        if any(value in (None, "", [], {}) for value in fields.values()):
+            return None
+        return {key: str(value) for key, value in fields.items()}
 
     # ------------------------------------------------------------ case emission
 
@@ -499,8 +519,10 @@ class Review:
         if peril := slot_value("PS_PERIL"):
             event["cause"] = peril
             event["peril"] = peril
-        if days := slot_value("PS_DAYS_MISSING"):
+        if (days := slot_value("PS_DAYS_MISSING")) is not None:
             event["days_vehicle_missing"] = days
+        if theft_clock := self._theft_clock():
+            event["theft_clock"] = theft_clock
         licence = slot_value("PS_LICENSE_STATE")
         if licence is not None:
             token = str(_as_list(licence)[0]) if not isinstance(licence, str) else str(licence)

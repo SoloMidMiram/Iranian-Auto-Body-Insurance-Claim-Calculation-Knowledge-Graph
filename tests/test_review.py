@@ -298,7 +298,49 @@ def test_the_pending_theft_file_stops_before_the_unanchored_clock_reaches_the_en
     assert review.tier()["assigned"] == "T2"
     assert review.decision()["decision"] == DECISION_INSUFFICIENT
     assert "U13_THEFT_CLOCK_ANCHOR" in review.open_uncertainties()
+    assert {
+        "Q-S2-10",
+        "Q-S2-11",
+        "Q-S2-12",
+        "Q-S2-13",
+        "Q-S2-14",
+    }.issubset({item["id"] for item in review.next_questions()})
+    assert "theft_clock" not in review.case_payload()["event"]
     assert review.calculate() is None
+
+
+def test_a_complete_sourced_theft_clock_reaches_the_engine_through_review(kb):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].update(
+        {
+            "Q-S2-08": 60,
+            "Q-S2-09": "CONSISTENT",
+            "Q-S2-10": "THEFT_OCCURRENCE",
+            "Q-S2-11": "1404-04-20",
+            "Q-S2-12": "1404-06-18",
+            "Q-S2-13": "SHAMSI",
+            "Q-S2-14": "police non-discovery enquiry, file 1404/123, dated 1404-06-18",
+            "Q-S4-06": "TRANSFERRED",
+        }
+    )
+    payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+    review = Review(payload, kb)
+
+    assert "U13_THEFT_CLOCK_ANCHOR" not in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_COMPUTE
+    assert review.case_payload()["event"]["theft_clock"] == {
+        "start_event": "THEFT_OCCURRENCE",
+        "start_date": "1404-04-20",
+        "as_of_date": "1404-06-18",
+        "calendar": "SHAMSI",
+        "source": "police non-discovery enquiry, file 1404/123, dated 1404-06-18",
+    }
+
+    result = review.calculate()
+    assert result is not None
+    assert result.route == "THEFT_TOTAL_SETTLEMENT"
+    assert result.fields["theft_clock"]["derived_days"] == 60
+    assert result.payable == Decimal(7200000000)
 
 
 def test_overdue_instalment_is_unresolved_and_lapse_refuses_without_arithmetic(kb, monkeypatch):

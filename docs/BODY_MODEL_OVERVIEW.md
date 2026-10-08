@@ -259,9 +259,10 @@ settlement_base = min(event_date_market_value, insured_sum)
 - Attempted-theft damage routes to `PARTIAL_DAMAGE`.
 - Partial-parts theft requires endorsement limit and franchise terms.
 
-The current stored theft day-count does not itself prove the clock's legal
-anchor. Until structured source-backed start/as-of dates are implemented, U13
-must block the review handoff rather than allow a guessed clock.
+The stored theft day-count does not itself prove the clock's legal anchor.
+Review now requires a sourced start event/date, as-of date, calendar, and source;
+U13 blocks the handoff until that group is complete, and the engine rejects any
+stored day count that differs from the derived interval.
 
 ### 5.2 Finalization pattern
 
