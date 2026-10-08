@@ -36,6 +36,9 @@ calibration, and unattended production settlement are outside this release.
 
 ## 2. End-to-end flowchart
 
+Single-page high-level Mermaid source:
+[01_high_level.mmd](diagrams/01_high_level.mmd).
+
 Standalone Mermaid source:
 [02_end_to_end_authorized_flow.mmd](diagrams/02_end_to_end_authorized_flow.mmd).
 

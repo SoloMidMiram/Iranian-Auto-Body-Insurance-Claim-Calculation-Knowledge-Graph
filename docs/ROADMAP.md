@@ -98,6 +98,23 @@ The sprint is complete only when all of the following are true:
    versions, and the tag states that the release is research/decision-support
    only.
 
+### Research/model validation checkpoint — 2026-10-08
+
+The cross-check in
+[`RESEARCH_REPORT_MODEL_VALIDATION.md`](RESEARCH_REPORT_MODEL_VALIDATION.md)
+found four amount/eligibility defects that precede the remaining sprint work:
+
+- Article 8 does not yet cap by actual loss and treats explicit zero as absent;
+- a causation-required exclusion can fire from a bare cause token;
+- configured `DEPRECIATE_THEN_CAP` applies battery/tyre depreciation twice;
+- percentage-franchise base semantics are collected but not executed.
+
+It also found that review-authorized live uncertainties are not universally
+reconciled with the result's blocking-uncertainty set. Treat RMV-001 through
+RMV-006 in that audit as release stops. They refine the existing P0/P2/P3 issue
+scope and must be repaired or explicitly removed from supported scope before the
+Oct 11 feature freeze; passing the original 50 fixtures does not close them.
+
 ### Practical roadmap after `v0.1-body-model`
 
 These ranges begin only after the one-week gate passes and are capacity
