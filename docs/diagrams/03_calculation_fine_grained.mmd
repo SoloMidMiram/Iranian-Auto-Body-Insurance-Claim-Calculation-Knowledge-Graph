@@ -1,0 +1,200 @@
+%% Iranian Auto Body Model — fine-grained authorized calculation flow
+%% Source of truth: src/iran_auto_claim/{admission,engine,plans,operators,guards}.py
+%% and knowledge/{branches,guards,uncertainties}.json
+%%{init: {"theme": "base", "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 24, "rankSpacing": 34}} }%%
+flowchart TB
+  INPUT(["Calculation request"]) --> TYPE{"Input is CalculationAuthorization?"}
+  TYPE -- "No" --> AUTHERR["AuthorizationError<br/>raw payload and Case are rejected"]
+  TYPE -- "Yes" --> VERIFY["Verify factory grant, issuer, decision,<br/>issued_at, snapshot hash and authorization kind"]
+  VERIFY --> VALID_AUTH{"Valid and decision is<br/>COMPUTE or SCENARIO_SET?"}
+  VALID_AUTH -- "No" --> AUTHERR
+  VALID_AUTH -- "Yes" --> MATERIALIZE["Decode immutable claim snapshot<br/>and create fresh schema-validated Case"]
+  MATERIALIZE --> KB["Load validated knowledge graph"]
+  KB --> INIT["Initialize CalcResult<br/>claim · unit IRR · authorization provenance"]
+
+  subgraph PREFLIGHT["A · COMMON PREFLIGHT"]
+    INIT --> RECON["Derive branch and reconcile<br/>declared branch with evidence"]
+    RECON --> RECON_STATE{"Reconciliation outcome"}
+    RECON_STATE -- "CONFLICT" --> CLASS_CONFLICT["CLASSIFICATION_CONFLICT<br/>payable = null"]
+    RECON_STATE -- "INSUFFICIENT_EVIDENCE" --> CLASS_EVID["CLASSIFICATION_EVIDENCE_REQUIRED<br/>payable = null"]
+    RECON_STATE -- "MATCH or AUTHORIZED_OVERRIDE" --> SELECT["Select canonical branch and variant;<br/>record classification provenance"]
+    SELECT --> SNAPSHOT{"Effective regulatory snapshot<br/>resolves for event date/year?"}
+    SNAPSHOT -- "No" --> SNAPSTOP["INSUFFICIENT_INFORMATION<br/>no regulatory snapshot"]
+    SNAPSHOT -- "Yes" --> BIND["Bind snapshot_id and rule ids"]
+    BIND --> COVER["Evaluate coverage, causation<br/>and exclusion predicates"]
+    COVER --> COVER_STATE{"Coverage gate outcome"}
+    COVER_STATE -- "Non-compensable" --> NONCOMP["payable = 0<br/>record exclusion and legal rule"]
+    COVER_STATE -- "Excluded; no endorsement" --> EXCLUDED["payable = 0<br/>EXCLUDED_WITHOUT_ENDORSEMENT"]
+    COVER_STATE -- "Endorsement exists; terms missing" --> ENDORSE["payable = null<br/>ENDORSEMENT_TERMS_REQUIRED · U02"]
+    COVER_STATE -- "Continue" --> U15{"Unnotified risk intensification?"}
+    U15 -- "Yes" --> RISKSTOP["payable = null<br/>U15 premium-ratio operator unresolved"]
+    U15 -- "No" --> DISPATCH{"Dispatch selected body branch"}
+  end
+
+  subgraph PARTIAL_FLOW["B1 · PARTIAL_DAMAGE"]
+    PD_START["Record partial-loss base rule"] --> PD_FORM{"Damage input form"}
+    PD_FORM -- "Itemized parts" --> PD_PARTS["For each part:<br/>assessed loss → special 50% cap if applicable<br/>→ replacement-part depreciation by category/year"]
+    PD_PARTS --> PD_LABOR["Add labor;<br/>record glass and other depreciation separately"]
+    PD_FORM -- "Aggregate" --> PD_AGG{"Gross damage or labor supplied?"}
+    PD_AGG -- "No" --> PD_INPUT_ERR["INPUT_ERROR<br/>partial damage base missing"]
+    PD_AGG -- "Yes" --> PD_DEP_SOURCE["Use explicit depreciation,<br/>base × rate, or recorded zero source"]
+    PD_LABOR --> PD_AFTER["after_depreciation = eligible loss − depreciation"]
+    PD_DEP_SOURCE --> PD_AFTER
+    PD_AFTER --> PD_RESCUE["allowable rescue = min(actual,<br/>20% × configured and recorded cap base)"]
+    PD_RESCUE --> PD_FRANCHISE["Resolve policy/endorsement franchise<br/>mode · rate/amount · base · minimum · source"]
+    PD_FRANCHISE --> PD_FR_OK{"Franchise complete and sourced?"}
+    PD_FR_OK -- "No" --> PD_U02["payable = null<br/>FRANCHISE_TERMS_REQUIRED · U02"]
+    PD_FR_OK -- "Yes" --> PD_RATIO["ratio = min(1, insured sum / event-day market value)"]
+    PD_RATIO --> PD_RATIO_ONE{"ratio = 1?"}
+    PD_RATIO_ONE -- "Yes" --> PD_PLAN_ONE["Validate graph operator membership/order;<br/>bind plan id and required guards"]
+    PD_RATIO_ONE -- "No" --> PD_ORDER{"Named supported operator order?"}
+    PD_ORDER -- "Yes" --> PD_PLAN_ONE
+    PD_ORDER -- "No" --> PD_PLAN_TWO["Validate and bind both graph plans:<br/>ratio → franchise and franchise → ratio"]
+    PD_PLAN_ONE --> PD_EXEC_ONE["Execute bounded registry;<br/>floor result at zero"]
+    PD_EXEC_ONE --> PD_PAY["Single payable"]
+    PD_PLAN_TWO --> PD_EXEC_TWO["Execute both approved sequences;<br/>floor each at zero"]
+    PD_EXEC_TWO --> PD_SCEN["payable = null<br/>two payable scenarios · U01 ORDER_UNRESOLVED"]
+  end
+
+  subgraph TOTAL_FLOW["B2 · TOTAL_LOSS"]
+    TL_START["combined = repair/replacement + threshold rescue<br/>threshold = 75% × event-day market value"] --> TL_TEST{"combined strictly greater<br/>than threshold?"}
+    TL_TEST -- "No; no authorized override" --> TL_NOT["payable = null<br/>NOT_TOTAL_LOSS;<br/>equality receives explicit reason"]
+    TL_TEST -- "Yes or authorized override" --> TL_VARIANT{"THRESHOLD_TEST variant?"}
+    TL_VARIANT -- "Yes" --> TL_ONLY["Return threshold facts only;<br/>payable = null"]
+    TL_VARIANT -- "No" --> TL_VALUES{"Market value and insured sum present?"}
+    TL_VALUES -- "No" --> TL_INPUT_ERR["INPUT_ERROR"]
+    TL_VALUES -- "Yes" --> TL_BASE["settlement_base = min(market value, insured sum)<br/>never apply underinsurance ratio again"]
+    TL_BASE --> TL_SALVAGE{"Salvage disposition"}
+    TL_SALVAGE -- "UNRESOLVED" --> TL_U12["payable = null<br/>SALVAGE_DISPOSITION_UNRESOLVED · U12"]
+    TL_SALVAGE -- "INSURER_TAKES_TITLE" --> TL_NO_SALVAGE["salvage deduction = 0<br/>guard salvage XOR title"]
+    TL_SALVAGE -- "INSURED_RETAINS" --> TL_DEDUCT["Deduct probable salvage once<br/>before franchise"]
+    TL_NO_SALVAGE --> TL_TERMS["Resolve rescue and sourced franchise"]
+    TL_DEDUCT --> TL_TERMS
+    TL_TERMS --> TL_PLAN["Validate resolved graph plan and bind guards:<br/>salvage → franchise → rescue → insured-sum cap"]
+    TL_PLAN --> TL_EXEC["Execute plan; floor at zero;<br/>enforce insured-sum ceiling"]
+    TL_EXEC --> TL_PAY["Single payable"]
+  end
+
+  subgraph GLASS_FLOW["B3 · GLASS_ONLY"]
+    GL_START["Run G_NO_UNIVERSAL_GLASS_FRANCHISE"] --> GL_BASE{"Damage caused by base body peril?"}
+    GL_BASE -- "Yes" --> GL_ROUTE["Route to PARTIAL_DAMAGE"]
+    GL_BASE -- "No" --> GL_ENDORSE{"Standalone glass endorsement present?"}
+    GL_ENDORSE -- "No" --> GL_ZERO["payable = 0<br/>NO_STANDALONE_COVER"]
+    GL_ENDORSE -- "Yes" --> GL_GROSS["gross = itemized assessed glass + labor,<br/>or aggregate gross/labor"]
+    GL_GROSS --> GL_DEP["depreciation = 0<br/>GLASS_EXEMPT_BY_RULE"]
+    GL_DEP --> GL_TERMS["Resolve rescue, sourced franchise<br/>and underinsurance ratio"]
+    GL_TERMS --> GL_RATIO_ONE{"ratio = 1?"}
+    GL_RATIO_ONE -- "Yes" --> GL_PLAN_ONE["Validate graph plan;<br/>bind plan id and guards"]
+    GL_RATIO_ONE -- "No" --> GL_ORDER{"Endorsement contractually resolves<br/>a supported order?"}
+    GL_ORDER -- "Yes" --> GL_PLAN_ONE
+    GL_ORDER -- "No" --> GL_PLAN_TWO["Validate both plans:<br/>ratio → franchise and franchise → ratio"]
+    GL_PLAN_ONE --> GL_EXEC_ONE["Execute selected plan;<br/>floor at zero"]
+    GL_EXEC_ONE --> GL_PAY["Single payable"]
+    GL_PLAN_TWO --> GL_EXEC_TWO["Execute both approved sequences"]
+    GL_EXEC_TWO --> GL_SCEN["payable = null<br/>scenario set · U03/U11"]
+  end
+
+  subgraph THEFT_FLOW["B4 · THEFT"]
+    TH_START{"Theft type"}
+    TH_START -- "WHOLE_VEHICLE" --> TH_DAYS{"Derived days missing supplied?"}
+    TH_DAYS -- "No" --> TH_INPUT_ERR["INPUT_ERROR<br/>days_vehicle_missing required"]
+    TH_DAYS -- "Yes" --> TH_CLOCK{"At least 60 days?"}
+    TH_CLOCK -- "No" --> TH_PENDING["payable = null<br/>PENDING_60_DAY_CRITERION"]
+    TH_CLOCK -- "Yes" --> TH_TITLE{"Title transferred to insurer?"}
+    TH_TITLE -- "No" --> TH_TITLE_REQ["payable = null<br/>TITLE_TRANSFER_REQUIRED"]
+    TH_TITLE -- "Yes" --> TH_SETTLE["Route to theft total settlement:<br/>base = min(market, insured)<br/>franchise → insured-sum cap"]
+    TH_SETTLE --> TH_PAY["Single payable"]
+    TH_START -- "ATTEMPTED_VEHICLE_THEFT_DAMAGE" --> TH_PARTIAL["Route to PARTIAL_DAMAGE"]
+    TH_START -- "PARTIAL_PARTS_THEFT or<br/>PARTS_STOLEN_AFTER_ACCIDENT" --> TH_TERMS["payable = null<br/>ENDORSEMENT_LIMIT_AND_FRANCHISE_REQUIRED · U02"]
+    TH_START -- "Missing or unsupported" --> TH_INPUT_ERR
+    TH_NOTE["Review precondition:<br/>U13 blocks an unsourced clock anchor;<br/>stored elapsed days alone are not authority"]
+    TH_NOTE -.-> TH_DAYS
+  end
+
+  DISPATCH -- "PARTIAL_DAMAGE" --> PD_START
+  DISPATCH -- "TOTAL_LOSS" --> TL_START
+  DISPATCH -- "GLASS_ONLY" --> GL_START
+  DISPATCH -- "THEFT" --> TH_START
+  DISPATCH -- "No registered handler" --> UNKNOWN["UNKNOWN_BRANCH<br/>payable = null"]
+  GL_ROUTE --> PD_START
+  TH_PARTIAL --> PD_START
+
+  PD_PAY --> BRANCH_DONE
+  PD_SCEN --> BRANCH_DONE
+  PD_U02 --> BRANCH_DONE
+  PD_INPUT_ERR --> BRANCH_DONE
+  TL_PAY --> BRANCH_DONE
+  TL_NOT --> BRANCH_DONE
+  TL_ONLY --> BRANCH_DONE
+  TL_INPUT_ERR --> BRANCH_DONE
+  TL_U12 --> BRANCH_DONE
+  GL_PAY --> BRANCH_DONE
+  GL_SCEN --> BRANCH_DONE
+  GL_ZERO --> BRANCH_DONE
+  TH_PAY --> BRANCH_DONE
+  TH_PENDING --> BRANCH_DONE
+  TH_TITLE_REQ --> BRANCH_DONE
+  TH_TERMS --> BRANCH_DONE
+  TH_INPUT_ERR --> BRANCH_DONE
+
+  subgraph ERROR_HANDLING["C · FAIL-CLOSED EXCEPTION MAPPING"]
+    UNC_EX["UncertaintyRequired<br/>payable = null · block uncertainty id<br/>retain candidate scenarios"]
+    GUARD_EX["GuardViolation<br/>payable = null · violation status<br/>record guard id"]
+    PLAN_EX["PlanError<br/>payable/scenarios cleared<br/>EXECUTION_PLAN_INVALID"]
+    INPUT_EX["OperatorError or CaseInputError<br/>payable = null · INPUT_ERROR"]
+  end
+
+  DISPATCH -. "from any branch step" .-> UNC_EX
+  DISPATCH -. "from any branch step" .-> GUARD_EX
+  DISPATCH -. "from plan validation/execution" .-> PLAN_EX
+  DISPATCH -. "from input/operator validation" .-> INPUT_EX
+
+  CLASS_CONFLICT --> BRANCH_DONE
+  CLASS_EVID --> BRANCH_DONE
+  SNAPSTOP --> BRANCH_DONE
+  NONCOMP --> BRANCH_DONE
+  EXCLUDED --> BRANCH_DONE
+  ENDORSE --> BRANCH_DONE
+  RISKSTOP --> BRANCH_DONE
+  UNKNOWN --> BRANCH_DONE
+  UNC_EX --> BRANCH_DONE
+  GUARD_EX --> BRANCH_DONE
+  PLAN_EX --> BRANCH_DONE
+  INPUT_EX --> BRANCH_DONE
+
+  subgraph FINALIZATION["D · COMMON SAFETY AND FINALIZATION"]
+    BRANCH_DONE["Branch/terminal outcome assembled"] --> UNC_GUARD["Run G_UNCERTAINTY_MUST_SURFACE:<br/>blocking uncertainty cannot coexist with one payable"]
+    UNC_GUARD --> GUARD_PLAN{"Every guard required by<br/>the active plan executed?"}
+    GUARD_PLAN -- "No" --> GUARD_INCOMPLETE["Clear payable and scenarios<br/>GUARD_PLAN_INCOMPLETE"]
+    GUARD_PLAN -- "Yes" --> PROV
+    GUARD_INCOMPLETE --> PROV["Build rule/operator/source provenance;<br/>record snapshot and plan identity"]
+    PROV --> CONF["formula confidence = minimum cited dependency;<br/>evidence confidence from required evidence"]
+    CONF --> AUTH_CAP["Apply immutable review evidence-confidence cap"]
+    AUTH_CAP --> ROUND["Round payable and every scenario to integer IRR"]
+    ROUND --> OUTPUT["Return CalcResult:<br/>payable XOR scenarios/pending<br/>status · reason · route · labels<br/>fields · rules · guards · provenance · confidence"]
+  end
+
+  AUTHERR --> STOP(["No calculation result"])
+  OUTPUT --> DONE(["Authorized traced result"])
+
+  classDef auth fill:#e0e7ff,stroke:#4f46e5,color:#1e1b4b,stroke-width:1.5px
+  classDef preflight fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:1.5px
+  classDef decision fill:#fef3c7,stroke:#d97706,color:#451a03,stroke-width:1.5px
+  classDef partial fill:#dcfce7,stroke:#16a34a,color:#052e16,stroke-width:1.5px
+  classDef total fill:#ccfbf1,stroke:#0f766e,color:#042f2e,stroke-width:1.5px
+  classDef glass fill:#f3e8ff,stroke:#9333ea,color:#3b0764,stroke-width:1.5px
+  classDef theft fill:#e0f2fe,stroke:#0284c7,color:#082f49,stroke-width:1.5px
+  classDef stop fill:#fee2e2,stroke:#dc2626,color:#450a0a,stroke-width:1.5px
+  classDef scenario fill:#ffedd5,stroke:#ea580c,color:#431407,stroke-width:1.5px
+  classDef finalize fill:#e5e7eb,stroke:#4b5563,color:#111827,stroke-width:1.5px
+
+  class INPUT,VERIFY,VALID_AUTH,MATERIALIZE,KB,INIT auth
+  class RECON,SELECT,BIND,COVER preflight
+  class TYPE,RECON_STATE,SNAPSHOT,COVER_STATE,U15,DISPATCH,PD_FORM,PD_AGG,PD_FR_OK,PD_RATIO_ONE,PD_ORDER,TL_TEST,TL_VARIANT,TL_VALUES,TL_SALVAGE,GL_BASE,GL_ENDORSE,GL_RATIO_ONE,GL_ORDER,TH_START,TH_DAYS,TH_CLOCK,TH_TITLE,GUARD_PLAN decision
+  class PD_START,PD_PARTS,PD_LABOR,PD_DEP_SOURCE,PD_AFTER,PD_RESCUE,PD_FRANCHISE,PD_RATIO,PD_PLAN_ONE,PD_EXEC_ONE,PD_PAY partial
+  class TL_START,TL_BASE,TL_NO_SALVAGE,TL_DEDUCT,TL_TERMS,TL_PLAN,TL_EXEC,TL_PAY total
+  class GL_START,GL_GROSS,GL_DEP,GL_TERMS,GL_PLAN_ONE,GL_EXEC_ONE,GL_PAY glass
+  class TH_NOTE,TH_SETTLE,TH_PAY theft
+  class AUTHERR,CLASS_CONFLICT,CLASS_EVID,SNAPSTOP,RISKSTOP,PD_INPUT_ERR,TL_INPUT_ERR,TH_INPUT_ERR,UNKNOWN,UNC_EX,GUARD_EX,PLAN_EX,INPUT_EX,GUARD_INCOMPLETE stop
+  class PD_PLAN_TWO,PD_EXEC_TWO,PD_SCEN,PD_U02,TL_U12,GL_PLAN_TWO,GL_EXEC_TWO,GL_SCEN,TH_PENDING,TH_TITLE_REQ,TH_TERMS scenario
+  class BRANCH_DONE,UNC_GUARD,PROV,CONF,AUTH_CAP,ROUND,OUTPUT finalize

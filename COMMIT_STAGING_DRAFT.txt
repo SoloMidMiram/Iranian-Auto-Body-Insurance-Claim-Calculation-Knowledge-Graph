@@ -1,0 +1,366 @@
+Body-model documentation consolidation and report/model validation draft
+Updated: 2026-10-08
+Local branch: docs/body-model-validation
+Remote branch: docs/body-model-validation
+Consolidation base: PR #46 head 5b1d06e2cd97c5e1832ccc4d830c703a954e6a50
+New PR: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/pull/47
+Local content commit: 6fc40928a734610ed88dd67327a94363bfc988f4
+Initial remote content commit: d82a2b6d0d96790a4273c400b0d2673059fc40d9
+Remote metadata commit verified by CI: 485462be50de26e3488ba838d1a149842947e087
+Status: OPEN; REPOSITORY GATE PASSED (run 37735246995)
+
+Branch organization
+===================
+
+- PR #45 is merged as b2c4dd8ee23609a6fefa6494ab639e6559e6b4c2.
+- PR #46 remains open and is the base for the consolidated documentation branch.
+- The new PR will contain the complete PR #46 flow/FAQ set, the omitted high-level
+  Mermaid source, and the research-report/model validation follow-up.
+- Runtime source changes are intentionally absent. The audit documents defects;
+  it does not present them as repaired.
+- `.qwen/` and `tests/# Objective.md` are local workspace/task artifacts and are
+  intentionally excluded from the commit and ignored by the repository.
+- The terminal Git remote has no HTTPS credentials. The connected GitHub
+  integration published the remote branch from PR #46's exact head. The local
+  branch carries the same consolidated work but has independent commit history
+  and no upstream configured; do not force-push it over the remote branch.
+
+## Outcome
+
+One-week body-model release plan
+--------------------------------
+
+- Defined `v0.1-body-model` as a fail-closed research/adjuster
+  decision-support release for PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, and
+  THEFT. Production certification, insurer calibration, third-party/Article 8,
+  APIs, and retrieval are explicitly outside the week.
+- Added a dated Oct 7-13 plan, at most two active workstreams, dependency-ordered
+  merges, feature freeze, hard release stops, and a version-pinned definition of
+  done to docs/ROADMAP.md.
+- Added practical post-release horizons for insurer calibration, independent
+  validation, a private pilot, and controlled release.
+- Corrected the planning dependency graph: P1-04 depends on P1-02/P1-05 and
+  P2-01 depends on P1-02/P1-04. The 29-issue manifest validates.
+- Updated GitHub issues #6, #7, #8, and #10-#15 with dated sprint slots, DRI,
+  predecessor/merge gates, closure evidence, and release-stop conditions.
+- Assigned the eight open sprint issues to SoloMidMiram. No issue was closed.
+- The release cannot be called complete without two named human authority
+  reviewers and accessible source artifacts by the end of Oct 7. The permitted
+  fallback label is engineering-complete/authority-blocked; no release tag.
+
+GitHub exposed two unresolved Codex review threads.
+
+1. Apply the authorized review's evidence-confidence cap
+   Status: FIXED AND RESOLVED
+
+   The finding was valid at 938e4f6. A review authorization recorded an
+   evidence_confidence_cap of 0.8, but direct compute() returned 0.95 while
+   Review.calculate() returned 0.8. Because calc and json use authorize() followed
+   by compute(), both CLI paths bypassed the cap.
+
+   The fix applies the immutable review-issued cap inside compute() after formula
+   confidence finalization. Review.calculate() now delegates to the same path.
+   Direct compute, Review.calculate, calc, and json all return 0.8 and add
+   EVIDENCE_CONFIDENCE_REDUCED for the missing-EVT_PHOTOS reproduction.
+
+   Added direct authorization and CLI regressions. Updated README confidence
+   documentation and repository test counts.
+
+2. Prevent provenance from overriding sealed authorization fields
+   Status: ALREADY FIXED; THREAD DOCUMENTED AND RESOLVED
+
+   Commit 938e4f6 stores provenance as immutable canonical JSON and returns only
+   detached decoded copies. provenance_record() overlays sealed issuer, decision,
+   claim_hash, and issued_at after custom provenance.
+
+   The regression now explicitly mutates those reserved fields as well as reviewer,
+   approved_overrides, classification, and policy snapshot values. Later emitted
+   provenance remains unchanged.
+
+Remote repository updates
+=========================
+
+- Pushed the six-file fix to the PR branch through the connected GitHub
+  integration as commit 7719970e604a393c8c01d533785eeb27abbde58a.
+- Published the roadmap and planning-manifest update to the same PR branch as
+  commit 2e9e70a02ffab7e545443b736aba9af34a5b27a4.
+- Corrected the dated #10 -> #12 dependency order in roadmap commit
+  7f86e4534ff9182e4061f39fcf1898b0c97a9c26.
+- Replied to and resolved both Codex review threads.
+- Refreshed the PR description with current architecture, verification, commits,
+  security boundary, and review-point status.
+- Updated issue #10 / P1-04 with the confidence-cap fix as partial progress.
+  The broader provenance/confidence issue remains open.
+- Updated issue #23 / P4-02 with the immutable authorization snapshot work as a
+  scoped precursor. The broader deterministic audit/replay issue remains open.
+- Did not close either roadmap issue.
+
+Commit identity note
+====================
+
+The shell had no HTTPS push credentials. The connected GitHub integration created
+the remote commit from the exact verified tree, so its SHA differs from the local
+commit:
+
+  local:  feaca30af1266a4ea02c1220994ec7558168453c
+  remote: 7719970e604a393c8c01d533785eeb27abbde58a
+
+Both commits have tree:
+
+  c7d2d10267e3ea470d7f74a1b15810be03a3ffd4
+
+The roadmap commits exist remotely on top of 7719970. Their two edited files are
+present in the local worktree but are not a local commit, so the local branch
+still points at feaca30.
+
+Changed files
+=============
+
+  README.md
+  docs/BODY_CLAIM_ACCEPTANCE_MODEL.md
+  src/iran_auto_claim/engine.py
+  src/iran_auto_claim/review.py
+  tests/test_admission.py
+  tests/test_cli.py
+  docs/ROADMAP.md
+  planning/issues.json
+
+Verification
+============
+
+  python -m compileall -q claim.py src scripts
+      PASS
+
+  python claim.py validate
+      PASS: knowledge graph OK
+
+  python claim.py fixtures
+      PASS: 50/50 fixtures
+
+  python -m pytest
+      PASS: 467 passed in 23.13s
+
+  python scripts/run_mutation_gate.py --check-report
+      PASS: report current, 16/16 killed (100.0%)
+
+  python scripts/sync_review_docs.py
+      PASS: documentation blocks are current
+
+  python scripts/sync_github_issues.py --repo SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph
+      PASS: valid manifest, 8 milestones, 11 labels, 29 issues
+
+  GitHub Actions repository-gate
+      PASS: runs 37479921775, 37482200566, and 37482714893
+
+  python3 scripts/sync_github_issues.py
+      PASS: valid manifest, 8 milestones, 11 labels, 29 issues
+
+Current PR state
+================
+
+- Merged as b2c4dd8ee23609a6fefa6494ab639e6559e6b4c2
+- Remote head: 7f86e4534ff9182e4061f39fcf1898b0c97a9c26
+- Unresolved Codex review threads: 0
+- Repository gate: successful
+
+Follow-up documentation PR #46
+==============================
+
+PR: https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph/pull/46
+Branch: docs/body-model-flow-patterns
+Remote commits:
+  09060226e6f21139742049189add0b07ae63d652
+  42357646b024642ac554ba0099627c4c928c721b
+  f58321c44a372831d3ce429d7771e0015dd255d7
+  5b1d06e2cd97c5e1832ccc4d830c703a954e6a50
+Status: OPEN; MERGEABLE; LATEST REPOSITORY GATE PASSED
+
+Outcome
+-------
+
+- Added docs/BODY_MODEL_OVERVIEW.md as one front-door guide.
+- Added docs/diagrams/01_high_level.mmd as the single-page overview source and
+  linked it from the guide.
+- Added an end-to-end Mermaid flowchart spanning recognition, acceptance,
+  immutable authorization, branch calculation, and traced output.
+- Added docs/diagrams/02_end_to_end_authorized_flow.mmd as the standalone,
+  directly renderable Mermaid source with labels and color classes.
+- Added docs/diagrams/03_calculation_fine_grained.mmd with the full authorized
+  engine path: preflight, all four body branches, graph plans, guards,
+  exception mapping, provenance, confidence capping, IRR rounding, and output.
+- Documented recognition precedence and classification reconciliation.
+- Documented FILE -> COVER -> BRANCH -> PARAMETERS -> ISSUE acceptance gates.
+- Documented the four terminal review decisions and calculation permission.
+- Documented authorization integrity plus partial, total-loss, glass, and theft
+  calculation patterns.
+- Added a stable response shape, practical action matrix, scope boundaries, and
+  current theft-clock/classifier limitations.
+- Added a prioritized customer FAQ hierarchy with 7 categories and 32 paired
+  English/Persian questions covering scope, recognition, acceptance,
+  calculation, results, evidence, and next steps.
+- Added knowledge/customer_faq.json as the explanatory-only source, a JSON
+  schema, deterministic Markdown generator, and bilingual/reference tests.
+- Linked the guide from README.md and docs/BODY_CLAIM_ACCEPTANCE_MODEL.md.
+- No formula, operator, guard, fixture, schema, or runtime behavior changed.
+
+Changed files
+-------------
+
+  README.md
+  docs/BODY_CLAIM_ACCEPTANCE_MODEL.md
+  docs/BODY_MODEL_OVERVIEW.md
+  docs/diagrams/01_high_level.mmd
+  docs/diagrams/02_end_to_end_authorized_flow.mmd
+  docs/diagrams/03_calculation_fine_grained.mmd
+  docs/CUSTOMER_FAQ.md
+  knowledge/customer_faq.json
+  schema/customer-faq.schema.json
+  scripts/sync_customer_faq.py
+  tests/test_customer_faq.py
+
+Verification
+------------
+
+  python3 claim.py validate
+      PASS: knowledge graph OK
+
+  python3 claim.py fixtures
+      PASS: 50/50 fixtures
+
+  python3 scripts/sync_review_docs.py
+      PASS: documentation blocks are current
+
+  python3 scripts/sync_github_issues.py
+      PASS: valid manifest, 8 milestones, 11 labels, 29 issues
+
+  python3 scripts/sync_customer_faq.py
+      PASS: 7 categories; 32 paired FAQs per language; all references resolve
+
+  GitHub comparison
+      PASS: four commits ahead of main; 10 files; 2615 additions; 0 deletions
+
+  GitHub Actions repository-gate (run 37662963109)
+      PASS: Python 3.10, 3.11, 3.12, and 3.13
+
+  GitHub Actions repository-gate (run 37663521449)
+      PASS: Python 3.10, 3.11, 3.12, and 3.13
+
+  GitHub Actions repository-gate (run 37664828125)
+      PASS: Python 3.10, 3.11, 3.12, and 3.13
+
+  GitHub Actions repository-gate (run 37666773150)
+      PASS: Python 3.10, 3.11, 3.12, and 3.13
+
+Current state
+-------------
+
+- PR #46 is open and mergeable.
+- Remote head: 5b1d06e2cd97c5e1832ccc4d830c703a954e6a50.
+- No merge action performed.
+
+Research report/model validation follow-up
+==========================================
+
+Outcome
+-------
+
+- Added docs/RESEARCH_REPORT_MODEL_VALIDATION.md with a requirement-by-
+  requirement comparison of the 2026-09-18 research report against the current
+  ontology, knowledge files, schema, review gate, runtime, guards, provenance,
+  ingestion path, and 50-case corpus.
+- Recorded the aligned architecture, compatible model extensions, partial
+  implementations, deferred product layers, report-side corrections, and a
+  target architecture with Mermaid.
+- Defined RMV-001 through RMV-018 with priority, existing issue coverage,
+  implementation method, and testable acceptance criteria.
+- Reproduced three concrete defects:
+  - Article 8 returned 80 when actual loss was 0 or 50, correspondence was 80,
+    and the policy limit was 200.
+  - a bare INTOXICATION cause token without causal confirmation returned a
+    NON_COMPENSABLE zero.
+  - DEPRECIATE_THEN_CAP produced net 56.25 for the discriminating battery case
+    where a one-pass depreciate-then-cap result is 75.
+- Identified the ignored percentage-franchise calculation base and incomplete
+  reconciliation of review-authorized live uncertainties as additional release
+  blockers.
+- Confirmed the research report's source register is physically truncated and
+  that its response-local citation markers are not durable audit references.
+- Updated README.md so provenance, uncertainty, and confidence are stated as
+  release invariants rather than completed certification claims, and linked the
+  validation.
+- Updated docs/ROADMAP.md with the 2026-10-08 checkpoint and made RMV-001 through
+  RMV-006 hard stops for the one-week body-model release.
+- No calculation runtime was changed in this follow-up. The reproduced defects
+  remain open and are explicitly documented rather than silently treated as
+  fixed.
+
+Changed files
+-------------
+
+  README.md
+  docs/ROADMAP.md
+  docs/RESEARCH_REPORT_MODEL_VALIDATION.md
+  COMMIT_STAGING_DRAFT.txt
+
+Verification
+------------
+
+  python3 -m compileall -q claim.py src scripts
+      PASS
+
+  python3 claim.py validate
+      PASS: graph structurally OK
+      FINDINGS: 22 body-authority; 48 source-metadata
+
+  python3 claim.py fixtures
+      PASS: 50/50 fixtures
+
+  python3 scripts/run_mutation_gate.py --check-report
+      PASS: mutation report current; 16/16 killed
+
+  python3 scripts/sync_review_docs.py
+      PASS: documentation blocks current
+
+  python3 scripts/sync_github_issues.py
+      PASS: valid manifest; 8 milestones, 11 labels, 29 issues; dry run only
+
+  python3 scripts/sync_customer_faq.py
+      PASS: customer FAQ data and documentation current
+
+  python3 -m pytest -q
+      NOT RUN: pytest is not installed in either available local Python
+      environment. No current full-suite pass is claimed by this audit.
+
+  GitHub Actions repository-gate (PR #47, run 37735246995)
+      PASS: consolidated remote branch at 485462be50de26e3488ba838d1a149842947e087
+
+Suggested commit
+----------------
+
+  docs(validation): compare research report with executable model
+
+Suggested PR note
+-----------------
+
+  This commit is an audit and planning change. It does not fix the reproduced
+  calculation defects. RMV-001 through RMV-006 must be repaired, independently
+  tested, or removed from supported scope before v0.1-body-model can pass its
+  release gate.
+
+FAQ journey review — 2026-10-08
+================================
+
+- Reordered the customer journey to: scope -> evidence preparation ->
+  recognition -> acceptance -> calculation -> result interpretation -> next
+  action. Evidence is now a P0 prerequisite rather than a post-result appendix.
+- Reordered acceptance questions so missing blockers are understood before
+  COMPUTE and SCENARIO_SET; reordered calculation so the no-universal-franchise
+  warning precedes branch formulas; reordered results so status, scenarios, and
+  confidence precede branch-specific glass and theft outcomes.
+- Corrected the confidence answer so it does not imply complete dependency
+  provenance, and replaced "certified model" with "current supported scope."
+- Kept English and Persian IDs, priorities, applicability, references, and order
+  synchronized; bumped FAQ data to 1.1.0 and regenerated the Markdown view.
+- Made category and question order explicit data, added dependency-order checks,
+  rejected duplicate JSON keys, and added regression tests for the customer
+  journey and the three reordered question groups.

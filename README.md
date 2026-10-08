@@ -18,16 +18,18 @@ EVENT → LEGAL/POLICY SNAPSHOT → COVERAGE + CAUSATION + EXCLUSION GATE
      → PAYABLE + RULE TRACE + PROVENANCE + CONFIDENCE + UNRESOLVED VARIABLES
 ```
 
-Three commitments hold everywhere in the code:
+Three target invariants guide the code and release gates:
 
-1. **Every executable node carries provenance** — source class, authority,
-   instrument, article, effective version/date, confidence, validation cycle.
-2. **Uncertainty is data, not a missing value.** Where the primary text does not
-   settle an operation, the engine returns a *scenario set* or refuses. It never
-   invents a number.
-3. **Confidence is computed, not asserted.** A result's confidence is the minimum
-   of the confidences of the rules it actually cited, further capped by the
-   single-interpretation confidence of any live blocking uncertainty.
+1. **Executable decisions must carry dependency-derived provenance** — source,
+   authority, effective version, policy/assessment inputs, and validation state.
+2. **Uncertainty is data, not a missing value.** A supported calculation may issue
+   one amount only after every live blocking uncertainty is resolved or surfaced.
+3. **Confidence is computed, not asserted.** It must cover every dependency that
+   affected eligibility or amount, not only the cited legal rules.
+
+These are release requirements, not claims of current certification. The
+[research-report/model validation](docs/RESEARCH_REPORT_MODEL_VALIDATION.md)
+records the remaining provenance gaps and amount-affecting defects.
 
 ## Quickstart
 
@@ -130,8 +132,17 @@ plan, phase gates, and import-ready GitHub backlog are maintained in:
 
 * [`docs/ROADMAP.md`](docs/ROADMAP.md) — investigation, implementation, phase
   ordering, preparation for the next phase, and release discipline.
+* [`docs/BODY_MODEL_OVERVIEW.md`](docs/BODY_MODEL_OVERVIEW.md) — one end-to-end
+  flowchart plus the recognition, acceptance, authorization, calculation, and
+  response patterns.
+* [`docs/CUSTOMER_FAQ.md`](docs/CUSTOMER_FAQ.md) — prioritized customer-facing
+  recognition and calculation questions in English followed by corresponding
+  Persian answers; generated from `knowledge/customer_faq.json`.
 * [`docs/VALIDATION_GATES.md`](docs/VALIDATION_GATES.md) — universal invariants,
   branch-specific boundary cases, and phase acceptance evidence.
+* [`docs/RESEARCH_REPORT_MODEL_VALIDATION.md`](docs/RESEARCH_REPORT_MODEL_VALIDATION.md)
+  — requirement-by-requirement comparison with the research report, reproduced
+  defects, priorities, and the target implementation architecture.
 * [`planning/issues.json`](planning/issues.json) — stable roadmap issue IDs,
   milestones, labels, dependencies, acceptance criteria, and validation.
 * [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md) — source,

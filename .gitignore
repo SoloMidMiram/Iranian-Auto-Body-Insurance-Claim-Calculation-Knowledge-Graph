@@ -10,5 +10,9 @@ dist/
 build/
 .idea/
 .vscode/
+.qwen/
 .DS_Store
 Thumbs.db
+
+# Local task briefs are workspace inputs, not test assets.
+tests/# Objective.md

@@ -1,0 +1,58 @@
+%% Iranian Auto Body Insurance Claim — High-level decision pipeline (single page)
+%% Source of truth: knowledge/{branches,operators,rules,guards,uncertainties}.json
+%% and src/iran_auto_claim/{review,engine,classify}.py
+%%{init: {"flowchart": {"htmlLabels": true, "curve": "basis"}} }%%
+flowchart TD
+    START(["START<br/>Claim file opened"])
+
+    INTAKE["<b>0 · CLAIM INTAKE</b><br/>capture event, policy, vehicle, driver, peril"]
+    FILE["<b>A · FILE VALIDATION</b><br/>identity · three event dates · policy in force"]
+    COVER["<b>B · COVERAGE VALIDATION</b><br/>peril · causation · exclusion state"]
+    DAMAGE["<b>C · DAMAGE CLASSIFICATION</b><br/>theft · total loss · glass · partial"]
+    PARAM["<b>D · PARAMETER VALIDATION</b><br/>vehicle · damage · insurance inputs"]
+    CALC["<b>E · CALCULATION / SCENARIO GENERATION</b><br/>branch operators, in branch order"]
+    GATE{"<b>DECISION GATE</b><br/>what may be issued now?"}
+
+    OUT_REF(["<b>REFUSE WITH LEGAL PROVISION</b><br/>name the defeating rule; run no arithmetic"])
+    OUT_INSUF(["<b>INSUFFICIENT INFORMATION</b><br/>print the missing input; never default"])
+    OUT_SCEN(["<b>SCENARIO SET</b><br/>every approved operator order; never average"])
+    OUT_COMPUTE(["<b>COMPUTE PAYABLE</b><br/>one sourced number"])
+
+    UNC{{"<b>UNCERTAINTY LAYER</b><br/>U01 U02 U03 U04 U05 U11 U12 U13 U14 U15<br/>live per case, not decorative"}}
+    PROV["<b>PROVENANCE LAYER</b><br/>Operator → Rule → Source → Authority class → Effective date"]
+
+    START --> INTAKE --> FILE --> COVER --> DAMAGE --> PARAM --> CALC --> GATE
+
+    GATE -- "coverage-defeating fact established" --> OUT_REF
+    GATE -- "required fact / term missing" --> OUT_INSUF
+    GATE -- "facts complete, rule order unresolved" --> OUT_SCEN
+    GATE -- "classified, sourced, complete" --> OUT_COMPUTE
+
+    UNC -. "blocks or branches the parameter lock" .-> PARAM
+    UNC -. "forces scenario output" .-> CALC
+    UNC -. "never silently resolved" .-> GATE
+    PROV -. "no authority chain = not executable" .-> CALC
+    PROV -. "every operator carries a citation" .-> GATE
+
+    classDef intake fill:#4a148c,stroke:#311b92,color:#ffffff,stroke-width:1px
+    classDef stage fill:#0d47a1,stroke:#062b63,color:#ffffff,stroke-width:1px
+    classDef calc fill:#1b5e20,stroke:#0b3d0f,color:#ffffff,stroke-width:1px
+    classDef gate fill:#00695c,stroke:#003d33,color:#ffffff,stroke-width:1px
+    classDef refuse fill:#b71c1c,stroke:#7f0000,color:#ffffff,stroke-width:1px
+    classDef missing fill:#455a64,stroke:#263238,color:#ffffff,stroke-width:1px
+    classDef scenario fill:#e65100,stroke:#8f3b00,color:#ffffff,stroke-width:1px
+    classDef exec fill:#2e7d32,stroke:#1b5e20,color:#ffffff,stroke-width:1px
+    classDef unc fill:#ff8f00,stroke:#b26500,color:#1a1a1a,stroke-width:1px
+    classDef prov fill:#37474f,stroke:#102027,color:#ffffff,stroke-width:1px
+
+    class START gate
+    class INTAKE intake
+    class FILE,COVER,DAMAGE,PARAM stage
+    class CALC calc
+    class GATE gate
+    class OUT_REF refuse
+    class OUT_INSUF missing
+    class OUT_SCEN scenario
+    class OUT_COMPUTE exec
+    class UNC unc
+    class PROV prov
