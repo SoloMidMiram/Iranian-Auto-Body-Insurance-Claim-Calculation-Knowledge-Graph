@@ -367,8 +367,8 @@ def test_theft_clock_requires_the_selected_event_date(kb):
     result = compute(payload, kb)
 
     assert result.status == "THEFT_CLOCK_ANCHOR_UNRESOLVED"
+    assert result.payable is None
     assert result.blocking_uncertainties == ["U13_THEFT_CLOCK_ANCHOR"]
-    assert "requires event.declaration_date" in result.reason
 
 
 def test_shamsi_leap_year_accepts_esfand_30(kb):
