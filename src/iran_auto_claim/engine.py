@@ -987,6 +987,39 @@ def _dated_theft_clock_days(clock: dict[str, Any]) -> int:
     return elapsed
 
 
+_THEFT_CLOCK_EVENT_DATE_FIELDS = {
+    "THEFT_OCCURRENCE": "event_date",
+    "AWARENESS": "awareness_date",
+    "DECLARATION": "declaration_date",
+}
+
+
+def _validate_theft_clock_start_event(case: Case, clock: dict[str, Any]) -> None:
+    """Bind the selected clock event to its canonical date in the case file."""
+
+    start_event = str(clock.get("start_event") or "")
+    event_date_field = _THEFT_CLOCK_EVENT_DATE_FIELDS.get(start_event)
+    if event_date_field is None:
+        raise operators.OperatorError(
+            f"unsupported theft-clock start_event {start_event!r}"
+        )
+
+    event_date = case.event.get(event_date_field)
+    if not isinstance(event_date, str) or not event_date:
+        raise operators.UncertaintyRequired(
+            "U13_THEFT_CLOCK_ANCHOR",
+            f"theft-clock start_event {start_event} requires event.{event_date_field}",
+            status="THEFT_CLOCK_ANCHOR_UNRESOLVED",
+        )
+
+    start_date = str(clock.get("start_date") or "")
+    if start_date != event_date:
+        raise operators.OperatorError(
+            f"theft-clock start_date ({start_date}) does not match "
+            f"event.{event_date_field} ({event_date}) for {start_event}"
+        )
+
+
 def calculate_theft(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("THEFT")
     theft_type = case.theft_type
@@ -1006,6 +1039,7 @@ def calculate_theft(case: Case, kb: Knowledge, res: CalcResult) -> None:
                 "whole-vehicle theft needs a sourced start event, start date and as-of date",
                 status="THEFT_CLOCK_ANCHOR_UNRESOLVED",
             )
+        _validate_theft_clock_start_event(case, clock)
         derived_days = _dated_theft_clock_days(clock)
         if derived_days != days:
             raise operators.OperatorError(

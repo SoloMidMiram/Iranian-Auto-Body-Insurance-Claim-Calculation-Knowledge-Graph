@@ -327,6 +327,34 @@ def main() -> int:
     else:
         raise AssertionError("non-leap Esfand 30 was accepted")
 
+    # A selected declaration anchor cannot borrow the earlier occurrence date to
+    # cross the sixty-day threshold before sixty declaration-based days elapsed.
+    mismatched_theft_clock = {
+        "claim_id": "theft-clock-event-date-probe",
+        "unit": "IRR",
+        "classification": {"branch": "THEFT"},
+        "damage": {
+            "theft_type": "WHOLE_VEHICLE",
+            "days_missing": 59,
+        },
+        "event": {
+            "event_date": "1403-01-01",
+            "declaration_date": "1403-01-02",
+            "theft_clock": {
+                "start_event": "DECLARATION",
+                "start_date": "1403-01-01",
+                "as_of_date": "1403-02-29",
+                "calendar": "SHAMSI",
+                "source": "mutation probe authority record",
+            },
+        },
+    }
+    mismatched_clock_result = compute(
+        _authorize_fixture_case(mismatched_theft_clock, kb), kb
+    )
+    assert mismatched_clock_result.status == "INPUT_ERROR"
+    assert "event.declaration_date" in mismatched_clock_result.reason
+
     # RMV-001: explicit zero is a real amount and caps Article 8 at zero.
     article8 = {
         "claim_id": "article8-zero-probe",

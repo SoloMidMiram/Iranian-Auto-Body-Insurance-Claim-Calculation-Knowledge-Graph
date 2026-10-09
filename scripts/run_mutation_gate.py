@@ -108,6 +108,13 @@ MUTATIONS = (
         "max_day = 30",
         "a non-leap Shamsi year accepts Esfand 30",
     ),
+    Mutation(
+        "M24",
+        "src/iran_auto_claim/engine.py",
+        "_validate_theft_clock_start_event(case, clock)\n        derived_days = _dated_theft_clock_days(clock)",
+        "derived_days = _dated_theft_clock_days(clock)",
+        "the theft clock can use a date that disagrees with its selected event",
+    ),
 )
 
 THRESHOLD = 90.0

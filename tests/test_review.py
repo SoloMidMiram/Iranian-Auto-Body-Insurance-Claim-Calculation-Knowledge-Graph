@@ -343,6 +343,31 @@ def test_a_complete_sourced_theft_clock_reaches_the_engine_through_review(kb):
     assert result.payable == Decimal(7200000000)
 
 
+def test_review_rejects_a_theft_clock_date_that_disagrees_with_selected_event(kb):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].update(
+        {
+            "Q-S2-08": 60,
+            "Q-S2-09": "CONSISTENT",
+            "Q-S2-10": "DECLARATION",
+            # The theft occurred on 1404-04-20, but this file's declaration
+            # date is 1404-04-21. Using the former would reach 60 one day early.
+            "Q-S2-11": "1404-04-20",
+            "Q-S2-12": "1404-06-18",
+            "Q-S2-13": "SHAMSI",
+            "Q-S2-14": "police non-discovery enquiry, file 1404/123",
+            "Q-S4-06": "TRANSFERRED",
+        }
+    )
+    payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+    review = Review(payload, kb)
+
+    assert "U13_THEFT_CLOCK_ANCHOR" in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert "theft_clock" not in review.case_payload()["event"]
+    assert review.calculate() is None
+
+
 def test_overdue_instalment_is_unresolved_and_lapse_refuses_without_arithmetic(kb, monkeypatch):
     def unexpected_compute(*args, **kwargs):
         pytest.fail("a blocked policy must not reach the calculation engine")

@@ -448,7 +448,8 @@ class Review:
         """Return the complete, source-bound whole-theft clock or no clock.
 
         A partial group must never reach the case schema: the review remains
-        blocked by its unanswered questions and U13 until all five fields exist.
+        blocked by its unanswered questions and U13 until all five fields exist
+        and the selected start event agrees with its canonical case date.
         """
         fields = {
             "start_event": self._bound.get("PS_THEFT_CLOCK_START_EVENT"),
@@ -458,6 +459,19 @@ class Review:
             "source": self._bound.get("PS_THEFT_CLOCK_SOURCE"),
         }
         if any(value in (None, "", [], {}) for value in fields.values()):
+            return None
+        start_event = str(fields["start_event"])
+        event_date_slot = {
+            "THEFT_OCCURRENCE": "PS_EVENT_DATE",
+            "AWARENESS": "PS_AWARENESS_DATE",
+            "DECLARATION": "PS_DECLARATION_DATE",
+        }.get(start_event)
+        if event_date_slot is None:
+            return None
+        canonical_date = self._bound.get(event_date_slot)
+        if canonical_date in (None, "") or str(fields["start_date"]) != str(
+            canonical_date
+        ):
             return None
         return {key: str(value) for key, value in fields.items()}
 

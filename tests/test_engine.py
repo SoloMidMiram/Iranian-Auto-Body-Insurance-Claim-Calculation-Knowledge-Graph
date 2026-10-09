@@ -60,6 +60,7 @@ def _case(branch=None, **inputs):
     if branch in ("THEFT", "TOTAL_THEFT") and inputs.get("theft_type") == "WHOLE_VEHICLE":
         days = int(inputs.get("days_missing", inputs.get("days_vehicle_missing", 0)))
         payload["event"] = {
+            "event_date": "2026-01-01",
             "theft_clock": {
                 "start_event": "THEFT_OCCURRENCE",
                 "start_date": "2026-01-01",
@@ -319,6 +320,7 @@ def _whole_theft_with_clock(
         title_transferred=True,
     )
     payload["event"] = {
+        "event_date": start,
         "theft_clock": {
             "start_event": "THEFT_OCCURRENCE",
             "start_date": start,
@@ -328,6 +330,45 @@ def _whole_theft_with_clock(
         }
     }
     return payload
+
+
+@pytest.mark.parametrize(
+    ("start_event", "event_date_field"),
+    [
+        ("THEFT_OCCURRENCE", "event_date"),
+        ("AWARENESS", "awareness_date"),
+        ("DECLARATION", "declaration_date"),
+    ],
+)
+def test_theft_clock_start_date_is_bound_to_selected_event(
+    kb, start_event, event_date_field
+):
+    payload = _whole_theft_with_clock(
+        start="1403-01-01", as_of="1403-02-29", days=59
+    )
+    payload["event"][event_date_field] = "1403-01-01"
+    payload["event"]["theft_clock"]["start_event"] = start_event
+
+    accepted = compute(payload, kb)
+    assert accepted.status == "PENDING_60_DAY_CRITERION"
+
+    payload["event"][event_date_field] = "1403-01-02"
+    rejected = compute(payload, kb)
+    assert rejected.status == "INPUT_ERROR"
+    assert f"event.{event_date_field} (1403-01-02)" in rejected.reason
+
+
+def test_theft_clock_requires_the_selected_event_date(kb):
+    payload = _whole_theft_with_clock(
+        start="1403-01-01", as_of="1403-02-29", days=59
+    )
+    payload["event"]["theft_clock"]["start_event"] = "DECLARATION"
+
+    result = compute(payload, kb)
+
+    assert result.status == "THEFT_CLOCK_ANCHOR_UNRESOLVED"
+    assert result.blocking_uncertainties == ["U13_THEFT_CLOCK_ANCHOR"]
+    assert "requires event.declaration_date" in result.reason
 
 
 def test_shamsi_leap_year_accepts_esfand_30(kb):

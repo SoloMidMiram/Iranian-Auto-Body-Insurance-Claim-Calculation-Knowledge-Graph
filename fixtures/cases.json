@@ -408,6 +408,7 @@
       "branch": "TOTAL_THEFT",
       "unit": "IRR",
       "event": {
+        "event_date": "2026-01-01",
         "theft_clock": {
           "start_event": "THEFT_OCCURRENCE",
           "start_date": "2026-01-01",
@@ -432,6 +433,7 @@
       "branch": "TOTAL_THEFT",
       "unit": "IRR",
       "event": {
+        "event_date": "2026-01-01",
         "theft_clock": {
           "start_event": "THEFT_OCCURRENCE",
           "start_date": "2026-01-01",
@@ -548,6 +550,7 @@
       "branch": "THEFT",
       "unit": "IRR",
       "event": {
+        "event_date": "2026-01-01",
         "theft_clock": {
           "start_event": "THEFT_OCCURRENCE",
           "start_date": "2026-01-01",
@@ -569,6 +572,7 @@
       "branch": "THEFT",
       "unit": "IRR",
       "event": {
+        "event_date": "2026-01-01",
         "theft_clock": {
           "start_event": "THEFT_OCCURRENCE",
           "start_date": "2026-01-01",
