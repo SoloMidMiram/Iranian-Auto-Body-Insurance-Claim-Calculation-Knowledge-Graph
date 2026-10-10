@@ -556,15 +556,16 @@ def test_authorization_provenance_is_preserved_into_the_result(kb):
     assert record["claim_hash"] == authorization.claim_hash
     assert record["tier"] == "T1"
     assert record["branch"] == "PARTIAL_DAMAGE"
-    # The T1 file dates are dash-separated, which the snapshot resolver does not
-    # read as a Jalali anchor, so it falls back to the recorded Iranian year.
-    assert record["snapshot_id"] == "BODY@1404/12/29"
+    # Legacy dash-separated Shamsi input is now validated and selects the actual
+    # occurrence day; it no longer substitutes the Iranian year's final day.
+    assert record["snapshot_id"] == "BODY@1404/08/20"
     assert record["classification"]["outcome"] == "MATCH"
     assert record["policy_snapshot"]["franchise"]["source"] == "POLICY"
     assert record["live_uncertainties"] == []
     assert record["blocking_conditions"] == []
 
     result = compute(authorization, kb)
+    assert result.payable == T1_PAYABLE
     assert result.authorization["claim_hash"] == authorization.claim_hash
     assert result.authorization["issuer"] == ISSUER_REVIEW
 

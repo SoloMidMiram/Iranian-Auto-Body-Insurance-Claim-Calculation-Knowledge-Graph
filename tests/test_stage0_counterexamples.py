@@ -146,7 +146,6 @@ def test_ia05_incomplete_title_transfer_cannot_pay_total_loss(kb):
     _assert_review_does_not_pay(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-07: invalid dates and chronology must not authorize payment")
 @pytest.mark.parametrize(
     ("question", "value"),
     [("Q-S0-02", "1404-99-99"), ("Q-S5-03", 1500)],
@@ -168,7 +167,6 @@ def test_ia08_unversioned_manual_franchise_cannot_pay(kb):
     _assert_review_does_not_pay(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-15: unequal monetary aliases require structured rejection")
 def test_ia15_conflicting_part_aliases_are_rejected(kb):
     payload = _review_case()
     payload["answers"]["Q-S4-03"][0]["assessed_loss_irr"] = 1

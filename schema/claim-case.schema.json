@@ -32,7 +32,8 @@
       "properties": {
         "as_of_date": {
           "type": "string",
-          "format": "date"
+          "format": "date",
+          "description": "Gregorian ISO evaluation cutoff/provenance date. It is not the event date and does not select the event-effective rule snapshot."
         },
         "iranian_year": {
           "type": "integer"
@@ -175,7 +176,8 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "description": "Shamsi production/model year. It may not be later than the Iranian year of the event."
         },
         "market_value_at_event_irr": {
           "type": "integer",
@@ -219,13 +221,16 @@
       "additionalProperties": false,
       "properties": {
         "event_date": {
-          "type": "string"
+          "type": "string",
+          "description": "Occurrence date. Compatibility contract: YYYY/MM/DD is Shamsi; YYYY-MM-DD in years 1300-1500 is legacy Shamsi; YYYY-MM-DD in years 1600-9999 is Gregorian; other year/separator combinations are ambiguous and rejected."
         },
         "awareness_date": {
-          "type": "string"
+          "type": "string",
+          "description": "Date the insured became aware of the loss, using the event-date calendar compatibility contract. It may not precede the event."
         },
         "declaration_date": {
-          "type": "string"
+          "type": "string",
+          "description": "Date the loss was declared, using the event-date calendar compatibility contract. It may not precede the event or awareness."
         },
         "cause": {
           "type": "string"
@@ -360,14 +365,16 @@
             "integer",
             "null"
           ],
-          "minimum": 0
+          "minimum": 0,
+          "description": "Actual incurred rescue/transport expense before the applicable cap; distinct from the threshold operand and from any already-reimbursable amount."
         },
         "rescue_for_total_loss_test_irr": {
           "type": [
             "integer",
             "null"
           ],
-          "minimum": 0
+          "minimum": 0,
+          "description": "Rescue amount admitted to the Article 19 total-loss numerator; distinct from settlement rescue actual/payable values."
         },
         "assessed_depreciation_irr": {
           "type": [
@@ -529,7 +536,8 @@
         },
         "rescue_payable": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Separately supplied reimbursable rescue amount after upstream admissibility/capping. It is not an alias of actual expense, is never copied into rescue_transport_actual_irr, and must not exceed the applicable engine-verified ceiling."
         },
         "rescue_for_threshold": {
           "type": "integer",

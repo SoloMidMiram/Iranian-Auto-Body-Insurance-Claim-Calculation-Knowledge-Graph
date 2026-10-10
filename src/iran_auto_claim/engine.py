@@ -25,7 +25,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date
 from decimal import Decimal
 from typing import Any
 
@@ -36,6 +35,7 @@ from .admission import (
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
 from .classify import classify
+from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
 from .plans import (
     FRANCHISE,
@@ -196,13 +196,24 @@ def _rescue(
     res: CalcResult,
     candidate_bases: dict[str, Decimal],
 ) -> Decimal:
-    actual = case.rescue_actual or Decimal(0)
+    actual = case.rescue_actual
+    supplied_payable = case.rescue_payable
+    if actual is not None and supplied_payable is not None and supplied_payable > actual:
+        raise operators.OperatorError(
+            "supplied rescue payable exceeds the separately supplied actual expense"
+        )
     configured = case.config.get("rescue_cap_base")
     if configured is None:
-        candidate_amounts = {
-            name: operators.allowable_rescue_transport(actual, base)
-            for name, base in candidate_bases.items()
-        }
+        if supplied_payable is not None:
+            candidate_amounts = {
+                name: min(supplied_payable, operators.RESCUE_CAP_RATIO * base)
+                for name, base in candidate_bases.items()
+            }
+        else:
+            candidate_amounts = {
+                name: operators.allowable_rescue_transport(actual, base)
+                for name, base in candidate_bases.items()
+            }
         if len(set(candidate_amounts.values())) > 1:
             res.fields["rescue_candidate_amounts"] = candidate_amounts
             raise operators.UncertaintyRequired(
@@ -224,18 +235,36 @@ def _rescue(
             )
         cap_base = candidate_bases[cap_kind]
 
-    cap = operators.allowable_rescue_transport(actual, cap_base)
+    cap_limit = operators.RESCUE_CAP_RATIO * cap_base if cap_base > 0 else Decimal(0)
+    if supplied_payable is not None:
+        if supplied_payable > cap_limit:
+            raise operators.OperatorError(
+                "supplied rescue payable exceeds the applicable rescue ceiling"
+            )
+        rescue = supplied_payable
+    else:
+        rescue = operators.allowable_rescue_transport(actual, cap_base)
     res.fields["rescue_cap_base_kind"] = cap_kind
     res.fields["rescue_cap_base"] = cap_base
-    res.fields["rescue_cap"] = operators.RESCUE_CAP_RATIO * cap_base if cap_base > 0 else Decimal(0)
-    res.fields["allowable_rescue_transport"] = cap
+    res.fields["rescue_cap"] = cap_limit
+    res.fields["allowable_rescue_transport"] = rescue
     res.fields["rescue_claimed"] = actual
+    res.fields["rescue_payable_supplied"] = supplied_payable
+    res.fields["rescue_input_kind"] = (
+        "ACTUAL_AND_PAYABLE"
+        if actual is not None and supplied_payable is not None
+        else "ACTUAL"
+        if actual is not None
+        else "PAYABLE"
+        if supplied_payable is not None
+        else "NONE"
+    )
     res.note_guard("G_RESCUE_CAP_CEILING")
-    if actual > 0:
+    if (actual or Decimal(0)) > 0 or (supplied_payable or Decimal(0)) > 0:
         res.note_rule("REG53_RESCUE_TRANSPORT_CAP")
-        if cap < actual:
+        if supplied_payable is None and actual is not None and rescue < actual:
             res.label("RESCUE_CAPPED")
-    return cap
+    return rescue
 
 
 def _ratio(case: Case, res: CalcResult) -> Decimal:
@@ -897,74 +926,24 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
 # Borkowski/Jalaali break table, used by the established deterministic
 # JalCal algorithm. The bounded range is deliberate: an unsupported year must
 # fail closed instead of silently switching to an approximate 33-year cycle.
-_SHAMSI_BREAK_YEARS = (
-    -61,
-    9,
-    38,
-    199,
-    426,
-    686,
-    756,
-    818,
-    1111,
-    1181,
-    1210,
-    1635,
-    2060,
-    2097,
-    2192,
-    2262,
-    2324,
-    2394,
-    2456,
-    3178,
-)
-
-
 def _is_shamsi_leap_year(year: int) -> bool:
     """Return JalCal's leap-year result for a supported Shamsi year."""
-    if year < 1 or year >= _SHAMSI_BREAK_YEARS[-1]:
-        raise operators.OperatorError(f"unsupported SHAMSI theft-clock year {year!r}")
-
-    previous_break = _SHAMSI_BREAK_YEARS[0]
-    jump = 0
-    for current_break in _SHAMSI_BREAK_YEARS[1:]:
-        jump = current_break - previous_break
-        if year < current_break:
-            break
-        previous_break = current_break
-
-    offset = year - previous_break
-    if jump - offset < 6:
-        offset = offset - jump + ((jump + 4) // 33) * 33
-    leap_index = (((offset + 1) % 33) - 1) % 4
-    return leap_index == 0
+    try:
+        return is_shamsi_leap_year(year)
+    except CalendarDateError as error:
+        raise operators.OperatorError(
+            f"unsupported SHAMSI theft-clock year {year!r}"
+        ) from error
 
 
 def _shamsi_ordinal(value: str) -> int:
     """Return a consistent day ordinal after validating a Shamsi date."""
     try:
-        year, month, day = (int(part) for part in value.split("-"))
-    except (AttributeError, TypeError, ValueError):
-        raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
-
-    if month < 1 or month > 12:
-        raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
-    if month <= 6:
-        max_day = 31
-        days_before_month = (month - 1) * 31
-    elif month <= 11:
-        max_day = 30
-        days_before_month = 186 + (month - 7) * 30
-    else:
-        max_day = 30 if _is_shamsi_leap_year(year) else 29
-        days_before_month = 336
-    if day < 1 or day > max_day:
-        raise operators.OperatorError(f"invalid SHAMSI theft-clock date {value!r}")
-
-    completed_years = year - 1
-    leap_days = sum(1 for item in range(1, year) if _is_shamsi_leap_year(item))
-    return completed_years * 365 + leap_days + days_before_month + day
+        return parse_claim_date(value, calendar="SHAMSI").chronology_key
+    except CalendarDateError as error:
+        raise operators.OperatorError(
+            f"invalid SHAMSI theft-clock date {value!r}"
+        ) from error
 
 
 def _dated_theft_clock_days(clock: dict[str, Any]) -> int:
@@ -974,14 +953,18 @@ def _dated_theft_clock_days(clock: dict[str, Any]) -> int:
     as_of = str(clock.get("as_of_date") or "")
     calendar = str(clock.get("calendar") or "").upper()
     try:
-        if calendar == "GREGORIAN":
-            elapsed = (date.fromisoformat(as_of) - date.fromisoformat(start)).days
-        elif calendar == "SHAMSI":
-            elapsed = _shamsi_ordinal(as_of) - _shamsi_ordinal(start)
-        else:
-            raise operators.OperatorError(f"unsupported theft-clock calendar {calendar!r}")
-    except ValueError as error:
-        raise operators.OperatorError(f"invalid Gregorian theft-clock date: {error}") from error
+        start_date = parse_claim_date(start, calendar=calendar)
+        as_of_date = parse_claim_date(as_of, calendar=calendar)
+        elapsed = as_of_date.chronology_key - start_date.chronology_key
+    except CalendarDateError as error:
+        if calendar not in ("GREGORIAN", "SHAMSI"):
+            raise operators.OperatorError(
+                f"unsupported theft-clock calendar {calendar!r}"
+            ) from error
+        label = "Gregorian" if calendar == "GREGORIAN" else "SHAMSI"
+        raise operators.OperatorError(
+            f"invalid {label} theft-clock date: {error}"
+        ) from error
     if elapsed < 0:
         raise operators.OperatorError("theft-clock as_of_date precedes its start_date")
     return elapsed

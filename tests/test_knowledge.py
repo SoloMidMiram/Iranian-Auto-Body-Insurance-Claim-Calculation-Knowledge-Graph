@@ -276,6 +276,12 @@ def test_snapshot_follows_the_event_date_and_not_a_current_year(kb):
     assert dated is not None
     assert dated["snapshot_id"] == "BODY@1405/06/01"
     assert dated["rule_ids"]
+    assert kb.resolve_snapshot("1405-06-01", 1405)["snapshot_id"] == "BODY@1405/06/01"
+    assert kb.resolve_snapshot("2026-08-02", 1405)["snapshot_id"] == "BODY@1405/05/11"
+    # Year-only synthetic cases retain the open snapshot; they do not fabricate
+    # a 12/29 occurrence date.
+    assert kb.resolve_snapshot(None, 1405)["snapshot_id"] == "BODY@open"
+    assert kb.resolve_snapshot("1404-99-99", 1404) is None
     assert kb.resolve_snapshot("1200/01/01", None) is None
 
 

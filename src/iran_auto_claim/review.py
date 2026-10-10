@@ -35,6 +35,7 @@ from .admission import (
 )
 from .case import PART_CATEGORIES
 from .classify import classify
+from .dates import parse_claim_date
 from .engine import CalcResult, compute, reconcile_classification
 from .knowledge import Knowledge
 from .schema_input import load_json_document, validate_review, validated_case
@@ -307,10 +308,9 @@ class Review:
 
     def _derive(self, slot_id: str, derivation: str) -> None:
         if derivation == "iranian_year_of_event":
-            raw = str(self.answer("Q-S0-02") or "")
-            year = int(raw[:4]) if raw[:4].isdigit() else None
-            if year is not None and 1300 <= year <= 1500:
-                self._bound[slot_id] = year
+            raw = self.answer("Q-S0-02")
+            if raw not in (None, ""):
+                self._bound[slot_id] = parse_claim_date(raw).iranian_year
         elif derivation == "underinsurance_ratio":
             market = self._bound.get("PS_MARKET_VALUE")
             insured = self._bound.get("PS_INSURED_SUM")

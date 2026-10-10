@@ -103,9 +103,9 @@ MUTATIONS = (
     ),
     Mutation(
         "M23",
-        "src/iran_auto_claim/engine.py",
-        "max_day = 30 if _is_shamsi_leap_year(year) else 29",
-        "max_day = 30",
+        "src/iran_auto_claim/dates.py",
+        "maximum = 30 if is_leap else 29",
+        "maximum = 30",
         "a non-leap Shamsi year accepts Esfand 30",
     ),
     Mutation(
@@ -172,7 +172,8 @@ def _render(results: list[tuple[Mutation, bool]]) -> str:
         "",
         (
             "- Target modules: `plans.py`, `operators.py`, the guard-plan gate in "
-            "`engine.py`, and the authorization boundary in `admission.py`"
+            "`engine.py`, canonical calendar validation in `dates.py`, and the "
+            "authorization boundary in `admission.py`"
         ),
         f"- Required score: **{THRESHOLD:.0f}%**",
         f"- Result: **{killed}/{total} killed ({score:.1f}%)**",
