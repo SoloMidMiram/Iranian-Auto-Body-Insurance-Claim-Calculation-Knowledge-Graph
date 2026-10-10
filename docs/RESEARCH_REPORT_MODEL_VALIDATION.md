@@ -275,8 +275,8 @@ The deterministic defect repair can fit inside the existing body-model sprint; l
 | Causation diagnostic | Original reproduction denied from a bare token; the follow-up requires both token and causal finding. |
 | Battery/tyre diagnostic | Original `DEPRECIATE_THEN_CAP` result double-deducted; the follow-up discriminating case returns 75/90/100 for the three configured modes. |
 | Fixture corpus | 50/50 pass after legacy fixture assumptions were made explicit. |
-| Full pytest suite | 502/502 passed locally after the runtime, date-semantics, and review-to-engine theft-clock remediation. |
-| Curated mutation gate | 23/23 killed (100%), including settlement-base aliasing and non-leap Esfand 30 mutants. |
+| Full pytest suite | Python 3.11 Stage 0 reproduction: 515 passed and 11 strict expected failures; all 11 map to named unresolved audit counterexamples and none unexpectedly passed. |
+| Curated mutation gate | 24/24 killed (100%), including settlement-base aliasing, non-leap Esfand 30, and theft-clock selected-event binding mutants. |
 
 ## Release conclusion
 
