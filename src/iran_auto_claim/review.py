@@ -35,7 +35,7 @@ from .admission import (
 )
 from .case import PART_CATEGORIES
 from .classify import classify
-from .dates import parse_claim_date
+from .dates import CalendarDateError, parse_claim_date
 from .engine import CalcResult, compute, reconcile_classification
 from .knowledge import Knowledge
 from .schema_input import load_json_document, validate_review, validated_case
@@ -469,9 +469,16 @@ class Review:
         if event_date_slot is None:
             return None
         canonical_date = self._bound.get(event_date_slot)
-        if canonical_date in (None, "") or str(fields["start_date"]) != str(
-            canonical_date
-        ):
+        if canonical_date in (None, ""):
+            return None
+        try:
+            start_key = parse_claim_date(
+                fields["start_date"], calendar=str(fields["calendar"])
+            ).chronology_key
+            event_key = parse_claim_date(canonical_date).chronology_key
+        except CalendarDateError:
+            return None
+        if start_key != event_key:
             return None
         return {key: str(value) for key, value in fields.items()}
 

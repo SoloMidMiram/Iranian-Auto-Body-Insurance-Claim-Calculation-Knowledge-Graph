@@ -79,7 +79,7 @@ Field-specific chronology predicates are:
 | production Shamsi year ≤ Iranian event year | production cannot occur after the insured event |
 | supplied `iranian_year` = Iranian year derived from occurrence | prevents a caller selecting a different annual/snapshot year |
 | theft-clock start ≤ theft-clock as-of | elapsed missing days cannot be negative |
-| theft-clock start = selected occurrence/awareness/declaration fact | existing selected-event binding remains authoritative |
+| theft-clock start = selected occurrence/awareness/declaration fact | existing selected-event binding remains authoritative; equality is by parsed calendar day, not raw spelling |
 
 Review provenance time, evaluation cutoff, policy-effective intervals and legal
 clocks are kept separate. This PR does not compute five-working-day notice,
@@ -88,6 +88,8 @@ The three ordered fields are the one canonical occurrence, insured-awareness,
 and insured-to-insurer declaration sequence for this claim. The predicates do
 not order police reports, assessors, reviewers, evidence receipt, complete-
 documents timestamps, evaluation cutoffs, or any other actor/process.
+Equivalent Shamsi slash/dash spellings and equivalent Gregorian/Shamsi values
+bind the same selected theft event; genuinely different days still reject.
 
 Snapshot selection now uses the actual validated event day. A supplied year can
 no longer fabricate `YYYY/12/29`. Year-only synthetic fixtures retain the open
@@ -204,7 +206,7 @@ Acceptance matrix:
 | Release verdict | **BLOCKED** |
 
 Fresh implementation result: the three repaired IDs pass with exit `0`; full
-pytest reports **553 passed, 8 expected failures** with exit `0`; fixtures are
+pytest reports **557 passed, 8 expected failures** with exit `0`; fixtures are
 50/50; independent invariants are 51/51; and the curated mutation gate remains
 24/24 killed. Compilation, knowledge validation (with the pre-existing 22 body-
 authority and 48 source-metadata findings), generated-review/FAQ checks, issue-

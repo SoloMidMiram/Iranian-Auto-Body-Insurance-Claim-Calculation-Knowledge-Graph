@@ -996,7 +996,16 @@ def _validate_theft_clock_start_event(case: Case, clock: dict[str, Any]) -> None
         )
 
     start_date = str(clock.get("start_date") or "")
-    if start_date != event_date:
+    try:
+        start_key = parse_claim_date(
+            start_date, calendar=str(clock.get("calendar") or "")
+        ).chronology_key
+        event_key = parse_claim_date(event_date).chronology_key
+    except CalendarDateError as error:
+        raise operators.OperatorError(
+            "theft-clock start event contains an invalid calendar date"
+        ) from error
+    if start_key != event_key:
         raise operators.OperatorError(
             f"theft-clock start_date ({start_date}) does not match "
             f"event.{event_date_field} ({event_date}) for {start_event}"

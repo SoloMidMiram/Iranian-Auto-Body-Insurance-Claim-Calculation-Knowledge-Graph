@@ -358,6 +358,21 @@ def test_theft_clock_start_date_is_bound_to_selected_event(
     assert f"event.{event_date_field} (1403-01-02)" in rejected.reason
 
 
+@pytest.mark.parametrize("event_date", ["1403/01/01", "2024-03-20"])
+def test_theft_clock_start_date_matches_selected_event_by_calendar_value(
+    kb, event_date
+):
+    payload = _whole_theft_with_clock(
+        start="1403-01-01", as_of="1403-02-29", days=59
+    )
+    payload["event"]["event_date"] = event_date
+
+    result = compute(payload, kb)
+
+    assert result.status == "PENDING_60_DAY_CRITERION"
+    assert result.fields["theft_clock"]["derived_days"] == 59
+
+
 def test_theft_clock_requires_the_selected_event_date(kb):
     payload = _whole_theft_with_clock(
         start="1403-01-01", as_of="1403-02-29", days=59

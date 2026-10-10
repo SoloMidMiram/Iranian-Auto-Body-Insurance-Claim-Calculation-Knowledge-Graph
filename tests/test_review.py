@@ -343,6 +343,33 @@ def test_a_complete_sourced_theft_clock_reaches_the_engine_through_review(kb):
     assert result.payable == Decimal(7200000000)
 
 
+@pytest.mark.parametrize("event_date", ["1404/04/20", "2025-07-11"])
+def test_review_binds_theft_clock_by_calendar_value(kb, event_date):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].update(
+        {
+            "Q-S0-02": event_date,
+            "Q-S2-08": 60,
+            "Q-S2-09": "CONSISTENT",
+            "Q-S2-10": "THEFT_OCCURRENCE",
+            "Q-S2-11": "1404-04-20",
+            "Q-S2-12": "1404-06-18",
+            "Q-S2-13": "SHAMSI",
+            "Q-S2-14": "calendar-equivalent synthetic police record",
+            "Q-S4-06": "TRANSFERRED",
+        }
+    )
+    payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+
+    review = Review(payload, kb)
+
+    assert "U13_THEFT_CLOCK_ANCHOR" not in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_COMPUTE
+    result = review.calculate()
+    assert result is not None
+    assert result.fields["theft_clock"]["derived_days"] == 60
+
+
 def test_review_rejects_a_theft_clock_date_that_disagrees_with_selected_event(kb):
     payload = load("review_t2_theft_pending.json")
     payload["answers"].update(
