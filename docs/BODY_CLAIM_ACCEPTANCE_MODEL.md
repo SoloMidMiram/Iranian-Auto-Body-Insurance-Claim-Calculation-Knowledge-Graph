@@ -298,18 +298,20 @@ documents are authentic or legally sufficient.
 
 ## 10. Current status and next engineering steps
 
-Validated on 2026-10-05:
+Revalidated on 2026-10-10 under Python 3.11.15:
 
-- knowledge graph integrity passes: 261 registered nodes;
+- knowledge graph integrity passes structurally: 271 registered nodes, with 22
+  body-authority and 48 source-metadata findings retained as release work;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 502 tests;
+- the complete automated suite reports 515 passed and 11 strict expected
+  failures tied to named unresolved audit counterexamples;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
 - missing franchise terms or authority stop every body settlement path on U02;
 - explicit zero franchise is accepted only from versioned, referenced policy evidence;
 - no calculation path reaches the engine without an authorization, and the
-  mutation gate kills hash, decision, and review-issuance bypass mutants (16/16).
+  mutation gate kills all 24 curated high-risk mutants (24/24).
 
 Remaining gaps, in priority order:
 

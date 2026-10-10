@@ -48,7 +48,7 @@ def test_body_result_traces_source_rule_operator_execution_and_result(kb):
     assert result.formula_confidence != result.evidence_confidence
 
 
-def _required_evidence(kb) -> list[str]:
+def _required_evidence_first_definition(kb) -> list[str]:
     return list(kb.branch("PARTIAL_DAMAGE")["required_evidence"])
 
 
@@ -61,8 +61,10 @@ def _required_evidence(kb) -> list[str]:
         ("all_true", False),
     ],
 )
-def test_evidence_confidence_counts_boolean_values_not_key_presence(kb, evidence, expect_missing):
-    required = _required_evidence(kb)
+def test_evidence_confidence_counts_boolean_values_not_key_presence_first_definition(
+    kb, evidence, expect_missing
+):
+    required = _required_evidence_first_definition(kb)
     if evidence == "all_false":
         evidence_map = {item: False for item in required}
     elif evidence == "mixed":
@@ -87,7 +89,7 @@ def test_evidence_confidence_counts_boolean_values_not_key_presence(kb, evidence
         assert not any("evidence missing" in finding for finding in findings)
 
 
-def _required_evidence(kb) -> list[str]:
+def _required_evidence_second_definition(kb) -> list[str]:
     return list(kb.branch("PARTIAL_DAMAGE")["required_evidence"])
 
 
@@ -100,8 +102,10 @@ def _required_evidence(kb) -> list[str]:
         ("all_true", False),
     ],
 )
-def test_evidence_confidence_counts_boolean_values_not_key_presence(kb, evidence, expect_missing):
-    required = _required_evidence(kb)
+def test_evidence_confidence_counts_boolean_values_not_key_presence_second_definition(
+    kb, evidence, expect_missing
+):
+    required = _required_evidence_second_definition(kb)
     if evidence == "all_false":
         evidence_map = {item: False for item in required}
     elif evidence == "mixed":

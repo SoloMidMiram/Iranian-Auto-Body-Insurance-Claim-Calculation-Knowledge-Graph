@@ -58,7 +58,8 @@ python claim.py ingest submissions/example_conflicting_educational.json
 The persistence and engine boundary accepts monetary values only as non-negative
 integer IRR. Toman and million-toman conversion is explicit presentation logic.
 
-Tests: `python -m pytest` (502 tests). Install development/test
+Tests: `python -m pytest` (`515 passed, 11 xfailed` in the Python 3.11 Stage 0
+baseline). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 

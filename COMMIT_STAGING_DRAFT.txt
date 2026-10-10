@@ -56,9 +56,10 @@ Runtime outcome
 Verification
 ============
 
-- Full pytest suite: 502/502 passed.
+- Python 3.11 Stage 0 suite: 515 passed, 11 strict expected failures, with all
+  11 reproduced as their named unresolved counterexamples and no XPASS.
 - Synthetic fixture corpus: 50/50 passed.
-- Curated high-risk mutation gate: 23/23 killed (100.0%).
+- Curated high-risk mutation gate: 24/24 killed (100.0%).
 - Knowledge validation: structurally OK; the pre-existing 22 body-authority and
   48 source-metadata findings remain documented release work.
 - Generated review and customer-FAQ documentation: current.
