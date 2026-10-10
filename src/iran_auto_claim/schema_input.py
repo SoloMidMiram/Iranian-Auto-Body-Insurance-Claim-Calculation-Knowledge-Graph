@@ -578,12 +578,13 @@ def _check_alias_group(
 ) -> None:
     present = [(path, _path_value(payload, path)) for path in paths]
     present = [(path, value) for path, value in present if value is not None]
-    if len({value for _, value in present}) > 1:
+    valid = [(path, value) for path, value in present if _review_number(value)]
+    if len(valid) > 1 and any(value != valid[0][1] for _, value in valid[1:]):
         issues.append(
             SchemaIssue(
                 CODE_CONFLICT,
-                present[-1][0],
-                f"monetary aliases must agree with {present[0][0]}",
+                valid[-1][0],
+                f"monetary aliases must agree with {valid[0][0]}",
             )
         )
 
@@ -592,12 +593,13 @@ def _check_local_aliases(
     item: dict[str, Any], keys: tuple[str, ...], path: str, issues: list[SchemaIssue]
 ) -> None:
     present = [(key, item[key]) for key in keys if item.get(key) is not None]
-    if len({value for _, value in present}) > 1:
+    valid = [(key, value) for key, value in present if _review_number(value)]
+    if len(valid) > 1 and any(value != valid[0][1] for _, value in valid[1:]):
         issues.append(
             SchemaIssue(
                 CODE_CONFLICT,
-                f"{path}.{present[-1][0]}",
-                f"monetary aliases must agree with {path}.{present[0][0]}",
+                f"{path}.{valid[-1][0]}",
+                f"monetary aliases must agree with {path}.{valid[0][0]}",
             )
         )
 

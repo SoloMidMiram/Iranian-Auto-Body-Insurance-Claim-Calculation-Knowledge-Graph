@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from functools import lru_cache
 import re
 
 
@@ -51,6 +52,8 @@ _SHAMSI_BREAK_YEARS = (
     2456,
     3178,
 )
+_SHAMSI_ANCHOR_YEAR = 1404
+_SHAMSI_ANCHOR_ORDINAL = date(2025, 3, 21).toordinal()
 
 
 class CalendarDateError(ValueError):
@@ -166,33 +169,60 @@ def _validate_shamsi(year: int, month: int, day: int) -> None:
         raise CalendarDateError("invalid Shamsi day")
 
 
+def _shamsi_year_length(year: int) -> int:
+    return 366 if is_shamsi_leap_year(year) else 365
+
+
+@lru_cache(maxsize=None)
+def _shamsi_year_start_ordinal(year: int) -> int:
+    """Return a Gregorian ordinal for a supported Shamsi year boundary.
+
+    The upper sentinel is the first day after the supported interval.  Building
+    conversion from the same break-table leap predicate used by validation
+    prevents boundary collisions where a validated Esfand 30 was previously
+    converted with a different 33-year approximation.
+    """
+    if year < 1 or year > _SHAMSI_BREAK_YEARS[-1]:
+        raise CalendarDateError(f"unsupported Shamsi year boundary {year!r}")
+    if year >= _SHAMSI_ANCHOR_YEAR:
+        elapsed = sum(
+            _shamsi_year_length(item)
+            for item in range(_SHAMSI_ANCHOR_YEAR, year)
+        )
+        return _SHAMSI_ANCHOR_ORDINAL + elapsed
+    elapsed = sum(
+        _shamsi_year_length(item)
+        for item in range(year, _SHAMSI_ANCHOR_YEAR)
+    )
+    return _SHAMSI_ANCHOR_ORDINAL - elapsed
+
+
+def _shamsi_day_offset(month: int, day: int) -> int:
+    if month <= 6:
+        return (month - 1) * 31 + day - 1
+    return 186 + (month - 7) * 30 + day - 1
+
+
 def gregorian_to_shamsi(gy: int, gm: int, gd: int) -> tuple[int, int, int]:
     """Convert a validated proleptic-Gregorian date into a Shamsi date."""
-    date(gy, gm, gd)
-    month_days = (0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
-    if gy > 1600:
-        jy = 979
-        gy -= 1600
-    else:
-        jy = 0
-        gy -= 621
-    gy2 = gy + 1 if gm > 2 else gy
-    days = (
-        365 * gy
-        + (gy2 + 3) // 4
-        - (gy2 + 99) // 100
-        + (gy2 + 399) // 400
-        - 80
-        + gd
-        + month_days[gm - 1]
-    )
-    jy += 33 * (days // 12053)
-    days %= 12053
-    jy += 4 * (days // 1461)
-    days %= 1461
-    if days > 365:
-        jy += (days - 1) // 365
-        days = (days - 1) % 365
+    ordinal = date(gy, gm, gd).toordinal()
+    lower = _shamsi_year_start_ordinal(1)
+    upper = _shamsi_year_start_ordinal(_SHAMSI_BREAK_YEARS[-1])
+    if ordinal < lower or ordinal >= upper:
+        raise CalendarDateError(
+            "Gregorian date is outside the supported Shamsi conversion interval"
+        )
+
+    low = 1
+    high = _SHAMSI_BREAK_YEARS[-1]
+    while low + 1 < high:
+        middle = (low + high) // 2
+        if _shamsi_year_start_ordinal(middle) <= ordinal:
+            low = middle
+        else:
+            high = middle
+    jy = low
+    days = ordinal - _shamsi_year_start_ordinal(jy)
     if days < 186:
         jm, jd = 1 + days // 31, 1 + days % 31
     else:
@@ -204,30 +234,7 @@ def gregorian_to_shamsi(gy: int, gm: int, gd: int) -> tuple[int, int, int]:
 def shamsi_to_gregorian(jy: int, jm: int, jd: int) -> tuple[int, int, int]:
     """Convert a validated Shamsi date into a proleptic-Gregorian date."""
     _validate_shamsi(jy, jm, jd)
-    if jy > 979:
-        gy = 1600
-        jy -= 979
-    else:
-        gy = 621
-    days = 365 * jy + (jy // 33) * 8 + ((jy % 33) + 3) // 4 + 78 + jd
-    days += (jm - 1) * 31 if jm < 7 else (jm - 7) * 30 + 186
-    gy += 400 * (days // 146097)
-    days %= 146097
-    if days > 36524:
-        gy += 100 * ((days - 1) // 36524)
-        days = (days - 1) % 36524
-        if days >= 365:
-            days += 1
-    gy += 4 * (days // 1461)
-    days %= 1461
-    if days > 365:
-        gy += (days - 1) // 365
-        days = (days - 1) % 365
-    gd = days + 1
-    leap = (gy % 4 == 0 and gy % 100 != 0) or gy % 400 == 0
-    month_days = (0, 31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-    gm = 1
-    while gd > month_days[gm]:
-        gd -= month_days[gm]
-        gm += 1
-    return gy, gm, gd
+    converted = date.fromordinal(
+        _shamsi_year_start_ordinal(jy) + _shamsi_day_offset(jm, jd)
+    )
+    return converted.year, converted.month, converted.day

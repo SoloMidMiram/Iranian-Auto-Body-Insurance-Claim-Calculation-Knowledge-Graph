@@ -333,6 +333,46 @@ def test_review_part_new_price_aliases_must_agree(kb):
     )
 
 
+@pytest.mark.parametrize("malformed", [[], {}], ids=("list", "object"))
+def test_malformed_review_money_aliases_return_structured_errors(kb, malformed):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S4-03": [
+                {
+                    "category": "BATTERY",
+                    "assessed_loss": malformed,
+                    "assessed_loss_irr": 100,
+                }
+            ]
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    assert any(
+        item.code == "invalid_type"
+        and item.path == "answers.Q-S4-03[0].assessed_loss"
+        for item in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize("malformed", [[], {}], ids=("list", "object"))
+def test_malformed_claim_money_aliases_return_structured_errors(malformed):
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "damage": {"gross": malformed, "gross_damage_irr": 100},
+            }
+        )
+    assert any(
+        item.code == "invalid_type" and item.path == "damage.gross"
+        for item in caught.value.errors
+    )
+
+
 @pytest.mark.parametrize(
     ("part", "path"),
     [

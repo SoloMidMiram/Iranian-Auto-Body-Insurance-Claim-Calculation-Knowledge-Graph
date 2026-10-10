@@ -64,6 +64,11 @@ The 1600–9999 interval identifies the spelling as Gregorian; occurrence dates
 outside the converter's supported Shamsi interval then refuse instead of
 guessing an Iranian claim year or snapshot.
 
+Shamsi validation and conversion use the same break-table leap predicate over
+the complete supported interval (years 1–3177). Regression coverage walks every
+year boundary and round-trips each final valid day; in particular,
+`1635/12/30` and `1636/01/01` now have consecutive, distinct ordinals.
+
 Field-specific chronology predicates are:
 
 | Predicate | Basis |
@@ -119,6 +124,8 @@ or more are supplied, every value must be equal.
 
 `vehicle.production_year_shamsi` and `damage.production_year` receive the same
 conflict check, but are calendar-year facts rather than money.
+Malformed list/object values are rejected as `invalid_type` before alias
+equality is considered; alias comparison never hashes or normalizes them.
 
 ### Distinct operands
 
@@ -197,7 +204,7 @@ Acceptance matrix:
 | Release verdict | **BLOCKED** |
 
 Fresh implementation result: the three repaired IDs pass with exit `0`; full
-pytest reports **547 passed, 8 expected failures** with exit `0`; fixtures are
+pytest reports **553 passed, 8 expected failures** with exit `0`; fixtures are
 50/50; independent invariants are 51/51; and the curated mutation gate remains
 24/24 killed. Compilation, knowledge validation (with the pre-existing 22 body-
 authority and 48 source-metadata findings), generated-review/FAQ checks, issue-
