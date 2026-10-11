@@ -358,6 +358,21 @@ def test_theft_clock_start_date_is_bound_to_selected_event(
     assert f"event.{event_date_field} (1403-01-02)" in rejected.reason
 
 
+@pytest.mark.parametrize("event_date", ["1403/01/01", "2024-03-20"])
+def test_theft_clock_start_date_matches_selected_event_by_calendar_value(
+    kb, event_date
+):
+    payload = _whole_theft_with_clock(
+        start="1403-01-01", as_of="1403-02-29", days=59
+    )
+    payload["event"]["event_date"] = event_date
+
+    result = compute(payload, kb)
+
+    assert result.status == "PENDING_60_DAY_CRITERION"
+    assert result.fields["theft_clock"]["derived_days"] == 59
+
+
 def test_theft_clock_requires_the_selected_event_date(kb):
     payload = _whole_theft_with_clock(
         start="1403-01-01", as_of="1403-02-29", days=59
@@ -383,14 +398,14 @@ def test_shamsi_leap_year_accepts_esfand_30(kb):
 
 
 def test_shamsi_non_leap_year_rejects_esfand_30(kb):
-    result = compute(
-        _whole_theft_with_clock(
-            start="1402-12-30", as_of="1403-01-01", days=1
-        ),
-        kb,
-    )
-    assert result.status == "INPUT_ERROR"
-    assert "invalid SHAMSI theft-clock date" in result.reason
+    with pytest.raises(InputSchemaError) as caught:
+        compute(
+            _whole_theft_with_clock(
+                start="1402-12-30", as_of="1403-01-01", days=1
+            ),
+            kb,
+        )
+    assert any(item.code == "invalid_date" for item in caught.value.errors)
 
 
 @pytest.mark.parametrize(
@@ -443,14 +458,18 @@ def test_shamsi_theft_clock_rejects_stored_day_mismatch(kb):
 
 
 def test_shamsi_theft_clock_rejects_as_of_before_start(kb):
-    result = compute(
-        _whole_theft_with_clock(
-            start="1403-02-01", as_of="1403-01-31", days=0
-        ),
-        kb,
+    with pytest.raises(InputSchemaError) as caught:
+        compute(
+            _whole_theft_with_clock(
+                start="1403-02-01", as_of="1403-01-31", days=0
+            ),
+            kb,
+        )
+    assert any(
+        item.code == "invalid_chronology"
+        and item.path == "event.theft_clock.as_of_date"
+        for item in caught.value.errors
     )
-    assert result.status == "INPUT_ERROR"
-    assert "precedes its start_date" in result.reason
 
 
 @pytest.mark.parametrize(
@@ -537,6 +556,64 @@ def test_rescue_cap_base_is_recorded_and_configurable(kb):
     assert result.fields["rescue_cap"] == D(40)
 
 
+def test_actual_and_payable_rescue_operands_remain_distinct_through_calculation(kb):
+    actual_only = _case(
+        "PARTIAL_DAMAGE", gross=1000, franchise=0, actual_rescue=300
+    )
+    actual_only["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    actual_result = compute(actual_only, kb)
+    assert actual_result.fields["rescue_input_kind"] == "ACTUAL"
+    assert actual_result.fields["rescue_claimed"] == D(300)
+    assert actual_result.fields["rescue_payable_supplied"] is None
+    assert actual_result.fields["allowable_rescue_transport"] == D(200)
+
+    payable_only = _case(
+        "PARTIAL_DAMAGE", gross=1000, franchise=0, rescue_payable=150
+    )
+    payable_only["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    payable_result = compute(payable_only, kb)
+    assert payable_result.fields["rescue_input_kind"] == "PAYABLE"
+    assert payable_result.fields["rescue_claimed"] is None
+    assert payable_result.fields["rescue_payable_supplied"] == D(150)
+    assert payable_result.fields["allowable_rescue_transport"] == D(150)
+
+    both = _case(
+        "PARTIAL_DAMAGE",
+        gross=1000,
+        franchise=0,
+        actual_rescue=300,
+        rescue_payable=150,
+    )
+    both["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    both_result = compute(both, kb)
+    assert both_result.fields["rescue_input_kind"] == "ACTUAL_AND_PAYABLE"
+    assert both_result.fields["rescue_claimed"] == D(300)
+    assert both_result.fields["rescue_payable_supplied"] == D(150)
+    assert both_result.fields["allowable_rescue_transport"] == D(150)
+
+
+def test_supplied_rescue_payable_above_actual_or_ceiling_is_refused(kb):
+    above_actual = _case(
+        "PARTIAL_DAMAGE",
+        gross=1000,
+        franchise=0,
+        actual_rescue=100,
+        rescue_payable=150,
+    )
+    above_actual["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    result = compute(above_actual, kb)
+    assert result.status == "INPUT_ERROR"
+    assert "exceeds the separately supplied actual expense" in result.reason
+
+    above_ceiling = _case(
+        "PARTIAL_DAMAGE", gross=1000, franchise=0, rescue_payable=201
+    )
+    above_ceiling["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    result = compute(above_ceiling, kb)
+    assert result.status == "INPUT_ERROR"
+    assert "exceeds the applicable rescue ceiling" in result.reason
+
+
 def test_material_rescue_denominator_difference_blocks_when_base_is_missing(kb):
     payload = _case(
         "PARTIAL_DAMAGE",
@@ -550,6 +627,49 @@ def test_material_rescue_denominator_difference_blocks_when_base_is_missing(kb):
     result = compute(payload, kb)
     assert result.payable is None
     assert result.status == "RESCUE_DENOMINATOR_UNRESOLVED"
+    assert result.blocking_uncertainties == ["U05_RESCUE_DENOMINATOR"]
+
+
+def test_zero_supplied_rescue_does_not_block_on_non_positive_candidate_base(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        gross=100,
+        depreciation=120,
+        market=100,
+        insured=100,
+        rescue_payable=0,
+        franchise=0,
+    )
+
+    result = compute(payload, kb)
+
+    assert result.status is None
+    assert result.payable == D(0)
+    assert result.fields["allowable_rescue_transport"] == D(0)
+    assert result.fields["rescue_payable_supplied"] == D(0)
+    assert result.blocking_uncertainties == []
+
+
+def test_positive_supplied_rescue_still_blocks_on_material_candidate_difference(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        gross=1000,
+        depreciation=900,
+        market=1000,
+        insured=1000,
+        rescue_payable=100,
+        franchise=0,
+    )
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "RESCUE_DENOMINATOR_UNRESOLVED"
+    assert result.fields["rescue_candidate_amounts"] == {
+        "ASSESSED_GROSS": D(100),
+        "ELIGIBLE_GROSS": D(100),
+        "SETTLEMENT_BASE": D(20),
+    }
     assert result.blocking_uncertainties == ["U05_RESCUE_DENOMINATOR"]
 
 

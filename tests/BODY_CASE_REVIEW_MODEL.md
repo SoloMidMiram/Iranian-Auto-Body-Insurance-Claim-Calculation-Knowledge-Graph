@@ -569,9 +569,11 @@ amount-affecting):**
   it.
 * **No evidence is verified.** `evidence_present` is an assertion by the reviewer. The
   layer reports what is demanded and what is claimed; it cannot see the documents.
-* **Date handling is deliberately thin**: a leading year between 1300 and 1500 is read
-  as Shamsi to derive the claim year. Working-day arithmetic for the notice deadline,
-  and any Shamsi/Gregorian conversion, are not implemented — the model records the
-  judgement (`Q-S0-04`) rather than computing it.
+* **Calendar identification is closed at intake**: slash dates are Shamsi; dash dates
+  in years 1300–1500 are legacy Shamsi; supported modern ISO dates are Gregorian;
+  ambiguous spellings reject. Occurrence, awareness, declaration, and theft-clock
+  dates are validated once and Gregorian occurrence dates are converted only to bind
+  the Iranian event year/snapshot. Working-day notice arithmetic remains outside the
+  engine: the model records that judgement (`Q-S0-04`) rather than inventing it.
 * **Free-text answers are confined to identification and sign-off** (`Q-S0-01`,
   `Q-S10-01`). A narrative field can never move an amount, by construction.

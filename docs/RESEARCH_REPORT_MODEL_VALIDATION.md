@@ -129,7 +129,9 @@ The report needs its own repairs:
 The repository schema correctly adds `additionalProperties: false`, IRR-only persistence, aliases used by legacy fixtures, and several conditional requirements. It is still too permissive as a single cross-domain admission contract:
 
 - only `claim_id` and `unit` are universally required;
-- event dates are plain strings in the claim schema while snapshot resolution expects Jalali `YYYY/MM/DD` or falls back to the supplied Iranian year;
+- event dates remain legacy strings in the claim schema, but the runtime now applies
+  a closed Shamsi/Gregorian compatibility contract, validates calendar dates, and
+  resolves the actual event day without a supplied-year-end substitution;
 - `days_vehicle_missing` is a number and is truncated with `int()`, rather than being validated as an integer derived from dates;
 - cause/peril remain free strings at the calculation boundary;
 - evidence presence is stored as booleans, not immutable evidence records;

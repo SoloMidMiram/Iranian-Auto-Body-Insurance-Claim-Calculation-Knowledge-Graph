@@ -15,6 +15,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable
 
+from .dates import CalendarDateError, parse_claim_date
 from .money import D
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[2]
@@ -286,12 +287,12 @@ def source_integrity_findings_for(source_id: str, source: dict[str, Any]) -> lis
 
 
 def _jalali_date(value: str | None) -> str | None:
-    if not isinstance(value, str) or len(value) != 10 or value[4] != "/" or value[7] != "/":
+    if value in (None, ""):
         return None
-    year, month, day = value[:4], value[5:7], value[8:]
-    if not (year.isdigit() and month.isdigit() and day.isdigit()):
+    try:
+        return parse_claim_date(value).snapshot_anchor
+    except CalendarDateError:
         return None
-    return value
 
 
 def resolve_callable(dotted: str) -> Any:
@@ -428,8 +429,11 @@ class Knowledge:
         if not rules:
             return None
         anchor = _jalali_date(event_date)
-        if anchor is None and iranian_year is not None:
-            anchor = f"{int(iranian_year):04d}/12/29"
+        # A supplied annual year is a consistency check, never a substitute for
+        # the missing event day.  The old 12/29 fallback could select a later
+        # effective rule than the occurrence actually permits.
+        if anchor is None and event_date not in (None, ""):
+            return None
         selected: list[dict[str, Any]] = []
         for rule in rules:
             start = str(rule.get("effective_date") or "")

@@ -201,6 +201,11 @@ ratio = min(1, insured_sum / event_date_market_value)
 allowable_rescue = min(actual_rescue, 20% * sourced_cap_base)
 ```
 
+An explicitly supplied `rescue_payable` remains a separate reimbursable
+operand. The engine verifies it against the applicable ceiling and, when actual
+expense is also supplied, against that expense; it is neither copied into
+`actual_rescue` nor capped a second time.
+
 Fully insured, resolved case:
 
 ```text

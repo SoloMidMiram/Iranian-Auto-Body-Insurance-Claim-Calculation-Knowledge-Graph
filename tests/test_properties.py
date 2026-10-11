@@ -80,7 +80,7 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
                 "market": 2000,
                 "insured": 1500,
                 "repair": 1800,
-                "rescue_payable": 900,
+                "actual_rescue": 900,
             },
             "policy": {
                 "policy_version": "TEST-v1",
@@ -161,7 +161,7 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                     "market": market,
                     "insured": insured,
                     "repair": market,
-                    "rescue_payable": rescue,
+                    "actual_rescue": rescue,
                 },
                 "policy": {
                     "policy_version": "TEST-v1",

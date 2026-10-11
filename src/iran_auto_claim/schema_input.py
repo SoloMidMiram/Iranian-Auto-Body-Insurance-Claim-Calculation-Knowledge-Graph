@@ -16,6 +16,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from .dates import CalendarDateError, ClaimDate, parse_claim_date
 from .knowledge import DEFAULT_ROOT
 
 CLAIM_SCHEMA = "claim-case.schema.json"
@@ -29,6 +30,11 @@ CODE_BOOLEAN = "invalid_boolean"
 CODE_UNAUTHORIZED = "review_not_authorized"
 CODE_SCHEMA = "unsupported_schema_keyword"
 CODE_JSON = "invalid_json"
+CODE_DATE = "invalid_date"
+CODE_CHRONOLOGY = "invalid_chronology"
+CODE_CONFLICT = "conflicting_alias"
+CODE_YEAR = "conflicting_year"
+CODE_INVALID_YEAR = "invalid_year"
 
 _SUPPORTED_SCHEMA_KEYS = {
     "$schema", "$id", "title", "description", "default",
@@ -60,6 +66,9 @@ class InputSchemaError(ValueError):
 
 def validate_claim(payload: Any) -> None:
     _require(payload, _load(CLAIM_SCHEMA))
+    issues = _claim_issues(payload)
+    if issues:
+        raise InputSchemaError(issues)
 
 
 def validate_review(payload: Any, kb: Any | None = None) -> None:
@@ -340,6 +349,261 @@ def _check_schema_keywords(
                     _check_schema_keywords(child, f"{path}.{key}[{index}]", issues)
 
 
+_CLAIM_MONEY_ALIAS_GROUPS: tuple[tuple[str, ...], ...] = (
+    ("damage.labor", "damage.labor_irr"),
+    ("damage.gross", "damage.gross_damage", "damage.gross_damage_irr"),
+    (
+        "damage.repair",
+        "damage.repair_total",
+        "damage.repair_total_irr",
+        "damage.repair_and_replacement_irr",
+    ),
+    ("damage.depreciation", "damage.assessed_depreciation_irr"),
+    ("damage.depreciable_parts", "damage.depreciable_parts_base_irr"),
+    (
+        "damage.rescue",
+        "damage.actual_rescue",
+        "damage.rescue_transport_actual_irr",
+    ),
+    ("damage.rescue_for_threshold", "damage.rescue_for_total_loss_test_irr"),
+    ("damage.market", "damage.market_value", "vehicle.market_value_at_event_irr"),
+    ("damage.insured", "damage.insured_sum", "vehicle.insured_sum_irr"),
+    ("damage.salvage", "damage.salvage_value", "vehicle.salvage_value_irr"),
+    ("damage.actual_damage", "damage.actual_financial_loss_irr"),
+    (
+        "damage.corresponding_damage",
+        "damage.similar_part_corresponding_damage",
+        "damage.article8_corresponding_damage_irr",
+    ),
+    (
+        "damage.policy_financial_limit",
+        "damage.tp_limit",
+        "policy.third_party_financial_limit_irr",
+    ),
+    ("damage.vehicle_value", "damage.victim_vehicle_value"),
+    ("damage.conventional_threshold", "damage.threshold"),
+)
+
+
+def _claim_issues(payload: Any) -> list[SchemaIssue]:
+    """Enforce cross-field contracts that JSON Schema cannot express."""
+    if not isinstance(payload, dict):
+        return []
+    issues: list[SchemaIssue] = []
+
+    parsed: dict[str, ClaimDate] = {}
+    event = payload.get("event")
+    if isinstance(event, dict):
+        for field in ("event_date", "awareness_date", "declaration_date"):
+            if event.get(field) not in (None, ""):
+                parsed_date = _date_issue(
+                    event[field],
+                    f"event.{field}",
+                    issues,
+                    require_iranian_mapping=field == "event_date",
+                )
+                if parsed_date is not None:
+                    parsed[field] = parsed_date
+        clock = event.get("theft_clock")
+        if isinstance(clock, dict):
+            calendar = clock.get("calendar")
+            start = _date_issue(
+                clock.get("start_date"),
+                "event.theft_clock.start_date",
+                issues,
+                calendar=calendar,
+            )
+            as_of = _date_issue(
+                clock.get("as_of_date"),
+                "event.theft_clock.as_of_date",
+                issues,
+                calendar=calendar,
+            )
+            if start is not None and as_of is not None and as_of.chronology_key < start.chronology_key:
+                issues.append(
+                    SchemaIssue(
+                        CODE_CHRONOLOGY,
+                        "event.theft_clock.as_of_date",
+                        "theft-clock as-of date precedes its selected start date",
+                    )
+                )
+
+    _check_event_chronology(parsed, "event", issues)
+
+    snapshot = payload.get("regulatory_snapshot")
+    snapshot = snapshot if isinstance(snapshot, dict) else {}
+    claim_year = snapshot.get("iranian_year")
+    event_date = parsed.get("event_date")
+    if claim_year is not None and not 1 <= int(claim_year) < 3178:
+        issues.append(
+            SchemaIssue(
+                CODE_INVALID_YEAR,
+                "regulatory_snapshot.iranian_year",
+                "Iranian claim year is outside the supported Shamsi interval",
+            )
+        )
+    if event_date is not None and claim_year is not None and int(claim_year) != event_date.iranian_year:
+        issues.append(
+            SchemaIssue(
+                CODE_YEAR,
+                "regulatory_snapshot.iranian_year",
+                f"Iranian claim year must equal event year {event_date.iranian_year}",
+            )
+        )
+
+    vehicle = payload.get("vehicle")
+    vehicle = vehicle if isinstance(vehicle, dict) else {}
+    damage = payload.get("damage")
+    damage = damage if isinstance(damage, dict) else {}
+    production_values = [
+        ("vehicle.production_year_shamsi", vehicle.get("production_year_shamsi")),
+        ("damage.production_year", damage.get("production_year")),
+    ]
+    present_production = [(path, value) for path, value in production_values if value is not None]
+    if len({value for _, value in present_production}) > 1:
+        issues.append(
+            SchemaIssue(
+                CODE_CONFLICT,
+                present_production[-1][0],
+                "production-year representations describe the same Shamsi year and must agree",
+            )
+        )
+    effective_year = event_date.iranian_year if event_date is not None else claim_year
+    for path, production_year in present_production:
+        if not 1 <= int(production_year) < 3178:
+            issues.append(
+                SchemaIssue(
+                    CODE_INVALID_YEAR,
+                    path,
+                    "production year is outside the supported Shamsi interval",
+                )
+            )
+        elif effective_year is not None and int(production_year) > int(effective_year):
+            issues.append(
+                SchemaIssue(
+                    CODE_CHRONOLOGY,
+                    path,
+                    f"production year {production_year} is after event year {effective_year}",
+                )
+            )
+
+    for group in _CLAIM_MONEY_ALIAS_GROUPS:
+        _check_alias_group(payload, group, issues)
+    for index, part in enumerate(damage.get("parts") or []):
+        if isinstance(part, dict):
+            _check_local_aliases(
+                part,
+                ("assessed_loss", "assessed_loss_irr"),
+                f"damage.parts[{index}]",
+                issues,
+            )
+    for index, part in enumerate(damage.get("replacement_parts") or []):
+        if isinstance(part, dict):
+            _check_local_aliases(
+                part,
+                ("loss", "assessed_loss"),
+                f"damage.replacement_parts[{index}]",
+                issues,
+            )
+    return issues
+
+
+def _date_issue(
+    value: Any,
+    path: str,
+    issues: list[SchemaIssue],
+    *,
+    calendar: Any = None,
+    require_iranian_mapping: bool = False,
+) -> ClaimDate | None:
+    try:
+        parsed = parse_claim_date(
+            value, calendar=None if calendar is None else str(calendar)
+        )
+        if require_iranian_mapping:
+            parsed.iranian_year
+        return parsed
+    except CalendarDateError as error:
+        issues.append(SchemaIssue(CODE_DATE, path, str(error)))
+        return None
+
+
+def _check_event_chronology(
+    parsed: dict[str, ClaimDate], prefix: str, issues: list[SchemaIssue],
+    paths: dict[str, str] | None = None,
+) -> None:
+    def field_path(field: str) -> str:
+        return (paths or {}).get(field, f"{prefix}.{field}")
+
+    event = parsed.get("event_date")
+    awareness = parsed.get("awareness_date")
+    declaration = parsed.get("declaration_date")
+    if event is not None and awareness is not None and awareness.chronology_key < event.chronology_key:
+        issues.append(
+            SchemaIssue(
+                CODE_CHRONOLOGY,
+                field_path("awareness_date"),
+                "awareness date precedes the loss event",
+            )
+        )
+    if event is not None and declaration is not None and declaration.chronology_key < event.chronology_key:
+        issues.append(
+            SchemaIssue(
+                CODE_CHRONOLOGY,
+                field_path("declaration_date"),
+                "declaration date precedes the loss event",
+            )
+        )
+    if awareness is not None and declaration is not None and declaration.chronology_key < awareness.chronology_key:
+        issues.append(
+            SchemaIssue(
+                CODE_CHRONOLOGY,
+                field_path("declaration_date"),
+                "declaration date precedes awareness of the loss",
+            )
+        )
+
+
+def _path_value(payload: dict[str, Any], path: str) -> Any:
+    current: Any = payload
+    for field in path.split("."):
+        if not isinstance(current, dict) or field not in current:
+            return None
+        current = current[field]
+    return current
+
+
+def _check_alias_group(
+    payload: dict[str, Any], paths: tuple[str, ...], issues: list[SchemaIssue]
+) -> None:
+    present = [(path, _path_value(payload, path)) for path in paths]
+    present = [(path, value) for path, value in present if value is not None]
+    valid = [(path, value) for path, value in present if _review_number(value)]
+    if len(valid) > 1 and any(value != valid[0][1] for _, value in valid[1:]):
+        issues.append(
+            SchemaIssue(
+                CODE_CONFLICT,
+                valid[-1][0],
+                f"monetary aliases must agree with {valid[0][0]}",
+            )
+        )
+
+
+def _check_local_aliases(
+    item: dict[str, Any], keys: tuple[str, ...], path: str, issues: list[SchemaIssue]
+) -> None:
+    present = [(key, item[key]) for key in keys if item.get(key) is not None]
+    valid = [(key, value) for key, value in present if _review_number(value)]
+    if len(valid) > 1 and any(value != valid[0][1] for _, value in valid[1:]):
+        issues.append(
+            SchemaIssue(
+                CODE_CONFLICT,
+                f"{path}.{valid[-1][0]}",
+                f"monetary aliases must agree with {path}.{valid[0][0]}",
+            )
+        )
+
+
 def _review_issues(payload: Any, kb: Any) -> list[SchemaIssue]:
     """Apply the graph's closed question/evidence vocabularies at the same boundary."""
     if not isinstance(payload, dict):
@@ -364,13 +628,66 @@ def _review_issues(payload: Any, kb: Any) -> list[SchemaIssue]:
                 isinstance(value, int) and not isinstance(value, bool)
             ):
                 issues.append(SchemaIssue(CODE_TYPE, path, "answer must be an integer"))
-            elif fmt == "date" and not (
-                isinstance(value, str)
-                and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value)
-            ):
-                issues.append(SchemaIssue(CODE_TYPE, path, "answer must be YYYY-MM-DD"))
+            elif fmt == "date":
+                calendar = None
+                if question_id in ("Q-S2-11", "Q-S2-12"):
+                    calendar = answers.get("Q-S2-13")
+                _date_issue(
+                    value,
+                    path,
+                    issues,
+                    calendar=calendar,
+                    require_iranian_mapping=question_id == "Q-S0-02",
+                )
             elif fmt == "list":
                 _check_review_list(question_id, value, allowed, path, issues)
+
+        review_dates: dict[str, ClaimDate] = {}
+        for field, question_id in (
+            ("event_date", "Q-S0-02"),
+            ("awareness_date", "Q-S0-03"),
+            ("declaration_date", "Q-S0-07"),
+        ):
+            if answers.get(question_id) not in (None, ""):
+                try:
+                    parsed_date = parse_claim_date(answers[question_id])
+                    if field == "event_date":
+                        parsed_date.iranian_year
+                    review_dates[field] = parsed_date
+                except CalendarDateError:
+                    pass
+        _check_event_chronology(
+            review_dates,
+            "answers",
+            issues,
+            paths={
+                "event_date": "answers.Q-S0-02",
+                "awareness_date": "answers.Q-S0-03",
+                "declaration_date": "answers.Q-S0-07",
+            },
+        )
+        event_date = review_dates.get("event_date")
+        production_year = answers.get("Q-S5-03")
+        if isinstance(production_year, int) and not isinstance(production_year, bool):
+            if not 1 <= production_year < 3178:
+                issues.append(
+                    SchemaIssue(
+                        CODE_INVALID_YEAR,
+                        "answers.Q-S5-03",
+                        "production year is outside the supported Shamsi interval",
+                    )
+                )
+            elif event_date is not None and production_year > event_date.iranian_year:
+                issues.append(
+                    SchemaIssue(
+                        CODE_CHRONOLOGY,
+                        "answers.Q-S5-03",
+                        f"production year {production_year} is after event year {event_date.iranian_year}",
+                    )
+                )
+
+    if payload.get("as_of") not in (None, ""):
+        _date_issue(payload["as_of"], "as_of", issues)
 
     known_evidence = set(kb.evidence)
     for field in ("evidence_present", "evidence_received"):
@@ -450,6 +767,18 @@ def _check_review_list(
                         "value must be a finite number",
                     )
                 )
+        _check_local_aliases(
+            item,
+            ("assessed_loss", "assessed_loss_irr"),
+            item_path,
+            issues,
+        )
+        _check_local_aliases(
+            item,
+            ("new_price", "new_price_irr"),
+            item_path,
+            issues,
+        )
         if "requires_replacement" in item and not isinstance(item["requires_replacement"], bool):
             issues.append(
                 SchemaIssue(

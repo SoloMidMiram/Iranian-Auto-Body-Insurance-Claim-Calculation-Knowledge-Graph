@@ -210,6 +210,11 @@ ratio             = min(1, insured_sum / event_date_market_value)
 allowable_rescue  = min(actual_rescue, 20% * sourced_rescue_cap_base)
 ```
 
+If an upstream adapter instead supplies `rescue_payable`, the engine keeps it
+separate from actual expense and uses it only after verifying that it does not
+exceed the applicable rescue ceiling (or the actual expense when both are
+present). It is never copied into `actual_rescue` or capped a second time.
+
 Resolved order:
 
 ```text

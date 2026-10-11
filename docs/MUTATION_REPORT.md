@@ -3,7 +3,7 @@
 This is a reproducible, curated high-risk mutation set for the deterministic
 body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
-- Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, and the authorization boundary in `admission.py`
+- Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
 - Result: **24/24 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`

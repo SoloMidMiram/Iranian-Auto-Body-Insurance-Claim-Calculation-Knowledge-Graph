@@ -29,7 +29,8 @@
       "supplied_by": ["Q-S0-03"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "The five-working-day notice clock runs from awareness, not from occurrence. Ask for both and never derive awareness from occurrence."
+      "select": "The five-working-day notice clock runs from awareness, not from occurrence. Ask for both and never derive awareness from occurrence.",
+      "validation": "This is the insured's awareness of this loss, so it cannot precede the occurrence date. It is not a police, assessor, review or document timestamp."
     },
     {
       "node_id": "PS_DECLARATION_DATE",
@@ -41,7 +42,8 @@
       "supplied_via": ["INSURED_ANSWER", "ASSESSOR_REPORT"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "Insurer practice sometimes counts the sixty-day theft clock from declaration while the regulation counts it from the theft. Record the declaration date anyway, because the settlement clocks in the payment provision run from complete documents."
+      "select": "Insurer practice sometimes counts the sixty-day theft clock from declaration while the regulation counts it from the theft. Record the declaration date anyway, because the settlement clocks in the payment provision run from complete documents.",
+      "validation": "This is the insured's declaration of this loss to the insurer. It cannot precede the occurrence or the insured-awareness fact. It is not a police report, assessor, review or complete-documents timestamp."
     },
     {
       "node_id": "PS_NOTICE_TIMELINESS",

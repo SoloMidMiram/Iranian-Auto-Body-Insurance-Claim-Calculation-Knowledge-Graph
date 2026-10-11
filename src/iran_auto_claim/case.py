@@ -193,14 +193,13 @@ class Case:
     @property
     def rescue_actual(self) -> Decimal | None:
         return self._money(
-            (
-                "rescue_transport_actual",
-                "rescue_transport_actual_irr",
-                "actual_rescue",
-                "rescue_payable",
-                "rescue",
-            )
+            ("rescue_transport_actual", "rescue_transport_actual_irr", "actual_rescue", "rescue")
         )
+
+    @property
+    def rescue_payable(self) -> Decimal | None:
+        """A separately supplied reimbursable rescue amount, never actual cost."""
+        return self._money(("rescue_payable",))
 
     @property
     def rescue_for_threshold(self) -> Decimal:
@@ -261,6 +260,9 @@ class Case:
 
     @property
     def victim_vehicle_value(self) -> Decimal | None:
+        # Market value is a branch-specific fallback when the damaged vehicle is
+        # the victim vehicle, not a second spelling that must equal an explicitly
+        # supplied victim valuation.
         return self._money(("victim_vehicle_value", "vehicle_value")) or self.market_value
 
     # -------------------------------------------------------- event / policy
@@ -348,6 +350,9 @@ class Case:
 
     @property
     def franchise_raw(self) -> Any:
+        # These are legacy/structured contractual carriers with different
+        # provenance, not true monetary aliases.  Authority validation owns
+        # their interpretation and remains outside IA-15.
         return self._find(("franchise", "franchise_from_policy", "franchise_amount"))
 
     @property
