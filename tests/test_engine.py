@@ -630,6 +630,49 @@ def test_material_rescue_denominator_difference_blocks_when_base_is_missing(kb):
     assert result.blocking_uncertainties == ["U05_RESCUE_DENOMINATOR"]
 
 
+def test_zero_supplied_rescue_does_not_block_on_non_positive_candidate_base(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        gross=100,
+        depreciation=120,
+        market=100,
+        insured=100,
+        rescue_payable=0,
+        franchise=0,
+    )
+
+    result = compute(payload, kb)
+
+    assert result.status is None
+    assert result.payable == D(0)
+    assert result.fields["allowable_rescue_transport"] == D(0)
+    assert result.fields["rescue_payable_supplied"] == D(0)
+    assert result.blocking_uncertainties == []
+
+
+def test_positive_supplied_rescue_still_blocks_on_material_candidate_difference(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        gross=1000,
+        depreciation=900,
+        market=1000,
+        insured=1000,
+        rescue_payable=100,
+        franchise=0,
+    )
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "RESCUE_DENOMINATOR_UNRESOLVED"
+    assert result.fields["rescue_candidate_amounts"] == {
+        "ASSESSED_GROSS": D(100),
+        "ELIGIBLE_GROSS": D(100),
+        "SETTLEMENT_BASE": D(20),
+    }
+    assert result.blocking_uncertainties == ["U05_RESCUE_DENOMINATOR"]
+
+
 def test_percentage_franchise_uses_the_named_base(kb):
     payload = _case(
         "PARTIAL_DAMAGE", gross=100, depreciation=20, market=100, insured=100

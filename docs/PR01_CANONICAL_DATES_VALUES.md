@@ -150,7 +150,9 @@ Fallback use is preserved and is not converted into alias equality:
   annual parameter for the Iranian claim year;
 - `rescue_payable` reaches settlement as its own normalized operand; it is not
   copied into actual expense and the engine refuses it above the verified cap;
-  actual expense continues through the cap operator; and
+  actual expense continues through the cap operator. Candidate ceilings floor
+  non-positive bases at zero, so an explicit zero payable cannot create a
+  spurious denominator uncertainty; and
 - a year-only synthetic body case uses the open loaded rule snapshot, never a
   fabricated year-end event date.
 
@@ -206,7 +208,7 @@ Acceptance matrix:
 | Release verdict | **BLOCKED** |
 
 Fresh implementation result: the three repaired IDs pass with exit `0`; full
-pytest reports **557 passed, 8 expected failures** with exit `0`; fixtures are
+pytest reports **559 passed, 8 expected failures** with exit `0`; fixtures are
 50/50; independent invariants are 51/51; and the curated mutation gate remains
 24/24 killed. Compilation, knowledge validation (with the pre-existing 22 body-
 authority and 48 source-metadata findings), generated-review/FAQ checks, issue-

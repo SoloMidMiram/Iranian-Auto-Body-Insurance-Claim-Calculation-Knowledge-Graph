@@ -206,7 +206,11 @@ def _rescue(
     if configured is None:
         if supplied_payable is not None:
             candidate_amounts = {
-                name: min(supplied_payable, operators.RESCUE_CAP_RATIO * base)
+                name: (
+                    min(supplied_payable, operators.RESCUE_CAP_RATIO * base)
+                    if base > 0
+                    else Decimal(0)
+                )
                 for name, base in candidate_bases.items()
             }
         else:
