@@ -22,7 +22,7 @@ exclusion.
 
 The pre-existing primary worktree was dirty and remains untouched. PR-02 was
 created in an isolated worktree from the fetched remote integration head. The
-final PR-01 commit `a103bd239502fe580724e156a1c04d09b49d2b39` is the first parent
+final PR-01 commit `a103bd239502fe580724e156a1c04d09b49d2b39` is the second parent
 of the merge and has the same files; PR-02 nevertheless uses the merge commit,
 not the earlier reviewed commit, as its parent.
 
