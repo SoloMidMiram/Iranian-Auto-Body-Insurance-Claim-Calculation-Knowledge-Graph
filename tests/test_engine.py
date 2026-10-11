@@ -55,6 +55,20 @@ def _case(branch=None, **inputs):
                 "source_version": "TEST-v1",
             },
         }
+    if branch in (
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+        "TOTAL_LOSS_TEST",
+        "GLASS_ONLY",
+        "THEFT",
+        "TOTAL_THEFT",
+        "THEFT_PARTIAL_DAMAGE",
+    ):
+        payload["coverage_gate"] = {"causal_relationship_established": True}
+        payload.setdefault("policy", {})["multiple_insurance"] = {
+            "state": "NO",
+            "prior_compensation": 0,
+        }
     if branch:
         payload["classification"] = {"branch": branch}
     if branch in ("THEFT", "TOTAL_THEFT") and inputs.get("theft_type") == "WHOLE_VEHICLE":
@@ -78,6 +92,73 @@ def _case(branch=None, **inputs):
 def test_classifier_routes_total_loss():
     verdict = classify(_case("TOTAL_LOSS", market=2000, repair=1600))
     assert verdict["branch"] == "TOTAL_LOSS"
+
+
+@pytest.mark.parametrize("causation", [False, None])
+def test_engine_blocks_unestablished_positive_covered_peril_causation(causation, kb):
+    payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+    if causation is None:
+        payload.pop("coverage_gate")
+    else:
+        payload["coverage_gate"]["causal_relationship_established"] = causation
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "COVERED_PERIL_CAUSATION_REQUIRED"
+    assert result.fields["guard_violation"] == (
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED"
+    )
+
+
+@pytest.mark.parametrize(
+    ("multiple_insurance", "status"),
+    [
+        (None, "RECOVERY_FACTS_REQUIRED"),
+        ({"state": "UNKNOWN", "prior_compensation": 0}, "RECOVERY_FACTS_REQUIRED"),
+        ({"state": "NO", "prior_compensation": 1}, "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"),
+        ({"state": "YES_OTHER_POLICIES", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+        ({"state": "YES_SAME_INSURER", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+    ],
+)
+def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
+    multiple_insurance, status, kb
+):
+    payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+    if multiple_insurance is None:
+        payload["policy"].pop("multiple_insurance")
+    else:
+        payload["policy"]["multiple_insurance"] = multiple_insurance
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == status
+    assert result.fields["guard_violation"] == "G_RECOVERY_ALLOCATION_CONTAINED"
+    recovery_guard = kb.guards["G_RECOVERY_ALLOCATION_CONTAINED"]
+    assert result.status in recovery_guard["violation_statuses"]
+    assert recovery_guard["triggered_label"] in result.labels
+
+
+def test_recovery_guard_declares_every_runtime_status(kb):
+    recovery_guard = kb.guards["G_RECOVERY_ALLOCATION_CONTAINED"]
+
+    assert set(recovery_guard["violation_statuses"]) == {
+        "RECOVERY_FACTS_REQUIRED",
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED",
+    }
+
+
+def test_engine_records_the_two_new_admission_guards_on_a_valid_control(kb):
+    result = compute(_case("PARTIAL_DAMAGE", gross=100, franchise=0), kb)
+
+    assert result.payable == D(100)
+    assert result.fields["covered_peril_causation_established"] is True
+    assert result.fields["multiple_insurance_state"] == "NO"
+    assert result.fields["prior_compensation"] == D(0)
+    assert "G_COVERED_PERIL_CAUSATION_ESTABLISHED" in result.guards_executed
+    assert "G_RECOVERY_ALLOCATION_CONTAINED" in result.guards_executed
 
 
 def test_classifier_keeps_a_partial_loss_partial():
@@ -219,8 +300,10 @@ def test_missing_both_article10_value_anchors_does_not_default_ratio_to_one(kb):
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE"},
         "damage": {"gross": 100, "depreciation": 0},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 10,
@@ -679,6 +762,7 @@ def test_percentage_franchise_uses_the_named_base(kb):
     )
     payload["policy"] = {
         "policy_version": "TEST-v1",
+        "multiple_insurance": {"state": "NO", "prior_compensation": 0},
         "franchise": {
             "mode": "PERCENT",
             "rate": 0.1,
@@ -704,6 +788,7 @@ def test_missing_percentage_franchise_base_is_rejected_instead_of_using_branch_d
     )
     payload["policy"] = {
         "policy_version": "TEST-v1",
+        "multiple_insurance": {"state": "NO", "prior_compensation": 0},
         "franchise": {
             "mode": "PERCENT",
             "rate": 0.1,
@@ -738,7 +823,11 @@ def _total_loss_with_percentage_franchise(calculation_base: str | None) -> dict:
     }
     if calculation_base is not None:
         franchise["calculation_base"] = calculation_base
-    payload["policy"] = {"policy_version": "TEST-v1", "franchise": franchise}
+    payload["policy"] = {
+        "policy_version": "TEST-v1",
+        "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+        "franchise": franchise,
+    }
     return payload
 
 
@@ -876,6 +965,7 @@ def test_scalar_zero_franchise_does_not_mean_no_franchise_coverage(kb):
 def test_unsourced_absolute_franchise_is_not_authority(kb):
     payload = _case("PARTIAL_DAMAGE", gross=100)
     payload["policy"] = {
+        "multiple_insurance": {"state": "NO", "prior_compensation": 0},
         "franchise": {
             "mode": "ABSOLUTE",
             "absolute_irr": 10,
@@ -893,6 +983,7 @@ def test_versioned_policy_evidence_can_explicitly_set_zero_franchise(kb):
     payload = _case("PARTIAL_DAMAGE", gross=100)
     payload["policy"] = {
         "policy_version": "BODY-1405-v1",
+        "multiple_insurance": {"state": "NO", "prior_compensation": 0},
         "franchise": {
             "mode": "ABSOLUTE",
             "absolute_irr": 0,

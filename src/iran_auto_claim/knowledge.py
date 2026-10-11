@@ -914,6 +914,34 @@ class Knowledge:
                     issues.append(f"guard {guard_id}: enforced_in {enforced_in!r} -> {exc}")
             if not node.get("triggered_label"):
                 issues.append(f"guard {guard_id}: no triggered_label, so the guard is unobservable")
+            has_violation_status = "violation_status" in node
+            has_violation_statuses = "violation_statuses" in node
+            violation_status = node.get("violation_status")
+            violation_statuses = node.get("violation_statuses")
+            if has_violation_status == has_violation_statuses:
+                issues.append(
+                    f"guard {guard_id}: declare exactly one of violation_status or "
+                    "violation_statuses"
+                )
+            elif has_violation_status and (
+                not isinstance(violation_status, str) or not violation_status
+            ):
+                issues.append(
+                    f"guard {guard_id}: violation_status must be a non-empty string"
+                )
+            elif has_violation_statuses and (
+                not isinstance(violation_statuses, list)
+                or not violation_statuses
+                or any(
+                    not isinstance(status, str) or not status
+                    for status in violation_statuses
+                )
+                or len(violation_statuses) != len(set(violation_statuses))
+            ):
+                issues.append(
+                    f"guard {guard_id}: violation_statuses must be a non-empty list of "
+                    "unique strings"
+                )
 
         for node in self.exclusions.values():
             exclusion_id = node.get("node_id", "<missing id>")

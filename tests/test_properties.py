@@ -20,8 +20,10 @@ def _partial(
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": gross, "depreciation": 0, "market": market, "insured": insured},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": franchise,
@@ -76,6 +78,7 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
             "unit": "IRR",
             "classification": {"branch": "TOTAL_LOSS"},
             "event": {"event_date": "1405/06/01"},
+            "coverage_gate": {"causal_relationship_established": True},
             "damage": {
                 "market": 2000,
                 "insured": 1500,
@@ -84,6 +87,7 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
             },
             "policy": {
                 "policy_version": "TEST-v1",
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                 "franchise": {
                     "mode": "ABSOLUTE",
                     "absolute_irr": 0,
@@ -157,6 +161,7 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                 "unit": "IRR",
                 "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
                 "event": {"event_date": "1405/06/01"},
+                "coverage_gate": {"causal_relationship_established": True},
                 "damage": {
                     "market": market,
                     "insured": insured,
@@ -165,6 +170,7 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                 },
                 "policy": {
                     "policy_version": "TEST-v1",
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                     "franchise": {
                         "mode": "ABSOLUTE",
                         "absolute_irr": franchise,

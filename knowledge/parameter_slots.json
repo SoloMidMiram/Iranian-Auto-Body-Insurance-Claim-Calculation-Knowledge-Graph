@@ -97,7 +97,7 @@
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REFUSE",
       "select": "Causation is a predicate, never a multiplier. If the causal link is asserted but not evidenced, the case routes to review; it does not attract a coefficient.",
-      "guardrail": "G_NO_ASSUMED_CAUSATION"
+      "guardrail": "G_COVERED_PERIL_CAUSATION_ESTABLISHED"
     },
     {
       "node_id": "PS_THEFT_TYPE",
@@ -521,7 +521,8 @@
       "supplied_via": ["INSURED_ANSWER", "POLICY_SCHEDULE"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "Record both whether another policy covers the same risk and every amount already received for this loss. Without fraudulent intent the paying insurer settles and then pursues contribution; the insured may never recover twice."
+      "select": "Record two distinct facts: state says whether another policy covers the same risk, while prior_compensation is the amount already received for this same damage from any source. A positive amount may coexist with state=NO. Without fraudulent intent Article 21 allows the paying insurer to settle and then pursue contribution; until that allocation is implemented, any YES_* state or positive prior compensation routes to review rather than payment.",
+      "guardrail": "G_RECOVERY_ALLOCATION_CONTAINED"
     },
     {
       "node_id": "PS_SUBROGATION_IMPAIRED",

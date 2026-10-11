@@ -10,7 +10,18 @@
     "L49-L50"
   ],
   "unit": "IRR",
-  "note": "Synthetic fixtures, not customer records. Every monetary input and expected amount is integer IRR; ratios, rates, years, and day counts are dimensionless. The fixture harness normalizes each legacy scalar franchise into a versioned synthetic policy term before calling the public engine boundary. Null payables preserve unresolved or blocked outcomes.",
+  "note": "Synthetic fixtures, not customer records. Every monetary input and expected amount is integer IRR; ratios, rates, years, and day counts are dimensionless. The fixture harness normalizes each legacy scalar franchise into a versioned synthetic policy term before calling the public engine boundary. The shared body-admission facts below are explicit positive-control facts, not production defaults. Null payables preserve unresolved or blocked outcomes.",
+  "shared_body_admission_facts": {
+    "coverage_gate": {
+      "causal_relationship_established": true
+    },
+    "policy": {
+      "multiple_insurance": {
+        "state": "NO",
+        "prior_compensation": 0
+      }
+    }
+  },
   "corrections_applied": [
     {
       "fixture": "L49",

@@ -24,6 +24,8 @@ ALL_GUARDS = [
     "G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE",
     "G_NO_GUESSED_ENDORSEMENT_TERMS",
     "G_NO_ASSUMED_CAUSATION",
+    "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+    "G_RECOVERY_ALLOCATION_CONTAINED",
     "G_UNCERTAINTY_MUST_SURFACE",
 ]
 
@@ -49,6 +51,14 @@ def compute(payload, kb):
     """Make the guard-focused synthetic assumptions explicit."""
     payload = copy.deepcopy(payload)
     branch = (payload.get("classification") or {}).get("branch")
+    if branch in ("PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"):
+        payload.setdefault("coverage_gate", {}).setdefault(
+            "causal_relationship_established", True
+        )
+        payload.setdefault("policy", {}).setdefault(
+            "multiple_insurance",
+            {"state": "NO", "prior_compensation": 0},
+        )
     damage = payload.setdefault("damage", {})
     if branch == "PARTIAL_DAMAGE":
         if not any(key in damage for key in ("market", "insured")):

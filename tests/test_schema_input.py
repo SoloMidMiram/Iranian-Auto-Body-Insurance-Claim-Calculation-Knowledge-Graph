@@ -442,6 +442,27 @@ def test_review_emits_every_previously_missing_case_field(kb):
     assert glass["policy"]["glass_valuation_condition"] == "WORDING_NOT_OBTAINED"
 
 
+@pytest.mark.parametrize("missing", ["state", "prior_compensation"])
+def test_multiple_insurance_object_requires_both_distinct_facts(missing):
+    multiple_insurance = {"state": "NO", "prior_compensation": 0}
+    multiple_insurance.pop(missing)
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "policy": {"multiple_insurance": multiple_insurance},
+            }
+        )
+
+    assert any(
+        item.code == "missing_field"
+        and item.path == f"policy.multiple_insurance.{missing}"
+        for item in caught.value.errors
+    )
+
+
 def test_theft_without_a_type_is_rejected():
     with pytest.raises(InputSchemaError) as caught:
         validate_claim(

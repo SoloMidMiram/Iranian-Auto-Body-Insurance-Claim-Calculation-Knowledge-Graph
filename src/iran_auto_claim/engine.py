@@ -455,6 +455,32 @@ def _exclusion_matches(case: Case, exclusion: dict[str, Any]) -> bool:
     return bool(checks) and all(checks)
 
 
+def enforce_body_eligibility_admission(case: Case, res: CalcResult) -> None:
+    """Run body admission predicates that must hold before any exclusion or amount.
+
+    Positive covered-peril causation and exclusion causation are different facts.
+    The former is checked here; ``evaluate_coverage_gate`` retains the latter.
+    Recovery containment likewise chooses no allocation formula: it only prevents
+    an unsupported recovery or contribution state from reaching settlement.
+    """
+    # Register each guard immediately before its check. If the first predicate
+    # fails, the second predicate has not run and must not replace the
+    # defect-specific status with GUARD_PLAN_INCOMPLETE during finalization.
+    res.require_guard("G_COVERED_PERIL_CAUSATION_ESTABLISHED")
+    res.fields["covered_peril_causation_established"] = (
+        case.covered_peril_causation_established
+    )
+    guards.check_covered_peril_causation(case)
+    res.note_guard("G_COVERED_PERIL_CAUSATION_ESTABLISHED")
+
+    res.require_guard("G_RECOVERY_ALLOCATION_CONTAINED")
+    res.fields["multiple_insurance_state"] = case.multiple_insurance_state
+    res.fields["prior_compensation"] = case.prior_compensation
+    res.note_rule("REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION")
+    guards.check_recovery_allocation(case)
+    res.note_guard("G_RECOVERY_ALLOCATION_CONTAINED")
+
+
 def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
     """Coverage, causation and exclusion gate. Returns True when it settles the claim."""
     # Article 6 non-compensable circumstances defeat cover outright.
@@ -1537,6 +1563,8 @@ def compute(
             and not _bind_body_snapshot(case, kb, res)
         ):
             classification_blocked = True
+        if not classification_blocked and res.branch in BODY_BRANCHES:
+            enforce_body_eligibility_admission(case, res)
         if not classification_blocked and not evaluate_coverage_gate(case, kb, res):
             if res.branch in BODY_BRANCHES:
                 check_risk_intensification(case, kb)
