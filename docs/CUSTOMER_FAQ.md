@@ -208,6 +208,16 @@ These inputs can change the branch, deductions, ratio, or whether payment is due
 
 **Knowledge-model links:** `PS_FRANCHISE`, `PS_EVENT_DATE`, `PS_PRODUCTION_YEAR`, `PS_MARKET_VALUE`, `PS_ENDORSEMENTS`, `U13_THEFT_CLOCK_ANCHOR`
 
+#### FAQ-ACCEPT-006 · P0 · How do causation and compensation already received affect admission?
+
+**Short answer:** Covered-peril causation must be established, and prior compensation must be recorded independently of other-policy status.
+
+An asserted or unknown causal link is insufficient information; a contradicted link can support refusal. That positive admission test is separate from proving causation for an exclusion. Compensation already received for the same damage may come from any source and can coexist with no other policy. A positive amount is currently routed to review because allocation is not implemented. Another-policy cases are also routed to review until contribution is implemented, even though Article 21 can allow settlement followed by contribution.
+
+**Customer action:** Provide the causation report, declare both other-policy status and the exact prior-compensation amount (including zero), and request authorized allocation review if either recovery fact blocks calculation.
+
+**Knowledge-model links:** `PS_CAUSATION_ESTABLISHED`, `PS_MULTIPLE_POLICIES`, `G_COVERED_PERIL_CAUSATION_ESTABLISHED`, `G_RECOVERY_ALLOCATION_CONTAINED`, `G_NO_ASSUMED_CAUSATION`, `REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION`
+
 #### FAQ-ACCEPT-003 · P0 · What does COMPUTE mean?
 
 **Short answer:** The recognized branch and all required amount-affecting inputs are complete enough for one authorized calculation.
@@ -559,6 +569,16 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 **اقدام بعدی مشتری:** حسب مورد جدول بیمه‌نامه و الحاقیه، تاریخ حادثه و اعلام، سال خودرو، گزارش ارزیابی، ارزش بازار و اسناد سرقت را ارائه کنید.
 
 **پیوند به مدل دانش:** `PS_FRANCHISE`, `PS_EVENT_DATE`, `PS_PRODUCTION_YEAR`, `PS_MARKET_VALUE`, `PS_ENDORSEMENTS`, `U13_THEFT_CLOCK_ANCHOR`
+
+#### FAQ-ACCEPT-006 · P0 · رابطه سببیت و جبران قبلی چه اثری بر پذیرش پرونده دارند؟
+
+**پاسخ کوتاه:** رابطه خطر تحت پوشش با خسارت باید اثبات شود و جبران قبلی مستقل از وضعیت بیمه‌نامه دیگر ثبت گردد.
+
+رابطه سببیت صرفاً ادعایی یا نامعلوم، اطلاعات ناکافی است؛ رابطه ردشده می‌تواند مبنای رد باشد. این آزمون مثبت پذیرش از اثبات رابطه سببیت برای اجرای یک استثنا جداست. جبران دریافتی برای همان خسارت ممکن است از هر منبعی باشد و می‌تواند با نبود بیمه‌نامه دیگر هم‌زمان باشد. مبلغ مثبت فعلاً به بازبینی ارجاع می‌شود، چون تخصیص آن پیاده‌سازی نشده است. پرونده دارای بیمه‌نامه دیگر نیز تا پیاده‌سازی مشارکت به بازبینی می‌رود، هرچند ماده ۲۱ می‌تواند تسویه و سپس مطالبه سهم را مجاز بداند.
+
+**اقدام بعدی مشتری:** گزارش سببیت را ارائه کنید، وضعیت بیمه‌نامه دیگر و مبلغ دقیق جبران قبلی ــ حتی صفر ــ را جداگانه اعلام کنید و اگر هرکدام مانع محاسبه شد، بازبینی مجاز تخصیص را بخواهید.
+
+**پیوند به مدل دانش:** `PS_CAUSATION_ESTABLISHED`, `PS_MULTIPLE_POLICIES`, `G_COVERED_PERIL_CAUSATION_ESTABLISHED`, `G_RECOVERY_ALLOCATION_CONTAINED`, `G_NO_ASSUMED_CAUSATION`, `REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION`
 
 #### FAQ-ACCEPT-003 · P0 · تصمیم COMPUTE چه معنایی دارد؟
 

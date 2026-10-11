@@ -43,6 +43,17 @@ def _case(branch: str, **inputs):
                 "source_version": "TEST-v1",
             },
         }
+    if branch in (
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+        "GLASS_ONLY",
+        "THEFT",
+    ):
+        payload["coverage_gate"] = {"causal_relationship_established": True}
+        payload.setdefault("policy", {})["multiple_insurance"] = {
+            "state": "NO",
+            "prior_compensation": 0,
+        }
     if any(key in inputs for key in ("rescue_payable", "actual_rescue", "rescue")):
         payload["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
     return payload

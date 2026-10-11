@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 
+from iran_auto_claim.admission import AuthorizationNotGranted
 from iran_auto_claim.schema_input import InputSchemaError
 from iran_auto_claim.review import (
     DECISION_COMPUTE,
@@ -168,6 +169,124 @@ def test_the_derived_case_round_trips_through_the_engine(kb):
     assert recomputed.payable == Decimal("1657000000")
     assert recomputed.authorization["issuer"] == "REVIEW_GATE"
     assert recomputed.authorization["claim_hash"] == authorization.claim_hash
+
+
+@pytest.mark.parametrize("answer", ["ASSERTED_ONLY", "UNKNOWN", None])
+def test_positive_covered_peril_causation_must_be_established(answer, kb):
+    payload = load("review_t1_fullcover_partial.json")
+    if answer is None:
+        payload["answers"].pop("Q-S2-02")
+    else:
+        payload["answers"]["Q-S2-02"] = answer
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    if answer == "ASSERTED_ONLY":
+        assert decision["blocking_conditions"] == [
+            "COVERED_PERIL_CAUSATION_NOT_ESTABLISHED"
+        ]
+    else:
+        assert "Q-S2-02" in decision["open_blocking_questions"]
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_contradicted_covered_peril_causation_remains_a_refusal(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S2-02"] = "CONTRADICTED"
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_REFUSE
+    assert any("contradicted" in reason for reason in decision["refused_by"])
+
+
+def test_established_causation_without_required_assessment_evidence_is_incomplete(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["evidence_present"].remove("EVT_ASSESSMENT_REPORT")
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "EVT_ASSESSMENT_REPORT" in decision["evidence_blocks"]
+    assert review.calculate() is None
+
+
+@pytest.mark.parametrize("prior_compensation", [1, 925000000, 1850000000])
+def test_positive_prior_compensation_blocks_without_inventing_policy_conflict(
+    prior_compensation, kb
+):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-05"] = "NO"
+    payload["answers"]["Q-S9-03"] = prior_compensation
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert decision["refused_by"] == []
+    assert decision["blocking_conditions"] == [
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"
+    ]
+    assert review.case_payload()["policy"]["multiple_insurance"] == {
+        "state": "NO",
+        "prior_compensation": prior_compensation,
+    }
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+@pytest.mark.parametrize("state", ["YES_OTHER_POLICIES", "YES_SAME_INSURER"])
+def test_multiple_policy_path_is_blocked_as_an_implementation_limitation(state, kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-05"] = state
+    payload["answers"]["Q-S9-03"] = 0
+    payload["evidence_present"].append("EVT_OTHER_POLICIES")
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert decision["refused_by"] == []
+    assert decision["blocking_conditions"] == [
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"
+    ]
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_prior_compensation_and_another_policy_remain_two_recorded_blocks(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-05"] = "YES_OTHER_POLICIES"
+    payload["answers"]["Q-S9-03"] = 1
+    payload["evidence_present"].append("EVT_OTHER_POLICIES")
+
+    decision = Review(payload, kb).decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert decision["refused_by"] == []
+    assert decision["blocking_conditions"] == [
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED",
+    ]
+
+
+@pytest.mark.parametrize("question", ["Q-S6-05", "Q-S9-03"])
+def test_missing_recovery_fact_never_defaults_to_no_policy_or_zero(question, kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"].pop(question)
+
+    decision = Review(payload, kb).decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert question in decision["open_blocking_questions"]
 
 
 def test_questions_gated_off_by_earlier_answers_are_not_asked(kb):

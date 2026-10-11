@@ -149,6 +149,32 @@
       "severity": "HIGH"
     },
     {
+      "node_id": "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+      "prevents": "Authorising a body-policy calculation when the claimed covered peril has not been established as the cause of the damage",
+      "enforced_in": "iran_auto_claim.guards.check_covered_peril_causation",
+      "check": "coverage_gate.causal_relationship_established must be exactly true before any BODY branch arithmetic is authorised",
+      "triggered_label": "COVERED_PERIL_CAUSATION_REQUIRED",
+      "violation_status": "COVERED_PERIL_CAUSATION_REQUIRED",
+      "related_rules": [],
+      "related_operators": [],
+      "exercised_by": ["tests/test_engine.py", "tests/test_review.py", "tests/test_guard_paths.py"],
+      "severity": "CRITICAL",
+      "note": "This positive admission predicate is separate from G_NO_ASSUMED_CAUSATION, which only controls whether a causation-dependent exclusion may fire."
+    },
+    {
+      "node_id": "G_RECOVERY_ALLOCATION_CONTAINED",
+      "prevents": "Authorising payment while prior compensation is positive or multiple-policy contribution handling is unsupported",
+      "enforced_in": "iran_auto_claim.guards.check_recovery_allocation",
+      "check": "Both recovery facts must be explicit; prior_compensation must be zero and state must be NO until an approved allocation or contribution implementation exists",
+      "triggered_label": "RECOVERY_ALLOCATION_CONTAINED",
+      "violation_status": "RECOVERY_ALLOCATION_UNSUPPORTED",
+      "related_rules": ["REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION"],
+      "related_operators": [],
+      "exercised_by": ["tests/test_engine.py", "tests/test_review.py", "tests/test_guard_paths.py"],
+      "severity": "CRITICAL",
+      "note": "prior_compensation means compensation for the same damage from any source, so a positive amount can coexist with state=NO. Blocking YES_* is an implementation limitation, not a statement that Article 21 forbids settlement before contribution."
+    },
+    {
       "node_id": "G_UNCERTAINTY_MUST_SURFACE",
       "prevents": "Returning a single fabricated number while a blocking uncertainty is live",
       "enforced_in": "iran_auto_claim.guards.check_uncertainty_propagation",

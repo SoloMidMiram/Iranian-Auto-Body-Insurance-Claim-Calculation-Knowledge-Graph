@@ -119,6 +119,10 @@ def main() -> int:
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": 1000},
+        "coverage_gate": {"causal_relationship_established": True},
+        "policy": {
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0}
+        },
     }
     kb = Knowledge.load()
     authorization = _authorize_fixture_case(probe_payload, kb)
@@ -211,7 +215,13 @@ def main() -> int:
 
     intensified = compute(
         _authorize_fixture_case(
-            {**probe_payload, "coverage_gate": {"risk_intensified": True}},
+            {
+                **probe_payload,
+                "coverage_gate": {
+                    **probe_payload["coverage_gate"],
+                    "risk_intensified": True,
+                },
+            },
             kb,
         ),
         kb,
@@ -245,13 +255,18 @@ def main() -> int:
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01", "cause": "ALCOHOL"},
+        "coverage_gate": {"causal_relationship_established": True},
         "damage": {
             "gross": 100,
             "depreciation": 20,
             "market": 100,
             "insured": 100,
         },
-        "policy": {"policy_version": "TEST-v1", "franchise": sourced_absolute},
+        "policy": {
+            "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+            "franchise": sourced_absolute,
+        },
     }
 
     # RMV-002: a coded intoxication cause without the causal authority flag is
@@ -280,6 +295,7 @@ def main() -> int:
         "claim_id": "total-loss-franchise-base-probe",
         "unit": "IRR",
         "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
+        "coverage_gate": {"causal_relationship_established": True},
         "damage": {
             "market": 2000,
             "insured": 2000,
@@ -289,6 +305,7 @@ def main() -> int:
         },
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "PERCENT",
                 "rate": 0.1,
@@ -333,6 +350,10 @@ def main() -> int:
         "claim_id": "theft-clock-event-date-probe",
         "unit": "IRR",
         "classification": {"branch": "THEFT"},
+        "coverage_gate": {"causal_relationship_established": True},
+        "policy": {
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0}
+        },
         "damage": {
             "theft_type": "WHOLE_VEHICLE",
             "days_missing": 59,

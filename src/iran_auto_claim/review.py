@@ -887,6 +887,28 @@ class Review:
         """
         return False
 
+    def _eligibility_blocking_conditions(self, branch: str | None) -> list[str]:
+        """Contain IA-01/02 before an immutable authorization can be issued."""
+        if branch not in ("PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"):
+            return []
+
+        conditions: list[str] = []
+        causation = str(self.answer("Q-S2-02") or "").upper()
+        if causation == "ASSERTED_ONLY":
+            conditions.append("COVERED_PERIL_CAUSATION_NOT_ESTABLISHED")
+
+        recovery = self._bound.get("PS_MULTIPLE_POLICIES")
+        if isinstance(recovery, dict):
+            prior = recovery.get("prior_compensation")
+            if prior is not None and money.D(prior) > 0:
+                conditions.append("PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED")
+            if str(recovery.get("state") or "").upper() in (
+                "YES_OTHER_POLICIES",
+                "YES_SAME_INSURER",
+            ):
+                conditions.append("MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED")
+        return conditions
+
     def decision(self) -> dict[str, Any]:
         """What the pipeline may issue now. This is the only gate that answers it."""
         classification = self.classification()
@@ -900,7 +922,7 @@ class Review:
         refused_by = self.refusal_reasons()
 
         evidence_blocks = self.stopping_evidence()
-        blocking_conditions = []
+        blocking_conditions = self._eligibility_blocking_conditions(branch)
         if str(self.answer("Q-S0-06") or "").upper() == "INSTALMENT_OVERDUE":
             blocking_conditions.append("POLICY_CANCELLATION_STATUS_UNRESOLVED")
         if self.uncertainty_is_live("U13_THEFT_CLOCK_ANCHOR"):

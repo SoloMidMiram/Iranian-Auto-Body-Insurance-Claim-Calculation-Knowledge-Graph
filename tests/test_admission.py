@@ -67,8 +67,10 @@ def test_a_raw_payload_cannot_reach_compute(kb):
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": 1600, "depreciation": 0, "market": 2000, "insured": 2000},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -221,8 +223,10 @@ def test_dataclasses_replace_cannot_retarget_an_authorization(kb):
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": 1600, "depreciation": 0, "market": 2000, "insured": 2000},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -372,9 +376,13 @@ def test_an_unresolved_risk_intensification_blocks_at_the_engine_too(kb):
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": 1600},
-        "coverage_gate": {"risk_intensified": True},
+        "coverage_gate": {
+            "causal_relationship_established": True,
+            "risk_intensified": True,
+        },
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -440,6 +448,7 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
         return {
             "policy_version": "TEST-v1",
             "endorsements": endorsements,
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -471,7 +480,10 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
             "classification": {"branch": branch, "domain": "BODY"},
             "event": {"event_date": "1405/06/01"},
             "damage": damage,
-            "coverage_gate": {"risk_intensified": True},
+            "coverage_gate": {
+                "causal_relationship_established": True,
+                "risk_intensified": True,
+            },
             "policy": policy(branch),
         }
         result = compute(_authorize_fixture_case(payload, kb), kb)

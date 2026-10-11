@@ -83,7 +83,9 @@ def test_final_payable_rounds_half_up_once_at_the_engine_boundary(kb):
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "damage": {"gross": 5, "depreciation": 0, "market": 5, "insured": 5},
+            "coverage_gate": {"causal_relationship_established": True},
             "policy": {
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                 "franchise": {
                     "mode": "PERCENT",
                     "rate": 0.5,
@@ -105,8 +107,10 @@ def test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float(kb):
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "damage": {"gross": 10, "depreciation": 0, "market": 3, "insured": 1},
+            "coverage_gate": {"causal_relationship_established": True},
             "policy": {
                 "policy_version": "TEST-v1",
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                 "franchise": {
                     "mode": "ABSOLUTE",
                     "absolute_irr": 1,
@@ -142,6 +146,7 @@ def test_very_large_integer_irr_does_not_overflow(kb):
             "claim_id": "LARGE-IRR",
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
+            "coverage_gate": {"causal_relationship_established": True},
             "damage": {
                 "gross": amount,
                 "depreciation": 0,
@@ -150,6 +155,7 @@ def test_very_large_integer_irr_does_not_overflow(kb):
             },
             "policy": {
                 "policy_version": "TEST-v1",
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                 "franchise": {
                     "mode": "ABSOLUTE",
                     "absolute_irr": 0,

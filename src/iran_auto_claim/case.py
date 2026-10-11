@@ -360,6 +360,35 @@ class Case:
         value = self.policy.get("franchise")
         return dict(value) if isinstance(value, dict) else None
 
+    @property
+    def covered_peril_causation_established(self) -> bool | None:
+        """Positive coverage causation, distinct from any exclusion predicate."""
+        if "causal_relationship_established" not in self.coverage:
+            return None
+        value = self.coverage["causal_relationship_established"]
+        return value if isinstance(value, bool) else None
+
+    @property
+    def multiple_insurance(self) -> dict[str, Any] | None:
+        value = self.policy.get("multiple_insurance")
+        return dict(value) if isinstance(value, dict) else None
+
+    @property
+    def multiple_insurance_state(self) -> str | None:
+        facts = self.multiple_insurance
+        if facts is None or facts.get("state") in (None, ""):
+            return None
+        return str(facts["state"])
+
+    @property
+    def prior_compensation(self) -> Decimal | None:
+        """Compensation already received for this damage, from any source."""
+        facts = self.multiple_insurance
+        if facts is None or "prior_compensation" not in facts:
+            return None
+        value = facts["prior_compensation"]
+        return None if value is None else D(value)
+
     def endorsement_tokens(self) -> set[str]:
         tokens: set[str] = set()
         listed = self.policy.get("endorsements") or self.raw.get("endorsements") or []

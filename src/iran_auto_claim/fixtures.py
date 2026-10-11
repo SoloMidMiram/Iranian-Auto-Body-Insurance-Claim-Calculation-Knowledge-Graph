@@ -15,6 +15,7 @@ Key resolution, in order:
 
 from __future__ import annotations
 
+import copy
 import json
 from decimal import Decimal
 from pathlib import Path
@@ -65,7 +66,16 @@ def _authorize_fixture_case(
 def load_fixtures(path: Path | str | None = None) -> list[dict[str, Any]]:
     target = Path(path) if path else FIXTURE_PATH
     payload = json.loads(target.read_text(encoding="utf-8"))
-    return payload["cases"]
+    shared_body_admission = payload.get("shared_body_admission_facts")
+    fixtures = copy.deepcopy(payload["cases"])
+    for fixture in fixtures:
+        if _domain_for(fixture["branch"]) == "BODY":
+            if not isinstance(shared_body_admission, dict):
+                raise ValueError(
+                    "body fixtures require explicit shared_body_admission_facts"
+                )
+            fixture["body_admission_facts"] = copy.deepcopy(shared_body_admission)
+    return fixtures
 
 
 def _equal(expected: Any, actual: Any) -> bool:
@@ -145,6 +155,18 @@ def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult
     for field in ("regulatory_snapshot", "vehicle", "event", "policy", "coverage_gate", "calculation_config"):
         if field in fixture:
             case_payload[field] = fixture[field]
+    body_admission = fixture.get("body_admission_facts")
+    if _domain_for(fixture["branch"]) == "BODY":
+        if not isinstance(body_admission, dict):
+            raise ValueError(
+                f"body fixture {fixture['id']} has no explicit body_admission_facts"
+            )
+        coverage_gate = dict(body_admission.get("coverage_gate") or {})
+        coverage_gate.update(case_payload.get("coverage_gate") or {})
+        case_payload["coverage_gate"] = coverage_gate
+        policy = dict(body_admission.get("policy") or {})
+        policy.update(case_payload.get("policy") or {})
+        case_payload["policy"] = policy
     if fixture_franchise is not None:
         policy = dict(case_payload.get("policy") or {})
         policy.setdefault("policy_version", "SYNTHETIC-FIXTURE-v1")

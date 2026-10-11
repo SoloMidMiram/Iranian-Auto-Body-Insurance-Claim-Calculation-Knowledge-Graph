@@ -41,6 +41,7 @@ def _total_loss_direct_case() -> dict:
         "unit": "IRR",
         "classification": {"branch": "TOTAL_LOSS"},
         "event": {"event_date": "1405-01-01"},
+        "coverage_gate": {"causal_relationship_established": True},
         "vehicle": {
             "market_value_at_event_irr": 2000,
             "insured_sum_irr": 2000,
@@ -48,6 +49,7 @@ def _total_loss_direct_case() -> dict:
         "damage": {"repair_total_irr": 1600},
         "policy": {
             "policy_version": "STAGE0-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -82,7 +84,6 @@ def test_stage0_control_complete_internal_total_loss_remains_collectable(kb):
     assert result.fields["salvage_deduction"] == 300
 
 
-@pytest.mark.xfail(strict=True, reason="IA-01: positive prior compensation must not yield one payable")
 def test_ia01_prior_compensation_blocks_a_single_payable(kb):
     payload = _review_case()
     payload["answers"]["Q-S9-03"] = 1850000000
@@ -94,7 +95,6 @@ def test_ia01_prior_compensation_blocks_a_single_payable(kb):
     _assert_review_does_not_pay(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-02: asserted-only causation must not authorize payment")
 def test_ia02_asserted_only_causation_blocks_a_single_payable(kb):
     payload = _review_case()
     payload["answers"]["Q-S2-02"] = "ASSERTED_ONLY"

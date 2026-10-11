@@ -88,6 +88,57 @@ def check_franchise_source(case: Any, mode: str, source: str | None) -> None:
         )
 
 
+def check_covered_peril_causation(case: Any) -> None:
+    """Require the positive covered-peril causal link before body arithmetic.
+
+    This is deliberately separate from ``G_NO_ASSUMED_CAUSATION``, which guards
+    whether an exclusion's own causal predicate has been established.
+    """
+    if case.covered_peril_causation_established is not True:
+        raise GuardViolation(
+            "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+            "the covered peril's causal relationship to this damage is not established",
+            "COVERED_PERIL_CAUSATION_REQUIRED",
+        )
+
+
+def check_recovery_allocation(case: Any) -> None:
+    """Contain unimplemented prior-recovery and multiple-policy settlement paths."""
+    facts = case.multiple_insurance
+    state = case.multiple_insurance_state
+    prior = case.prior_compensation
+    if facts is None or state in (None, "UNKNOWN") or prior is None:
+        raise GuardViolation(
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            "other-policy state and prior compensation from any source must both be recorded",
+            "RECOVERY_FACTS_REQUIRED",
+        )
+    if prior > 0:
+        raise GuardViolation(
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            (
+                "positive prior compensation is recorded, but no approved remainder or "
+                "coordination operator is implemented"
+            ),
+            "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
+        )
+    if state in ("YES_OTHER_POLICIES", "YES_SAME_INSURER"):
+        raise GuardViolation(
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            (
+                "another policy is recorded; settlement followed by contribution may be "
+                "legally available, but that implementation is not present"
+            ),
+            "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED",
+        )
+    if state != "NO":
+        raise GuardViolation(
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            f"unsupported multiple-insurance state {state!r}",
+            "RECOVERY_FACTS_REQUIRED",
+        )
+
+
 def check_uncertainty_propagation(result: Any) -> None:
     """A live blocking uncertainty must never coexist with a single payable.
 
@@ -110,5 +161,7 @@ GUARD_CHECKS = {
     "G_ARTICLE8_NO_WHOLE_CAR_RATIO": check_article8_method,
     "G_NO_UNIVERSAL_GLASS_FRANCHISE": check_universal_glass_franchise,
     "G_NO_HARDCODED_FRANCHISE_RATE": check_franchise_source,
+    "G_COVERED_PERIL_CAUSATION_ESTABLISHED": check_covered_peril_causation,
+    "G_RECOVERY_ALLOCATION_CONTAINED": check_recovery_allocation,
     "G_UNCERTAINTY_MUST_SURFACE": check_uncertainty_propagation,
 }

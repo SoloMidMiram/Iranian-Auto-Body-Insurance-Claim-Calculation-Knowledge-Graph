@@ -63,6 +63,7 @@ def test_customer_journey_and_questions_render_in_declared_order():
             "FAQ-ACCEPT-001",
             "FAQ-ACCEPT-002",
             "FAQ-ACCEPT-005",
+            "FAQ-ACCEPT-006",
             "FAQ-ACCEPT-003",
             "FAQ-ACCEPT-004",
         ],

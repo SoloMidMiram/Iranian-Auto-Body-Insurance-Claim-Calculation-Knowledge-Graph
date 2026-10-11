@@ -823,8 +823,14 @@
         "multiple_insurance": {
           "type": "object",
           "additionalProperties": false,
+          "description": "Two distinct admission facts: state records only whether another policy covers the same vehicle/risk; prior_compensation records compensation already received for the same damage from any source. Positive recovery is not proof of another policy.",
+          "required": [
+            "state",
+            "prior_compensation"
+          ],
           "properties": {
             "state": {
+              "description": "Whether another policy covers the same vehicle and risk; this does not identify the source of prior compensation.",
               "enum": [
                 "NO",
                 "YES_OTHER_POLICIES",
@@ -833,6 +839,7 @@
               ]
             },
             "prior_compensation": {
+              "description": "Non-negative integer IRR already received for the same damage from any source, including a responsible third party; explicit zero is distinct from omission.",
               "type": "integer",
               "minimum": 0
             }
