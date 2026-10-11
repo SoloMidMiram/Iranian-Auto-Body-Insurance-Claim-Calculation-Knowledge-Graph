@@ -135,6 +135,19 @@ def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
     assert result.payable is None
     assert result.status == status
     assert result.fields["guard_violation"] == "G_RECOVERY_ALLOCATION_CONTAINED"
+    recovery_guard = kb.guards["G_RECOVERY_ALLOCATION_CONTAINED"]
+    assert result.status in recovery_guard["violation_statuses"]
+    assert recovery_guard["triggered_label"] in result.labels
+
+
+def test_recovery_guard_declares_every_runtime_status(kb):
+    recovery_guard = kb.guards["G_RECOVERY_ALLOCATION_CONTAINED"]
+
+    assert set(recovery_guard["violation_statuses"]) == {
+        "RECOVERY_FACTS_REQUIRED",
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED",
+    }
 
 
 def test_engine_records_the_two_new_admission_guards_on_a_valid_control(kb):

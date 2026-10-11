@@ -87,7 +87,7 @@ bounded changes. Every command exited `0`:
 git diff --check
 ```
 
-Fresh results: **586 passed, 6 expected failures**, 50/50 fixtures passed, the
+Fresh results: **587 passed, 6 expected failures**, 50/50 fixtures passed, the
 checked 24/24 mutation report remained current, generated Review and FAQ files
 were current, and the issue manifest remained valid at 8 milestones, 11 labels,
 and 29 issues. The two repaired tests also exited `0` when run with `--runxfail`.

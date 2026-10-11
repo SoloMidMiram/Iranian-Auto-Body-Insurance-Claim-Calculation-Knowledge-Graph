@@ -215,6 +215,8 @@
         { "name": "prevents", "type": "string", "required": true },
         { "name": "enforced_in", "type": "string", "required": true },
         { "name": "triggered_label", "type": "string", "required": true },
+        { "name": "violation_status", "type": "string", "required": false },
+        { "name": "violation_statuses", "type": "array", "required": false },
         { "name": "related_rules", "type": "array", "required": false },
         { "name": "related_operators", "type": "array", "required": false },
         { "name": "related_uncertainties", "type": "array", "required": false }
