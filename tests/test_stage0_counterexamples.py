@@ -46,7 +46,10 @@ def _total_loss_direct_case() -> dict:
             "market_value_at_event_irr": 2000,
             "insured_sum_irr": 2000,
         },
-        "damage": {"repair_total_irr": 1600},
+        "damage": {
+            "repair_total_irr": 1600,
+            "rescue_for_total_loss_test_irr": 0,
+        },
         "policy": {
             "policy_version": "STAGE0-v1",
             "multiple_insurance": {"state": "NO", "prior_compensation": 0},

@@ -367,6 +367,7 @@
         "market": 30000000000,
         "insured": 24000000000,
         "repair": 23000000000,
+        "rescue_for_threshold": 0,
         "salvage": 4000000000,
         "salvage_disposition": "INSURED_RETAINS",
         "franchise": 1200000000,
@@ -387,6 +388,7 @@
         "market": 20000000000,
         "insured": 25000000000,
         "repair": 16000000000,
+        "rescue_for_threshold": 0,
         "salvage": 3000000000,
         "salvage_disposition": "INSURED_RETAINS",
         "franchise": 1000000000,
@@ -405,6 +407,7 @@
         "market": 20000000000,
         "insured": 20000000000,
         "repair": 16000000000,
+        "rescue_for_threshold": 0,
         "salvage_disposition": "INSURER_TAKES_TITLE",
         "franchise": 1000000000,
         "rescue_payable": 200000000

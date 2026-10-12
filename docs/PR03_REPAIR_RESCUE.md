@@ -20,10 +20,10 @@ Fresh GitHub and Git inspection on 12 October 2026 established:
 |---|---|
 | PR #55 | Merged into `fix/body-runtime-blockers` on 11 October 2026 |
 | PR #55 base | `fix/body-runtime-blockers` at `9859b9c736df98f6a27c69953083b64bbdb1165a` |
-| Final accepted PR #55 head | `fix/pr02-eligibility-admission` at `aad981f15857f44d464778cff8c8f041265b42cb` |
+| Final accepted PR #55 head | `fix/pr02-eligibility-admission` at `aad981f158574fcd6d74d15119533b6992b7ee6a` |
 | Accepted PR-03 parent | `origin/fix/body-runtime-blockers` at merge commit `a8a20472172fbb5700adcf7c52df639830fbd9f2` |
 | Parent tree | `150091f01bbff30495abc29094a3e5a5e79070f3` |
-| Merge parents | First: `9859b9c736df98f6a27c69953083b64bbdb1165a`; second: `aad981f15857f44d464778cff8c8f041265b42cb` |
+| Merge parents | First: `9859b9c736df98f6a27c69953083b64bbdb1165a`; second: `aad981f158574fcd6d74d15119533b6992b7ee6a` |
 | PR #48 | Still open from `fix/body-runtime-blockers` to `main`; not merged or retargeted |
 | PR-03 target | `fix/body-runtime-blockers` |
 | Newer integration commits | None after `a8a20472172fbb5700adcf7c52df639830fbd9f2` at reproduction time |
@@ -34,7 +34,7 @@ The final PR #55 history between its original base and accepted head is:
    IA-01/IA-02 containment.
 2. `8f10b9290a5dd82ccff86b50c957d328f4ad83cb`, parent `775c311...`, corrects
    the PR-02 integration-parent evidence record; and
-3. `aad981f15857f44d464778cff8c8f041265b42cb`, parent `8f10b929...`, aligns
+3. `aad981f158574fcd6d74d15119533b6992b7ee6a`, parent `8f10b929...`, aligns
    graph recovery-guard outputs.
 
 The integration merge is `a8a20472172fbb5700adcf7c52df639830fbd9f2`.
@@ -274,9 +274,10 @@ The precedence contract is:
    explicit zero;
 2. otherwise, if actual rescue is present, derive the threshold operand from
    that amount and record `DERIVED_FROM_ACTUAL_RESCUE` provenance;
-3. otherwise retain the legacy arithmetic-zero compatibility representation
-   while recording `OMITTED_DEFAULT_ZERO`, not an invented fact that no rescue
-   occurred; and
+3. otherwise, use arithmetic zero only when the imported case explicitly opts
+   into `rescue_omission_legacy_compatibility=true`, recording
+   `EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission remains
+   `UNRESOLVED_MISSING_RESCUE` and cannot authorize payment; and
 4. never fall back from `rescue_payable` or the capped settlement result.
 
 Actual and explicit-threshold amounts are not aliases and need not be numerically
@@ -302,10 +303,12 @@ may proceed while retaining their separate roles. This containment preserves
 RQ-07 instead of deciding whether the legally applicable threshold cost is
 actual, accepted or capped rescue.
 
-`OMITTED_DEFAULT_ZERO` is limited to legacy compatibility; it is not evidence
-that rescue did not occur. An unanswered Q-S4-07 or missing required assessment
-evidence remains blocking in Review. With an unknown classification rescue
-operand, a branch is safe only when one of these conditions is established:
+`EXPLICIT_LEGACY_DEFAULT_ZERO` is an explicit compatibility contract for
+historical imported controls; it is not evidence that rescue did not occur and
+Review never emits it. Ordinary omission is unresolved at the engine boundary.
+An unanswered Q-S4-07 or missing required assessment evidence remains blocking
+in Review. With an unknown classification rescue operand, a preliminary branch
+can be invariant only when one of these conditions is established:
 
 - repair/replacement cost alone is already strictly above 75%, so any
   non-negative rescue leaves the result total loss;
@@ -313,11 +316,11 @@ operand, a branch is safe only when one of these conditions is established:
 - evidence establishes an applicable upper bound and repair/replacement plus
   that bound cannot cross the strict threshold.
 
-Otherwise the unknown operand is material to classification and the result must
-be `CLASSIFICATION_EVIDENCE_REQUIRED` or an equivalent stable non-authorizing
-state. A legacy parser may retain zero for arithmetic compatibility, but the
-admission/classification gate must not treat that representation as a factual
-zero when it could change the branch.
+Otherwise the unknown operand is material to classification and the result is
+`CLASSIFICATION_EVIDENCE_REQUIRED`. Even when repair alone makes the total-loss
+branch invariant, ordinary omission remains unresolved for settlement and the
+engine produces no payable. Compatibility behavior must be selected explicitly
+and remains separately traceable from an evidenced zero.
 
 If an aggregate repair assessment already contains rescue, it cannot be used
 unchanged alongside a separate rescue operand. Evidence must decompose it into
@@ -442,7 +445,7 @@ payment authority belongs in PR-03.
 | Actual plus unequal explicit threshold without qualified selection record | No min/max/equality guess and no payable. Proceed only with scope-decomposing assessment evidence, applicable authority and an explicitly accepted interpretation; a source label alone does not resolve it. |
 | `rescue_payable` only | Never enters actual or classification; remains settlement-only and ceiling-checked |
 | Actual plus `rescue_payable` | Existing above-actual and above-ceiling checks unchanged; threshold never reads payable |
-| Omitted rescue vs explicit zero | Legacy arithmetic compatibility may match, but omission is not evidence of zero. Review remains blocking unless classification is invariant to the unknown non-negative operand or an evidence-backed zero/upper bound makes the branch safe. |
+| Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
 | Repair assessment excludes rescue plus a separate rescue operand | Rescue added exactly once; repair total remains rescue-exclusive |
 | Repair assessment already containing rescue | Decompose repair/replacement and rescue using assessment evidence; if material decomposition is unavailable, block rather than count rescue twice or infer a subtraction. |
 | Positive rescue with missing assessment evidence | Review remains non-authorizing regardless of the derived branch |
@@ -476,7 +479,9 @@ Review now emits actual rescue and a separate classification operand with
 `DERIVED_FROM_ACTUAL_RESCUE` provenance. The classifier and total-loss handler
 share the same resolver: explicit zero is preserved, actual is the documented
 fallback, settlement `rescue_payable` is never a source, and omitted legacy
-input is traced as `OMITTED_DEFAULT_ZERO`. Unequal actual/threshold operands
+compatibility is accepted only through the explicit flag and traced as
+`EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission is unresolved and blocks the
+engine payable. Unequal actual/threshold operands
 remain nonpayable until the repository can validate the required assessment,
 authority and accepted interpretation. An assessment flagged as already
 including positive rescue likewise blocks until it is decomposed.
@@ -491,8 +496,13 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
 # exit 0: 2 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 605 passed, 4 xfailed
+# exit 0: 608 passed, 4 xfailed
 ```
+
+The project metadata now requires `>=3.11,<3.12`, and the repository workflow
+installs and validates only Python 3.11. Python 3.10, 3.12 and 3.13 were removed
+from the CI matrix; older multi-version runs remain historical GitHub records,
+not acceptance evidence for this PR.
 
 The IA-03 regression now produces zero depreciation and the expected
 `1,540,000,000` IRR payable. The IA-04 Review classifies `7,400 + 200` as total
@@ -509,9 +519,10 @@ repair from replacement depreciation and classification rescue from
 capped/reimbursable settlement rescue; `docs/CUSTOMER_FAQ.md` is regenerated
 from `knowledge/customer_faq.json`.
 
-M25 kills an ignored replacement predicate and M26 kills a dropped
-Review-to-threshold rescue handoff. The regenerated current mutation report is
-**26/26 killed**; historical 24/24 and Stage-0 records remain unchanged.
+M25 kills an ignored replacement predicate, M26 kills a dropped
+Review-to-threshold rescue handoff, and M27 kills the engine-boundary omitted
+rescue gate. The regenerated current mutation report is **27/27 killed**;
+historical 24/24 and Stage-0 records remain unchanged.
 Validation confirms that `OP_DEPRECIATION_REPLACEMENT_PART` names the
 replacement predicate and the total-loss rule still names separate
 repair/replacement and rescue operands.

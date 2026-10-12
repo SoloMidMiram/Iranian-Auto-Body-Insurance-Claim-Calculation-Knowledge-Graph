@@ -1325,16 +1325,28 @@ def reconcile_classification(
         )
     derived = verdict["branch"]
     declared = case.branch
-    gap = _classification_evidence_gap(case, declared, derived)
+    classification_rescue, rescue_source, _ = case.classification_rescue()
+    if (
+        case.repair_total is not None
+        and case.market_value is not None
+        and classification_rescue is None
+        and rescue_source == "UNRESOLVED_MISSING_RESCUE"
+    ):
+        gap = (
+            "classification rescue is missing; a non-negative amount could change the "
+            "strict 75% branch or the settlement, so the preliminary zero cannot authorize payment"
+        )
+    else:
+        gap = _classification_evidence_gap(case, declared, derived)
 
-    if declared is None:
-        outcome = "MATCH"
-        selected = derived
-        reason = "no branch was declared; the evidence-derived branch is authoritative"
-    elif gap:
+    if gap:
         outcome = "INSUFFICIENT_EVIDENCE"
         selected = None
         reason = gap
+    elif declared is None:
+        outcome = "MATCH"
+        selected = derived
+        reason = "no branch was declared; the evidence-derived branch is authoritative"
     elif declared == derived:
         outcome = "MATCH"
         selected = declared

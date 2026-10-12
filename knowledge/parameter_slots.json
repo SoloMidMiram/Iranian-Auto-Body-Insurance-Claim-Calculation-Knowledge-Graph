@@ -348,7 +348,7 @@
       "supplied_via": ["ASSESSOR_REPORT", "INSURED_ANSWER"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
       "missing_behavior": "BLOCK_IF_MATERIAL",
-      "select": "Claimed actual cost is not payable cost. The evidenced actual amount is the classification fallback when no distinct threshold operand is selected, while settlement applies the separate 20% ceiling. Omission is legacy arithmetic zero only and is not evidence that no rescue occurred."
+      "select": "Claimed actual cost is not payable cost. The evidenced actual amount is the classification fallback when no distinct threshold operand is selected, while settlement applies the separate 20% ceiling. Ordinary omission is unresolved and blocks engine payment; explicit imported-case legacy compatibility is separately marked and is not evidence that no rescue occurred."
     },
     {
       "node_id": "PS_RESCUE_CAP_BASE",

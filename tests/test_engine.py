@@ -14,6 +14,18 @@ from iran_auto_claim.schema_input import InputSchemaError
 
 
 def _case(branch=None, **inputs):
+    if any(key in inputs for key in ("repair", "repair_total", "repair_total_irr")) and not any(
+        key in inputs
+        for key in (
+            "actual_rescue",
+            "rescue",
+            "rescue_transport_actual_irr",
+            "rescue_for_threshold",
+            "rescue_for_total_loss_test_irr",
+            "rescue_omission_legacy_compatibility",
+        )
+    ):
+        inputs["rescue_for_threshold"] = 0
     if branch in ("PARTIAL_DAMAGE", "THEFT_PARTIAL_DAMAGE"):
         if not any(key in inputs for key in ("market", "market_value", "insured", "insured_sum")):
             inputs["market"] = 10**12
@@ -1103,6 +1115,45 @@ def test_embedded_rescue_must_be_decomposed_before_threshold_addition(kb):
     assert result.payable is None
     assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
     assert "evidenced decomposition" in result.reason
+
+
+@pytest.mark.parametrize("declared_branch", [True, False])
+def test_missing_material_rescue_blocks_internal_partial_payment(kb, declared_branch):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        franchise=0,
+    )
+    payload["damage"].pop("rescue_for_threshold")
+    if not declared_branch:
+        payload["classification"].pop("branch")
+    result = compute(payload, kb)
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "preliminary zero cannot authorize payment" in result.reason
+
+
+def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        rescue_omission_legacy_compatibility=True,
+        franchise=0,
+    )
+    result = compute(payload, kb)
+    assert result.payable == D(7400)
+    assert result.fields["classification_rescue"] == D(0)
+    assert (
+        result.fields["classification_rescue_source"]
+        == "EXPLICIT_LEGACY_DEFAULT_ZERO"
+    )
 
 
 def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):

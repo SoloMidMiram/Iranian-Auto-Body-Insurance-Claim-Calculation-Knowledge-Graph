@@ -281,6 +281,30 @@ def main() -> int:
         "source_reference": "mutation probe schedule",
         "source_version": "TEST-v1",
     }
+    missing_rescue = {
+        "claim_id": "missing-rescue-probe",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01"},
+        "coverage_gate": {"causal_relationship_established": True},
+        "damage": {
+            "gross": 7400,
+            "repair": 7400,
+            "market": 10000,
+            "insured": 10000,
+        },
+        "policy": {
+            "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+            "franchise": sourced_absolute,
+        },
+    }
+    missing_rescue_result = compute(
+        _authorize_fixture_case(missing_rescue, kb), kb
+    )
+    assert missing_rescue_result.payable is None
+    assert missing_rescue_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+
     partial = {
         "claim_id": "runtime-defect-probe",
         "unit": "IRR",
@@ -331,6 +355,7 @@ def main() -> int:
             "market": 2000,
             "insured": 2000,
             "repair": 1600,
+            "rescue_for_threshold": 0,
             "salvage": 300,
             "salvage_disposition": "INSURED_RETAINS",
         },

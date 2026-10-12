@@ -6,6 +6,11 @@ Passing tests is necessary but not sufficient. Each phase produces an evidence
 bundle containing command output, reviewed source records, case results, and any
 approved exceptions. A gate fails when evidence is missing or indirect.
 
+Python 3.11 is the only supported interpreter for installation and validation.
+Virtual environments, dependency installation, repository commands and evidence
+must use the same Python 3.11 interpreter; historical results from other Python
+versions are not current acceptance evidence.
+
 The standard repository gate is:
 
 ```bash

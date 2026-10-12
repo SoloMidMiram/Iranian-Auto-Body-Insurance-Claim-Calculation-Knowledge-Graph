@@ -202,20 +202,20 @@ class Case:
         return self._money(("rescue_payable",))
 
     @property
-    def rescue_for_threshold(self) -> Decimal:
+    def rescue_for_threshold(self) -> Decimal | None:
         amount, _, unresolved = self.classification_rescue()
         if unresolved is not None:
             raise CaseInputError(unresolved)
-        return amount if amount is not None else Decimal(0)
+        return amount
 
     def classification_rescue(self) -> tuple[Decimal | None, str, str | None]:
         """Resolve the classification operand without reading settlement payable.
 
         The explicit threshold amount and actual expense are distinct operands.
         Review's evidenced actual-expense answer is the documented fallback when
-        no explicit threshold selection exists.  Missing legacy input remains an
-        arithmetic zero, but its provenance says that it is missing rather than
-        proving that no rescue occurred.
+        no explicit threshold selection exists. Ordinary omission remains
+        unresolved; only an explicit imported-case compatibility flag selects
+        the historical arithmetic-zero behavior.
         """
         explicit = self._money(
             ("rescue_for_threshold", "rescue_for_total_loss_test_irr")
@@ -244,7 +244,9 @@ class Case:
             return explicit, source, None
         if actual is not None:
             return actual, "DERIVED_FROM_ACTUAL_RESCUE", None
-        return Decimal(0), "OMITTED_DEFAULT_ZERO", None
+        if self.damage.get("rescue_omission_legacy_compatibility") is True:
+            return Decimal(0), "EXPLICIT_LEGACY_DEFAULT_ZERO", None
+        return None, "UNRESOLVED_MISSING_RESCUE", None
 
     @property
     def salvage(self) -> Decimal | None:

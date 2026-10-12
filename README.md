@@ -33,7 +33,8 @@ records the remaining provenance gaps and amount-affecting defects.
 
 ## Quickstart
 
-No dependencies beyond the standard library. Python 3.10+.
+No runtime dependencies beyond the standard library. The supported interpreter
+for installation and validation is Python 3.11 only.
 
 ```bash
 python claim.py validate              # integrity gate over the whole graph

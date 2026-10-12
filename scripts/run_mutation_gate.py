@@ -129,6 +129,13 @@ MUTATIONS = (
         'damage["rescue_for_total_loss_test_irr"] = 0',
         "Review drops evidenced rescue from the total-loss classification numerator",
     ),
+    Mutation(
+        "M27",
+        "src/iran_auto_claim/engine.py",
+        'and rescue_source == "UNRESOLVED_MISSING_RESCUE"',
+        "and False",
+        "omitted material rescue is treated as zero and allowed to authorize payment",
+    ),
 )
 
 THRESHOLD = 90.0

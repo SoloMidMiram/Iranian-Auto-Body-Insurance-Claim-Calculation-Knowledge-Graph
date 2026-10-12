@@ -71,6 +71,9 @@ def classify(case: Case | dict[str, Any], kb: Knowledge | None = None) -> dict[s
         rescue, rescue_source, unresolved = case.classification_rescue()
         if unresolved is not None:
             raise ClassificationEvidenceRequired(unresolved)
+        if rescue is None:
+            rescue = money.D(0)
+            rescue_source = "UNRESOLVED_MISSING_RESCUE_PRELIMINARY_ZERO"
         is_total, combined, threshold = operators.is_total_loss(
             case.repair_total, rescue, case.market_value
         )
