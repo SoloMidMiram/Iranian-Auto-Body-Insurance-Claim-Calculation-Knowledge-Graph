@@ -1326,15 +1326,17 @@ def reconcile_classification(
     derived = verdict["branch"]
     declared = case.branch
     classification_rescue, rescue_source, _ = case.classification_rescue()
-    if (
+    unresolved_rescue_gate = (
         case.repair_total is not None
         and case.market_value is not None
         and classification_rescue is None
         and rescue_source == "UNRESOLVED_MISSING_RESCUE"
-    ):
+    )
+    if unresolved_rescue_gate:
         gap = (
             "classification rescue is missing; a non-negative amount could change the "
-            "strict 75% branch or the settlement, so the preliminary zero cannot authorize payment"
+            "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
+            "payment and this evidence gate cannot be overridden"
         )
     else:
         gap = _classification_evidence_gap(case, declared, derived)
@@ -1357,7 +1359,11 @@ def reconcile_classification(
         reason = f"declared {declared} conflicts with evidence-derived {derived}"
 
     override = case.classification_override
-    if outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE") and override is not None:
+    if (
+        outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE")
+        and override is not None
+        and not unresolved_rescue_gate
+    ):
         outcome = "AUTHORIZED_OVERRIDE"
         selected = declared
         reason = "documented classification override authorizes the declared branch"

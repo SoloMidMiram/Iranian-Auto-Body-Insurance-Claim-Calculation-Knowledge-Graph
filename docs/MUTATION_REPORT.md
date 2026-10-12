@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, Review operand construction in `review.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **27/27 killed (100.0%)**
+- Result: **28/28 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -37,6 +37,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M25 | KILLED | repair-only work receives replacement-part depreciation |
 | M26 | KILLED | Review drops evidenced rescue from the total-loss classification numerator |
 | M27 | KILLED | omitted material rescue is treated as zero and allowed to authorize payment |
+| M28 | KILLED | a classification override bypasses the unresolved-rescue payment gate |
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

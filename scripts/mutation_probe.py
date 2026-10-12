@@ -284,7 +284,17 @@ def main() -> int:
     missing_rescue = {
         "claim_id": "missing-rescue-probe",
         "unit": "IRR",
-        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "classification": {
+            "branch": "PARTIAL_DAMAGE",
+            "domain": "BODY",
+            "override": {
+                "authorized": True,
+                "actor": "mutation-probe-adjuster",
+                "reason": "documented branch selection",
+                "source": "mutation-probe-review-board",
+                "timestamp": "2026-10-12T04:00:00Z",
+            },
+        },
         "event": {"event_date": "1405/06/01"},
         "coverage_gate": {"causal_relationship_established": True},
         "damage": {

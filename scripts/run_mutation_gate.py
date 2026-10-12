@@ -136,6 +136,13 @@ MUTATIONS = (
         "and False",
         "omitted material rescue is treated as zero and allowed to authorize payment",
     ),
+    Mutation(
+        "M28",
+        "src/iran_auto_claim/engine.py",
+        "and override is not None\n        and not unresolved_rescue_gate",
+        "and override is not None\n        and True",
+        "a classification override bypasses the unresolved-rescue payment gate",
+    ),
 )
 
 THRESHOLD = 90.0

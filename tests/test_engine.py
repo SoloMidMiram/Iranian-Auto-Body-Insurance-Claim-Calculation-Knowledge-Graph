@@ -1137,6 +1137,32 @@ def test_missing_material_rescue_blocks_internal_partial_payment(kb, declared_br
     assert "preliminary zero cannot authorize payment" in result.reason
 
 
+def test_missing_material_rescue_cannot_be_overridden_into_payment(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        franchise=0,
+    )
+    payload["damage"].pop("rescue_for_threshold")
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented partial-loss branch selection",
+        "source": "review-board-record-2026-42",
+        "timestamp": "2026-10-12T04:00:00Z",
+    }
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "preliminary zero cannot authorize payment" in result.reason
+
+
 def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
     payload = _case(
         "PARTIAL_DAMAGE",
@@ -1165,8 +1191,12 @@ def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):
     assert "repair-and-replacement assessment" in result.reason
 
 
-def test_documented_authorized_override_can_select_declared_total_loss(kb):
-    payload = _case("TOTAL_LOSS", market=100, insured=100, franchise=10)
+def test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands(
+    kb,
+):
+    payload = _case(
+        "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10
+    )
     payload["classification"]["override"] = {
         "authorized": True,
         "actor": "senior-adjuster-17",

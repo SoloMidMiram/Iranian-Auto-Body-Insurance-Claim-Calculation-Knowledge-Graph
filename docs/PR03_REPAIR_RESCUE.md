@@ -319,8 +319,11 @@ can be invariant only when one of these conditions is established:
 Otherwise the unknown operand is material to classification and the result is
 `CLASSIFICATION_EVIDENCE_REQUIRED`. Even when repair alone makes the total-loss
 branch invariant, ordinary omission remains unresolved for settlement and the
-engine produces no payable. Compatibility behavior must be selected explicitly
-and remains separately traceable from an evidenced zero.
+engine produces no payable. This unresolved-rescue gate cannot be converted
+into payment by a classification override. Overrides remain available for
+legitimate branch conflicts when the required classification operands are
+complete. Compatibility behavior must be selected explicitly and remains
+separately traceable from an evidenced zero.
 
 If an aggregate repair assessment already contains rescue, it cannot be used
 unchanged alongside a separate rescue operand. Evidence must decompose it into
@@ -445,7 +448,8 @@ payment authority belongs in PR-03.
 | Actual plus unequal explicit threshold without qualified selection record | No min/max/equality guess and no payable. Proceed only with scope-decomposing assessment evidence, applicable authority and an explicitly accepted interpretation; a source label alone does not resolve it. |
 | `rescue_payable` only | Never enters actual or classification; remains settlement-only and ceiling-checked |
 | Actual plus `rescue_payable` | Existing above-actual and above-ceiling checks unchanged; threshold never reads payable |
-| Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
+| Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable, including when a documented classification override is supplied. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
+| Evidence-complete branch conflict plus documented override | Existing authorized-override behavior remains available; the hard gate is specifically unresolved classification rescue, not overrides generally. |
 | Repair assessment excludes rescue plus a separate rescue operand | Rescue added exactly once; repair total remains rescue-exclusive |
 | Repair assessment already containing rescue | Decompose repair/replacement and rescue using assessment evidence; if material decomposition is unavailable, block rather than count rescue twice or infer a subtraction. |
 | Positive rescue with missing assessment evidence | Review remains non-authorizing regardless of the derived branch |
@@ -481,10 +485,19 @@ share the same resolver: explicit zero is preserved, actual is the documented
 fallback, settlement `rescue_payable` is never a source, and omitted legacy
 compatibility is accepted only through the explicit flag and traced as
 `EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission is unresolved and blocks the
-engine payable. Unequal actual/threshold operands
+engine payable even when a documented classification override is supplied.
+Unequal actual/threshold operands
 remain nonpayable until the repository can validate the required assessment,
 authority and accepted interpretation. An assessment flagged as already
 including positive rescue likewise blocks until it is decomposed.
+
+The review counterexample was reproduced before the correction with the
+Python 3.11 interpreter-bound environment: repair `7,400`, market value
+`10,000`, omitted rescue and a schema-valid documented override produced
+`AUTHORIZED_OVERRIDE` and a `7,400` IRR payable. The focused regression exited
+`1` on that exact assertion. After the correction, the same case remains
+`CLASSIFICATION_EVIDENCE_REQUIRED` with no payable, while an override of an
+evidence-complete `74/100` branch conflict remains authorized.
 
 Fresh post-change Python 3.11 evidence in the isolated worktree:
 
@@ -495,8 +508,14 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
   --runxfail -vv
 # exit 0: 2 passed
 
+/tmp/body-model-pr03-venv311/bin/python -m pytest \
+  tests/test_engine.py::test_missing_material_rescue_cannot_be_overridden_into_payment \
+  tests/test_engine.py::test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands \
+  -q
+# exit 0: 2 passed
+
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 608 passed, 4 xfailed
+# exit 0: 609 passed, 4 xfailed
 ```
 
 The project metadata now requires `>=3.11,<3.12`, and the repository workflow
@@ -520,8 +539,9 @@ capped/reimbursable settlement rescue; `docs/CUSTOMER_FAQ.md` is regenerated
 from `knowledge/customer_faq.json`.
 
 M25 kills an ignored replacement predicate, M26 kills a dropped
-Review-to-threshold rescue handoff, and M27 kills the engine-boundary omitted
-rescue gate. The regenerated current mutation report is **27/27 killed**;
+Review-to-threshold rescue handoff, M27 kills the engine-boundary omitted
+rescue gate, and M28 kills an override bypass of that hard gate. The regenerated
+current mutation report is **28/28 killed**;
 historical 24/24 and Stage-0 records remain unchanged.
 Validation confirms that `OP_DEPRECIATION_REPLACEMENT_PART` names the
 replacement predicate and the total-loss rule still names separate
