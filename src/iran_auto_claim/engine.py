@@ -1325,13 +1325,18 @@ def reconcile_classification(
         )
     derived = verdict["branch"]
     declared = case.branch
-    classification_rescue, rescue_source, _ = case.classification_rescue()
+    classification_rescue, rescue_source, unresolved_rescue = (
+        case.classification_rescue()
+    )
     threshold_classification_participates = derived in {
         "PARTIAL_DAMAGE",
         "TOTAL_LOSS",
         "GLASS_ONLY",
     }
     unresolved_rescue_gate = (
+        unresolved_rescue is not None
+        and (declared == "TOTAL_LOSS" or threshold_classification_participates)
+    ) or (
         threshold_classification_participates
         and case.repair_total is not None
         and case.market_value is not None
@@ -1339,7 +1344,7 @@ def reconcile_classification(
         and rescue_source == "UNRESOLVED_MISSING_RESCUE"
     )
     if unresolved_rescue_gate:
-        gap = (
+        gap = unresolved_rescue or (
             "classification rescue is missing; a non-negative amount could change the "
             "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
             "payment and this evidence gate cannot be overridden"
@@ -1647,6 +1652,15 @@ def compute(
         res.reason = str(error)
         res.fields["execution_plan_error"] = str(error)
         res.label("EXECUTION_PLAN_INVALID")
+    except ClassificationEvidenceRequired as error:
+        res.payable = None
+        res.status = "CLASSIFICATION_EVIDENCE_REQUIRED"
+        res.reason = str(error)
+        classification = res.fields.get("classification")
+        if isinstance(classification, dict):
+            classification["outcome"] = "INSUFFICIENT_EVIDENCE"
+            classification["reason"] = str(error)
+        res.label("CLASSIFICATION_EVIDENCE_REQUIRED")
     except operators.OperatorError as error:
         res.payable = None
         res.status = "INPUT_ERROR"

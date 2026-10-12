@@ -1236,3 +1236,47 @@ def test_documented_authorized_override_can_select_declared_total_loss_with_comp
     assert classification["override"]["actor"] == "senior-adjuster-17"
     assert result.fields["total_loss_threshold_override"] is True
     assert "AUTHORIZED_CLASSIFICATION_OVERRIDE" in result.labels
+
+
+@pytest.mark.parametrize(
+    ("inputs", "reason_fragment"),
+    [
+        (
+            {
+                "market": 100,
+                "insured": 100,
+                "actual_rescue": 20,
+                "rescue_for_threshold": 10,
+            },
+            "actual and explicit classification rescue differ",
+        ),
+        (
+            {
+                "insured": 100,
+                "repair": 80,
+                "actual_rescue": 10,
+                "repair_total_includes_rescue": True,
+            },
+            "repair/replacement already includes rescue",
+        ),
+    ],
+    ids=("conflicting-rescue", "embedded-rescue"),
+)
+def test_total_loss_override_cannot_bypass_unresolved_rescue(
+    kb, inputs, reason_fragment
+):
+    payload = _case("TOTAL_LOSS", franchise=10, **inputs)
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented total-loss branch selection",
+        "source": "review-board-record-2026-43",
+        "timestamp": "2026-10-12T05:00:00Z",
+    }
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert reason_fragment in result.reason

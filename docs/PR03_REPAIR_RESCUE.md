@@ -333,6 +333,13 @@ Overrides remain available for legitimate branch conflicts when the required
 classification operands are complete. Compatibility behavior must be selected
 explicitly and remains separately traceable from an evidenced zero.
 
+A total-loss override cannot bypass an unresolved rescue-scope conflict or an
+embedded-rescue decomposition requirement merely because repair or market
+evidence was too incomplete for the preliminary classifier to evaluate the
+threshold. Reconciliation keeps that case at `INSUFFICIENT_EVIDENCE`; the
+engine also translates any downstream `ClassificationEvidenceRequired` into a
+structured nonpayable result rather than allowing an exception to escape.
+
 If an aggregate repair assessment already contains rescue, it cannot be used
 unchanged alongside a separate rescue operand. Evidence must decompose it into
 repair/replacement excluding rescue and the applicable rescue operand. Where
@@ -458,6 +465,7 @@ payment authority belongs in PR-03.
 | Actual plus `rescue_payable` | Existing above-actual and above-ceiling checks unchanged; threshold never reads payable |
 | Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable when the repair/rescue threshold participates, including when a documented classification override is supplied. A route selected before that threshold, such as evidenced theft, is not blocked by an incidental repair assessment alone. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
 | Evidence-complete branch conflict plus documented override | Existing authorized-override behavior remains available; the hard gate is specifically unresolved classification rescue, not overrides generally. |
+| Total-loss override plus conflicting or embedded rescue and an incomplete threshold pair | `CLASSIFICATION_EVIDENCE_REQUIRED`; no override, dispatch or uncaught exception |
 | Repair assessment excludes rescue plus a separate rescue operand | Rescue added exactly once; repair total remains rescue-exclusive |
 | Repair assessment already containing rescue | Decompose repair/replacement and rescue using assessment evidence; if material decomposition is unavailable, block rather than count rescue twice or infer a subtraction. |
 | Positive rescue with missing assessment evidence | Review remains non-authorizing regardless of the derived branch |
@@ -532,8 +540,9 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
   tests/test_engine.py::test_missing_material_rescue_cannot_be_overridden_into_payment \
   tests/test_engine.py::test_missing_classification_rescue_does_not_block_whole_vehicle_theft \
   tests/test_engine.py::test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands \
+  tests/test_engine.py::test_total_loss_override_cannot_bypass_unresolved_rescue \
   -q
-# exit 0: 3 passed
+# exit 0: 5 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest \
   tests/test_schema_input.py::test_repair_only_status_defaults_false_and_contradictions_reject \
@@ -545,7 +554,7 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
 # exit 0: 7 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 616 passed, 4 xfailed
+# exit 0: 618 passed, 4 xfailed
 ```
 
 The project metadata now requires `>=3.11,<3.12`, and the repository workflow
