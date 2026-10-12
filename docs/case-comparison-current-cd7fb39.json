@@ -1,0 +1,1622 @@
+{
+  "revision": "cd7fb39a0b7859f2cec91b94770e240ab62e0b75",
+  "tree": "4c594155cf9404def9bb32896c711985f3abccb8",
+  "python": "3.11.15",
+  "reference_independence": "Reference outcomes were fixed in CASE_BASED_INSPECTION.md before execution; MATCH does not imply authenticated legal authority.",
+  "cases": [
+    {
+      "case": "inspection-c101-manual-franchise-unversioned",
+      "sha256": "05316e9ebac1cc199fa7742c172128e017fde80ca6eaa5b9203f39ca7f30fb3e",
+      "reference_outcome": "unversioned manual cannot establish a monetary franchise; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1432000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "CONFIRMED_MODEL_DEFECT_IA08"
+    },
+    {
+      "case": "inspection-c102-glass-endorsement-token-only",
+      "sha256": "f3f5d55b7fd4e163eddb50f967887bea4da7f7cf5dcae6556519b7c0e4ae9297",
+      "reference_outcome": "endorsement token without complete economic wording; no single payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "GLASS_ONLY",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [
+          "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+          "U11_GLASS_ARTICLE10_EXEMPTION"
+        ],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNSUPPORTED_SCOPE"
+    },
+    {
+      "case": "inspection-c104-theft-60-59-clock",
+      "sha256": "85400a7bf8e6484c08f70d02a2a07fa37235b538cac542f4b831d71000d52895",
+      "reference_outcome": "arithmetic 7200000000; authorization unresolved while legal clock anchor is unaccepted",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "THEFT",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 7200000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c105-theft-59-days",
+      "sha256": "3db7872e9de20ce6fb6c674bc7e28b7778880b9eb1b49a31c364d521e42f6261",
+      "reference_outcome": "theft threshold not met; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "THEFT",
+        "authorization_granted": true,
+        "status": "PENDING_60_DAY_CRITERION",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c106-theft-clock-unbound",
+      "sha256": "a28986645826de4fd428c2b836eb0ef871ff6db2e19a7e192da034dfaa8cbddc",
+      "reference_outcome": "unbound theft clock; no authorization or payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THEFT",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [
+          "U13_THEFT_CLOCK_ANCHOR"
+        ],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c13a-repair-only",
+      "sha256": "26d63d6c891a0a4aba778a1ed2da4a1d2844adc02083f794ec9867946473555c",
+      "reference_outcome": "PARTIAL_DAMAGE; authorize; depreciation 0; payable 1540000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1540000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c13b-replaced-but-flag-false",
+      "sha256": "d29f47bafb1763e610aaaf66323fdc1835ffa8da7b049999867b4f14833c1158",
+      "reference_outcome": "PARTIAL_DAMAGE; authorize; depreciation 0; payable 1540000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1540000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c13c-repair-only-flag-true",
+      "sha256": "737a7ca8f18bc9a3a3829d08b053031aef0859d4f95b80cf3b981982cb22c6a4",
+      "reference_outcome": "contradictory input; no authorization or payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 1,
+        "calc_exit": 1,
+        "decision": null,
+        "classification": null,
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c13d-replacement-control",
+      "sha256": "144228295be21ad87a305c12b21548a996a790d1eab06be74800da3fc5c55b48",
+      "reference_outcome": "PARTIAL_DAMAGE; depreciation 120000000; payable 1432000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1432000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c21mix-four-kinds",
+      "sha256": "49ba540c3d9e6a221fff59a5f6472aed9df51e5d72804149f990379da47c2eea",
+      "reference_outcome": "PARTIAL_DAMAGE; depreciation only on replaced non-glass part; payable 2332000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 2332000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c31u04-unresolved",
+      "sha256": "cc61e89c40e10e81ecf2222385c7d7aa2736fc22e4a54af4dd2ffbe9204509d3",
+      "reference_outcome": "no single payable; three battery/tyre modes remain authority-dependent",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c32u04-cap-then-dep",
+      "sha256": "49ea0519aa898bc74ad129ab52d4c719cd3192fcd56b0a2c0ca532008cb63d5c",
+      "reference_outcome": "no single payable; token alone is not an authority artifact",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNSUPPORTED_SCOPE"
+    },
+    {
+      "case": "inspection-c33u04-dep-then-cap",
+      "sha256": "b9f6671bdbfbd768587925e36181179414d9fa3f1b5b50c7295b548c981d79a0",
+      "reference_outcome": "no single payable; token alone is not an authority artifact",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNSUPPORTED_SCOPE"
+    },
+    {
+      "case": "inspection-c34u04-cap-only",
+      "sha256": "fec9c411cca2657db32c39f9e48794e2908e477dc71338175f0962c3dc58a3c1",
+      "reference_outcome": "no single payable; token alone is not an authority artifact",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNSUPPORTED_SCOPE"
+    },
+    {
+      "case": "inspection-c35q404-battery-new-price",
+      "sha256": "b9ae0647ee6a824155570e8d8a9e615787f2aa1467d8cca5c8c5bc42707f71d4",
+      "reference_outcome": "new-price and interaction slots should bind; otherwise no single payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNSUPPORTED_SCOPE"
+    },
+    {
+      "case": "inspection-c41-below-7499",
+      "sha256": "26c256fecb7391ac58a26b2e13697d49a6f39da77115da416ca60cb016e119b0",
+      "reference_outcome": "PARTIAL_DAMAGE at 74.99%; payable 6759",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6759,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c42-at-7500",
+      "sha256": "dd61139e55545c274c3b038879609140171860333ca0023b3cf259193ad7f78d",
+      "reference_outcome": "PARTIAL_DAMAGE at strict equality; payable 6760",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6760,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c43-above-7501",
+      "sha256": "3821317644084ffb9210894ea535307d51f9f4a4e789cfe75d8fe8c59e834f06",
+      "reference_outcome": "TOTAL_LOSS; no authorization without disposition/salvage evidence",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [
+          "U12_SALVAGE_DISPOSITION"
+        ],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c44-rescue-crosses-7600",
+      "sha256": "db3646ed562196723bbf70dec14ccb5cba59e8cd264c6b308a56e20160576d6b",
+      "reference_outcome": "TOTAL_LOSS; rescue counted once; no authorization without total-loss evidence",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [
+          "U12_SALVAGE_DISPOSITION"
+        ],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c45-rescue-omitted",
+      "sha256": "12786999319df80acb5853fa38f047d027262afb50f2bed998994a0da2685e83",
+      "reference_outcome": "classification rescue unknown; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c46-rescue-explicit-zero",
+      "sha256": "c6a93d3286d84df0b643aef6397f021c067f04b87d78eb37cd7888238de77b1e",
+      "reference_outcome": "PARTIAL_DAMAGE; explicit zero differs from omission; payable 6660",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6660,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c47-aggregate-only-rescue",
+      "sha256": "e2012fd4319adc4d807af4f3f26abe611f9c9847396f2504412dad5105ac9efd",
+      "reference_outcome": "TOTAL_LOSS; rescue counted once; block on missing itemisation/disposition evidence",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c48-assessed-depreciation-figure",
+      "sha256": "9540923711177f29ad13cafa25b61a84277cc53974202237cc6b75e8dac8f0d3",
+      "reference_outcome": "declared assessed-figure route has no usable money binding; no supported amount",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1432000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNSUPPORTED_SCOPE"
+    },
+    {
+      "case": "inspection-c61-title-not-transferred",
+      "sha256": "97e7862aaecc913fef890635331b0cf3929d83028ac4a4654eaf65b03b1236d8",
+      "reference_outcome": "INSURER_TAKES_TITLE without completed transfer; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 7200000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_ART19_INSURER_TAKES_TITLE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "CONFIRMED_MODEL_DEFECT_IA05"
+    },
+    {
+      "case": "inspection-c62-title-transferred",
+      "sha256": "d78dcfbed713cc66bdd130998df62490ccce5962e9705f52e668fbf333f409a8",
+      "reference_outcome": "completed insurer-title route; no salvage deduction; payable 7200000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 7200000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_ART19_INSURER_TAKES_TITLE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c63-retains-after-salvage",
+      "sha256": "2a12919471dd7f8055a8e8ba2196378303fb60200fd59019f7deb6955712f75a",
+      "reference_outcome": "retained salvage deducted before franchise; payable 6300000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6300000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c64-retains-settlement-base",
+      "sha256": "8bad08490a94b6fa625dc0466f318c410e69d41a85f566c0cda509432b862597",
+      "reference_outcome": "no single payable until franchise-base authority is accepted",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6200000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c65-retains-salvage-missing",
+      "sha256": "b848c4c44c7aa4db841001434893a1c3cfc72b3d88465dc6d7bed938f1bb55f1",
+      "reference_outcome": "retained salvage without valuation; no authorization or payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c66-disposition-unresolved",
+      "sha256": "d9f929e3aab79b9e0ecf90764aebdb4b58673650dc7eabe3d91e9d5d0774938b",
+      "reference_outcome": "unresolved disposition; no authorization or payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": "SALVAGE_DISPOSITION_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U12_SALVAGE_DISPOSITION"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c67-disposition-not-applicable",
+      "sha256": "f13d7ac3a5cae5ea1843c1ca1062077c9b35275d06cf7c275004a823603edd46",
+      "reference_outcome": "physical total loss with NOT_APPLICABLE remains blocked pending RQ-07",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6200000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c71-underinsured-unresolved",
+      "sha256": "b2539abf950ccf9344260d59b415ee95fa40e330c7b1ce215c654fdf286f3223",
+      "reference_outcome": "no single payable; preserve two named operator-order scenarios",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "ORDER_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [
+          1396250000,
+          1446875000
+        ],
+        "live_uncertainties": [
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c72-underinsured-order-locked",
+      "sha256": "34534983734a01cd73603e8f6d7fc482d3cf5a7056721f82b52ae4d5fae1aa10",
+      "reference_outcome": "no single payable; bare selection token is not an authority artifact",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": "AUTHORIZED_UNCERTAINTY_UNRESOLVED",
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c73-overinsured",
+      "sha256": "648b455836f19fe92c664a00910ee7a88232c6f5dee7059ed01c6a806b7fa473",
+      "reference_outcome": "ratio capped at one; PARTIAL_DAMAGE payable 6760",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 6760,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c74-underinsured-total-loss",
+      "sha256": "96a3d5761819dad859b7b59bfe3ca6fa88e7b792628fcd339b4f19eba00655e4",
+      "reference_outcome": "total-loss base min(market, insured), no second ratio; payable 5400000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 5400000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE",
+          "REG53_ART19_INSURER_TAKES_TITLE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "IMPLEMENTATION_INFERENCE"
+    },
+    {
+      "case": "inspection-c81-risk-intensified-yes",
+      "sha256": "564b54ce03eb4ba740dcf75262f71d536a10bcea1adab5d92939526a90b66999",
+      "reference_outcome": "U15 premium-ratio mechanism unresolved; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [
+          "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"
+        ],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c82-risk-intensified-unknown",
+      "sha256": "02b99991f665af3252b17246610e45496ea7148d9cc511e6a70b60ec3051bf4d",
+      "reference_outcome": "material policy fact unknown; no authorization",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c83-instalment-overdue",
+      "sha256": "60d18ac32dc98de661947d9fbe14a00dd317b1237ad30650d7dd6836bf35b694",
+      "reference_outcome": "consequence not source-bound; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c84-policy-state-unknown",
+      "sha256": "e110ef7f59885f80d96f365e6a66ca77180cbc339be18ef8f4c1d86649b49a6a",
+      "reference_outcome": "material policy state unknown; no authorization",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "INCOMPLETE_CASE_EVIDENCE"
+    },
+    {
+      "case": "inspection-c91-prior-full-compensation",
+      "sha256": "1073a82fee9e4bc5d746200c554958ff98fa4c241982d8ff284e5aa7d39f6330",
+      "reference_outcome": "prior recovery containment; no payable",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c92-prior-zero-documented",
+      "sha256": "8b03d474a4b90c4a0512db0b429471a099426b95313909409e63a73dd3c9863f",
+      "reference_outcome": "documented zero recovery; payable 1432000000",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1432000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c93-causation-asserted-only",
+      "sha256": "8f552ca5a43b5b43fd14018ea352e783dd2a54e105d691246e91c7b72f3923fe",
+      "reference_outcome": "covered-peril causation not established; no authorization",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c94-event-date-impossible",
+      "sha256": "6becf935aa0c2b8fdef4a65f47898942a8de267c5c5596d423e68a1f4708bdca",
+      "reference_outcome": "invalid date; structured refusal",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 1,
+        "calc_exit": 1,
+        "decision": null,
+        "classification": null,
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c95-production-year-future",
+      "sha256": "e5addec28b04eff44bdad92e35402d2f283b2947458419505a23159375d1633f",
+      "reference_outcome": "impossible chronology; structured refusal",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 1,
+        "calc_exit": 1,
+        "decision": null,
+        "classification": null,
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c96-conflicting-money-aliases",
+      "sha256": "2627fc6398dfca7732d194d76a25b3b56cd03e4e5dc9583cf5929b56e1367a38",
+      "reference_outcome": "conflicting aliases; structured refusal",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 1,
+        "calc_exit": 1,
+        "decision": null,
+        "classification": null,
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "CONFIRMED_REFERENCE"
+    },
+    {
+      "case": "inspection-c97-late-notice-no-excuse",
+      "sha256": "5d9e9c8436725ec28158c153b300288bdc26a5c93d2e7c17f460b3b4c1aaaf00",
+      "reference_outcome": "no single payable without evidenced notice adjudication",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1432000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_NOTICE_AND_DUTIES",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c98-recourse-released",
+      "sha256": "11971f8614b318d9ca7d3aabd6c7689eef4b7a2d5f3decbd7f13d16d534b32dd",
+      "reference_outcome": "no single payable without evidenced subrogation adjudication",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization_granted": true,
+        "status": null,
+        "payable_irr": 1432000000,
+        "payable_scenarios_irr": [],
+        "live_uncertainties": [],
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART14_SUBROGATION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ]
+      },
+      "comparison_verdict": "DISCREPANCY",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    },
+    {
+      "case": "inspection-c99-third-party-split",
+      "sha256": "744ac8f15a16c936e948e23133fe15fedc15d24d639cc0f141a917edf3b34fca",
+      "reference_outcome": "no body-only amount without supported allocation",
+      "reference_locator": "docs/CASE_BASED_INSPECTION.md sections 4 and 7",
+      "observed": {
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THIRD_PARTY_FINANCIAL",
+        "authorization_granted": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null
+      },
+      "comparison_verdict": "MATCH",
+      "disposition": "UNRESOLVED_AUTHORITY"
+    }
+  ]
+}
