@@ -339,6 +339,55 @@ def test_repair_only_status_defaults_false_and_contradictions_reject():
         for issue in caught.value.errors
     )
 
+    payload["damage"] = {
+        "replacement_parts": [{"category": "REPAIR_ONLY", "loss": 100}]
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.replacement_parts[0].category"
+        for issue in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize(
+    "actual_rescue",
+    [None, 100],
+    ids=("missing-actual", "mismatched-actual"),
+)
+def test_derived_classification_rescue_requires_matching_actual_expense(actual_rescue):
+    damage = {
+        "rescue_for_total_loss_test_irr": 101,
+        "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE",
+    }
+    if actual_rescue is not None:
+        damage["rescue_transport_actual_irr"] = actual_rescue
+    payload = {"claim_id": "X", "unit": "IRR", "damage": damage}
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.rescue_for_total_loss_test_source"
+        for issue in caught.value.errors
+    )
+
+
+def test_derived_classification_rescue_accepts_matching_actual_expense():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "damage": {
+                "rescue_transport_actual_irr": 101,
+                "rescue_for_total_loss_test_irr": 101,
+                "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE",
+            },
+        }
+    )
+
 
 def test_review_rejects_repair_only_marked_as_replacement(kb):
     payload = {

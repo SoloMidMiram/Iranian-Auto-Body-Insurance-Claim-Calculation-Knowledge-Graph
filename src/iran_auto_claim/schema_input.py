@@ -490,6 +490,47 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
 
     for group in _CLAIM_MONEY_ALIAS_GROUPS:
         _check_alias_group(payload, group, issues)
+    actual_rescue = next(
+        (
+            damage.get(name)
+            for name in (
+                "rescue",
+                "actual_rescue",
+                "rescue_transport_actual_irr",
+            )
+            if damage.get(name) is not None
+        ),
+        None,
+    )
+    threshold_rescue = next(
+        (
+            damage.get(name)
+            for name in (
+                "rescue_for_threshold",
+                "rescue_for_total_loss_test_irr",
+            )
+            if damage.get(name) is not None
+        ),
+        None,
+    )
+    if damage.get("rescue_for_total_loss_test_source") == "DERIVED_FROM_ACTUAL_RESCUE":
+        if actual_rescue is None:
+            issues.append(
+                SchemaIssue(
+                    CODE_CONTRADICTION,
+                    "damage.rescue_for_total_loss_test_source",
+                    "DERIVED_FROM_ACTUAL_RESCUE requires an actual-rescue operand",
+                )
+            )
+        elif threshold_rescue is not None and threshold_rescue != actual_rescue:
+            issues.append(
+                SchemaIssue(
+                    CODE_CONTRADICTION,
+                    "damage.rescue_for_total_loss_test_source",
+                    "DERIVED_FROM_ACTUAL_RESCUE requires the classification "
+                    "operand to match actual rescue",
+                )
+            )
     for index, part in enumerate(damage.get("parts") or []):
         if isinstance(part, dict):
             _check_local_aliases(
@@ -514,12 +555,14 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
                 f"damage.replacement_parts[{index}]",
                 issues,
             )
-            categories = {part.get("type"), part.get("category")}
-            if "REPAIR_ONLY" in categories:
+            repair_only_field = (
+                "type" if part.get("type") == "REPAIR_ONLY" else "category"
+            )
+            if part.get(repair_only_field) == "REPAIR_ONLY":
                 issues.append(
                     SchemaIssue(
                         CODE_CONTRADICTION,
-                        f"damage.replacement_parts[{index}].type",
+                        f"damage.replacement_parts[{index}].{repair_only_field}",
                         "replacement_parts cannot contain REPAIR_ONLY work",
                     )
                 )

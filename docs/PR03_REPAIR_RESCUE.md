@@ -273,7 +273,8 @@ The precedence contract is:
 1. if an explicit threshold operand is present, preserve and use it, including
    explicit zero;
 2. otherwise, if actual rescue is present, derive the threshold operand from
-   that amount and record `DERIVED_FROM_ACTUAL_RESCUE` provenance;
+   that amount and record `DERIVED_FROM_ACTUAL_RESCUE` provenance; an input
+   asserting that provenance must supply a matching actual-rescue operand;
 3. otherwise, use arithmetic zero only when the imported case explicitly opts
    into `rescue_omission_legacy_compatibility=true`, recording
    `EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission remains
@@ -500,6 +501,12 @@ remain nonpayable until the repository can validate the required assessment,
 authority and accepted interpretation. An assessment flagged as already
 including positive rescue likewise blocks until it is decomposed.
 
+The claim boundary rejects `DERIVED_FROM_ACTUAL_RESCUE` unless an actual-rescue
+operand exists and any separately supplied classification amount matches it.
+Replacement-only shorthand contradictions point to the carrier that supplied
+`REPAIR_ONLY` (`type` or `category`), so structured clients can identify the
+offending field without guessing.
+
 The review counterexample was reproduced before the correction with the
 Python 3.11 interpreter-bound environment: repair `7,400`, market value
 `10,000`, omitted rescue and a schema-valid documented override produced
@@ -524,8 +531,15 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
   -q
 # exit 0: 3 passed
 
+/tmp/body-model-pr03-venv311/bin/python -m pytest \
+  tests/test_schema_input.py::test_repair_only_status_defaults_false_and_contradictions_reject \
+  tests/test_schema_input.py::test_derived_classification_rescue_requires_matching_actual_expense \
+  tests/test_schema_input.py::test_derived_classification_rescue_accepts_matching_actual_expense \
+  -q
+# exit 0: 4 passed
+
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 610 passed, 4 xfailed
+# exit 0: 613 passed, 4 xfailed
 ```
 
 The project metadata now requires `>=3.11,<3.12`, and the repository workflow
