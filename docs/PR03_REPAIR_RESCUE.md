@@ -327,11 +327,14 @@ threshold-classified path and the engine produces no payable. This
 unresolved-rescue gate cannot be converted into payment by a classification
 override. Routes selected before the threshold, including evidenced theft,
 are not threshold-classified and are not blocked merely because an incidental
-repair assessment lacks a classification-rescue operand. Any rescue fact
-required by their settlement remains a separate branch-specific requirement.
-Overrides remain available for legitimate branch conflicts when the required
-classification operands are complete. Compatibility behavior must be selected
-explicitly and remains separately traceable from an evidenced zero.
+repair assessment lacks a classification-rescue operand when that route remains
+the final candidate. If an override instead selects `PARTIAL_DAMAGE`,
+`TOTAL_LOSS`, or `GLASS_ONLY`, the selected candidate route reactivates the
+missing-rescue gate even when the preliminary evidence-derived route was theft.
+Any rescue fact required by theft settlement remains a separate branch-specific
+requirement. Overrides remain available for legitimate branch conflicts when
+the required classification operands are complete. Compatibility behavior must
+be selected explicitly and remains separately traceable from an evidenced zero.
 
 A total-loss override cannot bypass an unresolved rescue-scope conflict or an
 embedded-rescue decomposition requirement merely because repair or market
@@ -464,6 +467,8 @@ payment authority belongs in PR-03.
 | `rescue_payable` only | Never enters actual or classification; remains settlement-only and ceiling-checked |
 | Actual plus `rescue_payable` | Existing above-actual and above-ceiling checks unchanged; threshold never reads payable |
 | Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable when the repair/rescue threshold participates, including when a documented classification override is supplied. A route selected before that threshold, such as evidenced theft, is not blocked by an incidental repair assessment alone. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
+| Evidence-derived theft, override selects partial or glass, rescue omitted | The final candidate route requires the threshold, so the result is `CLASSIFICATION_EVIDENCE_REQUIRED` with no payable. The preliminary theft route cannot lend its threshold exemption to the override-selected branch. |
+| Ordinary evidenced theft with incidental repair and omitted rescue, no threshold override | Remains theft and is not blocked merely by the incidental repair assessment; theft-specific evidence and settlement gates remain controlling. |
 | Evidence-complete branch conflict plus documented override | Existing authorized-override behavior remains available; the hard gate is specifically unresolved classification rescue, not overrides generally. |
 | Total-loss override plus conflicting or embedded rescue and an incomplete threshold pair | `CLASSIFICATION_EVIDENCE_REQUIRED`; no override, dispatch or uncaught exception |
 | Repair assessment excludes rescue plus a separate rescue operand | Rescue added exactly once; repair total remains rescue-exclusive |
@@ -502,9 +507,11 @@ fallback, settlement `rescue_payable` is never a source, and omitted legacy
 compatibility is accepted only through the explicit flag and traced as
 `EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission is unresolved and blocks a
 threshold-classified engine payable even when a documented classification
-override is supplied. An evidenced theft route selected before the threshold
-is not blocked merely because an incidental repair assessment omits that
-classification operand.
+override is supplied. Reconciliation checks both the evidence-derived route and
+the override-selected final candidate: an override from theft into partial,
+total-loss, or glass processing cannot inherit theft's threshold exemption. An
+evidenced theft route that remains the final candidate is not blocked merely
+because an incidental repair assessment omits that classification operand.
 Unequal actual/threshold operands
 remain nonpayable until the repository can validate the required assessment,
 authority and accepted interpretation. An assessment flagged as already
@@ -537,12 +544,14 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
 # exit 0: 2 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest \
+  tests/test_engine.py::test_override_into_threshold_branch_cannot_bypass_missing_rescue \
   tests/test_engine.py::test_missing_material_rescue_cannot_be_overridden_into_payment \
   tests/test_engine.py::test_missing_classification_rescue_does_not_block_whole_vehicle_theft \
   tests/test_engine.py::test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands \
   tests/test_engine.py::test_total_loss_override_cannot_bypass_unresolved_rescue \
+  tests/test_review.py::test_review_omitted_rescue_stays_missing_and_cannot_authorize \
   -q
-# exit 0: 5 passed
+# exit 0: 8 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest \
   tests/test_schema_input.py::test_repair_only_status_defaults_false_and_contradictions_reject \
@@ -554,7 +563,7 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
 # exit 0: 7 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 618 passed, 4 xfailed
+# exit 0: 621 passed, 4 xfailed
 ```
 
 The project metadata now requires `>=3.11,<3.12`, and the repository workflow
@@ -579,8 +588,9 @@ from `knowledge/customer_faq.json`.
 
 M25 kills an ignored replacement predicate, M26 kills a dropped
 Review-to-threshold rescue handoff, M27 kills the engine-boundary omitted
-rescue gate, and M28 kills an override bypass of that hard gate. The regenerated
-current mutation report is **28/28 killed**;
+rescue gate, M28 kills a general override bypass of that hard gate, and M29
+kills omission of the override-selected candidate route from threshold
+participation. The regenerated current mutation report is **29/29 killed**;
 historical 24/24 and Stage-0 records remain unchanged.
 Validation confirms that `OP_DEPRECIATION_REPLACEMENT_PART` names the
 replacement predicate and the total-loss rule still names separate

@@ -1277,6 +1277,7 @@ DISPATCH: dict[str, Callable[[Case, Knowledge, CalcResult], None]] = {
 }
 
 BODY_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"}
+RESCUE_THRESHOLD_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"}
 
 
 def _classification_evidence_gap(
@@ -1328,11 +1329,11 @@ def reconcile_classification(
     classification_rescue, rescue_source, unresolved_rescue = (
         case.classification_rescue()
     )
-    threshold_classification_participates = derived in {
-        "PARTIAL_DAMAGE",
-        "TOTAL_LOSS",
-        "GLASS_ONLY",
-    }
+    override = case.classification_override
+    threshold_classification_participates = (
+        derived in RESCUE_THRESHOLD_BRANCHES
+        or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)
+    )
     unresolved_rescue_gate = (
         unresolved_rescue is not None
         and (declared == "TOTAL_LOSS" or threshold_classification_participates)
@@ -1369,7 +1370,6 @@ def reconcile_classification(
         selected = None
         reason = f"declared {declared} conflicts with evidence-derived {derived}"
 
-    override = case.classification_override
     if (
         outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE")
         and override is not None

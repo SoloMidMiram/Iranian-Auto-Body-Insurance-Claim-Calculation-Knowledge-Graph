@@ -143,6 +143,13 @@ MUTATIONS = (
         "and override is not None\n        and True",
         "a classification override bypasses the unresolved-rescue payment gate",
     ),
+    Mutation(
+        "M29",
+        "src/iran_auto_claim/engine.py",
+        "or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)",
+        "or False",
+        "an override-selected threshold branch skips the missing-rescue evidence gate",
+    ),
 )
 
 THRESHOLD = 90.0

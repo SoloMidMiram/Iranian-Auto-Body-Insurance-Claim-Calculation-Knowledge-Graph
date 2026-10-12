@@ -619,6 +619,20 @@ def test_missing_rescue_assessment_evidence_blocks_authorization(kb):
     assert review.calculate() is None
 
 
+def test_review_omitted_rescue_stays_missing_and_cannot_authorize(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"].pop("Q-S4-07")
+    review = Review(payload, kb)
+
+    emitted = review.case_payload()
+    assert "rescue_transport_actual_irr" not in emitted["damage"]
+    assert "rescue_for_total_loss_test_irr" not in emitted["damage"]
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
 @pytest.mark.parametrize(
     "rescue,expected",
     [(99, "PARTIAL_DAMAGE"), (100, "PARTIAL_DAMAGE"), (101, "TOTAL_LOSS")],

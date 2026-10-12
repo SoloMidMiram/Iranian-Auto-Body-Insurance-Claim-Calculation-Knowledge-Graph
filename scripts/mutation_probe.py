@@ -315,6 +315,21 @@ def main() -> int:
     assert missing_rescue_result.payable is None
     assert missing_rescue_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
 
+    # A preliminary theft classification does not evaluate the repair/rescue
+    # threshold. If an override selects a threshold-dependent final branch,
+    # that candidate route must re-apply the missing-rescue evidence gate.
+    override_from_theft = copy.deepcopy(missing_rescue)
+    override_from_theft["claim_id"] = "override-from-theft-missing-rescue-probe"
+    override_from_theft["damage"].update(
+        {"theft_type": "WHOLE_VEHICLE", "days_missing": 10}
+    )
+    override_from_theft_result = compute(
+        _authorize_fixture_case(override_from_theft, kb), kb
+    )
+    assert override_from_theft_result.payable is None
+    assert override_from_theft_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert override_from_theft_result.fields["classification"]["derived_branch"] == "THEFT"
+
     partial = {
         "claim_id": "runtime-defect-probe",
         "unit": "IRR",
