@@ -115,6 +115,41 @@ MUTATIONS = (
         "derived_days = _dated_theft_clock_days(clock)",
         "the theft clock can use a date that disagrees with its selected event",
     ),
+    Mutation(
+        "M25",
+        "src/iran_auto_claim/operators.py",
+        "if not requires_replacement:\n        rate = Decimal(0)",
+        "if False:\n        rate = Decimal(0)",
+        "repair-only work receives replacement-part depreciation",
+    ),
+    Mutation(
+        "M26",
+        "src/iran_auto_claim/review.py",
+        'damage["rescue_for_total_loss_test_irr"] = irr(rescue_actual)',
+        'damage["rescue_for_total_loss_test_irr"] = 0',
+        "Review drops evidenced rescue from the total-loss classification numerator",
+    ),
+    Mutation(
+        "M27",
+        "src/iran_auto_claim/engine.py",
+        'and rescue_source == "UNRESOLVED_MISSING_RESCUE"',
+        "and False",
+        "omitted material rescue is treated as zero and allowed to authorize payment",
+    ),
+    Mutation(
+        "M28",
+        "src/iran_auto_claim/engine.py",
+        "and override is not None\n        and not unresolved_rescue_gate",
+        "and override is not None\n        and True",
+        "a classification override bypasses the unresolved-rescue payment gate",
+    ),
+    Mutation(
+        "M29",
+        "src/iran_auto_claim/engine.py",
+        "or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)",
+        "or False",
+        "an override-selected threshold branch skips the missing-rescue evidence gate",
+    ),
 )
 
 THRESHOLD = 90.0
@@ -172,8 +207,9 @@ def _render(results: list[tuple[Mutation, bool]]) -> str:
         "",
         (
             "- Target modules: `plans.py`, `operators.py`, the guard-plan gate in "
-            "`engine.py`, canonical calendar validation in `dates.py`, and the "
-            "authorization boundary in `admission.py`"
+            "`engine.py`, Review operand construction in `review.py`, canonical "
+            "calendar validation in `dates.py`, and the authorization boundary "
+            "in `admission.py`"
         ),
         f"- Required score: **{THRESHOLD:.0f}%**",
         f"- Result: **{killed}/{total} killed ({score:.1f}%)**",

@@ -34,7 +34,7 @@ from .admission import (
     CalculationAuthorization,
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
-from .classify import classify
+from .classify import ClassificationEvidenceRequired, classify
 from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
 from .plans import (
@@ -807,10 +807,15 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("TOTAL_LOSS")
     market = case.market_value
     repair = case.repair_total
+    classification_rescue, rescue_source, unresolved = case.classification_rescue()
+    if unresolved is not None:
+        raise ClassificationEvidenceRequired(unresolved)
     is_total, combined, threshold = operators.is_total_loss(
-        repair, case.rescue_for_threshold, market
+        repair, classification_rescue, market
     )
     if combined is not None:
+        res.fields["classification_rescue"] = classification_rescue
+        res.fields["classification_rescue_source"] = rescue_source
         res.fields["combined_for_threshold"] = combined
         res.fields["threshold_value"] = threshold
         res.fields["threshold_ratio"] = combined / market if market else None
@@ -1272,6 +1277,7 @@ DISPATCH: dict[str, Callable[[Case, Knowledge, CalcResult], None]] = {
 }
 
 BODY_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"}
+RESCUE_THRESHOLD_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"}
 
 
 def _classification_evidence_gap(
@@ -1301,19 +1307,60 @@ def _classification_evidence_gap(
 def reconcile_classification(
     case: Case, kb: Knowledge
 ) -> tuple[dict[str, Any], str | None, str | None]:
-    verdict = classify(case, kb)
+    try:
+        verdict = classify(case, kb)
+    except ClassificationEvidenceRequired as error:
+        reason = str(error)
+        return (
+            {
+                "declared_branch": case.declared_branch,
+                "declared_canonical_branch": case.branch,
+                "derived_branch": None,
+                "outcome": "INSUFFICIENT_EVIDENCE",
+                "confidence": 0.0,
+                "basis": [reason],
+                "reason": reason,
+            },
+            None,
+            reason,
+        )
     derived = verdict["branch"]
     declared = case.branch
-    gap = _classification_evidence_gap(case, declared, derived)
+    classification_rescue, rescue_source, unresolved_rescue = (
+        case.classification_rescue()
+    )
+    override = case.classification_override
+    threshold_classification_participates = (
+        derived in RESCUE_THRESHOLD_BRANCHES
+        or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)
+    )
+    unresolved_rescue_gate = (
+        unresolved_rescue is not None
+        and (declared == "TOTAL_LOSS" or threshold_classification_participates)
+    ) or (
+        threshold_classification_participates
+        and case.repair_total is not None
+        and case.market_value is not None
+        and classification_rescue is None
+        and rescue_source == "UNRESOLVED_MISSING_RESCUE"
+    )
+    if unresolved_rescue_gate:
+        gap = unresolved_rescue or (
+            "classification rescue is missing; a non-negative amount could change the "
+            "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
+            "payment and this evidence gate cannot be overridden"
+        )
+    else:
+        gap = _classification_evidence_gap(case, declared, derived)
 
-    if declared is None:
-        outcome = "MATCH"
-        selected = derived
-        reason = "no branch was declared; the evidence-derived branch is authoritative"
-    elif gap:
+    if gap:
         outcome = "INSUFFICIENT_EVIDENCE"
         selected = None
         reason = gap
+    elif declared is None:
+        outcome = "MATCH"
+        selected = derived
+        reason = "no branch was declared; the evidence-derived branch is authoritative"
     elif declared == derived:
         outcome = "MATCH"
         selected = declared
@@ -1323,8 +1370,11 @@ def reconcile_classification(
         selected = None
         reason = f"declared {declared} conflicts with evidence-derived {derived}"
 
-    override = case.classification_override
-    if outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE") and override is not None:
+    if (
+        outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE")
+        and override is not None
+        and not unresolved_rescue_gate
+    ):
         outcome = "AUTHORIZED_OVERRIDE"
         selected = declared
         reason = "documented classification override authorizes the declared branch"
@@ -1519,6 +1569,12 @@ def compute(
         res.fields["classification"] = reconciliation
         if case.repair_total is not None and case.market_value is not None:
             res.note_rule("REG53_ART19_TOTAL_LOSS_THRESHOLD")
+            classification_rescue, rescue_source, unresolved_rescue = (
+                case.classification_rescue()
+            )
+            if unresolved_rescue is None:
+                res.fields["classification_rescue"] = classification_rescue
+                res.fields["classification_rescue_source"] = rescue_source
         if reconciliation["outcome"] == "CONFLICT":
             res.payable = None
             res.status = "CLASSIFICATION_CONFLICT"
@@ -1596,6 +1652,15 @@ def compute(
         res.reason = str(error)
         res.fields["execution_plan_error"] = str(error)
         res.label("EXECUTION_PLAN_INVALID")
+    except ClassificationEvidenceRequired as error:
+        res.payable = None
+        res.status = "CLASSIFICATION_EVIDENCE_REQUIRED"
+        res.reason = str(error)
+        classification = res.fields.get("classification")
+        if isinstance(classification, dict):
+            classification["outcome"] = "INSUFFICIENT_EVIDENCE"
+            classification["reason"] = str(error)
+        res.label("CLASSIFICATION_EVIDENCE_REQUIRED")
     except operators.OperatorError as error:
         res.payable = None
         res.status = "INPUT_ERROR"

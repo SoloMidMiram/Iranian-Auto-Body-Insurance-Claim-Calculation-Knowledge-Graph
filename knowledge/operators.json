@@ -5,8 +5,8 @@
     {
       "node_id": "OP_DEPRECIATION_REPLACEMENT_PART",
       "type": "DEPRECIATION",
-      "formula": "year_index = claim_year - production_year + 1; rate = 0 if year_index < 5 else min(0.25, 0.05 * (year_index - 4)); amount = depreciable_base * rate",
-      "inputs": ["production_year", "claim_year", "part_category", "depreciable_base"],
+      "formula": "rate = 0 when requires_replacement is false; otherwise year_index = claim_year - production_year + 1 and rate = 0 if year_index < 5 else min(0.25, 0.05 * (year_index - 4)); amount = depreciable_base * rate",
+      "inputs": ["production_year", "claim_year", "part_category", "requires_replacement", "depreciable_base"],
       "outputs": ["depreciation_rate", "depreciation_amount"],
       "applies_to_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
       "scope": "ALL_REPLACEMENT_PARTS_EXCEPT_GLASS_AND_LAMP_GLASS",

@@ -14,6 +14,17 @@ from iran_auto_claim.money import D
 
 
 def _case(branch: str, **inputs):
+    if any(key in inputs for key in ("repair", "repair_total", "repair_total_irr")) and not any(
+        key in inputs
+        for key in (
+            "actual_rescue",
+            "rescue",
+            "rescue_transport_actual_irr",
+            "rescue_for_threshold",
+            "rescue_for_total_loss_test_irr",
+        )
+    ):
+        inputs["rescue_for_threshold"] = 0
     if branch == "PARTIAL_DAMAGE":
         if not any(key in inputs for key in ("market", "insured")):
             inputs["market"] = 10**12

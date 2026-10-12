@@ -387,7 +387,11 @@ class Review:
             return bool(ratio) and branch in ("PARTIAL_DAMAGE", "GLASS_ONLY") and float(ratio) < 1.0
         if uncertainty_id == "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION":
             parts = [item for item in _as_list(slot("PS_PART_CATEGORY")) if isinstance(item, dict)]
-            special = any(str(item.get("category")) in ("BATTERY", "TIRE") for item in parts)
+            special = any(
+                str(item.get("category")) in ("BATTERY", "TIRE")
+                and bool(item.get("requires_replacement", True))
+                for item in parts
+            )
             year = slot("PS_PRODUCTION_YEAR")
             claim_year = slot("PS_CLAIM_YEAR")
             index = (int(claim_year) - int(year) + 1) if year is not None and claim_year is not None else 0
@@ -501,7 +505,9 @@ class Review:
                     record: dict[str, Any] = {
                         "category": category,
                         "assessed_loss_irr": irr(item.get("assessed_loss", item.get("assessed_loss_irr", 0))),
-                        "requires_replacement": bool(item.get("requires_replacement", True)),
+                        "requires_replacement": bool(
+                            item.get("requires_replacement", category != "REPAIR_ONLY")
+                        ),
                     }
                     if isinstance(item.get("name"), str) and item["name"]:
                         record["name"] = item["name"]
@@ -584,6 +590,9 @@ class Review:
         ):
             if (value := slot_value(slot)) is not None:
                 damage[key] = irr(value)
+        if (rescue_actual := slot_value("PS_RESCUE_ACTUAL")) is not None:
+            damage["rescue_for_total_loss_test_irr"] = irr(rescue_actual)
+            damage["rescue_for_total_loss_test_source"] = "DERIVED_FROM_ACTUAL_RESCUE"
 
         config: dict[str, Any] = {}
         for key, slot in (

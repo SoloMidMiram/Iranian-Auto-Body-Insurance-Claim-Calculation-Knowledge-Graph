@@ -33,6 +33,7 @@ CODE_JSON = "invalid_json"
 CODE_DATE = "invalid_date"
 CODE_CHRONOLOGY = "invalid_chronology"
 CODE_CONFLICT = "conflicting_alias"
+CODE_CONTRADICTION = "contradictory_input"
 CODE_YEAR = "conflicting_year"
 CODE_INVALID_YEAR = "invalid_year"
 
@@ -489,6 +490,56 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
 
     for group in _CLAIM_MONEY_ALIAS_GROUPS:
         _check_alias_group(payload, group, issues)
+    actual_rescue = next(
+        (
+            damage.get(name)
+            for name in (
+                "rescue",
+                "actual_rescue",
+                "rescue_transport_actual_irr",
+            )
+            if damage.get(name) is not None
+        ),
+        None,
+    )
+    threshold_rescue = next(
+        (
+            damage.get(name)
+            for name in (
+                "rescue_for_threshold",
+                "rescue_for_total_loss_test_irr",
+            )
+            if damage.get(name) is not None
+        ),
+        None,
+    )
+    rescue_source = damage.get("rescue_for_total_loss_test_source")
+    if rescue_source == "DERIVED_FROM_ACTUAL_RESCUE":
+        if actual_rescue is None:
+            issues.append(
+                SchemaIssue(
+                    CODE_CONTRADICTION,
+                    "damage.rescue_for_total_loss_test_source",
+                    "DERIVED_FROM_ACTUAL_RESCUE requires an actual-rescue operand",
+                )
+            )
+        elif threshold_rescue is not None and threshold_rescue != actual_rescue:
+            issues.append(
+                SchemaIssue(
+                    CODE_CONTRADICTION,
+                    "damage.rescue_for_total_loss_test_source",
+                    "DERIVED_FROM_ACTUAL_RESCUE requires the classification "
+                    "operand to match actual rescue",
+                )
+            )
+    elif rescue_source == "EXPLICIT_THRESHOLD_OPERAND" and threshold_rescue is None:
+        issues.append(
+            SchemaIssue(
+                CODE_CONTRADICTION,
+                "damage.rescue_for_total_loss_test_source",
+                "EXPLICIT_THRESHOLD_OPERAND requires a classification-rescue operand",
+            )
+        )
     for index, part in enumerate(damage.get("parts") or []):
         if isinstance(part, dict):
             _check_local_aliases(
@@ -497,6 +548,14 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
                 f"damage.parts[{index}]",
                 issues,
             )
+            if part.get("category") == "REPAIR_ONLY" and part.get("requires_replacement") is True:
+                issues.append(
+                    SchemaIssue(
+                        CODE_CONTRADICTION,
+                        f"damage.parts[{index}].requires_replacement",
+                        "REPAIR_ONLY work cannot be marked as requiring replacement",
+                    )
+                )
     for index, part in enumerate(damage.get("replacement_parts") or []):
         if isinstance(part, dict):
             _check_local_aliases(
@@ -505,6 +564,17 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
                 f"damage.replacement_parts[{index}]",
                 issues,
             )
+            repair_only_field = (
+                "type" if part.get("type") == "REPAIR_ONLY" else "category"
+            )
+            if part.get(repair_only_field) == "REPAIR_ONLY":
+                issues.append(
+                    SchemaIssue(
+                        CODE_CONTRADICTION,
+                        f"damage.replacement_parts[{index}].{repair_only_field}",
+                        "replacement_parts cannot contain REPAIR_ONLY work",
+                    )
+                )
     return issues
 
 
@@ -785,6 +855,14 @@ def _check_review_list(
                     CODE_BOOLEAN,
                     f"{item_path}.requires_replacement",
                     "value must be a JSON boolean",
+                )
+            )
+        if category == "REPAIR_ONLY" and item.get("requires_replacement") is True:
+            issues.append(
+                SchemaIssue(
+                    CODE_CONTRADICTION,
+                    f"{item_path}.requires_replacement",
+                    "REPAIR_ONLY work cannot be marked as requiring replacement",
                 )
             )
 

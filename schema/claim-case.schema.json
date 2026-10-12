@@ -376,6 +376,21 @@
           "minimum": 0,
           "description": "Rescue amount admitted to the Article 19 total-loss numerator; distinct from settlement rescue actual/payable values."
         },
+        "rescue_for_total_loss_test_source": {
+          "enum": [
+            "EXPLICIT_THRESHOLD_OPERAND",
+            "DERIVED_FROM_ACTUAL_RESCUE"
+          ],
+          "description": "Provenance for the distinct total-loss classification rescue operand. DERIVED_FROM_ACTUAL_RESCUE requires a matching actual-rescue operand; EXPLICIT_THRESHOLD_OPERAND requires a supplied threshold operand. Neither provenance token can be asserted independently."
+        },
+        "repair_total_includes_rescue": {
+          "type": "boolean",
+          "description": "True only when the supplied repair/replacement aggregate already embeds rescue; a positive separate rescue then requires evidenced decomposition before classification."
+        },
+        "rescue_omission_legacy_compatibility": {
+          "type": "boolean",
+          "description": "Explicit opt-in for a legacy imported case that historically treated omitted rescue as arithmetic zero. It is not evidence that no rescue occurred and is never emitted by Review."
+        },
         "assessed_depreciation_irr": {
           "type": [
             "integer",

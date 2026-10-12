@@ -13,7 +13,21 @@ from iran_auto_claim.money import D
 from iran_auto_claim.schema_input import InputSchemaError
 
 
-def _case(branch=None, **inputs):
+def _build_case(branch=None, *, default_missing_rescue: bool, **inputs):
+    if default_missing_rescue and any(
+        key in inputs for key in ("repair", "repair_total", "repair_total_irr")
+    ) and not any(
+        key in inputs
+        for key in (
+            "actual_rescue",
+            "rescue",
+            "rescue_transport_actual_irr",
+            "rescue_for_threshold",
+            "rescue_for_total_loss_test_irr",
+            "rescue_omission_legacy_compatibility",
+        )
+    ):
+        inputs["rescue_for_threshold"] = 0
     if branch in ("PARTIAL_DAMAGE", "THEFT_PARTIAL_DAMAGE"):
         if not any(key in inputs for key in ("market", "market_value", "insured", "insured_sum")):
             inputs["market"] = 10**12
@@ -84,6 +98,15 @@ def _case(branch=None, **inputs):
             }
         }
     return payload
+
+
+def _case(branch=None, **inputs):
+    return _build_case(branch, default_missing_rescue=True, **inputs)
+
+
+def _case_without_rescue_default(branch=None, **inputs):
+    """Build adversarial evidence exactly as supplied, including rescue omission."""
+    return _build_case(branch, default_missing_rescue=False, **inputs)
 
 
 # --------------------------------------------------------------- classifier
@@ -674,6 +697,25 @@ def test_actual_and_payable_rescue_operands_remain_distinct_through_calculation(
     assert both_result.fields["rescue_payable_supplied"] == D(150)
     assert both_result.fields["allowable_rescue_transport"] == D(150)
 
+    classified = _case(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7000,
+        repair=7000,
+        actual_rescue=300,
+        rescue_payable=150,
+        franchise=0,
+    )
+    classified["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    classified_result = compute(classified, kb)
+    assert classified_result.fields["classification_rescue"] == D(300)
+    assert (
+        classified_result.fields["classification_rescue_source"]
+        == "DERIVED_FROM_ACTUAL_RESCUE"
+    )
+    assert classified_result.fields["allowable_rescue_transport"] == D(150)
+
 
 def test_supplied_rescue_payable_above_actual_or_ceiling_is_refused(kb):
     above_actual = _case(
@@ -1049,6 +1091,160 @@ def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
     assert result.fields["classification"]["outcome"] == "MATCH"
 
 
+def test_unequal_actual_and_classification_rescue_needs_accepted_interpretation(kb):
+    result = compute(
+        _case(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            repair=7400,
+            actual_rescue=200,
+            rescue_for_threshold=100,
+            franchise=0,
+        ),
+        kb,
+    )
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "applicable authority" in result.reason
+
+
+def test_embedded_rescue_must_be_decomposed_before_threshold_addition(kb):
+    result = compute(
+        _case(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            repair=7400,
+            actual_rescue=200,
+            repair_total_includes_rescue=True,
+            franchise=0,
+        ),
+        kb,
+    )
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert "evidenced decomposition" in result.reason
+
+
+@pytest.mark.parametrize("declared_branch", [True, False])
+def test_missing_material_rescue_blocks_internal_partial_payment(kb, declared_branch):
+    payload = _case_without_rescue_default(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        franchise=0,
+    )
+    if not declared_branch:
+        payload["classification"].pop("branch")
+    result = compute(payload, kb)
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "preliminary zero cannot authorize payment" in result.reason
+
+
+def test_missing_material_rescue_cannot_be_overridden_into_payment(kb):
+    payload = _case_without_rescue_default(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        franchise=0,
+    )
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented partial-loss branch selection",
+        "source": "review-board-record-2026-42",
+        "timestamp": "2026-10-12T04:00:00Z",
+    }
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "preliminary zero cannot authorize payment" in result.reason
+
+
+def test_missing_classification_rescue_does_not_block_whole_vehicle_theft(kb):
+    payload = _case_without_rescue_default(
+        "THEFT",
+        theft_type="WHOLE_VEHICLE",
+        days_missing=65,
+        market=10000,
+        insured=10000,
+        repair=7400,
+        franchise=1000,
+        title_transferred=True,
+        salvage_disposition="INSURER_TAKES_TITLE",
+    )
+    result = compute(payload, kb)
+
+    assert result.payable == D(9000)
+    assert result.fields["classification"]["outcome"] == "MATCH"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert not any(
+        "75% threshold" in item
+        for item in result.fields["classification"]["basis"]
+    )
+
+
+@pytest.mark.parametrize("declared_branch", ["PARTIAL_DAMAGE", "GLASS_ONLY"])
+def test_override_into_threshold_branch_cannot_bypass_missing_rescue(
+    kb, declared_branch
+):
+    payload = _case_without_rescue_default(
+        declared_branch,
+        theft_type="WHOLE_VEHICLE",
+        days_missing=10,
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        franchise=0,
+    )
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented non-theft branch selection",
+        "source": "review-board-record-2026-44",
+        "timestamp": "2026-10-12T06:00:00Z",
+    }
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "preliminary zero cannot authorize payment" in result.reason
+
+
+def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
+    payload = _case(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7400,
+        repair=7400,
+        rescue_omission_legacy_compatibility=True,
+        franchise=0,
+    )
+    result = compute(payload, kb)
+    assert result.payable == D(7400)
+    assert result.fields["classification_rescue"] == D(0)
+    assert (
+        result.fields["classification_rescue_source"]
+        == "EXPLICIT_LEGACY_DEFAULT_ZERO"
+    )
+
+
 def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):
     result = compute(_case("TOTAL_LOSS", market=100, insured=100, franchise=10), kb)
     classification = result.fields["classification"]
@@ -1058,8 +1254,12 @@ def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):
     assert "repair-and-replacement assessment" in result.reason
 
 
-def test_documented_authorized_override_can_select_declared_total_loss(kb):
-    payload = _case("TOTAL_LOSS", market=100, insured=100, franchise=10)
+def test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands(
+    kb,
+):
+    payload = _case(
+        "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10
+    )
     payload["classification"]["override"] = {
         "authorized": True,
         "actor": "senior-adjuster-17",
@@ -1074,3 +1274,47 @@ def test_documented_authorized_override_can_select_declared_total_loss(kb):
     assert classification["override"]["actor"] == "senior-adjuster-17"
     assert result.fields["total_loss_threshold_override"] is True
     assert "AUTHORIZED_CLASSIFICATION_OVERRIDE" in result.labels
+
+
+@pytest.mark.parametrize(
+    ("inputs", "reason_fragment"),
+    [
+        (
+            {
+                "market": 100,
+                "insured": 100,
+                "actual_rescue": 20,
+                "rescue_for_threshold": 10,
+            },
+            "actual and explicit classification rescue differ",
+        ),
+        (
+            {
+                "insured": 100,
+                "repair": 80,
+                "actual_rescue": 10,
+                "repair_total_includes_rescue": True,
+            },
+            "repair/replacement already includes rescue",
+        ),
+    ],
+    ids=("conflicting-rescue", "embedded-rescue"),
+)
+def test_total_loss_override_cannot_bypass_unresolved_rescue(
+    kb, inputs, reason_fragment
+):
+    payload = _case("TOTAL_LOSS", franchise=10, **inputs)
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented total-loss branch selection",
+        "source": "review-board-record-2026-43",
+        "timestamp": "2026-10-12T05:00:00Z",
+    }
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert reason_fragment in result.reason

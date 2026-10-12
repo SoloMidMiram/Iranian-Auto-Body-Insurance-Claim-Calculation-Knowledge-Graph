@@ -309,6 +309,143 @@ def test_distinct_money_operands_and_contractual_carriers_are_not_aliases():
     )
 
 
+def test_repair_only_status_defaults_false_and_contradictions_reject():
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "regulatory_snapshot": {"iranian_year": 1405},
+        "vehicle": {"production_year_shamsi": 1400},
+        "damage": {"parts": [{"category": "REPAIR_ONLY", "assessed_loss": 100}]},
+    }
+    assert validated_case(payload).parts[0]["requires_replacement"] is False
+
+    payload["damage"]["parts"][0]["requires_replacement"] = True
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.parts[0].requires_replacement"
+        for issue in caught.value.errors
+    )
+
+    payload["damage"] = {
+        "replacement_parts": [{"type": "REPAIR_ONLY", "loss": 100}]
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.replacement_parts[0].type"
+        for issue in caught.value.errors
+    )
+
+    payload["damage"] = {
+        "replacement_parts": [{"category": "REPAIR_ONLY", "loss": 100}]
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.replacement_parts[0].category"
+        for issue in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize(
+    "actual_rescue",
+    [None, 100],
+    ids=("missing-actual", "mismatched-actual"),
+)
+def test_derived_classification_rescue_requires_matching_actual_expense(actual_rescue):
+    damage = {
+        "rescue_for_total_loss_test_irr": 101,
+        "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE",
+    }
+    if actual_rescue is not None:
+        damage["rescue_transport_actual_irr"] = actual_rescue
+    payload = {"claim_id": "X", "unit": "IRR", "damage": damage}
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.rescue_for_total_loss_test_source"
+        for issue in caught.value.errors
+    )
+
+
+def test_derived_classification_rescue_accepts_matching_actual_expense():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "damage": {
+                "rescue_transport_actual_irr": 101,
+                "rescue_for_total_loss_test_irr": 101,
+                "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE",
+            },
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    "actual_rescue",
+    [None, 101],
+    ids=("without-actual", "with-incidental-actual"),
+)
+def test_explicit_classification_rescue_source_requires_threshold_operand(
+    actual_rescue,
+):
+    damage = {
+        "rescue_for_total_loss_test_source": "EXPLICIT_THRESHOLD_OPERAND",
+    }
+    if actual_rescue is not None:
+        damage["rescue_transport_actual_irr"] = actual_rescue
+    payload = {"claim_id": "X", "unit": "IRR", "damage": damage}
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.rescue_for_total_loss_test_source"
+        for issue in caught.value.errors
+    )
+
+
+def test_explicit_classification_rescue_source_accepts_threshold_operand():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "damage": {
+                "rescue_for_total_loss_test_irr": 101,
+                "rescue_for_total_loss_test_source": "EXPLICIT_THRESHOLD_OPERAND",
+            },
+        }
+    )
+
+
+def test_review_rejects_repair_only_marked_as_replacement(kb):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S4-03": [
+                {
+                    "category": "REPAIR_ONLY",
+                    "assessed_loss": 100,
+                    "requires_replacement": True,
+                }
+            ]
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    assert any(issue.code == "contradictory_input" for issue in caught.value.errors)
+
+
 def test_review_part_new_price_aliases_must_agree(kb):
     payload = {
         "claim_id": "X",

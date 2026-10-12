@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import copy
+import json
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 from iran_auto_claim.admission import (
     ISSUER_REVIEW,
@@ -35,6 +37,7 @@ from iran_auto_claim.plans import (
     graph_total_loss_payable,
     validate_active_sequence,
 )
+from iran_auto_claim.review import Review
 
 
 def main() -> int:
@@ -243,6 +246,34 @@ def main() -> int:
     assert tire_result["loss_after_depreciation"] == Decimal(90)
     assert tire_result["depreciation_amount"] == Decimal(10)
 
+    repair_only = eligible_part_loss(
+        {
+            "category": "REPAIR_ONLY",
+            "assessed_loss": Decimal(120),
+            "new_price": None,
+            "requires_replacement": False,
+        },
+        1399,
+        1404,
+    )
+    assert repair_only["capped_loss"] == Decimal(120)
+    assert repair_only["depreciation_amount"] == Decimal(0)
+
+    review_payload = json.loads(
+        (Path(__file__).resolve().parents[1] / "cases" / "review_t1_fullcover_partial.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    review_payload["answers"]["Q-S5-01"] = 10000
+    review_payload["answers"]["Q-S5-02"] = 10000
+    review_payload["answers"]["Q-S5-03"] = 1404
+    review_payload["answers"]["Q-S4-02"] = 0
+    review_payload["answers"]["Q-S4-03"] = [
+        {"category": "OTHER_REPLACEMENT_PART", "assessed_loss": 7400}
+    ]
+    review_payload["answers"]["Q-S4-07"] = 200
+    assert Review(review_payload, kb).classification()["branch"] == "TOTAL_LOSS"
+
     sourced_absolute = {
         "mode": "ABSOLUTE",
         "absolute_irr": 10,
@@ -250,6 +281,55 @@ def main() -> int:
         "source_reference": "mutation probe schedule",
         "source_version": "TEST-v1",
     }
+    missing_rescue = {
+        "claim_id": "missing-rescue-probe",
+        "unit": "IRR",
+        "classification": {
+            "branch": "PARTIAL_DAMAGE",
+            "domain": "BODY",
+            "override": {
+                "authorized": True,
+                "actor": "mutation-probe-adjuster",
+                "reason": "documented branch selection",
+                "source": "mutation-probe-review-board",
+                "timestamp": "2026-10-12T04:00:00Z",
+            },
+        },
+        "event": {"event_date": "1405/06/01"},
+        "coverage_gate": {"causal_relationship_established": True},
+        "damage": {
+            "gross": 7400,
+            "repair": 7400,
+            "market": 10000,
+            "insured": 10000,
+        },
+        "policy": {
+            "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+            "franchise": sourced_absolute,
+        },
+    }
+    missing_rescue_result = compute(
+        _authorize_fixture_case(missing_rescue, kb), kb
+    )
+    assert missing_rescue_result.payable is None
+    assert missing_rescue_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+
+    # A preliminary theft classification does not evaluate the repair/rescue
+    # threshold. If an override selects a threshold-dependent final branch,
+    # that candidate route must re-apply the missing-rescue evidence gate.
+    override_from_theft = copy.deepcopy(missing_rescue)
+    override_from_theft["claim_id"] = "override-from-theft-missing-rescue-probe"
+    override_from_theft["damage"].update(
+        {"theft_type": "WHOLE_VEHICLE", "days_missing": 10}
+    )
+    override_from_theft_result = compute(
+        _authorize_fixture_case(override_from_theft, kb), kb
+    )
+    assert override_from_theft_result.payable is None
+    assert override_from_theft_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert override_from_theft_result.fields["classification"]["derived_branch"] == "THEFT"
+
     partial = {
         "claim_id": "runtime-defect-probe",
         "unit": "IRR",
@@ -300,6 +380,7 @@ def main() -> int:
             "market": 2000,
             "insured": 2000,
             "repair": 1600,
+            "rescue_for_threshold": 0,
             "salvage": 300,
             "salvage_disposition": "INSURED_RETAINS",
         },

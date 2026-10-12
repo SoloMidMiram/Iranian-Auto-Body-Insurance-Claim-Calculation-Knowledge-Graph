@@ -460,7 +460,15 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
 
     cases = (
         ("PARTIAL_DAMAGE", {"gross": 1600}),
-        ("TOTAL_LOSS", {"market": 2000, "insured": 2000, "repair": 1900}),
+        (
+            "TOTAL_LOSS",
+            {
+                "market": 2000,
+                "insured": 2000,
+                "repair": 1900,
+                "rescue_for_threshold": 0,
+            },
+        ),
         ("GLASS_ONLY", {"gross": 1600}),
         (
             "THEFT",

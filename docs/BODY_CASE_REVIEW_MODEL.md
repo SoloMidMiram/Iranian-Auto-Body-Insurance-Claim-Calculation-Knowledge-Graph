@@ -296,7 +296,7 @@ the evidence it demands and the rung it belongs to
 | Q-S4-08 | What is the probable salvage value, and does the insured accept it? _(asked when: `{"branch_is": ["TOTAL_LOSS"]}`)_ | money | PS_SALVAGE_VALUE | EVT_SALVAGE_VALUATION | amount | T2 |
 | Q-S4-09 | Who keeps the wreck? _(asked when: `{"branch_is": ["TOTAL_LOSS"]}`)_ | NOT_APPLICABLE, INSURED_RETAINS, INSURER_TAKES_TITLE, UNRESOLVED | PS_SALVAGE_DISPOSITION | EVT_SALVAGE_VALUATION | amount | T2 |
 | Q-S4-10 | Is the vehicle repairable at all, or is repair technically impossible? _(asked when: `{"not": {"slot_present": "PS_DAYS_MISSING"}}`)_ | REPAIRABLE, TECHNICALLY_IRREPAIRABLE, ECONOMICALLY_TOTAL, UNKNOWN | - | EVT_ASSESSMENT_REPORT | hard | T2 |
-| Q-S4-11 | Where the assessment cannot be itemised, what is the aggregate repair-and-replacement figure? _(asked when: `{"answer_is": ["Q-S4-01", "AGGREGATE_ONLY"]}`)_ | money | PS_GROSS_DAMAGE, PS_REPAIR_TOTAL | EVT_ASSESSMENT_REPORT | hard | T0 |
+| Q-S4-11 | Where the assessment cannot be itemised, what is the aggregate repair-and-replacement figure excluding rescue and transport? _(asked when: `{"answer_is": ["Q-S4-01", "AGGREGATE_ONLY"]}`)_ | money | PS_GROSS_DAMAGE, PS_REPAIR_TOTAL | EVT_ASSESSMENT_REPORT | hard | T0 |
 | Q-S5-01 | What was the transactional value of the vehicle on the day of the event, and on what evidence? | money | PS_MARKET_VALUE | EVT_MARKET_VALUE_EVIDENCE, EVT_ASSESSMENT_REPORT | hard | T0 |
 | Q-S5-02 | What insured sum does the policy state for the year of the event? | money | PS_INSURED_SUM | EVT_POLICY_COPY | hard | T0 |
 | Q-S5-03 | What is the production (model) year, taken from the registration or the policy schedule? | integer | PS_PRODUCTION_YEAR | EVT_OWNERSHIP_DOCS, EVT_POLICY_COPY | amount | T1 |
@@ -363,7 +363,7 @@ where people most often get it wrong.
 | PS_PERIL | enum | REGULATION | Q-S2-01 | REFUSE | - | G_NO_ASSUMED_CAUSATION | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_PRODUCTION_YEAR | integer | REGULATION | Q-S5-03 | ASSESSOR_REQUIRED | - | - | PARTIAL_DAMAGE, GLASS_ONLY |
 | PS_REPAIR_TOTAL | money | ASSESSOR | Q-S4-01, Q-S4-11 | ASSESSOR_REQUIRED | - | - | TOTAL_LOSS, PARTIAL_DAMAGE |
-| PS_RESCUE_ACTUAL | money | REGULATION | Q-S4-07 | TREAT_AS_ZERO | - | - | PARTIAL_DAMAGE, TOTAL_LOSS |
+| PS_RESCUE_ACTUAL | money | REGULATION | Q-S4-07 | BLOCK_IF_MATERIAL | - | - | PARTIAL_DAMAGE, TOTAL_LOSS |
 | PS_RESCUE_CAP_BASE | enum | ADJUSTER_CONFIG | Q-S8-03 | BLOCK_IF_MATERIAL | U05_RESCUE_DENOMINATOR | - | PARTIAL_DAMAGE, TOTAL_LOSS |
 | PS_RISK_INTENSIFICATION | boolean | REGULATION | Q-S3-07 | REVIEW_GATE | - | G_NO_ASSUMED_CAUSATION | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_SALVAGE_DISPOSITION | enum | REGULATION | Q-S4-09 | SCENARIO_SET | U12_SALVAGE_DISPOSITION | - | TOTAL_LOSS |

@@ -60,6 +60,17 @@ def compute(payload, kb):
             {"state": "NO", "prior_compensation": 0},
         )
     damage = payload.setdefault("damage", {})
+    if any(key in damage for key in ("repair", "repair_total", "repair_total_irr")) and not any(
+        key in damage
+        for key in (
+            "actual_rescue",
+            "rescue",
+            "rescue_transport_actual_irr",
+            "rescue_for_threshold",
+            "rescue_for_total_loss_test_irr",
+        )
+    ):
+        damage["rescue_for_threshold"] = 0
     if branch == "PARTIAL_DAMAGE":
         if not any(key in damage for key in ("market", "insured")):
             damage["market"] = 10**12

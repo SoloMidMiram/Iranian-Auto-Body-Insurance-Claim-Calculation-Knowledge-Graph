@@ -148,9 +148,9 @@ The model first establishes what happened and what caused the damage, then tests
 
 **Short answer:** Calculation stops unless a documented, authorized override resolves the conflict.
 
-The reconciliation outcome becomes a conflict or insufficient evidence, so no branch arithmetic is allowed. An override is acceptable only when it records the responsible actor, reason, time, and supporting source.
+The reconciliation outcome becomes a conflict or insufficient evidence, so no branch arithmetic is allowed. For a total-loss threshold conflict, repair/replacement and classification rescue must be separated and rescue counted exactly once. An override is acceptable only when it records the responsible actor, reason, time, and supporting source.
 
-**Customer action:** Ask the reviewer to explain the derived branch and correct the evidence or record a properly authorized override.
+**Customer action:** Ask the reviewer to explain the derived branch, identify the separate classification-rescue operand, and correct the evidence or record a properly authorized override.
 
 **Knowledge-model links:** `S7_BRANCH_SELECTION`, `S10_QUALITY_GATE`, `G_NO_ASSUMED_CAUSATION`
 
@@ -158,9 +158,9 @@ The reconciliation outcome becomes a conflict or insufficient evidence, so no br
 
 **Short answer:** Only when repair and replacement cost plus threshold rescue is strictly greater than 75% of event-day market value.
 
-Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date, and the threshold test is separate from the later settlement formula.
+Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date. Repair/replacement excludes rescue, and the evidenced classification-rescue amount is added exactly once; settlement later caps its own rescue operand separately.
 
-**Customer action:** Obtain the event-day market valuation and itemized repair/replacement assessment; check the strict greater-than comparison.
+**Customer action:** Obtain the event-day market valuation, repair/replacement assessment excluding rescue, and rescue invoices; check the strict greater-than comparison and that rescue was not counted twice.
 
 **Knowledge-model links:** `REG53_ART19_TOTAL_LOSS_THRESHOLD`, `PS_REPAIR_TOTAL`, `PS_MARKET_VALUE`
 
@@ -286,9 +286,9 @@ When the vehicle is insured below its event-day value, the ratio can reduce a pa
 
 **Short answer:** Reasonable actual cost is added only up to 20% of the sourced cap base.
 
-The engine records the actual amount, selected denominator, ceiling, and allowed amount. The meaning of total damage used as the denominator can be material and remains an explicit uncertainty in edge cases.
+The engine keeps actual expense, total-loss classification rescue, and capped settlement rescue separate. Evidenced actual rescue is the classification fallback when no distinct threshold interpretation is selected; the settlement amount remains subject to its ceiling and is never copied back into classification. The denominator can remain a material uncertainty.
 
-**Customer action:** Keep invoices and ask the reviewer to identify whether assessed gross, eligible gross, or settlement base was used for the ceiling.
+**Customer action:** Keep invoices and an assessment that separates repair from rescue. Ask the reviewer to identify the classification operand and whether assessed gross, eligible gross, or settlement base was used for the settlement ceiling.
 
 **Knowledge-model links:** `REG53_RESCUE_TRANSPORT_CAP`, `G_RESCUE_CAP_CEILING`, `U05_RESCUE_DENOMINATOR`, `PS_RESCUE_ACTUAL`, `PS_RESCUE_CAP_BASE`
 
@@ -510,9 +510,9 @@ A new peril, insurer product, policy version, missing annual source, or unsuppor
 
 **پاسخ کوتاه:** محاسبه متوقف می‌شود، مگر اینکه تغییر شاخه با مجوز و مستندات کامل ثبت شود.
 
-نتیجه تطبیق، تعارض یا کمبود مدرک خواهد بود و محاسبه شاخه مجاز نیست. تغییر مجاز فقط زمانی پذیرفتنی است که شخص مسئول، دلیل، زمان و منبع پشتیبان ثبت شده باشد.
+نتیجه تطبیق، تعارض یا کمبود مدرک خواهد بود و محاسبه شاخه مجاز نیست. در تعارض مربوط به آستانه خسارت کلی، هزینه تعمیر و تعویض باید از هزینه نجاتِ مربوط به تشخیص جدا باشد و هزینه نجات دقیقاً یک بار محاسبه شود. تغییر مجاز فقط زمانی پذیرفتنی است که شخص مسئول، دلیل، زمان و منبع پشتیبان ثبت شده باشد.
 
-**اقدام بعدی مشتری:** از بازبین بخواهید مبنای شاخه استخراج‌شده را توضیح دهد و مدرک را اصلاح یا تغییر مجاز را رسمی ثبت کند.
+**اقدام بعدی مشتری:** از بازبین بخواهید مبنای شاخه استخراج‌شده و مبلغ جداگانه هزینه نجاتِ تشخیص را توضیح دهد و مدرک را اصلاح یا تغییر مجاز را رسمی ثبت کند.
 
 **پیوند به مدل دانش:** `S7_BRANCH_SELECTION`, `S10_QUALITY_GATE`, `G_NO_ASSUMED_CAUSATION`
 
@@ -520,9 +520,9 @@ A new peril, insurer product, policy version, missing annual source, or unsuppor
 
 **پاسخ کوتاه:** فقط وقتی هزینه تعمیر و تعویض به‌علاوه هزینه نجات مربوط به آزمون، بیش از ۷۵٪ ارزش روز حادثه باشد.
 
-برابری دقیق با ۷۵٪ خسارت کلی نیست. ارزش خودرو باید ارزش معاملاتی در تاریخ حادثه باشد و آزمون آستانه از فرمول نهایی تسویه جدا است.
+برابری دقیق با ۷۵٪ خسارت کلی نیست. ارزش خودرو باید ارزش معاملاتی در تاریخ حادثه باشد. مبلغ تعمیر و تعویض باید هزینه نجات را در بر نگیرد و هزینه نجات مستندِ مربوط به تشخیص فقط یک بار به آن افزوده شود؛ هزینه نجاتِ تسویه نیز جداگانه مشمول سقف خود می‌شود.
 
-**اقدام بعدی مشتری:** ارزش روز حادثه و برآورد ریز تعمیر و تعویض را بگیرید و شرط «بیشتر از» را بررسی کنید.
+**اقدام بعدی مشتری:** ارزش روز حادثه، برآورد تعمیر و تعویض بدون هزینه نجات و اسناد هزینه نجات را بگیرید؛ شرط «بیشتر از» و عدم احتساب دوباره هزینه نجات را بررسی کنید.
 
 **پیوند به مدل دانش:** `REG53_ART19_TOTAL_LOSS_THRESHOLD`, `PS_REPAIR_TOTAL`, `PS_MARKET_VALUE`
 
@@ -648,9 +648,9 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پاسخ کوتاه:** هزینه واقعی متعارف فقط تا سقف ۲۰٪ مبنای مستند پذیرفته و افزوده می‌شود.
 
-موتور مبلغ واقعی، مخرج انتخاب‌شده، سقف و مبلغ مجاز را ثبت می‌کند. معنای «کل خسارت» به‌عنوان مخرج در موارد مرزی می‌تواند مؤثر و همچنان ابهام صریح باشد.
+موتور هزینه واقعی، هزینه نجاتِ مربوط به تشخیص خسارت کلی و هزینه نجاتِ سقف‌خورده در تسویه را جدا نگه می‌دارد. اگر تفسیر جداگانه‌ای برای مبلغ آستانه انتخاب نشده باشد، هزینه واقعی مستند مبنای تشخیص است؛ مبلغ تسویه همچنان مشمول سقف خود است و هرگز به ورودی تشخیص بازگردانده نمی‌شود. مخرج سقف نیز در موارد مرزی می‌تواند ابهامی مؤثر باقی بماند.
 
-**اقدام بعدی مشتری:** فاکتورها را نگه دارید و بپرسید مخرج سقف، خسارت ارزیابی‌شده، خسارت قابل قبول یا مبنای تسویه بوده است.
+**اقدام بعدی مشتری:** فاکتورها و ارزیابی‌ای را نگه دارید که تعمیر را از هزینه نجات جدا می‌کند. از بازبین بخواهید مبلغ مورد استفاده در تشخیص و مخرج سقف تسویه—خسارت ناخالص ارزیابی‌شده، خسارت قابل قبول یا مبنای تسویه—را مشخص کند.
 
 **پیوند به مدل دانش:** `REG53_RESCUE_TRANSPORT_CAP`, `G_RESCUE_CAP_CEILING`, `U05_RESCUE_DENOMINATOR`, `PS_RESCUE_ACTUAL`, `PS_RESCUE_CAP_BASE`
 

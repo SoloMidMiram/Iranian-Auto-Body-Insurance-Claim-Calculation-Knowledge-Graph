@@ -138,13 +138,19 @@ def eligible_part_loss(
     assessed = D(part["assessed_loss"])
 
     capped = special_part_cap(category, assessed, part.get("new_price"))
+    requires_replacement = bool(
+        part.get("requires_replacement", category != "REPAIR_ONLY")
+    )
 
     override = part.get("depreciation_rate")
-    rate = (
-        D(override)
-        if override is not None
-        else replacement_part_depreciation_rate(production_year, claim_year, category)
-    )
+    if not requires_replacement:
+        rate = Decimal(0)
+    else:
+        rate = (
+            D(override)
+            if override is not None
+            else replacement_part_depreciation_rate(production_year, claim_year, category)
+        )
 
     if category in SPECIAL_CAP_CATEGORIES and rate > 0:
         interaction = cfg.get("battery_tire_depreciation_interaction", "UNRESOLVED")
