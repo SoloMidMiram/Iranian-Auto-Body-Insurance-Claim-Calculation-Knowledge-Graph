@@ -674,6 +674,25 @@ def test_actual_and_payable_rescue_operands_remain_distinct_through_calculation(
     assert both_result.fields["rescue_payable_supplied"] == D(150)
     assert both_result.fields["allowable_rescue_transport"] == D(150)
 
+    classified = _case(
+        "PARTIAL_DAMAGE",
+        market=10000,
+        insured=10000,
+        gross=7000,
+        repair=7000,
+        actual_rescue=300,
+        rescue_payable=150,
+        franchise=0,
+    )
+    classified["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+    classified_result = compute(classified, kb)
+    assert classified_result.fields["classification_rescue"] == D(300)
+    assert (
+        classified_result.fields["classification_rescue_source"]
+        == "DERIVED_FROM_ACTUAL_RESCUE"
+    )
+    assert classified_result.fields["allowable_rescue_transport"] == D(150)
+
 
 def test_supplied_rescue_payable_above_actual_or_ceiling_is_refused(kb):
     above_actual = _case(
@@ -1047,6 +1066,43 @@ def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
     assert result.fields["combined_for_threshold"] == D(76)
     assert result.fields["threshold_value"] == D(75)
     assert result.fields["classification"]["outcome"] == "MATCH"
+
+
+def test_unequal_actual_and_classification_rescue_needs_accepted_interpretation(kb):
+    result = compute(
+        _case(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            repair=7400,
+            actual_rescue=200,
+            rescue_for_threshold=100,
+            franchise=0,
+        ),
+        kb,
+    )
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "applicable authority" in result.reason
+
+
+def test_embedded_rescue_must_be_decomposed_before_threshold_addition(kb):
+    result = compute(
+        _case(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            repair=7400,
+            actual_rescue=200,
+            repair_total_includes_rescue=True,
+            franchise=0,
+        ),
+        kb,
+    )
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert "evidenced decomposition" in result.reason
 
 
 def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):

@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import copy
+import json
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 from iran_auto_claim.admission import (
     ISSUER_REVIEW,
@@ -35,6 +37,7 @@ from iran_auto_claim.plans import (
     graph_total_loss_payable,
     validate_active_sequence,
 )
+from iran_auto_claim.review import Review
 
 
 def main() -> int:
@@ -242,6 +245,34 @@ def main() -> int:
     )
     assert tire_result["loss_after_depreciation"] == Decimal(90)
     assert tire_result["depreciation_amount"] == Decimal(10)
+
+    repair_only = eligible_part_loss(
+        {
+            "category": "REPAIR_ONLY",
+            "assessed_loss": Decimal(120),
+            "new_price": None,
+            "requires_replacement": False,
+        },
+        1399,
+        1404,
+    )
+    assert repair_only["capped_loss"] == Decimal(120)
+    assert repair_only["depreciation_amount"] == Decimal(0)
+
+    review_payload = json.loads(
+        (Path(__file__).resolve().parents[1] / "cases" / "review_t1_fullcover_partial.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    review_payload["answers"]["Q-S5-01"] = 10000
+    review_payload["answers"]["Q-S5-02"] = 10000
+    review_payload["answers"]["Q-S5-03"] = 1404
+    review_payload["answers"]["Q-S4-02"] = 0
+    review_payload["answers"]["Q-S4-03"] = [
+        {"category": "OTHER_REPLACEMENT_PART", "assessed_loss": 7400}
+    ]
+    review_payload["answers"]["Q-S4-07"] = 200
+    assert Review(review_payload, kb).classification()["branch"] == "TOTAL_LOSS"
 
     sourced_absolute = {
         "mode": "ABSOLUTE",

@@ -309,6 +309,56 @@ def test_distinct_money_operands_and_contractual_carriers_are_not_aliases():
     )
 
 
+def test_repair_only_status_defaults_false_and_contradictions_reject():
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "regulatory_snapshot": {"iranian_year": 1405},
+        "vehicle": {"production_year_shamsi": 1400},
+        "damage": {"parts": [{"category": "REPAIR_ONLY", "assessed_loss": 100}]},
+    }
+    assert validated_case(payload).parts[0]["requires_replacement"] is False
+
+    payload["damage"]["parts"][0]["requires_replacement"] = True
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.parts[0].requires_replacement"
+        for issue in caught.value.errors
+    )
+
+    payload["damage"] = {
+        "replacement_parts": [{"type": "REPAIR_ONLY", "loss": 100}]
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.replacement_parts[0].type"
+        for issue in caught.value.errors
+    )
+
+
+def test_review_rejects_repair_only_marked_as_replacement(kb):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S4-03": [
+                {
+                    "category": "REPAIR_ONLY",
+                    "assessed_loss": 100,
+                    "requires_replacement": True,
+                }
+            ]
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    assert any(issue.code == "contradictory_input" for issue in caught.value.errors)
+
+
 def test_review_part_new_price_aliases_must_agree(kb):
     payload = {
         "claim_id": "X",

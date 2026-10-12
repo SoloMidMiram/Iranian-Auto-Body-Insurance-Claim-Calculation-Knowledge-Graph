@@ -203,7 +203,48 @@ class Case:
 
     @property
     def rescue_for_threshold(self) -> Decimal:
-        return self._money(("rescue_for_threshold", "rescue_for_total_loss_test_irr")) or Decimal(0)
+        amount, _, unresolved = self.classification_rescue()
+        if unresolved is not None:
+            raise CaseInputError(unresolved)
+        return amount if amount is not None else Decimal(0)
+
+    def classification_rescue(self) -> tuple[Decimal | None, str, str | None]:
+        """Resolve the classification operand without reading settlement payable.
+
+        The explicit threshold amount and actual expense are distinct operands.
+        Review's evidenced actual-expense answer is the documented fallback when
+        no explicit threshold selection exists.  Missing legacy input remains an
+        arithmetic zero, but its provenance says that it is missing rather than
+        proving that no rescue occurred.
+        """
+        explicit = self._money(
+            ("rescue_for_threshold", "rescue_for_total_loss_test_irr")
+        )
+        actual = self.rescue_actual
+        configured_source = self.damage.get("rescue_for_total_loss_test_source")
+
+        if self.damage.get("repair_total_includes_rescue") is True and (
+            (explicit is not None and explicit > 0)
+            or (actual is not None and actual > 0)
+        ):
+            return (
+                None,
+                "UNRESOLVED_EMBEDDED_RESCUE",
+                "repair/replacement already includes rescue; an evidenced decomposition is required before rescue can be added to the threshold numerator",
+            )
+
+        if explicit is not None and actual is not None and explicit != actual:
+            return (
+                None,
+                "UNRESOLVED_RESCUE_SCOPE_INTERPRETATION",
+                "actual and explicit classification rescue differ; a scope assessment, applicable authority and accepted interpretation are required",
+            )
+        if explicit is not None:
+            source = str(configured_source or "EXPLICIT_THRESHOLD_OPERAND")
+            return explicit, source, None
+        if actual is not None:
+            return actual, "DERIVED_FROM_ACTUAL_RESCUE", None
+        return Decimal(0), "OMITTED_DEFAULT_ZERO", None
 
     @property
     def salvage(self) -> Decimal | None:
@@ -443,7 +484,12 @@ class Case:
                         "category": _category(entry.get("category", "OTHER_REPLACEMENT_PART")),
                         "assessed_loss": D(loss),
                         "new_price": None if new_price is None else D(new_price),
-                        "requires_replacement": bool(entry.get("requires_replacement", True)),
+                        "requires_replacement": bool(
+                            entry.get(
+                                "requires_replacement",
+                                entry.get("category") != "REPAIR_ONLY",
+                            )
+                        ),
                     }
                 )
 

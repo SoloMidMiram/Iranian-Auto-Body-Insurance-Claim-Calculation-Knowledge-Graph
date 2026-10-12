@@ -581,6 +581,61 @@ def test_missing_event_year_stays_unknown_for_special_parts(kb):
     assert review.calculate() is None
 
 
+def test_nonreplacement_special_part_does_not_activate_u04(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S4-03"] = [
+        {
+            "category": "TIRE",
+            "assessed_loss": 120,
+            "new_price": 200,
+            "requires_replacement": False,
+        }
+    ]
+    review = Review(payload, kb)
+    assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" not in review.open_uncertainties()
+
+
+def test_review_emits_actual_and_classification_rescue_as_distinct_operands(kb):
+    review = Review.from_file(CASES / "review_t1_fullcover_partial.json", kb)
+    payload = review.case_payload()
+    actual = payload["damage"]["rescue_transport_actual_irr"]
+    assert payload["damage"]["rescue_for_total_loss_test_irr"] == actual
+    assert (
+        payload["damage"]["rescue_for_total_loss_test_source"]
+        == "DERIVED_FROM_ACTUAL_RESCUE"
+    )
+    assert "rescue_payable" not in payload["damage"]
+
+
+def test_missing_rescue_assessment_evidence_blocks_authorization(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["evidence_present"].remove("EVT_ASSESSMENT_REPORT")
+    review = Review(payload, kb)
+    assert any(
+        item["item"] == "EVT_ASSESSMENT_REPORT"
+        for item in review.missing_evidence()
+    )
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+
+
+@pytest.mark.parametrize(
+    "rescue,expected",
+    [(99, "PARTIAL_DAMAGE"), (100, "PARTIAL_DAMAGE"), (101, "TOTAL_LOSS")],
+)
+def test_review_rescue_uses_strict_total_loss_boundary(kb, rescue, expected):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S5-01"] = 10000
+    payload["answers"]["Q-S5-02"] = 10000
+    payload["answers"]["Q-S5-03"] = 1404
+    payload["answers"]["Q-S4-02"] = 0
+    payload["answers"]["Q-S4-03"] = [
+        {"category": "OTHER_REPLACEMENT_PART", "assessed_loss": 7400}
+    ]
+    payload["answers"]["Q-S4-07"] = rescue
+    assert Review(payload, kb).classification()["branch"] == expected
+
+
 def test_emission_preserves_sourced_dates_causation_mode_ratio_and_year(kb):
     review = Review.from_file(CASES / "review_t1_fullcover_partial.json", kb)
     payload = review.case_payload()

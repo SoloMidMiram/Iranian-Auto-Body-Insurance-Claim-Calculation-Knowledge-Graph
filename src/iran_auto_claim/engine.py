@@ -34,7 +34,7 @@ from .admission import (
     CalculationAuthorization,
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
-from .classify import classify
+from .classify import ClassificationEvidenceRequired, classify
 from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
 from .plans import (
@@ -807,10 +807,15 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("TOTAL_LOSS")
     market = case.market_value
     repair = case.repair_total
+    classification_rescue, rescue_source, unresolved = case.classification_rescue()
+    if unresolved is not None:
+        raise ClassificationEvidenceRequired(unresolved)
     is_total, combined, threshold = operators.is_total_loss(
-        repair, case.rescue_for_threshold, market
+        repair, classification_rescue, market
     )
     if combined is not None:
+        res.fields["classification_rescue"] = classification_rescue
+        res.fields["classification_rescue_source"] = rescue_source
         res.fields["combined_for_threshold"] = combined
         res.fields["threshold_value"] = threshold
         res.fields["threshold_ratio"] = combined / market if market else None
@@ -1301,7 +1306,23 @@ def _classification_evidence_gap(
 def reconcile_classification(
     case: Case, kb: Knowledge
 ) -> tuple[dict[str, Any], str | None, str | None]:
-    verdict = classify(case, kb)
+    try:
+        verdict = classify(case, kb)
+    except ClassificationEvidenceRequired as error:
+        reason = str(error)
+        return (
+            {
+                "declared_branch": case.declared_branch,
+                "declared_canonical_branch": case.branch,
+                "derived_branch": None,
+                "outcome": "INSUFFICIENT_EVIDENCE",
+                "confidence": 0.0,
+                "basis": [reason],
+                "reason": reason,
+            },
+            None,
+            reason,
+        )
     derived = verdict["branch"]
     declared = case.branch
     gap = _classification_evidence_gap(case, declared, derived)
@@ -1519,6 +1540,12 @@ def compute(
         res.fields["classification"] = reconciliation
         if case.repair_total is not None and case.market_value is not None:
             res.note_rule("REG53_ART19_TOTAL_LOSS_THRESHOLD")
+            classification_rescue, rescue_source, unresolved_rescue = (
+                case.classification_rescue()
+            )
+            if unresolved_rescue is None:
+                res.fields["classification_rescue"] = classification_rescue
+                res.fields["classification_rescue_source"] = rescue_source
         if reconciliation["outcome"] == "CONFLICT":
             res.payable = None
             res.status = "CLASSIFICATION_CONFLICT"

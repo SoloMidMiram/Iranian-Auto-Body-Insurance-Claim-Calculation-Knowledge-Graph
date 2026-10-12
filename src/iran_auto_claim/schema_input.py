@@ -33,6 +33,7 @@ CODE_JSON = "invalid_json"
 CODE_DATE = "invalid_date"
 CODE_CHRONOLOGY = "invalid_chronology"
 CODE_CONFLICT = "conflicting_alias"
+CODE_CONTRADICTION = "contradictory_input"
 CODE_YEAR = "conflicting_year"
 CODE_INVALID_YEAR = "invalid_year"
 
@@ -497,6 +498,14 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
                 f"damage.parts[{index}]",
                 issues,
             )
+            if part.get("category") == "REPAIR_ONLY" and part.get("requires_replacement") is True:
+                issues.append(
+                    SchemaIssue(
+                        CODE_CONTRADICTION,
+                        f"damage.parts[{index}].requires_replacement",
+                        "REPAIR_ONLY work cannot be marked as requiring replacement",
+                    )
+                )
     for index, part in enumerate(damage.get("replacement_parts") or []):
         if isinstance(part, dict):
             _check_local_aliases(
@@ -505,6 +514,15 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
                 f"damage.replacement_parts[{index}]",
                 issues,
             )
+            categories = {part.get("type"), part.get("category")}
+            if "REPAIR_ONLY" in categories:
+                issues.append(
+                    SchemaIssue(
+                        CODE_CONTRADICTION,
+                        f"damage.replacement_parts[{index}].type",
+                        "replacement_parts cannot contain REPAIR_ONLY work",
+                    )
+                )
     return issues
 
 
@@ -785,6 +803,14 @@ def _check_review_list(
                     CODE_BOOLEAN,
                     f"{item_path}.requires_replacement",
                     "value must be a JSON boolean",
+                )
+            )
+        if category == "REPAIR_ONLY" and item.get("requires_replacement") is True:
+            issues.append(
+                SchemaIssue(
+                    CODE_CONTRADICTION,
+                    f"{item_path}.requires_replacement",
+                    "REPAIR_ONLY work cannot be marked as requiring replacement",
                 )
             )
 

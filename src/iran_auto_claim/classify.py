@@ -39,6 +39,10 @@ THIRD_PARTY_SIGNALS = (
 )
 
 
+class ClassificationEvidenceRequired(ValueError):
+    """A material classification operand is unresolved."""
+
+
 def classify(case: Case | dict[str, Any], kb: Knowledge | None = None) -> dict[str, Any]:
     from .schema_input import validated_case
 
@@ -64,11 +68,14 @@ def classify(case: Case | dict[str, Any], kb: Knowledge | None = None) -> dict[s
         return _classify_third_party(case, kb, basis)
 
     if case.repair_total is not None and case.market_value is not None:
+        rescue, rescue_source, unresolved = case.classification_rescue()
+        if unresolved is not None:
+            raise ClassificationEvidenceRequired(unresolved)
         is_total, combined, threshold = operators.is_total_loss(
-            case.repair_total, case.rescue_for_threshold, case.market_value
+            case.repair_total, rescue, case.market_value
         )
         basis.append(
-            f"repair+rescue {combined} against 75% threshold {threshold} -> total={is_total}"
+            f"repair+rescue {combined} against 75% threshold {threshold} -> total={is_total}; rescue source={rescue_source}"
         )
         if is_total:
             return {"branch": "TOTAL_LOSS", "variant": None, "confidence": 0.97, "basis": basis}

@@ -304,8 +304,8 @@
       "supplied_via": ["ASSESSOR_REPORT"],
       "required_for_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
       "missing_behavior": "REFUSE",
-      "select": "Closed vocabulary: GLASS, LAMP_GLASS, BATTERY, TIRE, OTHER_REPLACEMENT_PART, REPAIR_ONLY. The category decides exemption from depreciation, the 50%-of-new cap, and whether the item enters the total-loss numerator at all.",
-      "validation": "unknown spellings are rejected rather than defaulted"
+      "select": "Closed vocabulary: GLASS, LAMP_GLASS, BATTERY, TIRE, OTHER_REPLACEMENT_PART, REPAIR_ONLY. Category and work status remain separate: repair-only cost stays eligible but receives zero replacement-part depreciation; battery/tyre caps still apply to eligible damage, and only replaced battery/tyre work activates the cap/depreciation interaction.",
+      "validation": "unknown spellings, REPAIR_ONLY marked for replacement, and REPAIR_ONLY records in replacement-only carriers are rejected rather than defaulted"
     },
     {
       "node_id": "PS_PART_NEW_PRICE",
@@ -347,8 +347,8 @@
       "supplied_by": ["Q-S4-07"],
       "supplied_via": ["ASSESSOR_REPORT", "INSURED_ANSWER"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
-      "missing_behavior": "TREAT_AS_ZERO",
-      "select": "Claimed cost is not payable cost: it is added after the 20% ceiling is applied, and the same figure is part of the total-loss numerator."
+      "missing_behavior": "BLOCK_IF_MATERIAL",
+      "select": "Claimed actual cost is not payable cost. The evidenced actual amount is the classification fallback when no distinct threshold operand is selected, while settlement applies the separate 20% ceiling. Omission is legacy arithmetic zero only and is not evidence that no rescue occurred."
     },
     {
       "node_id": "PS_RESCUE_CAP_BASE",
@@ -376,7 +376,7 @@
       "supplied_via": ["ASSESSOR_REPORT"],
       "required_for_branches": ["TOTAL_LOSS", "PARTIAL_DAMAGE"],
       "missing_behavior": "ASSESSOR_REQUIRED",
-      "select": "The numerator is repair and replacement cost WITH rescue and transport included, against 75% of the value on the accident date. A declared total loss without this evidence must not settle."
+      "select": "This operand is repair and replacement cost excluding rescue and transport. The classifier adds the separately evidenced classification-rescue operand exactly once and compares the result with 75% of event-date value. A declared total loss without this evidence must not settle."
     },
     {
       "node_id": "PS_SALVAGE_VALUE",

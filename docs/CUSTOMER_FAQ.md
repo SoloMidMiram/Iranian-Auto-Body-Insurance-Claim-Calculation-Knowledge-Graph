@@ -158,9 +158,9 @@ The reconciliation outcome becomes a conflict or insufficient evidence, so no br
 
 **Short answer:** Only when repair and replacement cost plus threshold rescue is strictly greater than 75% of event-day market value.
 
-Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date, and the threshold test is separate from the later settlement formula.
+Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date. Repair/replacement excludes rescue, and the evidenced classification-rescue amount is added exactly once; settlement later caps its own rescue operand separately.
 
-**Customer action:** Obtain the event-day market valuation and itemized repair/replacement assessment; check the strict greater-than comparison.
+**Customer action:** Obtain the event-day market valuation, repair/replacement assessment excluding rescue, and rescue invoices; check the strict greater-than comparison and that rescue was not counted twice.
 
 **Knowledge-model links:** `REG53_ART19_TOTAL_LOSS_THRESHOLD`, `PS_REPAIR_TOTAL`, `PS_MARKET_VALUE`
 
@@ -286,9 +286,9 @@ When the vehicle is insured below its event-day value, the ratio can reduce a pa
 
 **Short answer:** Reasonable actual cost is added only up to 20% of the sourced cap base.
 
-The engine records the actual amount, selected denominator, ceiling, and allowed amount. The meaning of total damage used as the denominator can be material and remains an explicit uncertainty in edge cases.
+The engine keeps actual expense, total-loss classification rescue, and capped settlement rescue separate. Evidenced actual rescue is the classification fallback when no distinct threshold interpretation is selected; the settlement amount remains subject to its ceiling and is never copied back into classification. The denominator can remain a material uncertainty.
 
-**Customer action:** Keep invoices and ask the reviewer to identify whether assessed gross, eligible gross, or settlement base was used for the ceiling.
+**Customer action:** Keep invoices and an assessment that separates repair from rescue. Ask the reviewer to identify the classification operand and whether assessed gross, eligible gross, or settlement base was used for the settlement ceiling.
 
 **Knowledge-model links:** `REG53_RESCUE_TRANSPORT_CAP`, `G_RESCUE_CAP_CEILING`, `U05_RESCUE_DENOMINATOR`, `PS_RESCUE_ACTUAL`, `PS_RESCUE_CAP_BASE`
 

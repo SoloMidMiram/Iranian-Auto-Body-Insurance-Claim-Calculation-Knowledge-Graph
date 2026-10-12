@@ -101,7 +101,6 @@ def test_ia02_asserted_only_causation_blocks_a_single_payable(kb):
     _assert_review_does_not_pay(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-03: repair-only work must not receive part depreciation")
 def test_ia03_repair_only_component_has_no_replacement_depreciation(kb):
     payload = _review_case()
     payload["answers"]["Q-S4-03"] = [
@@ -114,9 +113,9 @@ def test_ia03_repair_only_component_has_no_replacement_depreciation(kb):
     result = Review(payload, kb).calculate()
     assert result is not None
     assert result.fields["depreciation"] == 0
+    assert result.payable == 1540000000
 
 
-@pytest.mark.xfail(strict=True, reason="IA-04: total-loss classification must include the bound rescue operand")
 def test_ia04_rescue_crossing_the_strict_threshold_classifies_total_loss(kb):
     payload = _review_case()
     payload["answers"]["Q-S5-01"] = 10000

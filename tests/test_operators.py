@@ -77,6 +77,56 @@ def test_depreciation_maximum_is_25_percent():
         ) <= D("0.25")
 
 
+@pytest.mark.parametrize(
+    "category,new_price",
+    [("REPAIR_ONLY", None), ("OTHER_REPLACEMENT_PART", None), ("TIRE", 200)],
+)
+def test_nonreplacement_work_remains_eligible_without_replacement_depreciation(
+    category, new_price
+):
+    result = operators.eligible_part_loss(
+        {
+            "category": category,
+            "assessed_loss": D(120),
+            "new_price": None if new_price is None else D(new_price),
+            "requires_replacement": False,
+        },
+        1392,
+        1405,
+    )
+    expected_eligible = D(100) if category == "TIRE" else D(120)
+    assert result["capped_loss"] == expected_eligible
+    assert result["loss_after_depreciation"] == expected_eligible
+    assert result["depreciation_rate"] == 0
+    assert result["depreciation_amount"] == 0
+
+
+@pytest.mark.parametrize(
+    "mode,after_depreciation,effective_depreciation",
+    [
+        ("CAP_THEN_DEPRECIATE", 75, 25),
+        ("DEPRECIATE_THEN_CAP", 90, 10),
+        ("CAP_ONLY", 100, 0),
+    ],
+)
+def test_replacement_tire_preserves_all_interaction_modes(
+    mode, after_depreciation, effective_depreciation
+):
+    result = operators.eligible_part_loss(
+        {
+            "category": "TIRE",
+            "assessed_loss": D(120),
+            "new_price": D(200),
+            "requires_replacement": True,
+        },
+        1392,
+        1405,
+        {"battery_tire_depreciation_interaction": mode},
+    )
+    assert result["loss_after_depreciation"] == D(after_depreciation)
+    assert result["depreciation_amount"] == D(effective_depreciation)
+
+
 # --------------------------------------------------------- special part cap
 
 
