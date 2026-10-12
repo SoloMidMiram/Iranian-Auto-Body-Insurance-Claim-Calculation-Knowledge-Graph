@@ -1,0 +1,302 @@
+{
+  "revision": "cd7fb39a0b7859f2cec91b94770e240ab62e0b75",
+  "tree": "4c594155cf9404def9bb32896c711985f3abccb8",
+  "python": "3.11.15",
+  "scope": "bounded theft-derived classification with total-loss override",
+  "supported_review_limitation": "Review has no input that manufactures classification.override; supported rows therefore test missing evidence without an override.",
+  "internal_test_direct": [
+    {
+      "variant": "DIR-01 missing repair, explicit rescue zero",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "AUTHORIZED_OVERRIDE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "SETTLED",
+      "payable_irr": "9000",
+      "reason": null,
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "AUTHORIZED_CLASSIFICATION_OVERRIDE",
+        "TOTAL_LOSS"
+      ]
+    },
+    {
+      "variant": "DIR-02 missing market, repair and rescue zero present",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "AUTHORIZED_OVERRIDE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "INPUT_ERROR",
+      "payable_irr": null,
+      "reason": "market value and insured sum are both required for a total-loss settlement",
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "AUTHORIZED_CLASSIFICATION_OVERRIDE",
+        "TOTAL_LOSS"
+      ]
+    },
+    {
+      "variant": "DIR-03 missing repair and market, rescue zero present",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "AUTHORIZED_OVERRIDE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "INPUT_ERROR",
+      "payable_irr": null,
+      "reason": "market value and insured sum are both required for a total-loss settlement",
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "AUTHORIZED_CLASSIFICATION_OVERRIDE",
+        "TOTAL_LOSS"
+      ]
+    },
+    {
+      "variant": "DIR-04 rescue omitted, repair and market present",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "INSUFFICIENT_EVIDENCE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "CLASSIFICATION_EVIDENCE_REQUIRED",
+      "payable_irr": null,
+      "reason": "classification rescue is missing; a non-negative amount could change the strict 75% branch or the settlement, so the preliminary zero cannot authorize payment and this evidence gate cannot be overridden",
+      "required_guards": [
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "CLASSIFICATION_EVIDENCE_REQUIRED"
+      ]
+    },
+    {
+      "variant": "DIR-05 missing repair, actual rescue supplied",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "AUTHORIZED_OVERRIDE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "SETTLED",
+      "payable_irr": "9200",
+      "reason": null,
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "AUTHORIZED_CLASSIFICATION_OVERRIDE",
+        "TOTAL_LOSS"
+      ]
+    },
+    {
+      "variant": "DIR-06 missing repair, conflicting rescue operands",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "INSUFFICIENT_EVIDENCE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "CLASSIFICATION_EVIDENCE_REQUIRED",
+      "payable_irr": null,
+      "reason": "actual and explicit classification rescue differ; a scope assessment, applicable authority and accepted interpretation are required",
+      "required_guards": [
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "CLASSIFICATION_EVIDENCE_REQUIRED"
+      ]
+    },
+    {
+      "variant": "DIR-07 complete evidence-supported override",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "AUTHORIZED_OVERRIDE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "SETTLED",
+      "payable_irr": "9000",
+      "reason": null,
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "AUTHORIZED_CLASSIFICATION_OVERRIDE",
+        "TOTAL_LOSS"
+      ]
+    },
+    {
+      "variant": "DIR-08 ordinary theft without override",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "MATCH",
+      "derived_branch": "THEFT",
+      "selected_branch": "THEFT",
+      "status": "PENDING_60_DAY_CRITERION",
+      "payable_irr": null,
+      "reason": null,
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "PENDING_60_DAY_CRITERION",
+        "THEFT"
+      ]
+    },
+    {
+      "variant": "DIR-09 missing repair and rescue",
+      "path": "INTERNAL_TEST_DIRECT",
+      "authorization_granted": true,
+      "classification_outcome": "AUTHORIZED_OVERRIDE",
+      "derived_branch": "THEFT",
+      "selected_branch": "TOTAL_LOSS",
+      "status": "SETTLED",
+      "payable_irr": "9000",
+      "reason": null,
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "labels": [
+        "AUTHORIZED_CLASSIFICATION_OVERRIDE",
+        "TOTAL_LOSS"
+      ]
+    }
+  ],
+  "supported_review": [
+    {
+      "variant": "REV-01 missing repair assessment",
+      "path": "SUPPORTED_REVIEW",
+      "decision": "COMPUTE",
+      "authorization_granted": true,
+      "calculation": {
+        "status": "SETTLED",
+        "payable_irr": "7200000000"
+      },
+      "open_blocking_questions": [],
+      "evidence_blocks": []
+    },
+    {
+      "variant": "REV-02 missing market value",
+      "path": "SUPPORTED_REVIEW",
+      "decision": "INSUFFICIENT_INFORMATION",
+      "authorization_granted": false,
+      "calculation": null,
+      "open_blocking_questions": [
+        "Q-S5-01"
+      ],
+      "evidence_blocks": [],
+      "authorization_error": "review decision INSUFFICIENT_INFORMATION does not authorize calculation"
+    },
+    {
+      "variant": "REV-03 omitted rescue",
+      "path": "SUPPORTED_REVIEW",
+      "decision": "COMPUTE",
+      "authorization_granted": true,
+      "calculation": {
+        "status": "SETTLED",
+        "payable_irr": "7200000000"
+      },
+      "open_blocking_questions": [],
+      "evidence_blocks": []
+    }
+  ]
+}
