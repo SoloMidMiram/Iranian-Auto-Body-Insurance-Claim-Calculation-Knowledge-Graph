@@ -1326,8 +1326,14 @@ def reconcile_classification(
     derived = verdict["branch"]
     declared = case.branch
     classification_rescue, rescue_source, _ = case.classification_rescue()
+    threshold_classification_participates = derived in {
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+        "GLASS_ONLY",
+    }
     unresolved_rescue_gate = (
-        case.repair_total is not None
+        threshold_classification_participates
+        and case.repair_total is not None
         and case.market_value is not None
         and classification_rescue is None
         and rescue_source == "UNRESOLVED_MISSING_RESCUE"

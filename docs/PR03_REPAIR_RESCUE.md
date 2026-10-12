@@ -277,7 +277,8 @@ The precedence contract is:
 3. otherwise, use arithmetic zero only when the imported case explicitly opts
    into `rescue_omission_legacy_compatibility=true`, recording
    `EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission remains
-   `UNRESOLVED_MISSING_RESCUE` and cannot authorize payment; and
+   `UNRESOLVED_MISSING_RESCUE` and cannot authorize a branch for which the
+   repair/rescue threshold participates; and
 4. never fall back from `rescue_payable` or the capped settlement result.
 
 Actual and explicit-threshold amounts are not aliases and need not be numerically
@@ -316,14 +317,19 @@ can be invariant only when one of these conditions is established:
 - evidence establishes an applicable upper bound and repair/replacement plus
   that bound cannot cross the strict threshold.
 
-Otherwise the unknown operand is material to classification and the result is
-`CLASSIFICATION_EVIDENCE_REQUIRED`. Even when repair alone makes the total-loss
-branch invariant, ordinary omission remains unresolved for settlement and the
-engine produces no payable. This unresolved-rescue gate cannot be converted
-into payment by a classification override. Overrides remain available for
-legitimate branch conflicts when the required classification operands are
-complete. Compatibility behavior must be selected explicitly and remains
-separately traceable from an evidenced zero.
+Otherwise the unknown operand is material when the repair/rescue threshold
+participates in branch selection, and the result is
+`CLASSIFICATION_EVIDENCE_REQUIRED`. Even when repair alone makes that
+total-loss branch invariant, ordinary omission remains unresolved for that
+threshold-classified path and the engine produces no payable. This
+unresolved-rescue gate cannot be converted into payment by a classification
+override. Routes selected before the threshold, including evidenced theft,
+are not threshold-classified and are not blocked merely because an incidental
+repair assessment lacks a classification-rescue operand. Any rescue fact
+required by their settlement remains a separate branch-specific requirement.
+Overrides remain available for legitimate branch conflicts when the required
+classification operands are complete. Compatibility behavior must be selected
+explicitly and remains separately traceable from an evidenced zero.
 
 If an aggregate repair assessment already contains rescue, it cannot be used
 unchanged alongside a separate rescue operand. Evidence must decompose it into
@@ -448,7 +454,7 @@ payment authority belongs in PR-03.
 | Actual plus unequal explicit threshold without qualified selection record | No min/max/equality guess and no payable. Proceed only with scope-decomposing assessment evidence, applicable authority and an explicitly accepted interpretation; a source label alone does not resolve it. |
 | `rescue_payable` only | Never enters actual or classification; remains settlement-only and ceiling-checked |
 | Actual plus `rescue_payable` | Existing above-actual and above-ceiling checks unchanged; threshold never reads payable |
-| Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable, including when a documented classification override is supplied. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
+| Omitted rescue vs explicit zero | Ordinary omission is `UNRESOLVED_MISSING_RESCUE` and produces no engine payable when the repair/rescue threshold participates, including when a documented classification override is supplied. A route selected before that threshold, such as evidenced theft, is not blocked by an incidental repair assessment alone. An explicit threshold zero is evidence; an explicitly selected legacy compatibility zero is separately traced and never emitted by Review. |
 | Evidence-complete branch conflict plus documented override | Existing authorized-override behavior remains available; the hard gate is specifically unresolved classification rescue, not overrides generally. |
 | Repair assessment excludes rescue plus a separate rescue operand | Rescue added exactly once; repair total remains rescue-exclusive |
 | Repair assessment already containing rescue | Decompose repair/replacement and rescue using assessment evidence; if material decomposition is unavailable, block rather than count rescue twice or infer a subtraction. |
@@ -484,8 +490,11 @@ Review now emits actual rescue and a separate classification operand with
 share the same resolver: explicit zero is preserved, actual is the documented
 fallback, settlement `rescue_payable` is never a source, and omitted legacy
 compatibility is accepted only through the explicit flag and traced as
-`EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission is unresolved and blocks the
-engine payable even when a documented classification override is supplied.
+`EXPLICIT_LEGACY_DEFAULT_ZERO`; ordinary omission is unresolved and blocks a
+threshold-classified engine payable even when a documented classification
+override is supplied. An evidenced theft route selected before the threshold
+is not blocked merely because an incidental repair assessment omits that
+classification operand.
 Unequal actual/threshold operands
 remain nonpayable until the repository can validate the required assessment,
 authority and accepted interpretation. An assessment flagged as already
@@ -510,12 +519,13 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest \
   tests/test_engine.py::test_missing_material_rescue_cannot_be_overridden_into_payment \
+  tests/test_engine.py::test_missing_classification_rescue_does_not_block_whole_vehicle_theft \
   tests/test_engine.py::test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands \
   -q
-# exit 0: 2 passed
+# exit 0: 3 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 609 passed, 4 xfailed
+# exit 0: 610 passed, 4 xfailed
 ```
 
 The project metadata now requires `>=3.11,<3.12`, and the repository workflow

@@ -1163,6 +1163,31 @@ def test_missing_material_rescue_cannot_be_overridden_into_payment(kb):
     assert "preliminary zero cannot authorize payment" in result.reason
 
 
+def test_missing_classification_rescue_does_not_block_whole_vehicle_theft(kb):
+    payload = _case(
+        "THEFT",
+        theft_type="WHOLE_VEHICLE",
+        days_missing=65,
+        market=10000,
+        insured=10000,
+        repair=7400,
+        franchise=1000,
+        title_transferred=True,
+        salvage_disposition="INSURER_TAKES_TITLE",
+    )
+    payload["damage"].pop("rescue_for_threshold")
+
+    result = compute(payload, kb)
+
+    assert result.payable == D(9000)
+    assert result.fields["classification"]["outcome"] == "MATCH"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert not any(
+        "75% threshold" in item
+        for item in result.fields["classification"]["basis"]
+    )
+
+
 def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
     payload = _case(
         "PARTIAL_DAMAGE",
