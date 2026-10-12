@@ -389,6 +389,44 @@ def test_derived_classification_rescue_accepts_matching_actual_expense():
     )
 
 
+@pytest.mark.parametrize(
+    "actual_rescue",
+    [None, 101],
+    ids=("without-actual", "with-incidental-actual"),
+)
+def test_explicit_classification_rescue_source_requires_threshold_operand(
+    actual_rescue,
+):
+    damage = {
+        "rescue_for_total_loss_test_source": "EXPLICIT_THRESHOLD_OPERAND",
+    }
+    if actual_rescue is not None:
+        damage["rescue_transport_actual_irr"] = actual_rescue
+    payload = {"claim_id": "X", "unit": "IRR", "damage": damage}
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.rescue_for_total_loss_test_source"
+        for issue in caught.value.errors
+    )
+
+
+def test_explicit_classification_rescue_source_accepts_threshold_operand():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "damage": {
+                "rescue_for_total_loss_test_irr": 101,
+                "rescue_for_total_loss_test_source": "EXPLICIT_THRESHOLD_OPERAND",
+            },
+        }
+    )
+
+
 def test_review_rejects_repair_only_marked_as_replacement(kb):
     payload = {
         "claim_id": "X",

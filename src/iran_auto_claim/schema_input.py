@@ -513,7 +513,8 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
         ),
         None,
     )
-    if damage.get("rescue_for_total_loss_test_source") == "DERIVED_FROM_ACTUAL_RESCUE":
+    rescue_source = damage.get("rescue_for_total_loss_test_source")
+    if rescue_source == "DERIVED_FROM_ACTUAL_RESCUE":
         if actual_rescue is None:
             issues.append(
                 SchemaIssue(
@@ -531,6 +532,14 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
                     "operand to match actual rescue",
                 )
             )
+    elif rescue_source == "EXPLICIT_THRESHOLD_OPERAND" and threshold_rescue is None:
+        issues.append(
+            SchemaIssue(
+                CODE_CONTRADICTION,
+                "damage.rescue_for_total_loss_test_source",
+                "EXPLICIT_THRESHOLD_OPERAND requires a classification-rescue operand",
+            )
+        )
     for index, part in enumerate(damage.get("parts") or []):
         if isinstance(part, dict):
             _check_local_aliases(

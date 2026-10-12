@@ -381,7 +381,7 @@
             "EXPLICIT_THRESHOLD_OPERAND",
             "DERIVED_FROM_ACTUAL_RESCUE"
           ],
-          "description": "Provenance for the distinct total-loss classification rescue operand. DERIVED_FROM_ACTUAL_RESCUE requires a matching actual-rescue operand; it cannot be asserted independently."
+          "description": "Provenance for the distinct total-loss classification rescue operand. DERIVED_FROM_ACTUAL_RESCUE requires a matching actual-rescue operand; EXPLICIT_THRESHOLD_OPERAND requires a supplied threshold operand. Neither provenance token can be asserted independently."
         },
         "repair_total_includes_rescue": {
           "type": "boolean",

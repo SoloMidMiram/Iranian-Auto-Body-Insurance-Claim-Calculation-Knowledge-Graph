@@ -271,7 +271,8 @@ does not choose a battery/tyre interaction.
 The precedence contract is:
 
 1. if an explicit threshold operand is present, preserve and use it, including
-   explicit zero;
+   explicit zero; `EXPLICIT_THRESHOLD_OPERAND` provenance cannot be asserted
+   without that operand;
 2. otherwise, if actual rescue is present, derive the threshold operand from
    that amount and record `DERIVED_FROM_ACTUAL_RESCUE` provenance; an input
    asserting that provenance must supply a matching actual-rescue operand;
@@ -503,6 +504,9 @@ including positive rescue likewise blocks until it is decomposed.
 
 The claim boundary rejects `DERIVED_FROM_ACTUAL_RESCUE` unless an actual-rescue
 operand exists and any separately supplied classification amount matches it.
+It rejects `EXPLICIT_THRESHOLD_OPERAND` unless a threshold-rescue operand is
+actually supplied, rather than silently falling back to incidental actual
+rescue.
 Replacement-only shorthand contradictions point to the carrier that supplied
 `REPAIR_ONLY` (`type` or `category`), so structured clients can identify the
 offending field without guessing.
@@ -535,11 +539,13 @@ Fresh post-change Python 3.11 evidence in the isolated worktree:
   tests/test_schema_input.py::test_repair_only_status_defaults_false_and_contradictions_reject \
   tests/test_schema_input.py::test_derived_classification_rescue_requires_matching_actual_expense \
   tests/test_schema_input.py::test_derived_classification_rescue_accepts_matching_actual_expense \
+  tests/test_schema_input.py::test_explicit_classification_rescue_source_requires_threshold_operand \
+  tests/test_schema_input.py::test_explicit_classification_rescue_source_accepts_threshold_operand \
   -q
-# exit 0: 4 passed
+# exit 0: 7 passed
 
 /tmp/body-model-pr03-venv311/bin/python -m pytest
-# exit 0: 613 passed, 4 xfailed
+# exit 0: 616 passed, 4 xfailed
 ```
 
 The project metadata now requires `>=3.11,<3.12`, and the repository workflow
