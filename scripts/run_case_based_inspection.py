@@ -20,6 +20,17 @@ import sys
 from typing import Any
 
 
+MODEL_PATHS = (
+    "claim.py",
+    "pyproject.toml",
+    "src",
+    "knowledge",
+    "schema",
+    "ontology",
+    "fixtures",
+)
+
+
 def _command(command: list[str], root: Path) -> subprocess.CompletedProcess[str]:
     environment = dict(os.environ)
     root_src = str((root / "src").resolve())
@@ -60,6 +71,35 @@ def _verify_import_origin(root: Path) -> str:
 def _git_value(root: Path, expression: str) -> str:
     result = _command(["git", "rev-parse", expression], root)
     return result.stdout.strip() if result.returncode == 0 else "UNKNOWN"
+
+
+def _model_identity(root: Path) -> tuple[str, str]:
+    top = _git_value(root, "--show-toplevel")
+    if top == "UNKNOWN" or Path(top).resolve() != root.resolve():
+        raise SystemExit(f"model root must be a git worktree root: {root}")
+    status = _command(
+        [
+            "git",
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *MODEL_PATHS,
+        ],
+        root,
+    )
+    if status.returncode != 0:
+        raise SystemExit(f"cannot inspect model worktree status: {status.stderr.strip()}")
+    if status.stdout.strip():
+        raise SystemExit(
+            "model worktree has uncommitted implementation inputs: "
+            + repr(status.stdout.strip().splitlines())
+        )
+    revision = _git_value(root, "HEAD")
+    tree = _git_value(root, "HEAD^{tree}")
+    if "UNKNOWN" in {revision, tree}:
+        raise SystemExit("cannot resolve model revision and tree")
+    return revision, tree
 
 
 def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
@@ -466,14 +506,19 @@ def main() -> int:
     root = args.root.resolve()
     case_root = args.cases.resolve()
     import_origin = _verify_import_origin(root)
+    revision, tree = _model_identity(root)
     cases = _supported_cases(root, case_root)
     if len(cases) != 47:
         raise SystemExit(f"expected 47 inspection cases, found {len(cases)}")
     report: dict[str, Any] = {
-        "revision": _git_value(root, "HEAD"),
-        "tree": _git_value(root, "HEAD^{tree}"),
+        "revision": revision,
+        "tree": tree,
         "python": sys.version.split()[0],
         "import_origin": import_origin,
+        "import_origin_relative": str(
+            Path(import_origin).resolve().relative_to(root)
+        ),
+        "model_scope": list(MODEL_PATHS),
         "supported_path": cases,
     }
     if args.internal:

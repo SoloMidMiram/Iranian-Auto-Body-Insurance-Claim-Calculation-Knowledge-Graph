@@ -35,8 +35,47 @@ Missing fields fail. Money is normalized as exact integer IRR through
 
 The comparator exits nonzero for a malformed manifest; duplicate, missing or
 unexpected case; stale case digest; observation that does not describe the
-current case bytes; or any assertion that matches neither the reference nor an
-exact registered deviation.
+current case bytes; stale or mismatched model revision/tree; dirty model inputs;
+standalone calculation rendering that disagrees with the structured result; or
+any assertion that matches neither the reference nor an exact registered
+deviation.
+
+### Model and renderer binding
+
+An observation is accepted only when its full Git revision and tree equal the
+checkout selected by `--model-root`. The runner and comparator both reject
+uncommitted inputs in the bounded model scope (`claim.py`, packaging metadata,
+`src`, `knowledge`, `schema`, `ontology`, and `fixtures`). The recorded import
+origin must also identify `src/iran_auto_claim/__init__.py`. Case SHA-256 values
+remain a separate invariant; unchanged case bytes cannot make an observation
+from another model tree acceptable.
+
+For every successful standalone `claim calc`, the comparator independently
+parses the rendered `PAYABLE` and scenario lines and derives their expected
+display values from the structured integer-IRR result. Conversion is exact
+Decimal division by 10,000,000 IRR per million toman followed by half-up
+quantization to two display places. A changed amount, suffix, scenario count,
+label, or unit is an integrity failure that cannot be covered by a known-
+deviation envelope. The comparison report records the expected and observed
+rendered values under `observed_behavior.standalone_calculation`.
+
+Parent/fix reproduction at parent
+`58231f667aac308c0de4da1f989099f3ba6eda30`:
+
+- P1 parent: after a controlled edit to `src/iran_auto_claim/render.py`, with
+  all 47 case hashes unchanged, the comparator exited 0 with 37 `MATCH` and 10
+  `KNOWN_DEVIATION`. Current behavior rejects the same dirty model input with
+  exit 2; the automated regression also commits the model-only change and
+  rejects the stale observation revision.
+- P2 parent: changing only C13D's rendered payable from `143.20 m-toman` to
+  `143.21 m-toman`, or only its unit to `IRR`, exited 0 with the unchanged 37/10
+  result. Current behavior exits 1 with one `MISMATCH`, 36 `MATCH`, and 10
+  `KNOWN_DEVIATION`; the failure path is
+  `standalone_calculation.payable_rendered`.
+
+The controlled source probe was restored immediately after each run. No case
+payload, digest, reference expectation, known deviation, financial calculation,
+or legal-authority classification changed.
 
 `KNOWN_DEVIATION` is accepted only for drift detection. It is never converted
 to `MATCH`, never establishes calculation correctness, and remains
@@ -123,15 +162,18 @@ python scripts/build_case_comparison.py \
   /tmp/case-inspection.json \
   /tmp/case-comparison.json \
   --manifest docs/case-reference-manifest-v1.json \
-  --cases cases
+  --cases cases \
+  --model-root .
 ```
 
 The adversarial regression suite mutates copies in pytest temporary directories;
 it never rewrites the committed corpus. It covers the C42 strict-threshold
 crossing, C45 omitted-versus-zero rescue distinction, authorization withdrawal,
 same-branch payable drift, digest-only drift, missing/duplicate cases, and a
-material trace change. An autouse integrity check verifies the original case
-digests and `git diff -- cases` after every test.
+material trace change. It also changes model code without changing case hashes,
+then mutates only the standalone rendered amount or unit. An autouse integrity
+check verifies the original case digests and `git diff -- cases` after every
+test.
 
 ```bash
 python -m pytest -q tests/test_case_comparison.py

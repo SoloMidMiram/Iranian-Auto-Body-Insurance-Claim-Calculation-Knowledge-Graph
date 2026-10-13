@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 from typing import Any
 
 
@@ -51,6 +52,20 @@ TRACE_ROOTS = {
     "review_stderr",
 }
 HEX_DIGEST = re.compile(r"[0-9a-f]{64}")
+GIT_OBJECT_ID = re.compile(r"[0-9a-f]{40,64}")
+MODEL_PATHS = (
+    "claim.py",
+    "pyproject.toml",
+    "src",
+    "knowledge",
+    "schema",
+    "ontology",
+    "fixtures",
+)
+MILLION_TOMAN_IRR = Decimal(10_000_000)
+PAYABLE_LINE = re.compile(r"^  PAYABLE:\s+(.+?)\s*$", re.MULTILINE)
+SCENARIOS_LINE = re.compile(r"^  SCENARIOS:\s+(\d+) outcomes\s*$", re.MULTILINE)
+SCENARIO_LINE = re.compile(r"^    scenario ([A-Z]):\s+(.+?)\s*$", re.MULTILINE)
 MISSING = object()
 
 
@@ -63,6 +78,69 @@ def _load_json(path: Path) -> Any:
         return json.loads(path.read_text(encoding="utf-8"), parse_float=Decimal)
     except (OSError, json.JSONDecodeError) as error:
         raise ManifestError(f"cannot read valid JSON from {path}: {error}") from error
+
+
+def _git_output(root: Path, *arguments: str) -> str:
+    result = subprocess.run(
+        ["git", *arguments],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.strip() or result.stdout.strip()
+        raise ManifestError(
+            f"cannot inspect model checkout with git {' '.join(arguments)}: {detail}"
+        )
+    return result.stdout.strip()
+
+
+def _model_identity(model_root: Path) -> tuple[str, str]:
+    root = model_root.resolve()
+    top = Path(_git_output(root, "rev-parse", "--show-toplevel")).resolve()
+    if top != root:
+        raise ManifestError(f"model root must be the git worktree root: expected {top}, got {root}")
+    dirty = _git_output(
+        root,
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all",
+        "--",
+        *MODEL_PATHS,
+    )
+    if dirty:
+        raise ManifestError(
+            "model checkout has uncommitted implementation inputs: "
+            f"{dirty.splitlines()}"
+        )
+    revision = _git_output(root, "rev-parse", "HEAD")
+    tree = _git_output(root, "rev-parse", "HEAD^{tree}")
+    if not GIT_OBJECT_ID.fullmatch(revision) or not GIT_OBJECT_ID.fullmatch(tree):
+        raise ManifestError("model revision and tree must be full lowercase git object IDs")
+    return revision, tree
+
+
+def _validate_model_binding(observation: dict[str, Any], model_root: Path) -> tuple[str, str]:
+    revision, tree = _model_identity(model_root)
+    observed_revision = observation.get("revision")
+    observed_tree = observation.get("tree")
+    if observed_revision != revision:
+        raise ManifestError(
+            "observation revision mismatch: "
+            f"expected model {revision}, observed {observed_revision!r}"
+        )
+    if observed_tree != tree:
+        raise ManifestError(
+            f"observation tree mismatch: expected model {tree}, observed {observed_tree!r}"
+        )
+    if observation.get("model_scope") != list(MODEL_PATHS):
+        raise ManifestError(
+            "observation model_scope is missing or differs from the comparator scope"
+        )
+    if observation.get("import_origin_relative") != "src/iran_auto_claim/__init__.py":
+        raise ManifestError("observation import origin is not the selected model package")
+    return revision, tree
 
 
 def _unique_rows(rows: Any, key: str, label: str) -> dict[str, dict[str, Any]]:
@@ -91,6 +169,148 @@ def _money(value: Any, location: str) -> int | None:
     if not amount.is_finite() or amount != amount.to_integral_value():
         raise ManifestError(f"{location} is not an integer IRR amount: {value!r}")
     return int(amount)
+
+
+def _million_toman(value: Any, location: str) -> str:
+    amount = _money(value, location)
+    if amount is None:
+        raise ManifestError(f"{location} cannot be null when rendering money")
+    display = (Decimal(amount) / MILLION_TOMAN_IRR).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    return f"{display:,.2f} m-toman"
+
+
+def _standalone_calculation_evidence(
+    row: dict[str, Any],
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    process = row.get("process") if isinstance(row.get("process"), dict) else {}
+    calc_exit = process.get("calc_exit", MISSING)
+    applicable = calc_exit == 0
+    evidence: dict[str, Any] = {
+        "applicable": applicable,
+        "display_unit": "million_toman" if applicable else None,
+        "irr_per_display_unit": int(MILLION_TOMAN_IRR) if applicable else None,
+        "expected_payable": None,
+        "observed_payable": None,
+        "expected_scenarios": [],
+        "observed_scenarios": [],
+    }
+    if not applicable:
+        return evidence, []
+
+    failures: list[dict[str, Any]] = []
+    if row.get("calculation_present") is not True:
+        failures.append(
+            _failure(
+                "standalone_calculation.calculation_present",
+                True,
+                row.get("calculation_present", MISSING),
+                "successful claim calc has no structured Review calculation",
+            )
+        )
+    stdout = row.get("calc_stdout", MISSING)
+    if not isinstance(stdout, str):
+        failures.append(
+            _failure(
+                "standalone_calculation.stdout",
+                "rendered claim calc text",
+                stdout,
+                "calc stdout missing",
+            )
+        )
+        return evidence, failures
+
+    payable = row.get("payable_irr", MISSING)
+    scenarios = row.get("payable_scenarios_irr", MISSING)
+    try:
+        expected_payable = (
+            None
+            if payable is None
+            else _million_toman(payable, "observed.payable_irr")
+        )
+        if scenarios is None:
+            expected_scenarios: list[str] = []
+        elif isinstance(scenarios, list):
+            expected_scenarios = [
+                _million_toman(value, f"observed.payable_scenarios_irr[{index}]")
+                for index, value in enumerate(scenarios)
+            ]
+        else:
+            raise ManifestError("observed.payable_scenarios_irr must be a list or null")
+    except ManifestError as error:
+        failures.append(
+            _failure(
+                "standalone_calculation.structured_money",
+                "exact integer IRR",
+                {"payable_irr": payable, "payable_scenarios_irr": scenarios},
+                str(error),
+            )
+        )
+        return evidence, failures
+
+    payable_lines = PAYABLE_LINE.findall(stdout)
+    scenario_headers = [int(value) for value in SCENARIOS_LINE.findall(stdout)]
+    scenario_lines = SCENARIO_LINE.findall(stdout)
+    observed_payable = payable_lines[0] if len(payable_lines) == 1 else None
+    observed_scenarios = [value for _, value in scenario_lines]
+    evidence.update(
+        {
+            "expected_payable": expected_payable,
+            "observed_payable": observed_payable,
+            "expected_scenarios": expected_scenarios,
+            "observed_scenarios": observed_scenarios,
+        }
+    )
+    if len(payable_lines) > 1:
+        failures.append(
+            _failure(
+                "standalone_calculation.payable_line_count",
+                1 if expected_payable is not None else 0,
+                len(payable_lines),
+                "duplicate rendered payable lines",
+            )
+        )
+    if observed_payable != expected_payable:
+        failures.append(
+            _failure(
+                "standalone_calculation.payable_rendered",
+                expected_payable,
+                observed_payable,
+                "rendered amount or display unit differs from exact IRR conversion",
+            )
+        )
+    expected_header = [len(expected_scenarios)] if expected_scenarios else []
+    if scenario_headers != expected_header:
+        failures.append(
+            _failure(
+                "standalone_calculation.scenario_count",
+                expected_header,
+                scenario_headers,
+            )
+        )
+    expected_labels = [
+        chr(ord("A") + index) for index in range(len(expected_scenarios))
+    ]
+    observed_labels = [label for label, _ in scenario_lines]
+    if observed_labels != expected_labels:
+        failures.append(
+            _failure(
+                "standalone_calculation.scenario_labels",
+                expected_labels,
+                observed_labels,
+            )
+        )
+    if observed_scenarios != expected_scenarios:
+        failures.append(
+            _failure(
+                "standalone_calculation.scenarios_rendered",
+                expected_scenarios,
+                observed_scenarios,
+                "rendered scenario amount or display unit differs from exact IRR conversion",
+            )
+        )
+    return evidence, failures
 
 
 def _validate_expectation(expected: Any, location: str) -> None:
@@ -320,11 +540,14 @@ def compare(
     manifest_path: Path,
     observation_path: Path,
     case_root: Path,
+    model_root: Path | None = None,
 ) -> tuple[dict[str, Any], bool]:
     manifest, references = load_manifest(manifest_path)
     observation = _load_json(observation_path)
     if not isinstance(observation, dict):
         raise ManifestError("observation must be an object")
+    target_root = (model_root or Path.cwd()).resolve()
+    model_revision, model_tree = _validate_model_binding(observation, target_root)
     observed = _unique_rows(observation.get("supported_path"), "case", "observation cases")
     case_paths = {path.stem: path for path in sorted(case_root.glob("inspection-*.json"))}
     expected_ids = set(references)
@@ -350,13 +573,17 @@ def compare(
             digest_failures.append(
                 _failure("observation.sha256", actual_digest, row.get("sha256", MISSING), "observation does not describe current case bytes")
             )
-        reference_failures = digest_failures + compare_expectation(row, reference["expected"])
+        standalone_evidence, standalone_failures = _standalone_calculation_evidence(row)
+        integrity_failures = digest_failures + standalone_failures
+        reference_failures = integrity_failures + compare_expectation(
+            row, reference["expected"]
+        )
         deviation = reference.get("known_deviation")
         deviation_failures: list[dict[str, Any]] | None = None
         if not reference_failures:
             verdict = "MATCH"
             gate_treatment = "ACCEPTED"
-        elif deviation is not None and not digest_failures:
+        elif deviation is not None and not integrity_failures:
             deviation_failures = compare_expectation(row, deviation["observed"])
             if not deviation_failures:
                 verdict = "KNOWN_DEVIATION"
@@ -402,6 +629,7 @@ def compare(
                     )
                 }
                 | {
+                    "standalone_calculation": standalone_evidence,
                     "material_trace": {
                         path: _display(_path_value(row, path))
                         for path in sorted(assertion_paths)
@@ -420,9 +648,15 @@ def compare(
     counts = dict(sorted(Counter(row["comparison_verdict"] for row in rows).items()))
     output = {
         "schema_version": "1.0",
-        "revision": observation.get("revision"),
-        "tree": observation.get("tree"),
+        "revision": model_revision,
+        "tree": model_tree,
         "python": observation.get("python"),
+        "model_binding": {
+            "revision": model_revision,
+            "tree": model_tree,
+            "scope": list(MODEL_PATHS),
+            "import_origin_relative": observation.get("import_origin_relative"),
+        },
         "manifest": {
             "id": manifest.get("manifest_id"),
             "path": str(manifest_path),
@@ -452,9 +686,20 @@ def main() -> int:
         default=Path("docs/case-reference-manifest-v1.json"),
     )
     parser.add_argument("--cases", type=Path, default=Path("cases"))
+    parser.add_argument(
+        "--model-root",
+        type=Path,
+        default=Path.cwd(),
+        help="clean git worktree containing the exact model revision under test",
+    )
     args = parser.parse_args()
     try:
-        output, gate_ok = compare(args.manifest, args.observation, args.cases)
+        output, gate_ok = compare(
+            args.manifest,
+            args.observation,
+            args.cases,
+            model_root=args.model_root,
+        )
     except ManifestError as error:
         parser.exit(2, f"comparison input error: {error}\n")
     args.output.write_text(

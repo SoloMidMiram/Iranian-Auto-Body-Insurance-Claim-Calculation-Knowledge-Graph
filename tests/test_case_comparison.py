@@ -44,9 +44,11 @@ def inspection_cases_remain_unchanged() -> None:
 @pytest.fixture(scope="module")
 def baseline_observation() -> dict[str, object]:
     return {
-        "revision": "TEST",
-        "tree": "TEST",
+        "revision": inspection._git_value(ROOT, "HEAD"),
+        "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
         "python": "3.11",
+        "import_origin_relative": "src/iran_auto_claim/__init__.py",
+        "model_scope": list(comparator.MODEL_PATHS),
         "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
     }
 
@@ -96,6 +98,17 @@ def _failure_paths(result: dict[str, object]) -> set[str]:
     return {failure["path"] for failure in failures}
 
 
+def _git(root: Path, *arguments: str) -> str:
+    result = subprocess.run(
+        ["git", *arguments],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
 def test_reference_locators_are_case_relevant() -> None:
     cases = _manifest_cases()
 
@@ -141,6 +154,125 @@ def test_manifest_source_ids_resolve_to_registered_sources() -> None:
     for case_id, case in _manifest_cases().items():
         unknown = set(case["reference"]["source_ids"]) - registered
         assert not unknown, f"{case_id} has unregistered source IDs: {sorted(unknown)}"
+
+
+def test_model_change_with_unchanged_case_hashes_rejects_stale_observation(
+    tmp_path: Path, baseline_observation: dict[str, object]
+) -> None:
+    model_root = tmp_path / "model"
+    case_root = model_root / "cases"
+    shutil.copytree(ROOT / "cases", case_root)
+    model_file = model_root / "src" / "iran_auto_claim" / "model_probe.py"
+    model_file.parent.mkdir(parents=True)
+    model_file.write_text("MODEL_VERSION = 1\n", encoding="utf-8")
+    (model_root / "claim.py").write_text(
+        "# synthetic model entry point\n", encoding="utf-8"
+    )
+    _git(model_root, "init", "-b", "main")
+    _git(model_root, "add", "claim.py", "src", "cases")
+    _git(
+        model_root,
+        "-c",
+        "user.name=PR57 Test",
+        "-c",
+        "user.email=pr57@example.invalid",
+        "commit",
+        "-m",
+        "model v1",
+    )
+
+    observation = copy.deepcopy(baseline_observation)
+    observation["revision"] = _git(model_root, "rev-parse", "HEAD")
+    observation["tree"] = _git(model_root, "rev-parse", "HEAD^{tree}")
+    observation_path = tmp_path / "stale-model-observation.json"
+    _write_json(observation_path, observation)
+    before = {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in case_root.glob("inspection-*.json")
+    }
+
+    model_file.write_text("MODEL_VERSION = 2\n", encoding="utf-8")
+    after = {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in case_root.glob("inspection-*.json")
+    }
+    assert after == before
+    with pytest.raises(
+        comparator.ManifestError, match="uncommitted implementation inputs"
+    ):
+        comparator.compare(
+            MANIFEST,
+            observation_path,
+            case_root,
+            model_root=model_root,
+        )
+
+    _git(model_root, "add", str(model_file.relative_to(model_root)))
+    _git(
+        model_root,
+        "-c",
+        "user.name=PR57 Test",
+        "-c",
+        "user.email=pr57@example.invalid",
+        "commit",
+        "-m",
+        "model v2",
+    )
+    assert {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in case_root.glob("inspection-*.json")
+    } == before
+    with pytest.raises(comparator.ManifestError, match="observation revision mismatch"):
+        comparator.compare(
+            MANIFEST,
+            observation_path,
+            case_root,
+            model_root=model_root,
+        )
+
+
+@pytest.mark.parametrize(
+    ("old", "new"),
+    [("143.20", "143.21"), ("m-toman", "IRR")],
+    ids=("rendered-amount", "rendered-unit"),
+)
+def test_standalone_calc_rendered_money_and_unit_are_enforced(
+    tmp_path: Path,
+    baseline_observation: dict[str, object],
+    old: str,
+    new: str,
+) -> None:
+    observation = copy.deepcopy(baseline_observation)
+    row = next(
+        item
+        for item in observation["supported_path"]
+        if item["case"] == "inspection-c13d-replacement-control"
+    )
+    payable_line = next(
+        line
+        for line in row["calc_stdout"].splitlines()
+        if line.lstrip().startswith("PAYABLE:")
+    )
+    changed_line = payable_line.replace(old, new, 1)
+    assert changed_line != payable_line
+    row["calc_stdout"] = row["calc_stdout"].replace(payable_line, changed_line, 1)
+    observation_path = tmp_path / f"standalone-{new}.json"
+    _write_json(observation_path, observation)
+
+    report, passed = comparator.compare(MANIFEST, observation_path, ROOT / "cases")
+    result = next(
+        item
+        for item in report["cases"]
+        if item["case_id"] == "inspection-c13d-replacement-control"
+    )
+    assert not passed
+    assert result["comparison_verdict"] == "MISMATCH"
+    assert "standalone_calculation.payable_rendered" in _failure_paths(result)
+    evidence = result["observed_behavior"]["standalone_calculation"]
+    assert evidence["expected_payable"] == "143.20 m-toman"
+    assert evidence["observed_payable"] == changed_line.split("PAYABLE:", 1)[1].strip()
+    assert evidence["display_unit"] == "million_toman"
+    assert evidence["irr_per_display_unit"] == 10_000_000
 
 
 def test_c42_rescue_100_to_101_crosses_strict_threshold(
