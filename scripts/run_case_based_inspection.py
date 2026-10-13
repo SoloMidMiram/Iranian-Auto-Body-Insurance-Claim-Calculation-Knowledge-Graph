@@ -13,35 +13,47 @@ import copy
 from decimal import Decimal
 import hashlib
 import json
-import os
 from pathlib import Path
 import subprocess
 import sys
 from typing import Any
 
+try:
+    from .inspection_provenance import (
+        BASE_MODEL_PATHS,
+        INTERNAL_PROBE_ORIGINS_RELATIVE,
+        ProvenanceError,
+        isolated_environment,
+        load_model_modules,
+        load_selected_file,
+        model_identity,
+        model_scope,
+        verify_object_file,
+        verify_object_origin,
+    )
+except ImportError:  # Direct script execution.
+    from inspection_provenance import (
+        BASE_MODEL_PATHS,
+        INTERNAL_PROBE_ORIGINS_RELATIVE,
+        ProvenanceError,
+        isolated_environment,
+        load_model_modules,
+        load_selected_file,
+        model_identity,
+        model_scope,
+        verify_object_file,
+        verify_object_origin,
+    )
 
-MODEL_PATHS = (
-    "claim.py",
-    "pyproject.toml",
-    "src",
-    "knowledge",
-    "schema",
-    "ontology",
-    "fixtures",
-)
+
+MODEL_PATHS = BASE_MODEL_PATHS
 
 
 def _command(command: list[str], root: Path) -> subprocess.CompletedProcess[str]:
-    environment = dict(os.environ)
-    root_src = str((root / "src").resolve())
-    inherited = environment.get("PYTHONPATH")
-    environment["PYTHONPATH"] = (
-        root_src if not inherited else os.pathsep.join((root_src, inherited))
-    )
     return subprocess.run(
         command,
         cwd=root,
-        env=environment,
+        env=isolated_environment(root),
         text=True,
         capture_output=True,
         check=False,
@@ -73,33 +85,11 @@ def _git_value(root: Path, expression: str) -> str:
     return result.stdout.strip() if result.returncode == 0 else "UNKNOWN"
 
 
-def _model_identity(root: Path) -> tuple[str, str]:
-    top = _git_value(root, "--show-toplevel")
-    if top == "UNKNOWN" or Path(top).resolve() != root.resolve():
-        raise SystemExit(f"model root must be a git worktree root: {root}")
-    status = _command(
-        [
-            "git",
-            "status",
-            "--porcelain=v1",
-            "--untracked-files=all",
-            "--",
-            *MODEL_PATHS,
-        ],
-        root,
-    )
-    if status.returncode != 0:
-        raise SystemExit(f"cannot inspect model worktree status: {status.stderr.strip()}")
-    if status.stdout.strip():
-        raise SystemExit(
-            "model worktree has uncommitted implementation inputs: "
-            + repr(status.stdout.strip().splitlines())
-        )
-    revision = _git_value(root, "HEAD")
-    tree = _git_value(root, "HEAD^{tree}")
-    if "UNKNOWN" in {revision, tree}:
-        raise SystemExit("cannot resolve model revision and tree")
-    return revision, tree
+def _model_identity(root: Path, scope: tuple[str, ...]) -> tuple[str, str]:
+    try:
+        return model_identity(root, scope)
+    except ProvenanceError as error:
+        raise SystemExit(str(error)) from error
 
 
 def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
@@ -198,11 +188,38 @@ def _supported_cases(root: Path, case_root: Path) -> list[dict[str, Any]]:
     ]
 
 
-def _internal_probes(root: Path) -> list[dict[str, Any]]:
-    sys.path.insert(0, str(root / "src"))
-    sys.path.insert(0, str(root))
-    from iran_auto_claim.knowledge import Knowledge
-    from tests.admission_shim import compute
+def _internal_probes_local(
+    root: Path,
+) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    modules, origins = load_model_modules(root, ("knowledge",))
+    Knowledge = modules["knowledge"].Knowledge
+    shim = load_selected_file(
+        root,
+        "tests/admission_shim.py",
+        "_inspection_selected_admission_shim",
+    )
+    compute = shim.compute
+    shim_origin = str((root / "tests" / "admission_shim.py").resolve())
+    origins.update(
+        {
+            "tests.admission_shim": shim_origin,
+            "tests.admission_shim.compute": verify_object_file(
+                compute,
+                root / "tests" / "admission_shim.py",
+                "internal probe compute helper",
+            ),
+            "tests.admission_shim.compute_authorized": verify_object_origin(
+                root,
+                shim.compute_authorized,
+                "internal probe engine helper",
+            ),
+            "tests.admission_shim._authorize_fixture_case": verify_object_origin(
+                root,
+                shim._authorize_fixture_case,
+                "internal probe authorization helper",
+            ),
+        }
+    )
 
     knowledge = Knowledge.load(root)
 
@@ -489,7 +506,36 @@ def _internal_probes(root: Path) -> list[dict[str, Any]]:
                 }
             )
         rows.append(row)
-    return rows
+    return rows, origins
+
+
+def _internal_probes(
+    root: Path, expected_revision: str, expected_tree: str
+) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    result = _command(
+        [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--root",
+            str(root),
+            "--_internal-worker",
+        ],
+        root,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.strip() or result.stdout.strip()
+        raise SystemExit(f"internal probe worker failed provenance checks: {detail}")
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        raise SystemExit("internal probe worker returned malformed evidence") from error
+    rows = payload.get("rows")
+    origins = payload.get("import_origins")
+    if not isinstance(rows, list) or len(rows) != 14 or not isinstance(origins, dict):
+        raise SystemExit("internal probe worker returned incomplete evidence")
+    if payload.get("revision") != expected_revision or payload.get("tree") != expected_tree:
+        raise SystemExit("internal probe worker model identity changed during inspection")
+    return rows, origins
 
 
 def main() -> int:
@@ -502,11 +548,31 @@ def main() -> int:
         action="store_true",
         help="also run separately labelled INTERNAL_TEST_DIRECT containment probes",
     )
+    parser.add_argument("--_internal-worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     root = args.root.resolve()
+    if args._internal_worker:
+        try:
+            revision, tree = model_identity(root, model_scope(True))
+            rows, origins = _internal_probes_local(root)
+        except ProvenanceError as error:
+            raise SystemExit(str(error)) from error
+        print(
+            json.dumps(
+                {
+                    "revision": revision,
+                    "tree": tree,
+                    "rows": rows,
+                    "import_origins": origins,
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
     case_root = args.cases.resolve()
+    scope = model_scope(args.internal)
     import_origin = _verify_import_origin(root)
-    revision, tree = _model_identity(root)
+    revision, tree = _model_identity(root, scope)
     cases = _supported_cases(root, case_root)
     if len(cases) != 47:
         raise SystemExit(f"expected 47 inspection cases, found {len(cases)}")
@@ -518,11 +584,28 @@ def main() -> int:
         "import_origin_relative": str(
             Path(import_origin).resolve().relative_to(root)
         ),
-        "model_scope": list(MODEL_PATHS),
+        "provenance_profile": (
+            "SUPPORTED_PLUS_INTERNAL" if args.internal else "SUPPORTED_ONLY"
+        ),
+        "model_scope": list(scope),
         "supported_path": cases,
     }
     if args.internal:
-        report["internal_test_direct"] = _internal_probes(root)
+        internal_rows, internal_origins = _internal_probes(root, revision, tree)
+        report["internal_test_direct"] = internal_rows
+        report["internal_probe_import_origins"] = internal_origins
+        internal_relative = {
+            label: str(Path(origin).resolve().relative_to(root))
+            for label, origin in internal_origins.items()
+        }
+        if internal_relative != INTERNAL_PROBE_ORIGINS_RELATIVE:
+            raise SystemExit(
+                "internal probe module origins differ from the required provenance map"
+            )
+        report["internal_probe_import_origins_relative"] = internal_relative
+    ending_revision, ending_tree = _model_identity(root, scope)
+    if (ending_revision, ending_tree) != (revision, tree):
+        raise SystemExit("model identity changed while inspection was running")
     rendered = json.dumps(report, indent=2, ensure_ascii=False) + "\n"
     if args.output:
         args.output.write_text(rendered, encoding="utf-8", newline="\n")

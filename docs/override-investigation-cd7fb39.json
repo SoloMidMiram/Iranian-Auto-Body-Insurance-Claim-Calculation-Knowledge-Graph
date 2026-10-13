@@ -2,6 +2,42 @@
   "revision": "cd7fb39a0b7859f2cec91b94770e240ab62e0b75",
   "tree": "4c594155cf9404def9bb32896c711985f3abccb8",
   "python": "3.11.15",
+  "provenance_profile": "BOUNDED_OVERRIDE_INVESTIGATION",
+  "model_scope": [
+    "claim.py",
+    "pyproject.toml",
+    "src",
+    "knowledge",
+    "schema",
+    "ontology",
+    "fixtures"
+  ],
+  "import_origins": {
+    "iran_auto_claim": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/__init__.py",
+    "iran_auto_claim.admission": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/admission.py",
+    "iran_auto_claim.engine": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/engine.py",
+    "iran_auto_claim.fixtures": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/fixtures.py",
+    "iran_auto_claim.knowledge": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/knowledge.py",
+    "iran_auto_claim.review": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/review.py",
+    "AuthorizationNotGranted": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/admission.py",
+    "compute": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/engine.py",
+    "authorize_fixture_case": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/fixtures.py",
+    "Knowledge": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/knowledge.py",
+    "Review": "/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/review.py"
+  },
+  "import_origins_relative": {
+    "iran_auto_claim": "src/iran_auto_claim/__init__.py",
+    "iran_auto_claim.admission": "src/iran_auto_claim/admission.py",
+    "iran_auto_claim.engine": "src/iran_auto_claim/engine.py",
+    "iran_auto_claim.fixtures": "src/iran_auto_claim/fixtures.py",
+    "iran_auto_claim.knowledge": "src/iran_auto_claim/knowledge.py",
+    "iran_auto_claim.review": "src/iran_auto_claim/review.py",
+    "AuthorizationNotGranted": "src/iran_auto_claim/admission.py",
+    "compute": "src/iran_auto_claim/engine.py",
+    "authorize_fixture_case": "src/iran_auto_claim/fixtures.py",
+    "Knowledge": "src/iran_auto_claim/knowledge.py",
+    "Review": "src/iran_auto_claim/review.py"
+  },
   "scope": "bounded theft-derived classification with total-loss override",
   "supported_review_limitation": "Review has no input that manufactures classification.override; supported rows therefore test missing evidence without an override.",
   "internal_test_direct": [

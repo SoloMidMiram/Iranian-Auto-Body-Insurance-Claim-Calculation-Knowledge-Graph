@@ -11,6 +11,7 @@ import sys
 import pytest
 
 from scripts import build_case_comparison as comparator
+from scripts import inspection_provenance as provenance
 from scripts import run_case_based_inspection as inspection
 
 
@@ -48,6 +49,7 @@ def baseline_observation() -> dict[str, object]:
         "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
         "python": "3.11",
         "import_origin_relative": "src/iran_auto_claim/__init__.py",
+        "provenance_profile": "SUPPORTED_ONLY",
         "model_scope": list(comparator.MODEL_PATHS),
         "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
     }
@@ -107,6 +109,33 @@ def _git(root: Path, *arguments: str) -> str:
         check=True,
     )
     return result.stdout.strip()
+
+
+def test_internal_observation_requires_internal_probe_scope(
+    tmp_path: Path, baseline_observation: dict[str, object]
+) -> None:
+    observation = copy.deepcopy(baseline_observation)
+    observation["internal_test_direct"] = []
+    observation["provenance_profile"] = "SUPPORTED_PLUS_INTERNAL"
+    observation_path = tmp_path / "observation.json"
+    _write_json(observation_path, observation)
+
+    with pytest.raises(comparator.ManifestError, match="model_scope"):
+        comparator.compare(MANIFEST, observation_path, ROOT / "cases")
+
+
+def test_internal_observation_requires_verified_internal_import_origins(
+    tmp_path: Path, baseline_observation: dict[str, object]
+) -> None:
+    observation = copy.deepcopy(baseline_observation)
+    observation["internal_test_direct"] = []
+    observation["provenance_profile"] = "SUPPORTED_PLUS_INTERNAL"
+    observation["model_scope"] = list(provenance.model_scope(True))
+    observation_path = tmp_path / "observation.json"
+    _write_json(observation_path, observation)
+
+    with pytest.raises(comparator.ManifestError, match="internal probe import origins"):
+        comparator.compare(MANIFEST, observation_path, ROOT / "cases")
 
 
 def test_reference_locators_are_case_relevant() -> None:

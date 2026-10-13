@@ -13,15 +13,25 @@ import copy
 from datetime import date, timedelta
 import json
 from pathlib import Path
-import subprocess
 import sys
 from typing import Any
 
-from iran_auto_claim.admission import AuthorizationNotGranted
-from iran_auto_claim.engine import compute
-from iran_auto_claim.fixtures import _authorize_fixture_case
-from iran_auto_claim.knowledge import Knowledge
-from iran_auto_claim.review import Review
+try:
+    from .inspection_provenance import (
+        ProvenanceError,
+        load_model_modules,
+        model_identity,
+        model_scope,
+        verify_object_origin,
+    )
+except ImportError:  # Direct script execution.
+    from inspection_provenance import (
+        ProvenanceError,
+        load_model_modules,
+        model_identity,
+        model_scope,
+        verify_object_origin,
+    )
 
 
 OVERRIDE = {
@@ -31,17 +41,6 @@ OVERRIDE = {
     "source": "synthetic inspection review-board record",
     "timestamp": "2026-10-12T18:00:00+03:30",
 }
-
-
-def _git_value(root: Path, expression: str) -> str:
-    result = subprocess.run(
-        ["git", "rev-parse", expression],
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    return result.stdout.strip() if result.returncode == 0 else "UNKNOWN"
 
 
 def _direct_base() -> dict[str, Any]:
@@ -159,7 +158,9 @@ def _direct_variants() -> list[tuple[str, dict[str, Any]]]:
     return rows
 
 
-def _direct_results(knowledge: Knowledge) -> list[dict[str, Any]]:
+def _direct_results(
+    knowledge: Any, compute: Any, authorize_fixture_case: Any
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for name, payload in _direct_variants():
         row: dict[str, Any] = {
@@ -168,7 +169,7 @@ def _direct_results(knowledge: Knowledge) -> list[dict[str, Any]]:
             "authorization_granted": False,
         }
         try:
-            authorization = _authorize_fixture_case(copy.deepcopy(payload), knowledge)
+            authorization = authorize_fixture_case(copy.deepcopy(payload), knowledge)
             row["authorization_granted"] = True
             result = compute(authorization, knowledge)
             classification = result.fields.get("classification") or {}
@@ -200,7 +201,11 @@ def _direct_results(knowledge: Knowledge) -> list[dict[str, Any]]:
 
 
 def _review_results(
-    case_root: Path, knowledge: Knowledge
+    case_root: Path,
+    knowledge: Any,
+    Review: Any,
+    AuthorizationNotGranted: type[Exception],
+    compute: Any,
 ) -> list[dict[str, Any]]:
     source = json.loads(
         (case_root / "inspection-c104-theft-60-59-clock.json").read_text(
@@ -247,6 +252,23 @@ def _review_results(
     return rows
 
 
+def _selected_runtime(root: Path) -> tuple[dict[str, Any], dict[str, str]]:
+    modules, origins = load_model_modules(
+        root,
+        ("admission", "engine", "fixtures", "knowledge", "review"),
+    )
+    runtime = {
+        "AuthorizationNotGranted": modules["admission"].AuthorizationNotGranted,
+        "compute": modules["engine"].compute,
+        "authorize_fixture_case": modules["fixtures"]._authorize_fixture_case,
+        "Knowledge": modules["knowledge"].Knowledge,
+        "Review": modules["review"].Review,
+    }
+    for label, value in runtime.items():
+        origins[label] = verify_object_origin(root, value, label)
+    return runtime, origins
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
@@ -254,19 +276,53 @@ def main() -> int:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
-    knowledge = Knowledge.load(root)
+    scope = model_scope(False)
+    try:
+        revision, tree = model_identity(root, scope)
+        runtime, origins = _selected_runtime(root)
+    except ProvenanceError as error:
+        raise SystemExit(str(error)) from error
+    case_root = (
+        args.cases.resolve()
+        if args.cases.is_absolute()
+        else (root / args.cases).resolve()
+    )
+    knowledge = runtime["Knowledge"].load(root)
     report = {
-        "revision": _git_value(root, "HEAD"),
-        "tree": _git_value(root, "HEAD^{tree}"),
+        "revision": revision,
+        "tree": tree,
         "python": sys.version.split()[0],
+        "provenance_profile": "BOUNDED_OVERRIDE_INVESTIGATION",
+        "model_scope": list(scope),
+        "import_origins": origins,
+        "import_origins_relative": {
+            label: str(Path(origin).resolve().relative_to(root))
+            for label, origin in origins.items()
+        },
         "scope": "bounded theft-derived classification with total-loss override",
         "supported_review_limitation": (
             "Review has no input that manufactures classification.override; supported rows "
             "therefore test missing evidence without an override."
         ),
-        "internal_test_direct": _direct_results(knowledge),
-        "supported_review": _review_results(args.cases.resolve(), knowledge),
+        "internal_test_direct": _direct_results(
+            knowledge,
+            runtime["compute"],
+            runtime["authorize_fixture_case"],
+        ),
+        "supported_review": _review_results(
+            case_root,
+            knowledge,
+            runtime["Review"],
+            runtime["AuthorizationNotGranted"],
+            runtime["compute"],
+        ),
     }
+    try:
+        ending_revision, ending_tree = model_identity(root, scope)
+    except ProvenanceError as error:
+        raise SystemExit(str(error)) from error
+    if (ending_revision, ending_tree) != (revision, tree):
+        raise SystemExit("model identity changed while investigation was running")
     rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(rendered, encoding="utf-8", newline="\n")

@@ -6,6 +6,7 @@
   "model_binding": {
     "revision": "fa214d940cbfe79389ff1269800e52a69bff13b8",
     "tree": "bb8e3476e84c7c8b52551ef5295b1f8951c812c6",
+    "profile": "SUPPORTED_PLUS_INTERNAL",
     "scope": [
       "claim.py",
       "pyproject.toml",
@@ -13,7 +14,8 @@
       "knowledge",
       "schema",
       "ontology",
-      "fixtures"
+      "fixtures",
+      "tests/admission_shim.py"
     ],
     "import_origin_relative": "src/iran_auto_claim/__init__.py"
   },

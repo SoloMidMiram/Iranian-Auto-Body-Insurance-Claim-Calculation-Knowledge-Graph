@@ -15,8 +15,24 @@ import hashlib
 import json
 from pathlib import Path
 import re
-import subprocess
 from typing import Any
+
+try:
+    from .inspection_provenance import (
+        BASE_MODEL_PATHS,
+        INTERNAL_PROBE_ORIGINS_RELATIVE,
+        ProvenanceError,
+        model_identity,
+        model_scope,
+    )
+except ImportError:  # Direct script execution.
+    from inspection_provenance import (
+        BASE_MODEL_PATHS,
+        INTERNAL_PROBE_ORIGINS_RELATIVE,
+        ProvenanceError,
+        model_identity,
+        model_scope,
+    )
 
 
 ALLOWED_BASES = {
@@ -52,16 +68,7 @@ TRACE_ROOTS = {
     "review_stderr",
 }
 HEX_DIGEST = re.compile(r"[0-9a-f]{64}")
-GIT_OBJECT_ID = re.compile(r"[0-9a-f]{40,64}")
-MODEL_PATHS = (
-    "claim.py",
-    "pyproject.toml",
-    "src",
-    "knowledge",
-    "schema",
-    "ontology",
-    "fixtures",
-)
+MODEL_PATHS = BASE_MODEL_PATHS
 MILLION_TOMAN_IRR = Decimal(10_000_000)
 PAYABLE_LINE = re.compile(r"^  PAYABLE:\s+(.+?)\s*$", re.MULTILINE)
 SCENARIOS_LINE = re.compile(r"^  SCENARIOS:\s+(\d+) outcomes\s*$", re.MULTILINE)
@@ -80,49 +87,16 @@ def _load_json(path: Path) -> Any:
         raise ManifestError(f"cannot read valid JSON from {path}: {error}") from error
 
 
-def _git_output(root: Path, *arguments: str) -> str:
-    result = subprocess.run(
-        ["git", *arguments],
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        detail = result.stderr.strip() or result.stdout.strip()
-        raise ManifestError(
-            f"cannot inspect model checkout with git {' '.join(arguments)}: {detail}"
-        )
-    return result.stdout.strip()
-
-
-def _model_identity(model_root: Path) -> tuple[str, str]:
-    root = model_root.resolve()
-    top = Path(_git_output(root, "rev-parse", "--show-toplevel")).resolve()
-    if top != root:
-        raise ManifestError(f"model root must be the git worktree root: expected {top}, got {root}")
-    dirty = _git_output(
-        root,
-        "status",
-        "--porcelain=v1",
-        "--untracked-files=all",
-        "--",
-        *MODEL_PATHS,
-    )
-    if dirty:
-        raise ManifestError(
-            "model checkout has uncommitted implementation inputs: "
-            f"{dirty.splitlines()}"
-        )
-    revision = _git_output(root, "rev-parse", "HEAD")
-    tree = _git_output(root, "rev-parse", "HEAD^{tree}")
-    if not GIT_OBJECT_ID.fullmatch(revision) or not GIT_OBJECT_ID.fullmatch(tree):
-        raise ManifestError("model revision and tree must be full lowercase git object IDs")
-    return revision, tree
-
-
-def _validate_model_binding(observation: dict[str, Any], model_root: Path) -> tuple[str, str]:
-    revision, tree = _model_identity(model_root)
+def _validate_model_binding(
+    observation: dict[str, Any], model_root: Path
+) -> tuple[str, str, tuple[str, ...], str]:
+    include_internal = "internal_test_direct" in observation
+    scope = model_scope(include_internal)
+    profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+    try:
+        revision, tree = model_identity(model_root, scope)
+    except ProvenanceError as error:
+        raise ManifestError(str(error)) from error
     observed_revision = observation.get("revision")
     observed_tree = observation.get("tree")
     if observed_revision != revision:
@@ -134,13 +108,23 @@ def _validate_model_binding(observation: dict[str, Any], model_root: Path) -> tu
         raise ManifestError(
             f"observation tree mismatch: expected model {tree}, observed {observed_tree!r}"
         )
-    if observation.get("model_scope") != list(MODEL_PATHS):
+    if observation.get("provenance_profile") != profile:
+        raise ManifestError(
+            "observation provenance_profile is missing or incompatible with its evidence"
+        )
+    if observation.get("model_scope") != list(scope):
         raise ManifestError(
             "observation model_scope is missing or differs from the comparator scope"
         )
     if observation.get("import_origin_relative") != "src/iran_auto_claim/__init__.py":
         raise ManifestError("observation import origin is not the selected model package")
-    return revision, tree
+    if include_internal and observation.get(
+        "internal_probe_import_origins_relative"
+    ) != INTERNAL_PROBE_ORIGINS_RELATIVE:
+        raise ManifestError(
+            "internal probe import origins are missing or differ from the required map"
+        )
+    return revision, tree, scope, profile
 
 
 def _unique_rows(rows: Any, key: str, label: str) -> dict[str, dict[str, Any]]:
@@ -547,7 +531,9 @@ def compare(
     if not isinstance(observation, dict):
         raise ManifestError("observation must be an object")
     target_root = (model_root or Path.cwd()).resolve()
-    model_revision, model_tree = _validate_model_binding(observation, target_root)
+    model_revision, model_tree, checked_scope, provenance_profile = (
+        _validate_model_binding(observation, target_root)
+    )
     observed = _unique_rows(observation.get("supported_path"), "case", "observation cases")
     case_paths = {path.stem: path for path in sorted(case_root.glob("inspection-*.json"))}
     expected_ids = set(references)
@@ -654,7 +640,8 @@ def compare(
         "model_binding": {
             "revision": model_revision,
             "tree": model_tree,
-            "scope": list(MODEL_PATHS),
+            "profile": provenance_profile,
+            "scope": list(checked_scope),
             "import_origin_relative": observation.get("import_origin_relative"),
         },
         "manifest": {
