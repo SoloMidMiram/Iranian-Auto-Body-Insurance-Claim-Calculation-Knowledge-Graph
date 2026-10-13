@@ -623,6 +623,12 @@ byte-identical submissions.
 
 ## Appendix B — reproduction and continued use
 
+> **Corrected comparator (PR #57):** the historical prose expectations and
+> 37/10 observation below are preserved, but the enforceable v1 manifest and
+> derived-verdict acceptance policy are documented in
+> `docs/CASE_COMPARATOR_V1.md`. `docs/case-reference-manifest-v1.json` is the
+> machine-readable oracle; the runner never regenerates it from model output.
+
 Run the complete corpus against any pinned checkout from the inspection branch. The output is a
 machine-readable observation record; it does not update an expected result or approve a legal
 interpretation.
