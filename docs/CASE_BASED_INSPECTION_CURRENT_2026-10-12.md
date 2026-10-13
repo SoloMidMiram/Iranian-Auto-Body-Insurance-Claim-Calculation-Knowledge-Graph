@@ -39,30 +39,39 @@ one report, and one runner. Before its local commit:
 - the runner has no network or remote-action path. Its only write is the
   explicitly requested `--output` file.
 
-The runner was tightened before preservation so each subprocess prepends the
-selected worktree's `src` directory to `PYTHONPATH`, verifies
+The runner now replaces inherited `PYTHONPATH` with the selected worktree's
+`src` directory, disables user-site imports, verifies
 `iran_auto_claim.__file__` is below that directory, and records the resolved
-import path. This prevents an editable install from another checkout from
-silently changing the inspected implementation.
+import path. With `--internal`, the checked-input scope also includes
+`tests/admission_shim.py`; a clean isolated worker records and verifies the
+shim, engine-helper, authorization-helper, knowledge, and package origins. The
+worker and parent identities are compared, and the parent rechecks the selected
+revision, tree, and cleanliness after collection. This prevents a competing
+checkout or uncommitted internal shim from silently changing the evidence.
+
+The bounded override investigation uses the same isolation primitives. It
+removes cached `iran_auto_claim` modules, selects `<root>/src`, and fails closed
+unless the implementation, knowledge, Review, and authorization helper origins
+all belong to the selected `--root`.
 
 ## Reproduction commands and current results
 
 All commands used Python 3.11.15. The accepted integration ran in a detached,
-clean worktree at `cd7fb39…`; imports resolved to
-`/tmp/body-model-integration-cd7fb39/src/iran_auto_claim/__init__.py`.
+clean worktree at `cd7fb39…`; the refreshed evidence resolved imports under
+`/tmp/body-model-review-base-cd7fb39/src/iran_auto_claim/` and the internal shim
+at `/tmp/body-model-review-base-cd7fb39/tests/admission_shim.py`.
 
 ```bash
 python scripts/run_case_based_inspection.py \
-  --root /tmp/body-model-integration-cd7fb39 \
-  --cases /tmp/body-model-case-inspection-commit/cases \
+  --root /tmp/body-model-review-base-cd7fb39 \
+  --cases /tmp/body-model-pr57-comparator/cases \
   --internal \
   --output docs/case-inspection-current-cd7fb39.json
 # exit 0: 47 supported cases, 14 INTERNAL_TEST_DIRECT probes
 
-PYTHONPATH=/tmp/body-model-integration-cd7fb39/src \
 python scripts/investigate_total_loss_override.py \
-  --root /tmp/body-model-integration-cd7fb39 \
-  --cases /tmp/body-model-case-inspection-commit/cases \
+  --root /tmp/body-model-review-base-cd7fb39 \
+  --cases /tmp/body-model-pr57-comparator/cases \
   --output docs/override-investigation-cd7fb39.json
 # exit 0: 9 direct variants, 3 supported-Review controls
 ```

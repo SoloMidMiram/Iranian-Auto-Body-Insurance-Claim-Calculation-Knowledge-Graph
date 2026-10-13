@@ -43,12 +43,17 @@ deviation.
 ### Model and renderer binding
 
 An observation is accepted only when its full Git revision and tree equal the
-checkout selected by `--model-root`. The runner and comparator both reject
-uncommitted inputs in the bounded model scope (`claim.py`, packaging metadata,
-`src`, `knowledge`, `schema`, `ontology`, and `fixtures`). The recorded import
-origin must also identify `src/iran_auto_claim/__init__.py`. Case SHA-256 values
-remain a separate invariant; unchanged case bytes cannot make an observation
-from another model tree acceptable.
+checkout selected by `--model-root`. The runner and comparator share an
+explicit provenance profile. Both reject uncommitted inputs in the bounded
+model scope (`claim.py`, packaging metadata, `src`, `knowledge`, `schema`,
+`ontology`, and `fixtures`); `SUPPORTED_PLUS_INTERNAL` additionally requires
+`tests/admission_shim.py`. The runner removes inherited `PYTHONPATH` entries,
+records the selected package origin, runs internal probes in an isolated
+worker, and records the exact shim, engine-helper, authorization-helper,
+knowledge, and package origins. The comparator requires that profile, scope,
+and relative origin map. Case SHA-256 values remain a separate invariant;
+unchanged case bytes cannot make an observation from another model tree
+acceptable.
 
 For every successful standalone `claim calc`, the comparator independently
 parses the rendered `PAYABLE` and scenario lines and derives their expected
@@ -76,6 +81,29 @@ Parent/fix reproduction at parent
 The controlled source probe was restored immediately after each run. No case
 payload, digest, reference expectation, known deviation, financial calculation,
 or legal-authority classification changed.
+
+Parent/fix reproduction at parent
+`09b07b35e1e20f87ab994ec9b656df379bf85b8d`:
+
+- Investigation-import parent: running the investigation against the clean
+  `fa214d940cbfe79389ff1269800e52a69bff13b8` worktree while importing the
+  script from the parent checkout produced a report tagged `fa214d9…` / tree
+  `bb8e347…`, but `Review`, `Knowledge`, `compute`, and the authorization helper
+  all resolved under the `09b07b3…` worktree. Current behavior discards cached
+  model modules, selects `<root>/src`, verifies every module/helper origin, and
+  records all relative origins under the `fa214d9…` worktree even with a
+  conflicting inherited `PYTHONPATH`.
+- Internal-shim parent: replacing the uncommitted shim body with a controlled
+  `RuntimeError` changed all 14 internal rows while the runner exited zero and
+  still tagged revision `09b07b3…` / tree `3605310…`; its seven-path scope did
+  not include the shim. Current `SUPPORTED_PLUS_INTERNAL` behavior adds
+  `tests/admission_shim.py`, fails before observation on a dirty shim, verifies
+  the worker identity/origins, and rechecks identity after collection.
+
+Both controlled parent probes were restored immediately. Automated regressions
+cover a separate selected checkout, a conflicting `PYTHONPATH`, the exact
+origin map, a dirty internal shim, and comparator rejection of an internal
+observation using the supported-only scope.
 
 `KNOWN_DEVIATION` is accepted only for drift detection. It is never converted
 to `MATCH`, never establishes calculation correctness, and remains
