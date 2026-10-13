@@ -222,21 +222,27 @@
         "authority_status": "CONTRACT_OR_TERM_ARTIFACT_INCOMPLETE",
         "source_ids": [
           "SRC_REG53_MIRROR",
+          "SRC_IRANINSURANCE_BODY_ENDORSEMENT_TERMS",
           "SRC_INSURER_MANUAL_PENDING"
         ],
         "rule_locators": [
-          "REG53_POLICY_DEFINED_FRANCHISE",
-          "U02_FRANCHISE_BASE_SCHEDULES"
+          "Regulation 53 Art 5 / REG53_ART5_ENDORSABLE_EXCLUSIONS",
+          "Q-S3-05 and Q-S6-06 / EVT_ENDORSEMENT_WORDING",
+          "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+          "U11_GLASS_ARTICLE10_EXEMPTION"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
-          "actual policy/manual effective date unavailable"
+          "Iran Insurance example endorsement version/effective date unavailable",
+          "applicable policy endorsement schedule not obtained"
         ],
         "unit": "IRR",
         "operator_order": [
-          "validate source identity and version before applying money term"
+          "establish the applicable standalone-glass wording",
+          "determine whether the general underinsurance rule applies",
+          "apply only versioned contractual economics"
         ],
-        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "derivation": "A held endorsement token does not establish standalone-glass economics or displace the general underinsurance rule; the applicable wording is required before any payment can be confirmed.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },
@@ -4076,24 +4082,22 @@
         "basis": "CONTROLLED_MATH",
         "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
         "source_ids": [
-          "SRC_REG53_MIRROR",
-          "SRC_INSURER_MANUAL_PENDING"
+          "SRC_REG53_MIRROR"
         ],
         "rule_locators": [
           "Regulation 53 Art 20 note 2",
-          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
-          "U01_ARTICLE10_PARTIAL_ORDER"
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
-          "insurer worksheet unavailable"
+          "synthetic event 1404-08-20"
         ],
         "unit": "IRR",
         "operator_order": [
-          "depreciation",
-          "underinsurance/franchise order unresolved"
+          "ratio = min(1, insured sum / market value)",
+          "ratio is capped at one, so no underinsurance reduction applies"
         ],
-        "derivation": "Both named exact-IRR scenarios are derived; no authority chooses one.",
+        "derivation": "The insured sum exceeds the market value, so the exact underinsurance ratio is capped at one and the controlled calculation remains 6,760 IRR.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },
@@ -4189,17 +4193,16 @@
         "authority_status": "IMPLEMENTATION_INFERENCE_NOT_SETTLED_AUTHORITY",
         "source_ids": [
           "SRC_REG53_MIRROR",
-          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
-          "SRC_CIC_CIRCULAR_1400_401_146850"
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
         ],
         "rule_locators": [
-          "Regulation 53 Art 19",
+          "Regulation 53 Arts 19 and 20 note 2",
           "REG53_ART19_TOTAL_LOSS_VALUATION",
-          "Circular 1400/401/146850"
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
-          "Circular effective 1400/09/13",
           "synthetic event 1404-08-20"
         ],
         "unit": "IRR",
@@ -4208,9 +4211,10 @@
           "salvage deduction when retained",
           "franchise",
           "rescue addition",
+          "do not apply the underinsurance ratio a second time",
           "insured-sum cap"
         ],
-        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "derivation": "Implementation inference from Articles 19 and 20 note 2: the settlement base is already capped at the insured sum, so a second underinsurance-ratio application would double-reduce the loss.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },
@@ -4305,21 +4309,25 @@
         "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
         "source_ids": [
           "SRC_REG53_MIRROR",
-          "SRC_INSURER_MANUAL_PENDING"
+          "SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS"
         ],
         "rule_locators": [
-          "REG53_POLICY_DEFINED_FRANCHISE",
-          "U02_FRANCHISE_BASE_SCHEDULES"
+          "REG53_NOTICE_AND_DUTIES",
+          "Q-S3-07 / PS_RISK_INTENSIFICATION",
+          "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
-          "actual policy/manual effective date unavailable"
+          "synthetic event 1404-08-20",
+          "applicable premium tariff and claims instruction not obtained"
         ],
         "unit": "IRR",
         "operator_order": [
-          "validate source identity and version before applying money term"
+          "establish risk intensification and causation",
+          "obtain the charged and intensified-risk premiums",
+          "apply the premium-ratio mechanism only after its authority and inputs are complete"
         ],
-        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "derivation": "Risk intensification uses a premium ratio, not the underinsurance ratio. The required tariff premium and reviewed claims instruction are unavailable, so no payable is derived.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },
@@ -4504,22 +4512,25 @@
         "basis": "UNRESOLVED",
         "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
         "source_ids": [
-          "SRC_REG53_MIRROR",
-          "SRC_INSURER_MANUAL_PENDING"
+          "SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS"
         ],
         "rule_locators": [
-          "REG53_POLICY_DEFINED_FRANCHISE",
-          "U02_FRANCHISE_BASE_SCHEDULES"
+          "Q-S0-06 / PS_POLICY_STATE",
+          "EVT_POLICY_COPY and EVT_PREMIUM_PROOF",
+          "POLICY_CANCELLATION_STATUS_UNRESOLVED"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
-          "actual policy/manual effective date unavailable"
+          "synthetic event 1404-08-20",
+          "applicable private conditions and cancellation record not obtained"
         ],
         "unit": "IRR",
         "operator_order": [
-          "validate source identity and version before applying money term"
+          "establish the applicable premium-payment terms",
+          "determine whether the insurer cancelled the policy before the loss",
+          "only then decide coverage and authorize calculation"
         ],
-        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "derivation": "An overdue instalment does not by itself prove lapse. The applicable private conditions and cancellation evidence are required before coverage or payment can be decided.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },
@@ -5273,7 +5284,8 @@
         ],
         "rule_locators": [
           "REG53_NOTICE_AND_DUTIES",
-          "REG53_ART14_SUBROGATION"
+          "Q-S0-04 / PS_NOTICE_TIMELINESS",
+          "RQ-05_NOTICE_ADJUDICATION"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
@@ -5281,10 +5293,10 @@
         ],
         "unit": "IRR",
         "operator_order": [
-          "adjudicate material duty/recourse consequence",
+          "adjudicate the late-notice consequence",
           "only then authorize calculation"
         ],
-        "derivation": "The source identifies a consequence but the case lacks a reviewed adjudication artifact.",
+        "derivation": "The notice duty is relevant, but the case lacks a reviewed RQ-05 adjudication artifact establishing the consequence of delay.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },
@@ -5461,8 +5473,9 @@
           "SRC_REG53_MIRROR"
         ],
         "rule_locators": [
-          "REG53_NOTICE_AND_DUTIES",
-          "REG53_ART14_SUBROGATION"
+          "REG53_ART14_SUBROGATION",
+          "Q-S9-01 / PS_SUBROGATION_IMPAIRED",
+          "RQ-06_SUBROGATION_ADJUDICATION"
         ],
         "effective_or_applicability_dates": [
           "Regulation 53 registered effective 1384/12/09",
@@ -5470,10 +5483,10 @@
         ],
         "unit": "IRR",
         "operator_order": [
-          "adjudicate material duty/recourse consequence",
+          "adjudicate the impairment-of-recourse consequence",
           "only then authorize calculation"
         ],
-        "derivation": "The source identifies a consequence but the case lacks a reviewed adjudication artifact.",
+        "derivation": "Article 14 is relevant, but the case lacks a reviewed RQ-06 adjudication artifact establishing the consequence of released recourse.",
         "reviewer": null,
         "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
       },

@@ -18,6 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "docs" / "case-reference-manifest-v1.json"
 
 
+def _manifest_cases() -> dict[str, dict[str, object]]:
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    return {case["case_id"]: case for case in manifest["cases"]}
+
+
 def _case_hashes() -> dict[str, str]:
     return {
         path.name: hashlib.sha256(path.read_bytes()).hexdigest()
@@ -89,6 +94,53 @@ def _failure_paths(result: dict[str, object]) -> set[str]:
     failures = result["reference_assertion_failures"]
     assert isinstance(failures, list)
     return {failure["path"] for failure in failures}
+
+
+def test_reference_locators_are_case_relevant() -> None:
+    cases = _manifest_cases()
+
+    glass = cases["inspection-c102-glass-endorsement-token-only"]["reference"]
+    assert {
+        "REG53_ART5_ENDORSABLE_EXCLUSIONS",
+        "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+        "U11_GLASS_ARTICLE10_EXEMPTION",
+    } <= set(" ".join(glass["rule_locators"]).replace("/", " ").split())
+
+    intensified = cases["inspection-c81-risk-intensified-yes"]["reference"]
+    assert "U15_RISK_INTENSIFICATION_PREMIUM_RATIO" in intensified["rule_locators"]
+
+    overdue = cases["inspection-c83-instalment-overdue"]["reference"]
+    assert "POLICY_CANCELLATION_STATUS_UNRESOLVED" in overdue["rule_locators"]
+
+    for reference in (glass, intensified, overdue):
+        assert "REG53_POLICY_DEFINED_FRANCHISE" not in reference["rule_locators"]
+        assert "U02_FRANCHISE_BASE_SCHEDULES" not in reference["rule_locators"]
+
+    late_notice = cases["inspection-c97-late-notice-no-excuse"]["reference"]
+    assert "REG53_NOTICE_AND_DUTIES" in late_notice["rule_locators"]
+    assert "REG53_ART14_SUBROGATION" not in late_notice["rule_locators"]
+
+    recourse = cases["inspection-c98-recourse-released"]["reference"]
+    assert "REG53_ART14_SUBROGATION" in recourse["rule_locators"]
+    assert "REG53_NOTICE_AND_DUTIES" not in recourse["rule_locators"]
+
+    overinsured = cases["inspection-c73-overinsured"]["reference"]
+    assert "U01_ARTICLE10_PARTIAL_ORDER" not in overinsured["rule_locators"]
+
+    total_loss = cases["inspection-c74-underinsured-total-loss"]["reference"]
+    assert "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE" in total_loss[
+        "rule_locators"
+    ]
+
+
+def test_manifest_source_ids_resolve_to_registered_sources() -> None:
+    sources = json.loads(
+        (ROOT / "knowledge" / "sources.json").read_text(encoding="utf-8")
+    )
+    registered = {source["node_id"] for source in sources["sources"]}
+    for case_id, case in _manifest_cases().items():
+        unknown = set(case["reference"]["source_ids"]) - registered
+        assert not unknown, f"{case_id} has unregistered source IDs: {sorted(unknown)}"
 
 
 def test_c42_rescue_100_to_101_crosses_strict_threshold(
