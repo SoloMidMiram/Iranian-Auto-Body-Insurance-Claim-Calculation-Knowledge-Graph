@@ -315,6 +315,20 @@ def main() -> int:
     assert missing_rescue_result.payable is None
     assert missing_rescue_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
 
+    # M27 must remain observable without an override. An ordinary
+    # evidence-derived threshold route cannot turn omitted rescue into zero.
+    missing_rescue_without_override = copy.deepcopy(missing_rescue)
+    missing_rescue_without_override["claim_id"] = "missing-rescue-no-override-probe"
+    missing_rescue_without_override["classification"].pop("override")
+    missing_rescue_without_override_result = compute(
+        _authorize_fixture_case(missing_rescue_without_override, kb), kb
+    )
+    assert missing_rescue_without_override_result.payable is None
+    assert (
+        missing_rescue_without_override_result.status
+        == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    )
+
     # A preliminary theft classification does not evaluate the repair/rescue
     # threshold. If an override selects a threshold-dependent final branch,
     # that candidate route must re-apply the missing-rescue evidence gate.
@@ -329,6 +343,18 @@ def main() -> int:
     assert override_from_theft_result.payable is None
     assert override_from_theft_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
     assert override_from_theft_result.fields["classification"]["derived_branch"] == "THEFT"
+
+    override_without_repair = copy.deepcopy(override_from_theft)
+    override_without_repair["claim_id"] = "override-from-theft-missing-repair-probe"
+    override_without_repair["classification"]["branch"] = "TOTAL_LOSS"
+    override_without_repair["damage"].pop("repair")
+    override_without_repair["damage"]["rescue_for_threshold"] = 0
+    override_without_repair_result = compute(
+        _authorize_fixture_case(override_without_repair, kb), kb
+    )
+    assert override_without_repair_result.payable is None
+    assert override_without_repair_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert "repair-and-replacement assessment" in override_without_repair_result.reason
 
     partial = {
         "claim_id": "runtime-defect-probe",
