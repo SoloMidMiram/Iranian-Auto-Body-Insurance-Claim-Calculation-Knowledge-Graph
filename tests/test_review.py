@@ -633,6 +633,27 @@ def test_review_omitted_rescue_stays_missing_and_cannot_authorize(kb):
         review.authorize()
 
 
+def test_supported_theft_review_does_not_manufacture_threshold_evidence_or_override(kb):
+    review = Review(load("review_t2_theft_pending.json"), kb)
+
+    emitted = review.case_payload()
+    assert "repair_total_irr" not in emitted["damage"]
+    assert "rescue_for_total_loss_test_irr" not in emitted["damage"]
+    assert "override" not in emitted["classification"]
+    assert review.classification()["branch"] == "THEFT"
+
+
+def test_supported_theft_review_missing_market_cannot_authorize(kb):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].pop("Q-S5-01")
+    review = Review(payload, kb)
+
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
 @pytest.mark.parametrize(
     "rescue,expected",
     [(99, "PARTIAL_DAMAGE"), (100, "PARTIAL_DAMAGE"), (101, "TOTAL_LOSS")],

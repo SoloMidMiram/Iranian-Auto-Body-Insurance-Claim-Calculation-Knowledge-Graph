@@ -38,7 +38,17 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M26 | KILLED | Review drops evidenced rescue from the total-loss classification numerator |
 | M27 | KILLED | omitted material rescue is treated as zero and allowed to authorize payment |
 | M28 | KILLED | a classification override bypasses the unresolved-rescue payment gate |
-| M29 | KILLED | an override-selected threshold branch skips the missing-rescue evidence gate |
+| M30 | KILLED | a classification override bypasses final-selected-branch evidence completeness |
+
+## Triaged mutation survivors
+
+- **M27 was missing coverage, not equivalent.** The probe now includes an ordinary
+  evidence-derived threshold route without an override. Mutating its omitted-rescue
+  gate produces a payable and is killed.
+- **M29 was equivalent under the corrected final-branch contract and is retired.**
+  Its candidate-branch disjunct duplicated `_final_selected_branch_evidence_gap`;
+  removing that disjunct leaves the focused and complete probes unchanged. M30
+  directly mutates the controlling final-selected-branch condition and is killed.
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

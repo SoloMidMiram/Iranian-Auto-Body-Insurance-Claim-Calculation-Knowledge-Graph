@@ -1304,6 +1304,53 @@ def _classification_evidence_gap(
     return None
 
 
+def _missing_classification_rescue_reason() -> str:
+    return (
+        "classification rescue is missing; a non-negative amount could change the "
+        "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
+        "payment and this evidence gate cannot be overridden"
+    )
+
+
+def _final_selected_branch_evidence_gap(
+    case: Case, selected_branch: str | None
+) -> str | None:
+    """Require the classification operands consumed by an override-selected route.
+
+    An override supplies authority to select a branch; it does not supply the
+    evidence that branch needs. Threshold-dependent body routes therefore need
+    their repair, market and classification-rescue operands before the override
+    can become calculation authorization.
+    """
+    if selected_branch not in RESCUE_THRESHOLD_BRANCHES:
+        return None
+
+    missing = []
+    if case.repair_total is None:
+        missing.append("repair-and-replacement assessment")
+    if case.market_value is None:
+        missing.append("event-date market value")
+
+    classification_rescue, rescue_source, unresolved_rescue = (
+        case.classification_rescue()
+    )
+    if unresolved_rescue is not None:
+        return unresolved_rescue
+    if classification_rescue is None and (
+        rescue_source == "UNRESOLVED_MISSING_RESCUE"
+    ):
+        missing.append("classification rescue")
+
+    if not missing:
+        return None
+    if missing == ["classification rescue"]:
+        return _missing_classification_rescue_reason()
+    return (
+        f"override-selected {selected_branch} classification needs "
+        + ", ".join(missing)
+    )
+
+
 def reconcile_classification(
     case: Case, kb: Knowledge
 ) -> tuple[dict[str, Any], str | None, str | None]:
@@ -1330,10 +1377,10 @@ def reconcile_classification(
         case.classification_rescue()
     )
     override = case.classification_override
-    threshold_classification_participates = (
-        derived in RESCUE_THRESHOLD_BRANCHES
-        or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)
-    )
+    # Candidate branches selected by an override are checked independently by
+    # _final_selected_branch_evidence_gap. Keep this predicate about the
+    # evidence-derived route so the two gates do not encode the same condition.
+    threshold_classification_participates = derived in RESCUE_THRESHOLD_BRANCHES
     unresolved_rescue_gate = (
         unresolved_rescue is not None
         and (declared == "TOTAL_LOSS" or threshold_classification_participates)
@@ -1344,12 +1391,15 @@ def reconcile_classification(
         and classification_rescue is None
         and rescue_source == "UNRESOLVED_MISSING_RESCUE"
     )
+    final_selected_branch_gap = (
+        _final_selected_branch_evidence_gap(case, declared)
+        if override is not None and not unresolved_rescue_gate
+        else None
+    )
     if unresolved_rescue_gate:
-        gap = unresolved_rescue or (
-            "classification rescue is missing; a non-negative amount could change the "
-            "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
-            "payment and this evidence gate cannot be overridden"
-        )
+        gap = unresolved_rescue or _missing_classification_rescue_reason()
+    elif final_selected_branch_gap is not None:
+        gap = final_selected_branch_gap
     else:
         gap = _classification_evidence_gap(case, declared, derived)
 
@@ -1374,6 +1424,7 @@ def reconcile_classification(
         outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE")
         and override is not None
         and not unresolved_rescue_gate
+        and final_selected_branch_gap is None
     ):
         outcome = "AUTHORIZED_OVERRIDE"
         selected = declared

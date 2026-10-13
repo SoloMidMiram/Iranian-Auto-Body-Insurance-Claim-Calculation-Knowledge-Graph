@@ -1226,6 +1226,79 @@ def test_override_into_threshold_branch_cannot_bypass_missing_rescue(
     assert "preliminary zero cannot authorize payment" in result.reason
 
 
+def _theft_derived_total_loss_override(**inputs):
+    payload = _case_without_rescue_default(
+        "TOTAL_LOSS",
+        theft_type="WHOLE_VEHICLE",
+        days_missing=10,
+        market=10000,
+        insured=10000,
+        gross=7400,
+        salvage_value=0,
+        salvage_disposition="INSURED_RETAINS",
+        franchise=1000,
+        **inputs,
+    )
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented total-loss branch selection",
+        "source": "review-board-record-2026-45",
+        "timestamp": "2026-10-13T06:00:00Z",
+    }
+    return payload
+
+
+@pytest.mark.parametrize(
+    "rescue_inputs",
+    [
+        {"rescue_for_threshold": 0},
+        {"actual_rescue": 200},
+        {},
+    ],
+    ids=("explicit-zero-rescue", "actual-rescue", "rescue-omitted"),
+)
+def test_override_selected_total_loss_requires_repair_assessment(kb, rescue_inputs):
+    result = compute(_theft_derived_total_loss_override(**rescue_inputs), kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "repair-and-replacement assessment" in result.reason
+
+
+def test_override_selected_total_loss_requires_event_market_value(kb):
+    payload = _theft_derived_total_loss_override(
+        repair=7400,
+        rescue_for_threshold=0,
+    )
+    payload["damage"].pop("market")
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "event-date market value" in result.reason
+
+
+def test_theft_derived_total_loss_override_with_complete_operands_remains_available(kb):
+    result = compute(
+        _theft_derived_total_loss_override(
+            repair=7400,
+            rescue_for_threshold=0,
+        ),
+        kb,
+    )
+
+    assert result.payable == D(9000)
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "AUTHORIZED_OVERRIDE"
+    assert result.fields["total_loss_threshold_override"] is True
+
+
 def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
     payload = _case(
         "PARTIAL_DAMAGE",
