@@ -1,0 +1,3580 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "inspection-reference-manifest-v1",
+  "reference_review_status": "AUTHOR_PREPARED_AWAITING_FRESH_INDEPENDENT_REVIEW",
+  "reference_origin": "Typed transcription of the pre-execution reference matrix and independent Decimal arithmetic in docs/CASE_BASED_INSPECTION.md sections 2-5; expectations are not regenerated from observed model results.",
+  "historical_observation": {
+    "revision": "fa214d940cbfe79389ff1269800e52a69bff13b8",
+    "match": 37,
+    "discrepancy": 10,
+    "label": "HISTORICAL_PRE_CORRECTED_COMPARATOR_OBSERVATION",
+    "not_an_acceptance_result": true
+  },
+  "known_deviation_policy": {
+    "gate_effect": "Registered deviations are accepted only as exact drift envelopes so new behavior changes fail the comparator.",
+    "release_effect": "Every KNOWN_DEVIATION remains release-blocking and is never counted as MATCH.",
+    "review_requirement": "Changing a reference or deviation envelope requires explicit review; the runner never rewrites this manifest."
+  },
+  "cases": [
+    {
+      "case_id": "inspection-c101-manual-franchise-unversioned",
+      "input_sha256": "05316e9ebac1cc199fa7742c172128e017fde80ca6eaa5b9203f39ca7f30fb3e",
+      "reference": {
+        "basis": "CONTRACT_TERM",
+        "authority_status": "CONTRACT_OR_TERM_ARTIFACT_INCOMPLETE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "U02_FRANCHISE_BASE_SCHEDULES"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "actual policy/manual effective date unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "validate source identity and version before applying money term"
+        ],
+        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_FRANCHISE.value.source",
+            "operator": "equals",
+            "value": "INSURER_MANUAL"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-08"
+        ],
+        "description": "An unversioned insurer-manual rate is accepted as contractual authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "PARTIAL_DAMAGE",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "PARTIAL_DAMAGE"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 1432000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "fields.franchise_source",
+              "operator": "equals",
+              "value": "INSURER_MANUAL"
+            },
+            {
+              "path": "rule_trace",
+              "operator": "contains",
+              "value": "REG53_POLICY_DEFINED_FRANCHISE"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c102-glass-endorsement-token-only",
+      "input_sha256": "f3f5d55b7fd4e163eddb50f967887bea4da7f7cf5dcae6556519b7c0e4ae9297",
+      "reference": {
+        "basis": "CONTRACT_TERM",
+        "authority_status": "CONTRACT_OR_TERM_ARTIFACT_INCOMPLETE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "U02_FRANCHISE_BASE_SCHEDULES"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "actual policy/manual effective date unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "validate source identity and version before applying money term"
+        ],
+        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "GLASS_ONLY",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+            "U11_GLASS_ARTICLE10_EXEMPTION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_blocking_questions",
+            "operator": "contains",
+            "value": "Q-S6-06"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c104-theft-60-59-clock",
+      "input_sha256": "85400a7bf8e6484c08f70d02a2a07fa37235b538cac542f4b831d71000d52895",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19 theft clause",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "U13_THEFT_CLOCK_ANCHOR"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer procedure undated",
+          "synthetic dates in 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "derive elapsed Shamsi days from declared anchor",
+          "apply >= 60 test"
+        ],
+        "derivation": "Day arithmetic is controlled; the legally applicable clock anchor remains unaccepted.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THEFT",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_THEFT_CLOCK_START_EVENT.value",
+            "operator": "equals",
+            "value": "THEFT_OCCURRENCE"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-06",
+          "RQ-02"
+        ],
+        "description": "Caller-selected theft clock is treated as accepted authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "THEFT",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "THEFT"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 7200000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "fields.days_missing",
+              "operator": "equals",
+              "value": 60
+            },
+            {
+              "path": "fields.theft_clock.start_event",
+              "operator": "equals",
+              "value": "THEFT_OCCURRENCE"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c105-theft-59-days",
+      "input_sha256": "3db7872e9de20ce6fb6c674bc7e28b7778880b9eb1b49a31c364d521e42f6261",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19 theft clause",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "U13_THEFT_CLOCK_ANCHOR"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer procedure undated",
+          "synthetic dates in 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "derive elapsed Shamsi days from declared anchor",
+          "apply >= 60 test"
+        ],
+        "derivation": "Day arithmetic is controlled; the legally applicable clock anchor remains unaccepted.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "THEFT",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "THEFT"
+        },
+        "calculation": {
+          "present": true,
+          "status": "PENDING_60_DAY_CRITERION",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.days_missing",
+            "operator": "equals",
+            "value": 59
+          },
+          {
+            "path": "fields.theft_clock.source",
+            "operator": "equals",
+            "value": "police non-discovery enquiry dated 1404-06-18"
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_THEFT_TOTAL_LOSS_60D"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c106-theft-clock-unbound",
+      "input_sha256": "a28986645826de4fd428c2b836eb0ef871ff6db2e19a7e192da034dfaa8cbddc",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19 theft clause",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "U13_THEFT_CLOCK_ANCHOR"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer procedure undated",
+          "synthetic dates in 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "derive elapsed Shamsi days from declared anchor",
+          "apply >= 60 test"
+        ],
+        "derivation": "Day arithmetic is controlled; the legally applicable clock anchor remains unaccepted.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THEFT",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_THEFT_CLOCK_START_EVENT.status",
+            "operator": "equals",
+            "value": "UNANSWERED"
+          },
+          {
+            "path": "blocking_conditions",
+            "operator": "contains",
+            "value": "THEFT_CLOCK_ANCHOR_UNRESOLVED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c13a-repair-only",
+      "input_sha256": "26d63d6c891a0a4aba778a1ed2da4a1d2844adc02083f794ec9867946473555c",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19(b)",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic case applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "eligible replacement-part loss",
+          "depreciation",
+          "franchise",
+          "rescue addition"
+        ],
+        "derivation": "Independent Decimal arithmetic from stated operands; synthetic franchise is a controlled input.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 1540000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.depreciation",
+            "operator": "money_equals",
+            "value": 0
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19B_PARTIAL_LOSS_BASE"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c13b-replaced-but-flag-false",
+      "input_sha256": "d29f47bafb1763e610aaaf66323fdc1835ffa8da7b049999867b4f14833c1158",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19(b)",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic case applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "eligible replacement-part loss",
+          "depreciation",
+          "franchise",
+          "rescue addition"
+        ],
+        "derivation": "Independent Decimal arithmetic from stated operands; synthetic franchise is a controlled input.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 1540000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.depreciation",
+            "operator": "money_equals",
+            "value": 0
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19B_PARTIAL_LOSS_BASE"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c13c-repair-only-flag-true",
+      "input_sha256": "737a7ca8f18bc9a3a3829d08b053031aef0859d4f95b80cf3b981982cb22c6a4",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 1,
+          "calc_exit": 1
+        },
+        "review_decision": null,
+        "classification": null,
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": null,
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_error_codes",
+            "operator": "contains",
+            "value": "contradictory_input"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c13d-replacement-control",
+      "input_sha256": "144228295be21ad87a305c12b21548a996a790d1eab06be74800da3fc5c55b48",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19(b)",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic case applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "eligible replacement-part loss",
+          "depreciation",
+          "franchise",
+          "rescue addition"
+        ],
+        "derivation": "Independent Decimal arithmetic from stated operands; synthetic franchise is a controlled input.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 1432000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.depreciation",
+            "operator": "money_equals",
+            "value": 120000000
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19B_PARTIAL_LOSS_BASE"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c21mix-four-kinds",
+      "input_sha256": "49ba540c3d9e6a221fff59a5f6472aed9df51e5d72804149f990379da47c2eea",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19(b)",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic case applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "eligible replacement-part loss",
+          "depreciation",
+          "franchise",
+          "rescue addition"
+        ],
+        "derivation": "Independent Decimal arithmetic from stated operands; synthetic franchise is a controlled input.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 2332000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.depreciation",
+            "operator": "money_equals",
+            "value": 120000000
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c31u04-unresolved",
+      "input_sha256": "cc61e89c40e10e81ecf2222385c7d7aa2736fc22e4a54af4dd2ffbe9204509d3",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 3",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer practice artifact unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "50% new-price cap",
+          "depreciation interaction unresolved"
+        ],
+        "derivation": "No insurer manual or claims-department artifact establishes the interaction order.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "calculation": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+            "operator": "equals",
+            "value": "NOT_TRIGGERED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c32u04-cap-then-dep",
+      "input_sha256": "49ea0519aa898bc74ad129ab52d4c719cd3192fcd56b0a2c0ca532008cb63d5c",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 3",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer practice artifact unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "50% new-price cap",
+          "depreciation interaction unresolved"
+        ],
+        "derivation": "No insurer manual or claims-department artifact establishes the interaction order.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "calculation": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+            "operator": "equals",
+            "value": "NOT_TRIGGERED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c33u04-dep-then-cap",
+      "input_sha256": "b9f6671bdbfbd768587925e36181179414d9fa3f1b5b50c7295b548c981d79a0",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 3",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer practice artifact unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "50% new-price cap",
+          "depreciation interaction unresolved"
+        ],
+        "derivation": "No insurer manual or claims-department artifact establishes the interaction order.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "calculation": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+            "operator": "equals",
+            "value": "NOT_TRIGGERED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c34u04-cap-only",
+      "input_sha256": "fec9c411cca2657db32c39f9e48794e2908e477dc71338175f0962c3dc58a3c1",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 3",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer practice artifact unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "50% new-price cap",
+          "depreciation interaction unresolved"
+        ],
+        "derivation": "No insurer manual or claims-department artifact establishes the interaction order.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "calculation": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+            "operator": "equals",
+            "value": "NOT_TRIGGERED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c35q404-battery-new-price",
+      "input_sha256": "b9ae0647ee6a824155570e8d8a9e615787f2aa1467d8cca5c8c5bc42707f71d4",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 3",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer practice artifact unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "50% new-price cap",
+          "depreciation interaction unresolved"
+        ],
+        "derivation": "No insurer manual or claims-department artifact establishes the interaction order.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "calculation": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_PART_NEW_PRICE.status",
+            "operator": "equals",
+            "value": "RESOLVED"
+          },
+          {
+            "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+            "operator": "equals",
+            "value": "RESOLVED"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-13"
+        ],
+        "description": "Supported Review never binds the supplied new price or interaction answer.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "SCENARIO_SET",
+          "classification": "PARTIAL_DAMAGE",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "SCENARIO_SET",
+            "branch": "PARTIAL_DAMAGE"
+          },
+          "calculation": {
+            "present": true,
+            "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+            "payable_irr": null,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [
+              "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+            ],
+            "calculation": [
+              "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+            ]
+          },
+          "trace_assertions": [
+            {
+              "path": "review_parameters.PS_PART_NEW_PRICE.status",
+              "operator": "equals",
+              "value": "NOT_TRIGGERED"
+            },
+            {
+              "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+              "operator": "equals",
+              "value": "NOT_TRIGGERED"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c41-below-7499",
+      "input_sha256": "26c256fecb7391ac58a26b2e13697d49a6f39da77115da416ca60cb016e119b0",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "covered repair/replacement plus rescue",
+          "strictly greater than 75% of market value"
+        ],
+        "derivation": "Exact integer-IRR boundary arithmetic; equality is partial loss.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 6759,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.classification_rescue",
+            "operator": "money_equals",
+            "value": 99
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_TOTAL_LOSS_THRESHOLD"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c42-at-7500",
+      "input_sha256": "dd61139e55545c274c3b038879609140171860333ca0023b3cf259193ad7f78d",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "covered repair/replacement plus rescue",
+          "strictly greater than 75% of market value"
+        ],
+        "derivation": "Exact integer-IRR boundary arithmetic; equality is partial loss.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 6760,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.classification_rescue",
+            "operator": "money_equals",
+            "value": 100
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_TOTAL_LOSS_THRESHOLD"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c43-above-7501",
+      "input_sha256": "3821317644084ffb9210894ea535307d51f9f4a4e789cfe75d8fe8c59e834f06",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "covered repair/replacement plus rescue",
+          "strictly greater than 75% of market value"
+        ],
+        "derivation": "Exact integer-IRR boundary arithmetic; equality is partial loss.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "UNRESOLVED"
+          },
+          {
+            "path": "evidence_blocks",
+            "operator": "contains",
+            "value": "EVT_SALVAGE_VALUATION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c44-rescue-crosses-7600",
+      "input_sha256": "db3646ed562196723bbf70dec14ccb5cba59e8cd264c6b308a56e20160576d6b",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "covered repair/replacement plus rescue",
+          "strictly greater than 75% of market value"
+        ],
+        "derivation": "Exact integer-IRR boundary arithmetic; equality is partial loss.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "UNRESOLVED"
+          },
+          {
+            "path": "evidence_blocks",
+            "operator": "contains",
+            "value": "EVT_SALVAGE_VALUATION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c45-rescue-omitted",
+      "input_sha256": "12786999319df80acb5853fa38f047d027262afb50f2bed998994a0da2685e83",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_blocking_questions",
+            "operator": "contains",
+            "value": "Q-S4-07"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c46-rescue-explicit-zero",
+      "input_sha256": "c6a93d3286d84df0b643aef6397f021c067f04b87d78eb37cd7888238de77b1e",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "covered repair/replacement plus rescue",
+          "strictly greater than 75% of market value"
+        ],
+        "derivation": "Exact integer-IRR boundary arithmetic; equality is partial loss.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 6660,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.classification_rescue",
+            "operator": "money_equals",
+            "value": 0
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_TOTAL_LOSS_THRESHOLD"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c47-aggregate-only-rescue",
+      "input_sha256": "e2012fd4319adc4d807af4f3f26abe611f9c9847396f2504412dad5105ac9efd",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_blocking_questions",
+            "operator": "contains",
+            "value": "Q-S4-03"
+          },
+          {
+            "path": "evidence_blocks",
+            "operator": "contains",
+            "value": "EVT_SALVAGE_VALUATION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c48-assessed-depreciation-figure",
+      "input_sha256": "9540923711177f29ad13cafa25b61a84277cc53974202237cc6b75e8dac8f0d3",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "ASSESSED_DEPRECIATION_AMOUNT_MISSING"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_ASSESSED_DEPRECIATION.status",
+            "operator": "equals",
+            "value": "UNANSWERED"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-13"
+        ],
+        "description": "Declared assessed-figure depreciation is ignored and computed-per-part is substituted.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "PARTIAL_DAMAGE",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "PARTIAL_DAMAGE"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 1432000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "review_parameters.PS_ASSESSED_DEPRECIATION.status",
+              "operator": "equals",
+              "value": "NOT_TRIGGERED"
+            },
+            {
+              "path": "fields.depreciation_source",
+              "operator": "equals",
+              "value": "COMPUTED_PER_PART"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c61-title-not-transferred",
+      "input_sha256": "97e7862aaecc913fef890635331b0cf3929d83028ac4a4654eaf65b03b1236d8",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "TITLE_TRANSFER_INCOMPLETE"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_TITLE_TRANSFERRED.status",
+            "operator": "equals",
+            "value": "RESOLVED"
+          },
+          {
+            "path": "review_parameters.PS_TITLE_TRANSFERRED.value",
+            "operator": "equals",
+            "value": "false"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-05"
+        ],
+        "description": "Insurer-title settlement pays although title transfer is not completed.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "TOTAL_LOSS",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "TOTAL_LOSS"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 7200000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "review_parameters.PS_TITLE_TRANSFERRED.status",
+              "operator": "equals",
+              "value": "NOT_TRIGGERED"
+            },
+            {
+              "path": "fields.salvage_deduction",
+              "operator": "money_equals",
+              "value": 0
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c62-title-transferred",
+      "input_sha256": "d78dcfbed713cc66bdd130998df62490ccce5962e9705f52e668fbf333f409a8",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "TOTAL_LOSS"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 7200000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.salvage_deduction",
+            "operator": "money_equals",
+            "value": 0
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_TOTAL_LOSS_VALUATION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c63-retains-after-salvage",
+      "input_sha256": "2a12919471dd7f8055a8e8ba2196378303fb60200fd59019f7deb6955712f75a",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "TOTAL_LOSS"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 6300000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.base_after_salvage",
+            "operator": "money_equals",
+            "value": 7000000000
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c64-retains-settlement-base",
+      "input_sha256": "8bad08490a94b6fa625dc0466f318c410e69d41a85f566c0cda509432b862597",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-03_FRANCHISE_BASE_AUTHORITY"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "INSURED_RETAINS"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-09",
+          "RQ-03"
+        ],
+        "description": "A pre-salvage franchise base settles without accepted authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "TOTAL_LOSS",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "TOTAL_LOSS"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 6200000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "fields.franchise_calculation_base",
+              "operator": "money_equals",
+              "value": 8000000000
+            },
+            {
+              "path": "fields.salvage_disposition",
+              "operator": "equals",
+              "value": "INSURED_RETAINS"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c65-retains-salvage-missing",
+      "input_sha256": "b848c4c44c7aa4db841001434893a1c3cfc72b3d88465dc6d7bed938f1bb55f1",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_blocking_questions",
+            "operator": "contains",
+            "value": "Q-S4-08"
+          },
+          {
+            "path": "evidence_blocks",
+            "operator": "contains",
+            "value": "EVT_SALVAGE_VALUATION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c66-disposition-unresolved",
+      "input_sha256": "d9f929e3aab79b9e0ecf90764aebdb4b58673650dc7eabe3d91e9d5d0774938b",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "TOTAL_LOSS"
+        },
+        "calculation": {
+          "present": true,
+          "status": "SALVAGE_DISPOSITION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "calculation": [
+            "U12_SALVAGE_DISPOSITION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "UNRESOLVED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c67-disposition-not-applicable",
+      "input_sha256": "f13d7ac3a5cae5ea1843c1ca1062077c9b35275d06cf7c275004a823603edd46",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-07_DISPOSITION_SEMANTICS"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "NOT_APPLICABLE"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-09",
+          "RQ-07"
+        ],
+        "description": "NOT_APPLICABLE silently behaves as insured-retains on physical total loss.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "TOTAL_LOSS",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "TOTAL_LOSS"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 6200000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "fields.salvage_disposition",
+              "operator": "equals",
+              "value": "NOT_APPLICABLE"
+            },
+            {
+              "path": "fields.franchise_calculation_base",
+              "operator": "money_equals",
+              "value": 8000000000
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c71-underinsured-unresolved",
+      "input_sha256": "b2539abf950ccf9344260d59b415ee95fa40e330c7b1ce215c654fdf286f3223",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 20 note 2",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer worksheet unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "depreciation",
+          "underinsurance/franchise order unresolved"
+        ],
+        "derivation": "Both named exact-IRR scenarios are derived; no authority chooses one.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "ORDER_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": [
+            1396250000,
+            1446875000
+          ]
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "calculation": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.order_used",
+            "operator": "equals",
+            "value": "UNRESOLVED"
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c72-underinsured-order-locked",
+      "input_sha256": "34534983734a01cd73603e8f6d7fc482d3cf5a7056721f82b52ae4d5fae1aa10",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 20 note 2",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer worksheet unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "depreciation",
+          "underinsurance/franchise order unresolved"
+        ],
+        "derivation": "Both named exact-IRR scenarios are derived; no authority chooses one.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_ARTICLE10_PARTIAL_ORDER.value",
+            "operator": "equals",
+            "value": "AFTER_DEPRECIATION_BEFORE_FRANCHISE"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "U01",
+          "RQ-04"
+        ],
+        "description": "A bare selection token is accepted as authority for operator order.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "SCENARIO_SET",
+          "classification": "PARTIAL_DAMAGE",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "SCENARIO_SET",
+            "branch": "PARTIAL_DAMAGE"
+          },
+          "calculation": {
+            "present": true,
+            "status": "AUTHORIZED_UNCERTAINTY_UNRESOLVED",
+            "payable_irr": null,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [
+              "U01_ARTICLE10_PARTIAL_ORDER"
+            ],
+            "calculation": [
+              "U01_ARTICLE10_PARTIAL_ORDER"
+            ]
+          },
+          "trace_assertions": [
+            {
+              "path": "review_parameters.PS_ARTICLE10_PARTIAL_ORDER.status",
+              "operator": "equals",
+              "value": "RESOLVED"
+            },
+            {
+              "path": "fields.order_used",
+              "operator": "equals",
+              "value": "AFTER_DEPRECIATION_BEFORE_FRANCHISE"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c73-overinsured",
+      "input_sha256": "648b455836f19fe92c664a00910ee7a88232c6f5dee7059ed01c6a806b7fa473",
+      "reference": {
+        "basis": "CONTROLLED_MATH",
+        "authority_status": "REFERENCE_INPUTS_CORROBORATED_NOT_AUTHENTICATED",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 20 note 2",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer worksheet unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "depreciation",
+          "underinsurance/franchise order unresolved"
+        ],
+        "derivation": "Both named exact-IRR scenarios are derived; no authority chooses one.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 6760,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.article10_ratio",
+            "operator": "equals",
+            "value": 1
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c74-underinsured-total-loss",
+      "input_sha256": "96a3d5761819dad859b7b59bfe3ca6fa88e7b792628fcd339b4f19eba00655e4",
+      "reference": {
+        "basis": "DOMAIN_ASSUMPTION",
+        "authority_status": "IMPLEMENTATION_INFERENCE_NOT_SETTLED_AUTHORITY",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "TOTAL_LOSS"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 5400000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.settlement_base",
+            "operator": "money_equals",
+            "value": 6000000000
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c81-risk-intensified-yes",
+      "input_sha256": "564b54ce03eb4ba740dcf75262f71d536a10bcea1adab5d92939526a90b66999",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "U02_FRANCHISE_BASE_SCHEDULES"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "actual policy/manual effective date unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "validate source identity and version before applying money term"
+        ],
+        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "blocking_conditions",
+            "operator": "contains",
+            "value": "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c82-risk-intensified-unknown",
+      "input_sha256": "02b99991f665af3252b17246610e45496ea7148d9cc511e6a70b60ec3051bf4d",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_hard_questions",
+            "operator": "contains",
+            "value": "Q-S3-07"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c83-instalment-overdue",
+      "input_sha256": "60d18ac32dc98de661947d9fbe14a00dd317b1237ad30650d7dd6836bf35b694",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "U02_FRANCHISE_BASE_SCHEDULES"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "actual policy/manual effective date unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "validate source identity and version before applying money term"
+        ],
+        "derivation": "Contractual authority is absent or incomplete; no payment is legally confirmed.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "blocking_conditions",
+            "operator": "contains",
+            "value": "POLICY_CANCELLATION_STATUS_UNRESOLVED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c84-policy-state-unknown",
+      "input_sha256": "e110ef7f59885f80d96f365e6a66ca77180cbc339be18ef8f4c1d86649b49a6a",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_hard_questions",
+            "operator": "contains",
+            "value": "Q-S0-06"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c91-prior-full-compensation",
+      "input_sha256": "1073a82fee9e4bc5d746200c554958ff98fa4c241982d8ff284e5aa7d39f6330",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "blocking_conditions",
+            "operator": "contains",
+            "value": "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c92-prior-zero-documented",
+      "input_sha256": "8b03d474a4b90c4a0512db0b429471a099426b95313909409e63a73dd3c9863f",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "COMPUTE",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": null,
+          "payable_irr": 1432000000,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": []
+        },
+        "trace_assertions": [
+          {
+            "path": "fields.prior_compensation",
+            "operator": "money_equals",
+            "value": 0
+          },
+          {
+            "path": "rule_trace",
+            "operator": "contains",
+            "value": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c93-causation-asserted-only",
+      "input_sha256": "8f552ca5a43b5b43fd14018ea352e783dd2a54e105d691246e91c7b72f3923fe",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "blocking_conditions",
+            "operator": "contains",
+            "value": "COVERED_PERIL_CAUSATION_NOT_ESTABLISHED"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c94-event-date-impossible",
+      "input_sha256": "6becf935aa0c2b8fdef4a65f47898942a8de267c5c5596d423e68a1f4708bdca",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 1,
+          "calc_exit": 1
+        },
+        "review_decision": null,
+        "classification": null,
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": null,
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_error_codes",
+            "operator": "contains",
+            "value": "invalid_date"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c95-production-year-future",
+      "input_sha256": "e5addec28b04eff44bdad92e35402d2f283b2947458419505a23159375d1633f",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 1,
+          "calc_exit": 1
+        },
+        "review_decision": null,
+        "classification": null,
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": null,
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_error_codes",
+            "operator": "contains",
+            "value": "invalid_chronology"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c96-conflicting-money-aliases",
+      "input_sha256": "2627fc6398dfca7732d194d76a25b3b56cd03e4e5dc9583cf5929b56e1367a38",
+      "reference": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 1,
+          "calc_exit": 1
+        },
+        "review_decision": null,
+        "classification": null,
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": null,
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_error_codes",
+            "operator": "contains",
+            "value": "conflicting_alias"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "This is an independently derived engineering/arithmetic reference, not an authenticated legal opinion."
+      ]
+    },
+    {
+      "case_id": "inspection-c97-late-notice-no-excuse",
+      "input_sha256": "5d9e9c8436725ec28158c153b300288bdc26a5c93d2e7c17f460b3b4c1aaaf00",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR"
+        ],
+        "rule_locators": [
+          "REG53_NOTICE_AND_DUTIES",
+          "REG53_ART14_SUBROGATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "adjudicate material duty/recourse consequence",
+          "only then authorize calculation"
+        ],
+        "derivation": "The source identifies a consequence but the case lacks a reviewed adjudication artifact.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-05_NOTICE_ADJUDICATION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_NOTICE_TIMELINESS.value",
+            "operator": "equals",
+            "value": "true"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-10",
+          "RQ-05"
+        ],
+        "description": "Late notice is labeled but not adjudicated before payment.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "PARTIAL_DAMAGE",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "PARTIAL_DAMAGE"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 1432000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "labels",
+              "operator": "contains",
+              "value": "LATE_NOTICE_REVIEW"
+            },
+            {
+              "path": "rule_trace",
+              "operator": "contains",
+              "value": "REG53_NOTICE_AND_DUTIES"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c98-recourse-released",
+      "input_sha256": "11971f8614b318d9ca7d3aabd6c7689eef4b7a2d5f3decbd7f13d16d534b32dd",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR"
+        ],
+        "rule_locators": [
+          "REG53_NOTICE_AND_DUTIES",
+          "REG53_ART14_SUBROGATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "adjudicate material duty/recourse consequence",
+          "only then authorize calculation"
+        ],
+        "derivation": "The source identifies a consequence but the case lacks a reviewed adjudication artifact.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-06_SUBROGATION_ADJUDICATION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SUBROGATION_IMPAIRED.value",
+            "operator": "equals",
+            "value": "true"
+          }
+        ]
+      },
+      "known_deviation": {
+        "finding_ids": [
+          "IA-10",
+          "RQ-06"
+        ],
+        "description": "Subrogation impairment is labeled but not adjudicated before payment.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING",
+        "observed": {
+          "process": {
+            "review_exit": 0,
+            "calc_exit": 0
+          },
+          "review_decision": "COMPUTE",
+          "classification": "PARTIAL_DAMAGE",
+          "authorization": {
+            "granted": true,
+            "issuer": "REVIEW_GATE",
+            "decision": "COMPUTE",
+            "branch": "PARTIAL_DAMAGE"
+          },
+          "calculation": {
+            "present": true,
+            "status": null,
+            "payable_irr": 1432000000,
+            "payable_scenarios_irr": []
+          },
+          "blocking_uncertainties": {
+            "review": [],
+            "calculation": []
+          },
+          "trace_assertions": [
+            {
+              "path": "labels",
+              "operator": "contains",
+              "value": "SUBROGATION_IMPAIRMENT_REVIEW"
+            },
+            {
+              "path": "rule_trace",
+              "operator": "contains",
+              "value": "REG53_ART14_SUBROGATION"
+            }
+          ]
+        }
+      },
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    },
+    {
+      "case_id": "inspection-c99-third-party-split",
+      "input_sha256": "744ac8f15a16c936e948e23133fe15fedc15d24d639cc0f141a917edf3b34fca",
+      "reference": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "expected": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THIRD_PARTY_FINANCIAL",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_blocking_questions",
+            "operator": "contains",
+            "value": "Q-S8-05"
+          }
+        ]
+      },
+      "known_deviation": null,
+      "accepted_limitations": [
+        "All registered external sources lack content hashes, complete effective intervals, and revalidation evidence.",
+        "Independent authority is unavailable or incomplete; no plausible arithmetic result is promoted to a legally confirmed payment."
+      ]
+    }
+  ]
+}

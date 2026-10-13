@@ -62,50 +62,100 @@ def _git_value(root: Path, expression: str) -> str:
     return result.stdout.strip() if result.returncode == 0 else "UNKNOWN"
 
 
+def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+    """Observe one supported-path case without interpreting process status as authority."""
+
+    raw = case_path.read_bytes()
+    json.loads(raw)
+    review = _command(
+        [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+        root,
+    )
+    calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+    parsed: dict[str, Any] | None = None
+    if review.stdout.lstrip().startswith("{"):
+        parsed = json.loads(review.stdout)
+    decision = (parsed or {}).get("decision") or {}
+    classification = (parsed or {}).get("classification") or {}
+    raw_calculation = (parsed or {}).get("calculation")
+    calculation_present = isinstance(raw_calculation, dict)
+    calculation = raw_calculation if calculation_present else {}
+    raw_authorization = calculation.get("authorization")
+    authorization = raw_authorization if isinstance(raw_authorization, dict) else {}
+    authorization_granted = (
+        authorization.get("issuer") == "REVIEW_GATE"
+        and authorization.get("decision") in {"COMPUTE", "SCENARIO_SET"}
+        and isinstance(authorization.get("claim_hash"), str)
+    )
+    parameters: dict[str, dict[str, Any]] = {}
+    for parameter in (parsed or {}).get("parameters") or []:
+        if not isinstance(parameter, dict) or not isinstance(parameter.get("slot"), str):
+            continue
+        parameters[parameter["slot"]] = {
+            key: parameter.get(key)
+            for key in (
+                "status",
+                "value",
+                "unit",
+                "authority",
+            )
+        }
+    return {
+        "case": case_path.stem,
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "process": {
+            "review_exit": review.returncode,
+            "calc_exit": calc.returncode,
+        },
+        # Retain the flat process keys for historical report consumers. They are
+        # observations only and are never used as authorization evidence.
+        "review_exit": review.returncode,
+        "calc_exit": calc.returncode,
+        "decision": decision.get("decision"),
+        "review_branch": classification.get("branch"),
+        "authorization": {
+            "granted": authorization_granted,
+            "issuer": authorization.get("issuer"),
+            "decision": authorization.get("decision"),
+            "branch": authorization.get("branch"),
+            "claim_hash": authorization.get("claim_hash"),
+            "blocking_conditions": authorization.get("blocking_conditions"),
+        },
+        "calculation_present": calculation_present,
+        "open_hard_questions": decision.get("open_hard_questions"),
+        "open_blocking_questions": decision.get("open_blocking_questions"),
+        "evidence_blocks": decision.get("evidence_blocks"),
+        "blocking_conditions": decision.get("blocking_conditions"),
+        "live_uncertainties": decision.get("live_uncertainties"),
+        "calculation_blocking_uncertainties": calculation.get(
+            "blocking_uncertainties"
+        ),
+        "payable_irr": calculation.get("payable_irr"),
+        "payable_scenarios_irr": calculation.get("payable_scenarios_irr"),
+        "status": calculation.get("status"),
+        "reason": calculation.get("reason"),
+        "labels": calculation.get("labels"),
+        "fields": calculation.get("fields"),
+        "rule_trace": calculation.get("rule_trace"),
+        "required_guards": calculation.get("required_guards"),
+        "guards_executed": calculation.get("guards_executed"),
+        "review_parameters": parameters,
+        "review_error_codes": [
+            error.get("code")
+            for error in (parsed or {}).get("errors") or []
+            if isinstance(error, dict) and isinstance(error.get("code"), str)
+        ],
+        "review_stderr": review.stderr.strip(),
+        "calc_stdout": calc.stdout.strip(),
+        "calc_stderr": calc.stderr.strip(),
+    }
+
+
 def _supported_cases(root: Path, case_root: Path) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
-    for case_path in sorted(case_root.glob("inspection-*.json")):
-        raw = case_path.read_bytes()
-        json.loads(raw)
-        review = _command(
-            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
-            root,
-        )
-        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
-        parsed: dict[str, Any] | None = None
-        if review.stdout.lstrip().startswith("{"):
-            parsed = json.loads(review.stdout)
-        decision = (parsed or {}).get("decision") or {}
-        classification = (parsed or {}).get("classification") or {}
-        calculation = (parsed or {}).get("calculation") or {}
-        rows.append(
-            {
-                "case": case_path.stem,
-                "sha256": hashlib.sha256(raw).hexdigest(),
-                "review_exit": review.returncode,
-                "calc_exit": calc.returncode,
-                "decision": decision.get("decision"),
-                "review_branch": classification.get("branch"),
-                "open_hard_questions": decision.get("open_hard_questions"),
-                "open_blocking_questions": decision.get("open_blocking_questions"),
-                "evidence_blocks": decision.get("evidence_blocks"),
-                "blocking_conditions": decision.get("blocking_conditions"),
-                "live_uncertainties": decision.get("live_uncertainties"),
-                "payable_irr": calculation.get("payable_irr"),
-                "payable_scenarios_irr": calculation.get("payable_scenarios_irr"),
-                "status": calculation.get("status"),
-                "reason": calculation.get("reason"),
-                "labels": calculation.get("labels"),
-                "fields": calculation.get("fields"),
-                "rule_trace": calculation.get("rule_trace"),
-                "required_guards": calculation.get("required_guards"),
-                "guards_executed": calculation.get("guards_executed"),
-                "review_stderr": review.stderr.strip(),
-                "calc_stdout": calc.stdout.strip(),
-                "calc_stderr": calc.stderr.strip(),
-            }
-        )
-    return rows
+    return [
+        _supported_case(root, case_path)
+        for case_path in sorted(case_root.glob("inspection-*.json"))
+    ]
 
 
 def _internal_probes(root: Path) -> list[dict[str, Any]]:

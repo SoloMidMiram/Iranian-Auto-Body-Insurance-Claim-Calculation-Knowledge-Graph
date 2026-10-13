@@ -88,9 +88,12 @@ Review exits are 43 zero / four nonzero; `calc` exits are 29 zero / eighteen
 nonzero. The 14 internal probes contain eight settled controls, five
 `CLASSIFICATION_EVIDENCE_REQUIRED`, and one `CLASSIFICATION_CONFLICT`.
 
-`case-comparison-current-cd7fb39.json` joins every observed row and full input
+The historical `case-comparison-current-cd7fb39.json` joins every observed row and full input
 digest to the independently fixed reference summary and its prose locator. It
-contains 37 matches and ten discrepancies. Those ten are not all model defects:
+contains the pre-correction labels 37 matches and ten discrepancies. Those
+labels are preserved as a **historical observation**, not a current acceptance
+result. The enforceable manifest and corrected derived-verdict policy are in
+`CASE_COMPARATOR_V1.md`. The ten historical discrepancies are not all model defects:
 the machine-readable disposition separates two confirmed defects (IA-05 and
 IA-08), unresolved authority, unsupported scope, incomplete evidence, and one
 explicit implementation inference. A `MATCH` likewise does not authenticate
