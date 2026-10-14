@@ -40,6 +40,13 @@ standalone calculation rendering that disagrees with the structured result; or
 any assertion that matches neither the reference nor an exact registered
 deviation.
 
+The v1.1 evidence contract also exits nonzero for a missing or stale inspector
+identity, an uncommitted executable harness, a changed harness digest, an
+observation produced by a different inspector revision, a changed external case
+corpus, a changed manifest during comparison, or a misleading execution
+profile. The report binds the manifest SHA-256 and a separate canonical digest
+of its known-deviation envelope.
+
 ### Model and renderer binding
 
 An observation is accepted only when its full Git revision and tree equal the
@@ -54,6 +61,28 @@ knowledge, and package origins. The comparator requires that profile, scope,
 and relative origin map. Case SHA-256 values remain a separate invariant;
 unchanged case bytes cannot make an observation from another model tree
 acceptable.
+
+The inspector and model may be different Git worktrees. The runner records its
+own Git revision/tree, executed relative path, bounded harness file list,
+per-file SHA-256 values, and aggregate harness SHA-256. The comparator
+independently authenticates the runner and its own harness from the inspector
+checkout. Absolute worktree locations are recorded but are not portable
+identity fields. A clean older model can therefore be inspected by a newer
+versioned inspector without attributing inspector code to the model revision.
+
+The 47 supported Review cases are the acceptance-gated corpus. Their source
+directory, resolved file paths, individual SHA-256 values, sizes, and aggregate
+corpus digest are recorded. Execution uses private snapshots of those captured
+bytes, and the original files are verified again before output. The comparator
+independently reconstructs the same portable corpus identity and verifies it
+again after comparison.
+
+The 14 `INTERNAL_TEST_DIRECT` rows are diagnostic containment evidence. Their
+presence, unique names, worker identity, helper origins, and count are
+structurally checked, but their outcomes are **not** compared with reference
+expectations and are **not** part of `acceptance_gate_passed`. The report labels
+them `DIAGNOSTIC_NOT_OUTCOME_VALIDATED`; no comparator claim extends to their
+amounts, statuses, labels, or trace fields.
 
 For every successful standalone `claim calc`, the comparator independently
 parses the rendered `PAYABLE` and scenario lines and derives their expected
@@ -105,6 +134,26 @@ cover a separate selected checkout, a conflicting `PYTHONPATH`, the exact
 origin map, a dirty internal shim, and comparator rejection of an internal
 observation using the supported-only scope.
 
+Parent/fix reproduction at parent
+`ef3e8c79275238dd70a67775185e75dfb092ed55`:
+
+- External C104 parent: changing the externally supplied C104 input changed two
+  supported-review rows while the report retained the same clean model
+  revision/tree and contained no input identity. The controlled input digest
+  changed from `85400a7b…` to `6bf98aef…`. Current behavior requires the C104
+  digest from the reference manifest, records its resolved identity, executes
+  the captured bytes, and verifies the source and manifest again before output.
+- Caller-harness parent: changing only the caller checkout's `INT-01` probe
+  label changed internal evidence while the selected model identity stayed
+  unchanged; the comparator still returned 37/10 and `PASS`. Current behavior
+  rejects dirty executable harness files, records parent and worker harness
+  identities, and requires the comparator's runner identity to match. A clean
+  stale inspector revision or a differently committed harness is also rejected.
+
+Regressions cover altered external C104 bytes, an uncommitted caller probe
+definition, a clean stale inspector, a different committed unauthorized
+harness, and a valid newer-inspector/older-model cross-worktree run.
+
 `KNOWN_DEVIATION` is accepted only for drift detection. It is never converted
 to `MATCH`, never establishes calculation correctness, and remains
 release-blocking. Changing either a reference expectation or a known-deviation
@@ -121,9 +170,12 @@ corrected comparator derives:
 - acceptance gate `PASS`, with release still **BLOCKED** by every known
   deviation and the repository's outstanding authority/review findings.
 
-The full derived report is preserved in
-`docs/case-comparison-pr57-fa214d.json`; its revision identifies the inspected
-parent behavior, while this PR changes only evidence tooling and documentation.
+The earlier derived report is preserved in
+`docs/case-comparison-pr57-fa214d.json` as a pre-v1.1 snapshot. It does not
+contain the complete evidence contract and is not a current acceptance artifact.
+A v1.1 acceptance report must be freshly generated outside the tracked
+inspector tree so its recorded inspector revision is not invalidated by adding
+the report itself to a later commit.
 
 ## Reference status
 

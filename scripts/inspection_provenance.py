@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
+import hashlib
 import inspect
+import json
 import os
 from pathlib import Path
 import re
@@ -32,11 +34,37 @@ INTERNAL_PROBE_ORIGINS_RELATIVE = {
     "tests.admission_shim.compute_authorized": "src/iran_auto_claim/engine.py",
     "tests.admission_shim._authorize_fixture_case": "src/iran_auto_claim/fixtures.py",
 }
+RUNNER_HARNESS_PATHS = (
+    "scripts/run_case_based_inspection.py",
+    "scripts/inspection_provenance.py",
+)
+INVESTIGATION_HARNESS_PATHS = (
+    "scripts/investigate_total_loss_override.py",
+    "scripts/inspection_provenance.py",
+)
+COMPARATOR_HARNESS_PATHS = (
+    "scripts/build_case_comparison.py",
+    "scripts/inspection_provenance.py",
+)
 GIT_OBJECT_ID = re.compile(r"[0-9a-f]{40,64}")
 
 
 class ProvenanceError(RuntimeError):
     """The selected checkout cannot support a trustworthy observation."""
+
+
+def sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
+
+
+def canonical_sha256(value: Any) -> str:
+    encoded = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return sha256_bytes(encoded)
 
 
 def model_scope(include_internal_probes: bool) -> tuple[str, ...]:
@@ -103,6 +131,161 @@ def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
             "model revision and tree must be full lowercase git object IDs"
         )
     return revision, tree
+
+
+def inspector_identity(anchor: Path, scope: Iterable[str]) -> dict[str, Any]:
+    """Authenticate the exact committed harness that is executing evidence code."""
+
+    resolved_anchor = anchor.resolve()
+    inspector_root = Path(
+        _git(resolved_anchor.parent, "rev-parse", "--show-toplevel")
+    ).resolve()
+    relative_anchor = str(resolved_anchor.relative_to(inspector_root))
+    paths = tuple(scope)
+    if relative_anchor not in paths:
+        raise ProvenanceError(
+            f"executed inspector {relative_anchor} is outside its declared harness scope"
+        )
+    dirty = _git(
+        inspector_root,
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all",
+        "--",
+        *paths,
+    )
+    if dirty:
+        raise ProvenanceError(
+            "inspector has uncommitted executable inputs: "
+            f"{dirty.splitlines()}"
+        )
+    revision = _git(inspector_root, "rev-parse", "HEAD")
+    tree = _git(inspector_root, "rev-parse", "HEAD^{tree}")
+    if not GIT_OBJECT_ID.fullmatch(revision) or not GIT_OBJECT_ID.fullmatch(tree):
+        raise ProvenanceError(
+            "inspector revision and tree must be full lowercase git object IDs"
+        )
+    files = []
+    for relative in paths:
+        path = (inspector_root / relative).resolve()
+        if inspector_root not in path.parents or not path.is_file():
+            raise ProvenanceError(f"inspector harness file is missing or escapes root: {path}")
+        raw = path.read_bytes()
+        files.append(
+            {
+                "path": relative,
+                "sha256": sha256_bytes(raw),
+                "size_bytes": len(raw),
+            }
+        )
+    return {
+        "revision": revision,
+        "tree": tree,
+        "root": str(inspector_root),
+        "executed_path": str(resolved_anchor),
+        "executed_path_relative": relative_anchor,
+        "scope": list(paths),
+        "files": files,
+        "harness_sha256": canonical_sha256(files),
+    }
+
+
+def inspector_digest_view(identity: dict[str, Any]) -> dict[str, Any]:
+    """Return the portable authenticated portion of an inspector identity."""
+
+    return {
+        key: identity.get(key)
+        for key in (
+            "revision",
+            "tree",
+            "executed_path_relative",
+            "scope",
+            "files",
+            "harness_sha256",
+        )
+    }
+
+
+def verified_file_identity(path: Path) -> dict[str, Any]:
+    """Read one input once and return its resolved content identity."""
+
+    resolved = path.resolve()
+    raw = resolved.read_bytes()
+    return {
+        "path": str(resolved),
+        "name": resolved.name,
+        "sha256": sha256_bytes(raw),
+        "size_bytes": len(raw),
+        "bytes": raw,
+    }
+
+
+def public_file_identity(identity: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in identity.items() if key != "bytes"}
+
+
+def verified_case_corpus(
+    case_root: Path,
+) -> tuple[dict[str, Any], dict[str, bytes]]:
+    """Capture all supported case bytes and a stable aggregate identity."""
+
+    resolved_root = case_root.resolve()
+    paths = sorted(resolved_root.glob("inspection-*.json"))
+    if len(paths) != 47:
+        raise ProvenanceError(f"expected 47 inspection cases, found {len(paths)}")
+    files = []
+    captured: dict[str, bytes] = {}
+    for path in paths:
+        resolved = path.resolve()
+        if resolved.parent != resolved_root:
+            raise ProvenanceError(f"case input escapes the selected directory: {path}")
+        raw = resolved.read_bytes()
+        try:
+            json.loads(raw)
+        except json.JSONDecodeError as error:
+            raise ProvenanceError(f"case input is malformed JSON: {resolved}: {error}") from error
+        captured[path.name] = raw
+        files.append(
+            {
+                "name": path.name,
+                "path": str(resolved),
+                "sha256": sha256_bytes(raw),
+                "size_bytes": len(raw),
+            }
+        )
+    digest_records = [
+        {key: item[key] for key in ("name", "sha256", "size_bytes")}
+        for item in files
+    ]
+    return (
+        {
+            "resolved_root": str(resolved_root),
+            "pattern": "inspection-*.json",
+            "count": len(files),
+            "files": files,
+            "corpus_sha256": canonical_sha256(digest_records),
+        },
+        captured,
+    )
+
+
+def case_corpus_digest_view(identity: dict[str, Any]) -> dict[str, Any]:
+    """Return the portable portion used to compare equivalent corpus copies."""
+
+    files = identity.get("files")
+    portable_files = []
+    if isinstance(files, list):
+        for item in files:
+            if isinstance(item, dict):
+                portable_files.append(
+                    {key: item.get(key) for key in ("name", "sha256", "size_bytes")}
+                )
+    return {
+        "pattern": identity.get("pattern"),
+        "count": identity.get("count"),
+        "files": portable_files,
+        "corpus_sha256": identity.get("corpus_sha256"),
+    }
 
 
 def _expected_package_root(root: Path) -> Path:
