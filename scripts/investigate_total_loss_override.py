@@ -18,18 +18,32 @@ from typing import Any
 
 try:
     from .inspection_provenance import (
+        INVESTIGATION_HARNESS_PATHS,
         ProvenanceError,
+        canonical_sha256,
+        inspector_identity,
+        inspector_digest_view,
         load_model_modules,
         model_identity,
         model_scope,
+        public_file_identity,
+        sha256_bytes,
+        verified_file_identity,
         verify_object_origin,
     )
 except ImportError:  # Direct script execution.
     from inspection_provenance import (
+        INVESTIGATION_HARNESS_PATHS,
         ProvenanceError,
+        canonical_sha256,
+        inspector_identity,
+        inspector_digest_view,
         load_model_modules,
         model_identity,
         model_scope,
+        public_file_identity,
+        sha256_bytes,
+        verified_file_identity,
         verify_object_origin,
     )
 
@@ -201,17 +215,12 @@ def _direct_results(
 
 
 def _review_results(
-    case_root: Path,
+    source: dict[str, Any],
     knowledge: Any,
     Review: Any,
     AuthorizationNotGranted: type[Exception],
     compute: Any,
 ) -> list[dict[str, Any]]:
-    source = json.loads(
-        (case_root / "inspection-c104-theft-60-59-clock.json").read_text(
-            encoding="utf-8"
-        )
-    )
     variants = []
     for name, question in (
         ("REV-01 missing repair assessment", "Q-S4-03"),
@@ -252,6 +261,43 @@ def _review_results(
     return rows
 
 
+def _manifest_binding(path: Path, case_digest: str) -> tuple[dict[str, Any], bytes]:
+    resolved = path.resolve()
+    raw = resolved.read_bytes()
+    try:
+        manifest = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise ProvenanceError(f"reference manifest is malformed: {resolved}: {error}") from error
+    cases = manifest.get("cases") if isinstance(manifest, dict) else None
+    if not isinstance(cases, list):
+        raise ProvenanceError("reference manifest has no case list")
+    case_id = "inspection-c104-theft-60-59-clock"
+    matches = [case for case in cases if case.get("case_id") == case_id]
+    if len(matches) != 1:
+        raise ProvenanceError(f"reference manifest must contain exactly one {case_id}")
+    expected_digest = matches[0].get("input_sha256")
+    if case_digest != expected_digest:
+        raise ProvenanceError(
+            f"C104 input digest differs from the reference manifest: "
+            f"expected {expected_digest}, observed {case_digest}"
+        )
+    deviations = [
+        {"case_id": case.get("case_id"), "known_deviation": case.get("known_deviation")}
+        for case in cases
+        if case.get("known_deviation") is not None
+    ]
+    return (
+        {
+            "path": str(resolved),
+            "manifest_id": manifest.get("manifest_id"),
+            "sha256": sha256_bytes(raw),
+            "known_deviation_envelope_sha256": canonical_sha256(deviations),
+            "c104_expected_sha256": expected_digest,
+        },
+        raw,
+    )
+
+
 def _selected_runtime(root: Path) -> tuple[dict[str, Any], dict[str, str]]:
     modules, origins = load_model_modules(
         root,
@@ -273,11 +319,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--cases", type=Path, default=Path("cases"))
+    parser.add_argument("--manifest", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     scope = model_scope(False)
     try:
+        harness = inspector_identity(Path(__file__), INVESTIGATION_HARNESS_PATHS)
         revision, tree = model_identity(root, scope)
         runtime, origins = _selected_runtime(root)
     except ProvenanceError as error:
@@ -287,11 +335,33 @@ def main() -> int:
         if args.cases.is_absolute()
         else (root / args.cases).resolve()
     )
+    case_identity = verified_file_identity(
+        case_root / "inspection-c104-theft-60-59-clock.json"
+    )
+    try:
+        source = json.loads(case_identity["bytes"])
+    except json.JSONDecodeError as error:
+        raise SystemExit(f"C104 input is malformed JSON: {error}") from error
+    inspector_root = Path(harness["root"])
+    manifest_path = (
+        args.manifest.resolve()
+        if args.manifest is not None
+        else inspector_root / "docs" / "case-reference-manifest-v1.json"
+    )
+    try:
+        manifest_binding, manifest_bytes = _manifest_binding(
+            manifest_path, case_identity["sha256"]
+        )
+    except ProvenanceError as error:
+        raise SystemExit(str(error)) from error
     knowledge = runtime["Knowledge"].load(root)
     report = {
         "revision": revision,
         "tree": tree,
         "python": sys.version.split()[0],
+        "inspector": harness,
+        "case_input": public_file_identity(case_identity),
+        "reference_manifest": manifest_binding,
         "provenance_profile": "BOUNDED_OVERRIDE_INVESTIGATION",
         "model_scope": list(scope),
         "import_origins": origins,
@@ -310,7 +380,7 @@ def main() -> int:
             runtime["authorize_fixture_case"],
         ),
         "supported_review": _review_results(
-            case_root,
+            source,
             knowledge,
             runtime["Review"],
             runtime["AuthorizationNotGranted"],
@@ -319,10 +389,17 @@ def main() -> int:
     }
     try:
         ending_revision, ending_tree = model_identity(root, scope)
+        ending_harness = inspector_identity(Path(__file__), INVESTIGATION_HARNESS_PATHS)
     except ProvenanceError as error:
         raise SystemExit(str(error)) from error
     if (ending_revision, ending_tree) != (revision, tree):
         raise SystemExit("model identity changed while investigation was running")
+    if inspector_digest_view(ending_harness) != inspector_digest_view(harness):
+        raise SystemExit("inspection harness identity changed while investigation was running")
+    if verified_file_identity(Path(case_identity["path"])) != case_identity:
+        raise SystemExit("C104 input bytes changed while investigation was running")
+    if manifest_path.read_bytes() != manifest_bytes:
+        raise SystemExit("reference manifest changed while investigation was running")
     rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(rendered, encoding="utf-8", newline="\n")

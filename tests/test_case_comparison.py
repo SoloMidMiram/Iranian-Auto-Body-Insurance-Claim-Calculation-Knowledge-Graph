@@ -31,6 +31,14 @@ def _case_hashes() -> dict[str, str]:
     }
 
 
+def _compare(*args, **kwargs):
+    return comparator.compare(
+        *args,
+        **kwargs,
+        enforce_inspector_provenance=False,
+    )
+
+
 @pytest.fixture(autouse=True)
 def inspection_cases_remain_unchanged() -> None:
     before = _case_hashes()
@@ -44,6 +52,7 @@ def inspection_cases_remain_unchanged() -> None:
 
 @pytest.fixture(scope="module")
 def baseline_observation() -> dict[str, object]:
+    case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
     return {
         "revision": inspection._git_value(ROOT, "HEAD"),
         "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
@@ -51,6 +60,20 @@ def baseline_observation() -> dict[str, object]:
         "import_origin_relative": "src/iran_auto_claim/__init__.py",
         "provenance_profile": "SUPPORTED_ONLY",
         "model_scope": list(comparator.MODEL_PATHS),
+        "inspector": {"unit_test": True},
+        "case_inputs": case_inputs,
+        "execution_profile": {
+            "supported_review": {
+                "count": 47,
+                "acceptance_gate": True,
+                "assertion_source": "reference_manifest",
+            },
+            "internal_test_direct": {
+                "count": 0,
+                "acceptance_gate": False,
+                "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+            },
+        },
         "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
     }
 
@@ -80,6 +103,7 @@ def _mutated_case_report(
     _write_json(case_path, payload)
 
     observation = copy.deepcopy(baseline_observation)
+    observation["case_inputs"], _ = provenance.verified_case_corpus(case_root)
     rows = observation["supported_path"]
     assert isinstance(rows, list)
     replacement = inspection._supported_case(ROOT, case_path)
@@ -87,7 +111,7 @@ def _mutated_case_report(
     observation_path = tmp_path / "observation.json"
     _write_json(observation_path, observation)
 
-    report, passed = comparator.compare(MANIFEST, observation_path, case_root)
+    report, passed = _compare(MANIFEST, observation_path, case_root)
     result = next(row for row in report["cases"] if row["case_id"] == case_id)
     assert not passed
     assert result["comparison_verdict"] == "MISMATCH"
@@ -121,7 +145,7 @@ def test_internal_observation_requires_internal_probe_scope(
     _write_json(observation_path, observation)
 
     with pytest.raises(comparator.ManifestError, match="model_scope"):
-        comparator.compare(MANIFEST, observation_path, ROOT / "cases")
+        _compare(MANIFEST, observation_path, ROOT / "cases")
 
 
 def test_internal_observation_requires_verified_internal_import_origins(
@@ -135,7 +159,7 @@ def test_internal_observation_requires_verified_internal_import_origins(
     _write_json(observation_path, observation)
 
     with pytest.raises(comparator.ManifestError, match="internal probe import origins"):
-        comparator.compare(MANIFEST, observation_path, ROOT / "cases")
+        _compare(MANIFEST, observation_path, ROOT / "cases")
 
 
 def test_reference_locators_are_case_relevant() -> None:
@@ -229,7 +253,7 @@ def test_model_change_with_unchanged_case_hashes_rejects_stale_observation(
     with pytest.raises(
         comparator.ManifestError, match="uncommitted implementation inputs"
     ):
-        comparator.compare(
+        _compare(
             MANIFEST,
             observation_path,
             case_root,
@@ -252,7 +276,7 @@ def test_model_change_with_unchanged_case_hashes_rejects_stale_observation(
         for path in case_root.glob("inspection-*.json")
     } == before
     with pytest.raises(comparator.ManifestError, match="observation revision mismatch"):
-        comparator.compare(
+        _compare(
             MANIFEST,
             observation_path,
             case_root,
@@ -288,7 +312,7 @@ def test_standalone_calc_rendered_money_and_unit_are_enforced(
     observation_path = tmp_path / f"standalone-{new}.json"
     _write_json(observation_path, observation)
 
-    report, passed = comparator.compare(MANIFEST, observation_path, ROOT / "cases")
+    report, passed = _compare(MANIFEST, observation_path, ROOT / "cases")
     result = next(
         item
         for item in report["cases"]
@@ -389,14 +413,14 @@ def test_missing_and_duplicate_case_are_rejected(
     missing_path = tmp_path / "missing.json"
     _write_json(missing_path, missing)
     with pytest.raises(comparator.ManifestError, match="case-set mismatch"):
-        comparator.compare(MANIFEST, missing_path, case_root)
+        _compare(MANIFEST, missing_path, case_root)
 
     duplicate = copy.deepcopy(baseline_observation)
     duplicate["supported_path"].append(copy.deepcopy(duplicate["supported_path"][0]))
     duplicate_path = tmp_path / "duplicate.json"
     _write_json(duplicate_path, duplicate)
     with pytest.raises(comparator.ManifestError, match="duplicate observation cases"):
-        comparator.compare(MANIFEST, duplicate_path, case_root)
+        _compare(MANIFEST, duplicate_path, case_root)
 
 
 def test_changed_material_trace_assertion_is_detected(
@@ -435,28 +459,78 @@ def test_manifest_rejects_duplicate_id_and_float_money(tmp_path: Path) -> None:
 def test_cli_exits_nonzero_for_new_mismatch(
     tmp_path: Path, baseline_observation: dict[str, object]
 ) -> None:
+    checkout = tmp_path / "clean-comparator"
+    checkout.mkdir()
+    for relative in (
+        "claim.py",
+        "pyproject.toml",
+        "src",
+        "knowledge",
+        "schema",
+        "ontology",
+        "fixtures",
+        "cases",
+        "tests/admission_shim.py",
+        "scripts/build_case_comparison.py",
+        "scripts/run_case_based_inspection.py",
+        "scripts/inspection_provenance.py",
+        "docs/case-reference-manifest-v1.json",
+    ):
+        source = ROOT / relative
+        destination = checkout / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if source.is_dir():
+            shutil.copytree(
+                source,
+                destination,
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+            )
+        else:
+            shutil.copy2(source, destination)
+    _git(checkout, "init", "--quiet")
+    _git(checkout, "add", ".")
+    _git(
+        checkout,
+        "-c",
+        "user.name=PR57 Test",
+        "-c",
+        "user.email=pr57@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "clean comparator checkout",
+    )
     observation = copy.deepcopy(baseline_observation)
+    observation["revision"] = _git(checkout, "rev-parse", "HEAD")
+    observation["tree"] = _git(checkout, "rev-parse", "HEAD^{tree}")
+    observation["inspector"] = provenance.inspector_identity(
+        checkout / "scripts" / "run_case_based_inspection.py",
+        provenance.RUNNER_HARNESS_PATHS,
+    )
+    observation["case_inputs"], _ = provenance.verified_case_corpus(
+        checkout / "cases"
+    )
     row = next(
         item
         for item in observation["supported_path"]
         if item["case"] == "inspection-c42-at-7500"
     )
     row["payable_irr"] = 1
-    observation_path = tmp_path / "mismatch.json"
-    output_path = tmp_path / "comparison.json"
+    observation_path = checkout / "mismatch.json"
+    output_path = checkout / "comparison.json"
     _write_json(observation_path, observation)
     result = subprocess.run(
         [
             sys.executable,
-            str(ROOT / "scripts" / "build_case_comparison.py"),
+            str(checkout / "scripts" / "build_case_comparison.py"),
             str(observation_path),
             str(output_path),
             "--manifest",
-            str(MANIFEST),
+            str(checkout / "docs" / "case-reference-manifest-v1.json"),
             "--cases",
-            str(ROOT / "cases"),
+            str(checkout / "cases"),
         ],
-        cwd=ROOT,
+        cwd=checkout,
         text=True,
         capture_output=True,
         check=False,

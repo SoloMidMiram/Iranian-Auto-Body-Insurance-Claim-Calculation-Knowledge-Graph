@@ -52,7 +52,21 @@ checkout or uncommitted internal shim from silently changing the evidence.
 The bounded override investigation uses the same isolation primitives. It
 removes cached `iran_auto_claim` modules, selects `<root>/src`, and fails closed
 unless the implementation, knowledge, Review, and authorization helper origins
-all belong to the selected `--root`.
+all belong to the selected `--root`. Its externally supplied C104 file is bound
+to the reference-manifest digest, executed from captured bytes, and verified
+unchanged before output.
+
+Inspector provenance is separate from model provenance. Each executable records
+and verifies its own committed harness revision/tree and per-file/aggregate
+digests. Cross-worktree internal workers must report the same portable harness
+identity as the parent. The case runner likewise records all 47 input files and
+their aggregate digest, executes snapshots, and verifies the external source
+directory after collection.
+
+Only the 47 supported Review rows feed the comparator acceptance verdict. The
+14 internal rows remain diagnostic evidence: their harness, origins, count and
+unique names are authenticated, but their outcomes are not reference-asserted
+and do not affect the 37/10 acceptance counts.
 
 ## Reproduction commands and current results
 
@@ -119,7 +133,10 @@ controlling explanation of those differences.
 
 The suspected final-branch risk is **confirmed at the internal calculation
 boundary**, but its precise trigger is narrower than “missing rescue” alone.
-The full machine record is `override-investigation-cd7fb39.json`.
+The historical machine record is `override-investigation-cd7fb39.json`. It
+predates the complete harness/input contract and must not be presented as fresh
+v1.1 acceptance evidence; a fresh run records the inspector, C104 and manifest
+digests described above.
 
 All direct variants start with evidence-derived `THEFT`, a documented override
 selecting `TOTAL_LOSS`, market and insured value 10,000 unless removed, a

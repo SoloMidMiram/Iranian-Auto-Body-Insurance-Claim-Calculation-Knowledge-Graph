@@ -16,18 +16,24 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 from typing import Any
 
 try:
     from .inspection_provenance import (
         BASE_MODEL_PATHS,
         INTERNAL_PROBE_ORIGINS_RELATIVE,
+        RUNNER_HARNESS_PATHS,
         ProvenanceError,
+        case_corpus_digest_view,
+        inspector_identity,
+        inspector_digest_view,
         isolated_environment,
         load_model_modules,
         load_selected_file,
         model_identity,
         model_scope,
+        verified_case_corpus,
         verify_object_file,
         verify_object_origin,
     )
@@ -35,12 +41,17 @@ except ImportError:  # Direct script execution.
     from inspection_provenance import (
         BASE_MODEL_PATHS,
         INTERNAL_PROBE_ORIGINS_RELATIVE,
+        RUNNER_HARNESS_PATHS,
         ProvenanceError,
+        case_corpus_digest_view,
+        inspector_identity,
+        inspector_digest_view,
         isolated_environment,
         load_model_modules,
         load_selected_file,
         model_identity,
         model_scope,
+        verified_case_corpus,
         verify_object_file,
         verify_object_origin,
     )
@@ -510,8 +521,11 @@ def _internal_probes_local(
 
 
 def _internal_probes(
-    root: Path, expected_revision: str, expected_tree: str
-) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    root: Path,
+    expected_revision: str,
+    expected_tree: str,
+    expected_harness: dict[str, Any],
+) -> tuple[list[dict[str, Any]], dict[str, str], dict[str, Any]]:
     result = _command(
         [
             sys.executable,
@@ -535,7 +549,12 @@ def _internal_probes(
         raise SystemExit("internal probe worker returned incomplete evidence")
     if payload.get("revision") != expected_revision or payload.get("tree") != expected_tree:
         raise SystemExit("internal probe worker model identity changed during inspection")
-    return rows, origins
+    worker_harness = payload.get("inspector")
+    if not isinstance(worker_harness, dict) or inspector_digest_view(
+        worker_harness
+    ) != inspector_digest_view(expected_harness):
+        raise SystemExit("internal probe worker harness differs from the parent inspector")
+    return rows, origins, worker_harness
 
 
 def main() -> int:
@@ -553,6 +572,7 @@ def main() -> int:
     root = args.root.resolve()
     if args._internal_worker:
         try:
+            harness = inspector_identity(Path(__file__), RUNNER_HARNESS_PATHS)
             revision, tree = model_identity(root, model_scope(True))
             rows, origins = _internal_probes_local(root)
         except ProvenanceError as error:
@@ -562,6 +582,7 @@ def main() -> int:
                 {
                     "revision": revision,
                     "tree": tree,
+                    "inspector": harness,
                     "rows": rows,
                     "import_origins": origins,
                 },
@@ -571,15 +592,36 @@ def main() -> int:
         return 0
     case_root = args.cases.resolve()
     scope = model_scope(args.internal)
+    try:
+        harness = inspector_identity(Path(__file__), RUNNER_HARNESS_PATHS)
+        case_inputs, captured_cases = verified_case_corpus(case_root)
+    except ProvenanceError as error:
+        raise SystemExit(str(error)) from error
     import_origin = _verify_import_origin(root)
     revision, tree = _model_identity(root, scope)
-    cases = _supported_cases(root, case_root)
-    if len(cases) != 47:
-        raise SystemExit(f"expected 47 inspection cases, found {len(cases)}")
+    with tempfile.TemporaryDirectory(prefix="iran-claim-inspection-") as temporary:
+        snapshot_root = Path(temporary)
+        for name, raw in captured_cases.items():
+            (snapshot_root / name).write_bytes(raw)
+        cases = _supported_cases(root, snapshot_root)
     report: dict[str, Any] = {
         "revision": revision,
         "tree": tree,
         "python": sys.version.split()[0],
+        "inspector": harness,
+        "case_inputs": case_inputs,
+        "execution_profile": {
+            "supported_review": {
+                "count": 47,
+                "acceptance_gate": True,
+                "assertion_source": "reference_manifest",
+            },
+            "internal_test_direct": {
+                "count": 14 if args.internal else 0,
+                "acceptance_gate": False,
+                "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+            },
+        },
         "import_origin": import_origin,
         "import_origin_relative": str(
             Path(import_origin).resolve().relative_to(root)
@@ -591,8 +633,11 @@ def main() -> int:
         "supported_path": cases,
     }
     if args.internal:
-        internal_rows, internal_origins = _internal_probes(root, revision, tree)
+        internal_rows, internal_origins, worker_harness = _internal_probes(
+            root, revision, tree, harness
+        )
         report["internal_test_direct"] = internal_rows
+        report["internal_probe_worker_inspector"] = worker_harness
         report["internal_probe_import_origins"] = internal_origins
         internal_relative = {
             label: str(Path(origin).resolve().relative_to(root))
@@ -603,9 +648,26 @@ def main() -> int:
                 "internal probe module origins differ from the required provenance map"
             )
         report["internal_probe_import_origins_relative"] = internal_relative
+        report["internal_probe_policy"] = {
+            "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+            "acceptance_gate": False,
+            "outcome_assertions": None,
+            "structural_requirement": "14 uniquely named probe rows",
+        }
     ending_revision, ending_tree = _model_identity(root, scope)
     if (ending_revision, ending_tree) != (revision, tree):
         raise SystemExit("model identity changed while inspection was running")
+    try:
+        ending_harness = inspector_identity(Path(__file__), RUNNER_HARNESS_PATHS)
+        ending_case_inputs, ending_cases = verified_case_corpus(case_root)
+    except ProvenanceError as error:
+        raise SystemExit(str(error)) from error
+    if inspector_digest_view(ending_harness) != inspector_digest_view(harness):
+        raise SystemExit("inspection harness identity changed while inspection was running")
+    if case_corpus_digest_view(ending_case_inputs) != case_corpus_digest_view(
+        case_inputs
+    ) or ending_cases != captured_cases:
+        raise SystemExit("case input bytes changed while inspection was running")
     rendered = json.dumps(report, indent=2, ensure_ascii=False) + "\n"
     if args.output:
         args.output.write_text(rendered, encoding="utf-8", newline="\n")
