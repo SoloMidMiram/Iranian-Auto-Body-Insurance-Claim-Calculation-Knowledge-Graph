@@ -429,6 +429,18 @@ def main() -> int:
     total_after_salvage = compute(_authorize_fixture_case(total, kb), kb)
     assert total_after_salvage.fields["franchise"] == Decimal(170)
 
+    insurer_title = copy.deepcopy(total)
+    insurer_title["claim_id"] = "incomplete-title-transfer-probe"
+    insurer_title["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    insurer_title["damage"]["title_transferred"] = False
+    insurer_title_result = compute(_authorize_fixture_case(insurer_title, kb), kb)
+    assert insurer_title_result.payable is None
+    assert insurer_title_result.status == "TITLE_TRANSFER_REQUIRED"
+    assert (
+        insurer_title_result.fields["guard_violation"]
+        == "G_SALVAGE_XOR_TITLE_TRANSFER"
+    )
+
     # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
     # year; a permissive month-12 check would change theft eligibility.
     assert _dated_theft_clock_days(

@@ -916,6 +916,12 @@ class Review:
                 "YES_SAME_INSURER",
             ):
                 conditions.append("MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED")
+        if (
+            branch == "TOTAL_LOSS"
+            and self._bound.get("PS_SALVAGE_DISPOSITION") == "INSURER_TAKES_TITLE"
+            and str(self._bound.get("PS_TITLE_TRANSFERRED") or "").lower() != "true"
+        ):
+            conditions.append("TITLE_TRANSFER_REQUIRED")
         return conditions
 
     def decision(self) -> dict[str, Any]:

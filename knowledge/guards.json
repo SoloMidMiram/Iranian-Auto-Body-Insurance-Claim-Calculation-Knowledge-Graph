@@ -16,9 +16,9 @@
     },
     {
       "node_id": "G_SALVAGE_XOR_TITLE_TRANSFER",
-      "prevents": "Transferring salvage ownership to the insurer and also deducting its value from the settlement",
+      "prevents": "Omitting salvage before title transfer is complete, or transferring salvage ownership to the insurer and also deducting its value from the settlement",
       "enforced_in": "iran_auto_claim.engine.calculate_total_loss",
-      "check": "salvage_disposition == INSURER_TAKES_TITLE implies no salvage deduction; INSURED_RETAINS implies a deduction",
+      "check": "salvage_disposition == INSURER_TAKES_TITLE requires completed title transfer and no salvage deduction; INSURED_RETAINS implies a deduction",
       "triggered_label": "DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT",
       "violation_status": "GUARD_VIOLATION_SALVAGE_DOUBLE_COUNT",
       "related_rules": ["REG53_ART19_INSURER_TAKES_TITLE", "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE"],

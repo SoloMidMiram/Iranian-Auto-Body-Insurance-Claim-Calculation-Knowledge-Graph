@@ -150,6 +150,13 @@ MUTATIONS = (
         "and True",
         "a classification override bypasses final-selected-branch evidence completeness",
     ),
+    Mutation(
+        "M31",
+        "src/iran_auto_claim/engine.py",
+        "if not case.title_transferred:\n            raise guards.GuardViolation(",
+        "if False:\n            raise guards.GuardViolation(",
+        "an incomplete title transfer can use the insurer-title no-salvage route",
+    ),
 )
 
 THRESHOLD = 90.0

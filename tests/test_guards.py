@@ -167,6 +167,7 @@ def test_salvage_is_not_both_deducted_and_transferred(kb):
             repair=1600,
             salvage_value=300,
             salvage_disposition="INSURER_TAKES_TITLE",
+            title_transferred=True,
             franchise=100,
         ),
         kb,

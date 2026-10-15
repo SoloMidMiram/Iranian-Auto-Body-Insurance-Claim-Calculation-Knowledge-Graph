@@ -181,6 +181,7 @@ def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
                 "repair": 1600,
                 "salvage_value": 300,
                 "salvage_disposition": "INSURER_TAKES_TITLE",
+                "title_transferred": True,
             },
             "policy": _policy(100),
         },
