@@ -150,6 +150,13 @@ MUTATIONS = (
         "or False",
         "an override-selected threshold branch skips the missing-rescue evidence gate",
     ),
+    Mutation(
+        "M31",
+        "src/iran_auto_claim/engine.py",
+        "if not case.title_transferred:\n            raise guards.GuardViolation(",
+        "if False:\n            raise guards.GuardViolation(",
+        "an incomplete title transfer can use the insurer-title no-salvage route",
+    ),
 )
 
 THRESHOLD = 90.0

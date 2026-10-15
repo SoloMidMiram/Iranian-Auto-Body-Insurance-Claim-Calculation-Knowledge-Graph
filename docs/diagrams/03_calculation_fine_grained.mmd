@@ -66,7 +66,9 @@ flowchart TB
     TL_VALUES -- "Yes" --> TL_BASE["settlement_base = min(market value, insured sum)<br/>never apply underinsurance ratio again"]
     TL_BASE --> TL_SALVAGE{"Salvage disposition"}
     TL_SALVAGE -- "UNRESOLVED" --> TL_U12["payable = null<br/>SALVAGE_DISPOSITION_UNRESOLVED · U12"]
-    TL_SALVAGE -- "INSURER_TAKES_TITLE" --> TL_NO_SALVAGE["salvage deduction = 0<br/>guard salvage XOR title"]
+    TL_SALVAGE -- "INSURER_TAKES_TITLE" --> TL_TITLE{"Title transfer complete?"}
+    TL_TITLE -- "No" --> TL_TITLE_STOP["payable = null<br/>TITLE_TRANSFER_REQUIRED"]
+    TL_TITLE -- "Yes" --> TL_NO_SALVAGE["salvage deduction = 0<br/>guard salvage XOR title"]
     TL_SALVAGE -- "INSURED_RETAINS" --> TL_DEDUCT["Deduct probable salvage once<br/>before franchise"]
     TL_NO_SALVAGE --> TL_TERMS["Resolve rescue and sourced franchise"]
     TL_DEDUCT --> TL_TERMS
