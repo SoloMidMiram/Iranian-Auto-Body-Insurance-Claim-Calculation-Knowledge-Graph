@@ -640,7 +640,7 @@ def main() -> int:
         report["internal_probe_worker_inspector"] = worker_harness
         report["internal_probe_import_origins"] = internal_origins
         internal_relative = {
-            label: str(Path(origin).resolve().relative_to(root))
+            label: Path(origin).resolve().relative_to(root).as_posix()
             for label, origin in internal_origins.items()
         }
         if internal_relative != INTERNAL_PROBE_ORIGINS_RELATIVE:
