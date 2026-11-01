@@ -1,0 +1,2 @@
+# Inspection references hash original bytes; preserve them on Windows checkouts.
+cases/inspection-*.json text eol=lf
