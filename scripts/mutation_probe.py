@@ -451,6 +451,12 @@ def main() -> int:
         assert blocked.payable is None
         assert blocked.status in ("SALVAGE_DISPOSITION_UNRESOLVED", "SALVAGE_VALUE_REQUIRED")
 
+    invalid_route = copy.deepcopy(total)
+    invalid_route["damage"]["salvage_disposition"] = "NOT_APPLICABLE"
+    invalid_route_result = compute(_authorize_fixture_case(invalid_route, kb), kb)
+    assert invalid_route_result.payable is None
+    assert invalid_route_result.status == "SALVAGE_DISPOSITION_UNRESOLVED"
+
     # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
     # year; a permissive month-12 check would change theft eligibility.
     assert _dated_theft_clock_days(
