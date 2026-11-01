@@ -1,0 +1,26 @@
+Obtaining file:///F:/Git/body-model-settlement-authority
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: pytest<10,>=8 in c:\users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\lib\site-packages (from iran-auto-claim==1.0.0) (9.2.0)
+Requirement already satisfied: colorama>=0.4 in c:\users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\lib\site-packages (from pytest<10,>=8->iran-auto-claim==1.0.0) (0.4.6)
+Requirement already satisfied: iniconfig>=2 in c:\users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\lib\site-packages (from pytest<10,>=8->iran-auto-claim==1.0.0) (2.3.1)
+Requirement already satisfied: packaging>=24 in c:\users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\lib\site-packages (from pytest<10,>=8->iran-auto-claim==1.0.0) (26.3)
+Requirement already satisfied: pluggy<2,>=1.6 in c:\users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\lib\site-packages (from pytest<10,>=8->iran-auto-claim==1.0.0) (1.7.0)
+Requirement already satisfied: pygments>=2.15 in c:\users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\lib\site-packages (from pytest<10,>=8->iran-auto-claim==1.0.0) (2.21.0)
+Building wheels for collected packages: iran-auto-claim
+  Building editable for iran-auto-claim (pyproject.toml): started
+  Building editable for iran-auto-claim (pyproject.toml): finished with status 'done'
+  Created wheel for iran-auto-claim: filename=iran_auto_claim-1.0.0-0.editable-py3-none-any.whl size=1672 sha256=7df5f393b6967ac5a132f775105a905102e71352e687ee0818b953374aa3bc34
+  Stored in directory: C:\Users\cebit.ir\AppData\Local\Temp\pip-ephem-wheel-cache-er5jm2mt\wheels\a1\90\a2\2c35026559dc82958d45f0549c1ebe1c7c86a1ccb4e1690341
+Successfully built iran-auto-claim
+Installing collected packages: iran-auto-claim
+Successfully installed iran-auto-claim-1.0.0
+
+[notice] A new release of pip is available: 23.1.2 -> 26.2.2
+[notice] To update, run: F:\Git\body-model-settlement-authority\.venv\Scripts\python.exe -m pip install --upgrade pip

@@ -1,0 +1,30 @@
+valid manifest: 8 milestones, 11 labels, 29 issues
+DRY-RUN P0-01: Enforce the claim JSON Schema at every runtime entry point
+DRY-RUN P0-02: Define IRR-only persistence, numeric invariants, and rounding
+DRY-RUN P0-03: Block body settlement when franchise economics are missing
+DRY-RUN P0-04: Correct Article 8 actual-loss ceilings and zero handling
+DRY-RUN P0-05: Require total-loss evidence and reconcile declared classification
+DRY-RUN P0-06: Establish reproducible CI, repository governance, and safety posture
+DRY-RUN P1-01: Audit and reclassify every legal and regulatory source
+DRY-RUN P1-02: Implement effective-dated regulatory and policy snapshots
+DRY-RUN P1-03: Replace annual parameters with primary official evidence and refresh workflow
+DRY-RUN P1-05: Add source integrity hashes, locators, and revalidation enforcement
+DRY-RUN P1-04: Complete provenance and confidence across every executable dependency
+DRY-RUN P2-01: Finalize the closed claim, evidence, and override taxonomy
+DRY-RUN P2-02: Make graph branch and operator configuration authoritative
+DRY-RUN P2-03: Prove every configured guard is invoked on every applicable path
+DRY-RUN P2-04: Add property, metamorphic, mutation, and model-parity tests
+DRY-RUN P3-01: Define insurer document acquisition and approval protocol
+DRY-RUN P3-02: Implement versioned insurer franchise adapters
+DRY-RUN P3-03: Resolve Article 10 and franchise operator order from insurer worksheets
+DRY-RUN P3-04: Calibrate standalone-glass endorsement behavior
+DRY-RUN P3-05: Integrate governed Article 8 assessor correspondence inputs
+DRY-RUN P3-06: Resolve battery/tire interaction and rescue denominator
+DRY-RUN P4-01: Build an independently reviewed anonymized golden-case corpus
+DRY-RUN P4-02: Create immutable calculation snapshots and deterministic audit output
+DRY-RUN P4-03: Make knowledge ingestion atomic, recursive, and concurrency-safe
+DRY-RUN P4-04: Complete privacy, security, and abuse threat model
+DRY-RUN P5-01: Build authenticated API and mandatory adjuster review workflow
+DRY-RUN P5-02: Run and evaluate a 100-claim private shadow pilot
+DRY-RUN P6-01: Assemble certification dossier and controlled release scope
+DRY-RUN P6-02: Add provenance-aware retrieval only after deterministic certification

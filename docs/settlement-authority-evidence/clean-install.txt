@@ -1,0 +1,33 @@
+Obtaining file:///F:/Git/body-model-settlement-authority-clean
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProxyError('Cannot connect to proxy.', TimeoutError('_ssl.c:985: The handshake operation timed out'))': /simple/pytest/
+Collecting pytest<10,>=8 (from iran-auto-claim==1.0.0)
+  Using cached pytest-9.2.0-py3-none-any.whl (411 kB)
+Collecting colorama>=0.4 (from pytest<10,>=8->iran-auto-claim==1.0.0)
+  Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Collecting iniconfig>=2 (from pytest<10,>=8->iran-auto-claim==1.0.0)
+  Using cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Collecting packaging>=24 (from pytest<10,>=8->iran-auto-claim==1.0.0)
+  Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Collecting pluggy<2,>=1.6 (from pytest<10,>=8->iran-auto-claim==1.0.0)
+  Using cached pluggy-1.7.0-py3-none-any.whl (27 kB)
+Collecting pygments>=2.15 (from pytest<10,>=8->iran-auto-claim==1.0.0)
+  Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+Building wheels for collected packages: iran-auto-claim
+  Building editable for iran-auto-claim (pyproject.toml): started
+  Building editable for iran-auto-claim (pyproject.toml): finished with status 'done'
+  Created wheel for iran-auto-claim: filename=iran_auto_claim-1.0.0-0.editable-py3-none-any.whl size=1679 sha256=4db68c606edc35549916a66e5a82c209fc1abf21ee55e1559a242267423a23df
+  Stored in directory: C:\Users\cebit.ir\AppData\Local\Temp\pip-ephem-wheel-cache-frf9fjka\wheels\5b\13\ba\6b430a28214c4e6415bb560f03cb6aa11754b93d0d7d7f6d4e
+Successfully built iran-auto-claim
+Installing collected packages: pygments, pluggy, packaging, iran-auto-claim, iniconfig, colorama, pytest
+Successfully installed colorama-0.4.6 iniconfig-2.3.1 iran-auto-claim-1.0.0 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0
+
+[notice] A new release of pip is available: 23.1.2 -> 26.2.2
+[notice] To update, run: F:\Git\body-model-settlement-authority-clean\.venv\Scripts\python.exe -m pip install --upgrade pip

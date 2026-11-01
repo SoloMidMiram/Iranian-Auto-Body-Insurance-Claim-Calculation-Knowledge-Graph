@@ -1,0 +1,1628 @@
+....................F..................................FFEFE.E.E.EFEFEFE [  8%]
+FEFEFEFEFEFE.E.E........................................................ [ 17%]
+........................................................................ [ 27%]
+........................................................................ [ 37%]
+........................................................................ [ 47%]
+.............FF.FF.F....F.F...........................EEEEEE............ [ 57%]
+..............................FF.F...................................... [ 67%]
+........................................................................ [ 77%]
+........................................................................ [ 87%]
+........................................................................ [ 97%]
+...............                                                          [100%]
+=================================== ERRORS ====================================
+_ ERROR at teardown of test_internal_observation_requires_internal_probe_scope _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at teardown of test_internal_observation_requires_verified_internal_import_origins _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_______ ERROR at teardown of test_reference_locators_are_case_relevant ________
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at teardown of test_manifest_source_ids_resolve_to_registered_sources _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at teardown of test_model_change_with_unchanged_case_hashes_rejects_stale_observation _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at teardown of test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount] _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at teardown of test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit] _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+__ ERROR at teardown of test_c42_rescue_100_to_101_crosses_strict_threshold ___
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+__ ERROR at teardown of test_c45_omitted_rescue_to_explicit_zero_is_detected __
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+___ ERROR at teardown of test_authorization_granted_to_refused_is_detected ____
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+____ ERROR at teardown of test_payable_change_with_same_branch_is_detected ____
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at teardown of test_changed_input_digest_without_output_change_is_detected _
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+______ ERROR at teardown of test_missing_and_duplicate_case_are_rejected ______
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+___ ERROR at teardown of test_changed_material_trace_assertion_is_detected ____
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+___ ERROR at teardown of test_manifest_rejects_duplicate_id_and_float_money ___
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+________ ERROR at teardown of test_cli_exits_nonzero_for_new_mismatch _________
+
+    @pytest.fixture(autouse=True)
+    def inspection_cases_remain_unchanged() -> None:
+        before = _case_hashes()
+        yield
+        assert _case_hashes() == before
+        result = subprocess.run(
+            ["git", "diff", "--quiet", "--", "cases"], cwd=ROOT, check=False
+        )
+>       assert result.returncode == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', 'diff', '--quiet', '--', 'cases'], returncode=1).returncode
+
+tests\test_case_comparison.py:50: AssertionError
+_ ERROR at setup of test_valid_cross_checkout_records_complete_evidence_contract _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x00000233870B35D0>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': 'fc53da19269466254d9ed04e4b27b1fac89efd82', 'tree': '2049ea5b3233035e9cae58c258fd4dcf5e237e8c', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+_ ERROR at setup of test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x00000233870B35D0>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': 'fc53da19269466254d9ed04e4b27b1fac89efd82', 'tree': '2049ea5b3233035e9cae58c258fd4dcf5e237e8c', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+_____ ERROR at setup of test_investigation_rejects_modified_external_c104 _____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x00000233870B35D0>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': 'fc53da19269466254d9ed04e4b27b1fac89efd82', 'tree': '2049ea5b3233035e9cae58c258fd4dcf5e237e8c', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+____ ERROR at setup of test_runner_rejects_mutated_caller_probe_definition ____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x00000233870B35D0>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': 'fc53da19269466254d9ed04e4b27b1fac89efd82', 'tree': '2049ea5b3233035e9cae58c258fd4dcf5e237e8c', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+__ ERROR at setup of test_comparator_rejects_stale_clean_inspector_revision ___
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x00000233870B35D0>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': 'fc53da19269466254d9ed04e4b27b1fac89efd82', 'tree': '2049ea5b3233035e9cae58c258fd4dcf5e237e8c', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+_ ERROR at setup of test_comparator_rejects_different_committed_unauthorized_harness _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x00000233870B35D0>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': 'fc53da19269466254d9ed04e4b27b1fac89efd82', 'tree': '2049ea5b3233035e9cae58c258fd4dcf5e237e8c', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+================================== FAILURES ===================================
+____ test_mutating_a_case_supplied_at_issuance_cannot_change_the_snapshot _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_mutating_a_case_supplied_at_issuance_cannot_change_the_snapshot(kb):
+        payload = Review.from_file(CASES / FULLCOVER, kb).case_payload()
+        supplied = Case(copy.deepcopy(payload))
+>       authorization = _authorize_fixture_case(supplied, kb)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_admission.py:331: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\iran_auto_claim\fixtures.py:61: in _authorize_fixture_case
+    _with_synthetic_authority(case_payload),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:78: in _with_synthetic_authority
+    case = Case(result)
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <iran_auto_claim.case.Case object at 0x000002338758F610>
+raw = <iran_auto_claim.case.Case object at 0x000002338758D990>
+
+    def __init__(self, raw: dict[str, Any]) -> None:
+        if not isinstance(raw, dict):
+>           raise CaseInputError("a case must be a JSON object")
+E           iran_auto_claim.case.CaseInputError: a case must be a JSON object
+
+src\iran_auto_claim\case.py:92: CaseInputError
+________ test_review_evidenced_zero_salvage_preserves_supported_route _________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_review_evidenced_zero_salvage_preserves_supported_route(kb):
+        payload = json.loads((Path(__file__).parents[1] / "cases/inspection-c63-retains-after-salvage.json").read_text())
+        payload["answers"]["Q-S4-08"] = 0
+        assert "EVT_SALVAGE_VALUATION" in payload["evidence_present"]
+        result = Review(payload, kb).calculate()
+>       assert result is not None and result.payable is not None
+E       assert (None is not None)
+
+tests\test_article19_acceptance.py:92: AssertionError
+___________ test_internal_observation_requires_internal_probe_scope ___________
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_internal_observation_requ0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_internal_observation_requires_internal_probe_scope(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        observation = copy.deepcopy(baseline_observation)
+        observation["internal_test_direct"] = []
+        observation["provenance_profile"] = "SUPPORTED_PLUS_INTERNAL"
+        observation_path = tmp_path / "observation.json"
+        _write_json(observation_path, observation)
+    
+>       with pytest.raises(comparator.ManifestError, match="model_scope"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'model_scope'
+E         Actual message: "model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']"
+
+tests\test_case_comparison.py:147: AssertionError
+_____ test_internal_observation_requires_verified_internal_import_origins _____
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_internal_observation_requ1')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_internal_observation_requires_verified_internal_import_origins(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        observation = copy.deepcopy(baseline_observation)
+        observation["internal_test_direct"] = []
+        observation["provenance_profile"] = "SUPPORTED_PLUS_INTERNAL"
+        observation["model_scope"] = list(provenance.model_scope(True))
+        observation_path = tmp_path / "observation.json"
+        _write_json(observation_path, observation)
+    
+>       with pytest.raises(comparator.ManifestError, match="internal probe import origins"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'internal probe import origins'
+E         Actual message: "model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']"
+
+tests\test_case_comparison.py:161: AssertionError
+_ test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount] __
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_standalone_calc_rendered_0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+old = '143.20', new = '143.21'
+
+    @pytest.mark.parametrize(
+        ("old", "new"),
+        [("143.20", "143.21"), ("m-toman", "IRR")],
+        ids=("rendered-amount", "rendered-unit"),
+    )
+    def test_standalone_calc_rendered_money_and_unit_are_enforced(
+        tmp_path: Path,
+        baseline_observation: dict[str, object],
+        old: str,
+        new: str,
+    ) -> None:
+        observation = copy.deepcopy(baseline_observation)
+        row = next(
+            item
+            for item in observation["supported_path"]
+            if item["case"] == "inspection-c13d-replacement-control"
+        )
+>       payable_line = next(
+            line
+            for line in row["calc_stdout"].splitlines()
+            if line.lstrip().startswith("PAYABLE:")
+        )
+E       StopIteration
+
+tests\test_case_comparison.py:304: StopIteration
+__ test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit] ___
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_standalone_calc_rendered_1')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+old = 'm-toman', new = 'IRR'
+
+    @pytest.mark.parametrize(
+        ("old", "new"),
+        [("143.20", "143.21"), ("m-toman", "IRR")],
+        ids=("rendered-amount", "rendered-unit"),
+    )
+    def test_standalone_calc_rendered_money_and_unit_are_enforced(
+        tmp_path: Path,
+        baseline_observation: dict[str, object],
+        old: str,
+        new: str,
+    ) -> None:
+        observation = copy.deepcopy(baseline_observation)
+        row = next(
+            item
+            for item in observation["supported_path"]
+            if item["case"] == "inspection-c13d-replacement-control"
+        )
+>       payable_line = next(
+            line
+            for line in row["calc_stdout"].splitlines()
+            if line.lstrip().startswith("PAYABLE:")
+        )
+E       StopIteration
+
+tests\test_case_comparison.py:304: StopIteration
+_____________ test_c42_rescue_100_to_101_crosses_strict_threshold _____________
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+>           revision, tree = model_identity(model_root, scope)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\build_case_comparison.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-settlement-authority')
+scope = ('claim.py', 'pyproject.toml', 'src', 'knowledge', 'schema', 'ontology', ...)
+
+    def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
+        """Return revision/tree only for a clean, exact worktree and input scope."""
+    
+        selected = root.resolve()
+        top = Path(_git(selected, "rev-parse", "--show-toplevel")).resolve()
+        if top != selected:
+            raise ProvenanceError(
+                f"model root must be the git worktree root: expected {top}, got {selected}"
+            )
+        paths = tuple(scope)
+        dirty = _git(
+            selected,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        )
+        if dirty:
+>           raise ProvenanceError(
+                "model checkout has uncommitted implementation inputs in checked scope: "
+                f"{dirty.splitlines()}"
+            )
+E           scripts.inspection_provenance.ProvenanceError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\inspection_provenance.py:123: ProvenanceError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_c42_rescue_100_to_101_cro0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_c42_rescue_100_to_101_crosses_strict_threshold(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+>       result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c42-at-7500",
+            lambda payload: payload["answers"].__setitem__("Q-S4-07", 101),
+        )
+
+tests\test_case_comparison.py:334: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_case_comparison.py:114: in _mutated_case_report
+    report, passed = _compare(MANIFEST, observation_path, case_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_case_comparison.py:35: in _compare
+    return comparator.compare(
+scripts\build_case_comparison.py:641: in compare
+    _validate_model_binding(observation, target_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+            revision, tree = model_identity(model_root, scope)
+        except ProvenanceError as error:
+>           raise ManifestError(str(error)) from error
+E           scripts.build_case_comparison.ManifestError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\build_case_comparison.py:114: ManifestError
+____________ test_c45_omitted_rescue_to_explicit_zero_is_detected _____________
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+>           revision, tree = model_identity(model_root, scope)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\build_case_comparison.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-settlement-authority')
+scope = ('claim.py', 'pyproject.toml', 'src', 'knowledge', 'schema', 'ontology', ...)
+
+    def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
+        """Return revision/tree only for a clean, exact worktree and input scope."""
+    
+        selected = root.resolve()
+        top = Path(_git(selected, "rev-parse", "--show-toplevel")).resolve()
+        if top != selected:
+            raise ProvenanceError(
+                f"model root must be the git worktree root: expected {top}, got {selected}"
+            )
+        paths = tuple(scope)
+        dirty = _git(
+            selected,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        )
+        if dirty:
+>           raise ProvenanceError(
+                "model checkout has uncommitted implementation inputs in checked scope: "
+                f"{dirty.splitlines()}"
+            )
+E           scripts.inspection_provenance.ProvenanceError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\inspection_provenance.py:123: ProvenanceError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_c45_omitted_rescue_to_exp0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_c45_omitted_rescue_to_explicit_zero_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+>       result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c45-rescue-omitted",
+            lambda payload: payload["answers"].__setitem__("Q-S4-07", 0),
+        )
+
+tests\test_case_comparison.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_case_comparison.py:114: in _mutated_case_report
+    report, passed = _compare(MANIFEST, observation_path, case_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_case_comparison.py:35: in _compare
+    return comparator.compare(
+scripts\build_case_comparison.py:641: in compare
+    _validate_model_binding(observation, target_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+            revision, tree = model_identity(model_root, scope)
+        except ProvenanceError as error:
+>           raise ManifestError(str(error)) from error
+E           scripts.build_case_comparison.ManifestError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\build_case_comparison.py:114: ManifestError
+______________ test_authorization_granted_to_refused_is_detected ______________
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+>           revision, tree = model_identity(model_root, scope)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\build_case_comparison.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-settlement-authority')
+scope = ('claim.py', 'pyproject.toml', 'src', 'knowledge', 'schema', 'ontology', ...)
+
+    def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
+        """Return revision/tree only for a clean, exact worktree and input scope."""
+    
+        selected = root.resolve()
+        top = Path(_git(selected, "rev-parse", "--show-toplevel")).resolve()
+        if top != selected:
+            raise ProvenanceError(
+                f"model root must be the git worktree root: expected {top}, got {selected}"
+            )
+        paths = tuple(scope)
+        dirty = _git(
+            selected,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        )
+        if dirty:
+>           raise ProvenanceError(
+                "model checkout has uncommitted implementation inputs in checked scope: "
+                f"{dirty.splitlines()}"
+            )
+E           scripts.inspection_provenance.ProvenanceError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\inspection_provenance.py:123: ProvenanceError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_authorization_granted_to_0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_authorization_granted_to_refused_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+>       result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c42-at-7500",
+            lambda payload: payload["answers"].__setitem__("Q-S3-01", "WRONG_CLASS"),
+        )
+
+tests\test_case_comparison.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_case_comparison.py:114: in _mutated_case_report
+    report, passed = _compare(MANIFEST, observation_path, case_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_case_comparison.py:35: in _compare
+    return comparator.compare(
+scripts\build_case_comparison.py:641: in compare
+    _validate_model_binding(observation, target_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+            revision, tree = model_identity(model_root, scope)
+        except ProvenanceError as error:
+>           raise ManifestError(str(error)) from error
+E           scripts.build_case_comparison.ManifestError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\build_case_comparison.py:114: ManifestError
+______________ test_payable_change_with_same_branch_is_detected _______________
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+>           revision, tree = model_identity(model_root, scope)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\build_case_comparison.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-settlement-authority')
+scope = ('claim.py', 'pyproject.toml', 'src', 'knowledge', 'schema', 'ontology', ...)
+
+    def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
+        """Return revision/tree only for a clean, exact worktree and input scope."""
+    
+        selected = root.resolve()
+        top = Path(_git(selected, "rev-parse", "--show-toplevel")).resolve()
+        if top != selected:
+            raise ProvenanceError(
+                f"model root must be the git worktree root: expected {top}, got {selected}"
+            )
+        paths = tuple(scope)
+        dirty = _git(
+            selected,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        )
+        if dirty:
+>           raise ProvenanceError(
+                "model checkout has uncommitted implementation inputs in checked scope: "
+                f"{dirty.splitlines()}"
+            )
+E           scripts.inspection_provenance.ProvenanceError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\inspection_provenance.py:123: ProvenanceError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_payable_change_with_same_0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_payable_change_with_same_branch_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+>       result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c42-at-7500",
+            lambda payload: payload["answers"].__setitem__("Q-S4-07", 99),
+        )
+
+tests\test_case_comparison.py:375: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_case_comparison.py:114: in _mutated_case_report
+    report, passed = _compare(MANIFEST, observation_path, case_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_case_comparison.py:35: in _compare
+    return comparator.compare(
+scripts\build_case_comparison.py:641: in compare
+    _validate_model_binding(observation, target_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+            revision, tree = model_identity(model_root, scope)
+        except ProvenanceError as error:
+>           raise ManifestError(str(error)) from error
+E           scripts.build_case_comparison.ManifestError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\build_case_comparison.py:114: ManifestError
+_________ test_changed_input_digest_without_output_change_is_detected _________
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+>           revision, tree = model_identity(model_root, scope)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\build_case_comparison.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-settlement-authority')
+scope = ('claim.py', 'pyproject.toml', 'src', 'knowledge', 'schema', 'ontology', ...)
+
+    def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
+        """Return revision/tree only for a clean, exact worktree and input scope."""
+    
+        selected = root.resolve()
+        top = Path(_git(selected, "rev-parse", "--show-toplevel")).resolve()
+        if top != selected:
+            raise ProvenanceError(
+                f"model root must be the git worktree root: expected {top}, got {selected}"
+            )
+        paths = tuple(scope)
+        dirty = _git(
+            selected,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        )
+        if dirty:
+>           raise ProvenanceError(
+                "model checkout has uncommitted implementation inputs in checked scope: "
+                f"{dirty.splitlines()}"
+            )
+E           scripts.inspection_provenance.ProvenanceError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\inspection_provenance.py:123: ProvenanceError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_changed_input_digest_with0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_changed_input_digest_without_output_change_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        original = next(
+            row
+            for row in baseline_observation["supported_path"]
+            if row["case"] == "inspection-c42-at-7500"
+        )
+>       result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c42-at-7500",
+            lambda payload: payload.__setitem__("note", payload["note"] + " digest-only"),
+        )
+
+tests\test_case_comparison.py:396: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_case_comparison.py:114: in _mutated_case_report
+    report, passed = _compare(MANIFEST, observation_path, case_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_case_comparison.py:35: in _compare
+    return comparator.compare(
+scripts\build_case_comparison.py:641: in compare
+    _validate_model_binding(observation, target_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+            revision, tree = model_identity(model_root, scope)
+        except ProvenanceError as error:
+>           raise ManifestError(str(error)) from error
+E           scripts.build_case_comparison.ManifestError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\build_case_comparison.py:114: ManifestError
+________________ test_missing_and_duplicate_case_are_rejected _________________
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_missing_and_duplicate_cas0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_missing_and_duplicate_case_are_rejected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        case_root = _copy_cases(tmp_path)
+        missing = copy.deepcopy(baseline_observation)
+        missing["supported_path"].pop()
+        missing_path = tmp_path / "missing.json"
+        _write_json(missing_path, missing)
+>       with pytest.raises(comparator.ManifestError, match="case-set mismatch"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'case-set mismatch'
+E         Actual message: "model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']"
+
+tests\test_case_comparison.py:415: AssertionError
+______________ test_changed_material_trace_assertion_is_detected ______________
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+>           revision, tree = model_identity(model_root, scope)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\build_case_comparison.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-settlement-authority')
+scope = ('claim.py', 'pyproject.toml', 'src', 'knowledge', 'schema', 'ontology', ...)
+
+    def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
+        """Return revision/tree only for a clean, exact worktree and input scope."""
+    
+        selected = root.resolve()
+        top = Path(_git(selected, "rev-parse", "--show-toplevel")).resolve()
+        if top != selected:
+            raise ProvenanceError(
+                f"model root must be the git worktree root: expected {top}, got {selected}"
+            )
+        paths = tuple(scope)
+        dirty = _git(
+            selected,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        )
+        if dirty:
+>           raise ProvenanceError(
+                "model checkout has uncommitted implementation inputs in checked scope: "
+                f"{dirty.splitlines()}"
+            )
+E           scripts.inspection_provenance.ProvenanceError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\inspection_provenance.py:123: ProvenanceError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1246/test_changed_material_trace_as0')
+baseline_observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_changed_material_trace_assertion_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+>       result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c105-theft-59-days",
+            lambda payload: payload["answers"].__setitem__(
+                "Q-S2-14", "synthetic alternative clock-source record"
+            ),
+        )
+
+tests\test_case_comparison.py:429: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_case_comparison.py:114: in _mutated_case_report
+    report, passed = _compare(MANIFEST, observation_path, case_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_case_comparison.py:35: in _compare
+    return comparator.compare(
+scripts\build_case_comparison.py:641: in compare
+    _validate_model_binding(observation, target_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'revision': '7a2cdccd5b41171ee20e37f203428a1463c7be4c', 'tree': '96c430cd8123fae1cf0b51e21da2b8f9a21ed686', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+model_root = WindowsPath('F:/Git/body-model-settlement-authority')
+
+    def _validate_model_binding(
+        observation: dict[str, Any], model_root: Path
+    ) -> tuple[str, str, tuple[str, ...], str]:
+        include_internal = "internal_test_direct" in observation
+        scope = model_scope(include_internal)
+        profile = "SUPPORTED_PLUS_INTERNAL" if include_internal else "SUPPORTED_ONLY"
+        try:
+            revision, tree = model_identity(model_root, scope)
+        except ProvenanceError as error:
+>           raise ManifestError(str(error)) from error
+E           scripts.build_case_comparison.ManifestError: model checkout has uncommitted implementation inputs in checked scope: ['M fixtures/cases.json', ' M schema/claim-case.schema.json', ' M schema/review-answers.schema.json', ' M src/iran_auto_claim/authority.py', ' M src/iran_auto_claim/engine.py', ' M src/iran_auto_claim/fixtures.py', ' M src/iran_auto_claim/review.py']
+
+scripts\build_case_comparison.py:114: ManifestError
+______________ test_salvage_is_not_both_deducted_and_transferred ______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_salvage_is_not_both_deducted_and_transferred(kb):
+        result = compute(
+            _case(
+                "TOTAL_LOSS",
+                market=2000,
+                insured=2000,
+                repair=1600,
+                salvage_value=300,
+                salvage_disposition="INSURER_TAKES_TITLE",
+                title_transferred=True,
+                franchise=100,
+            ),
+            kb,
+        )
+        assert result.fields["salvage_deduction"] == D(0)
+        assert "DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT" in result.labels
+>       assert result.payable == D(1900)
+E       AssertionError: assert None == Decimal('1900')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='guard-test', unit='IRR', payable=None, payable_...: 'sha256:66076880300c2749ae5c66305bad8438140b0532444e1d0bb7ec196508a91db0', 'issued_at': '2026-11-01T18:35:55+00:00'}).payable
+E        +  and   Decimal('1900') = D(1900)
+
+tests\test_guards.py:177: AssertionError
+_____________ test_salvage_precedes_franchise_under_the_circular ______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_salvage_precedes_franchise_under_the_circular(kb):
+        result = compute(
+            _case("TOTAL_LOSS", market=2000, insured=2000, repair=1600, salvage_value=300, franchise=100),
+            kb,
+        )
+        assert result.fields["salvage_deduction"] == D(300)
+        assert result.fields["base_after_salvage"] == D(1700)
+        assert "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE" in result.rule_trace
+>       assert result.payable == D(1600)
+E       AssertionError: assert None == Decimal('1600')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='guard-test', unit='IRR', payable=None, payable_...: 'sha256:ed11bc408bf46133b4d72d4ed01081ceb7c6dc45706cfdb121ac9c3116f8dca7', 'issued_at': '2026-11-01T18:35:55+00:00'}).payable
+E        +  and   Decimal('1600') = D(1600)
+
+tests\test_guards.py:188: AssertionError
+_______ test_underinsurance_is_never_applied_to_an_already_capped_base ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_underinsurance_is_never_applied_to_an_already_capped_base(kb):
+        result = compute(
+            _case("TOTAL_LOSS", market=3000, insured=2400, repair=2300, salvage_value=400, franchise=120, rescue_payable=50),
+            kb,
+        )
+        # min(3000, 2400) - 400 - 120 + 50 = 1930; a second 0.8 ratio would give 1544
+>       assert result.payable == D(1930)
+E       AssertionError: assert None == Decimal('1930')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='guard-test', unit='IRR', payable=None, payable_...: 'sha256:60937f69f9dde9933a86f54592819ca785786d8b47c0d0fb4a944a768f2e3ba0', 'issued_at': '2026-11-01T18:35:55+00:00'}).payable
+E        +  and   Decimal('1930') = D(1930)
+
+tests\test_guards.py:206: AssertionError
+____________________ test_insured_sum_ceiling_is_enforced _____________________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_insured_sum_ceiling_is_enforced(kb):
+        result = compute(
+            _case(
+                "TOTAL_LOSS",
+                market=1000,
+                insured=1000,
+                repair=800,
+                salvage_value=100,
+                franchise=1000,
+            ),
+            kb,
+        )
+>       assert result.payable == D(0)
+E       AssertionError: assert None == Decimal('0')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='guard-test', unit='IRR', payable=None, payable_...: 'sha256:58489755095e0407c1070f9b1541813190a7edd55fab6cd390a6b5b3847989a0', 'issued_at': '2026-11-01T18:35:55+00:00'}).payable
+E        +  and   Decimal('0') = D(0)
+
+tests\test_guards.py:223: AssertionError
+____________ test_resolving_the_interaction_yields_a_single_number ____________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_resolving_the_interaction_yields_a_single_number(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE",
+            production_year=1392,
+            battery_loss=40,
+            battery_new_price=80,
+            franchise=2,
+        )
+        payload["regulatory_snapshot"] = {"iranian_year": 1405}
+        payload["damage"]["market"] = 4000
+        payload["damage"]["insured"] = 4000
+        payload["calculation_config"] = {"battery_tire_depreciation_interaction": "CAP_THEN_DEPRECIATE"}
+        result = compute(payload, kb)
+        # cap = 0.5 * 80 = 40; rate = min(0.25, 0.05 * 10) = 0.25; dep = 10
+        assert result.fields["depreciation"] == D(10)
+>       assert result.payable == D(28)
+E       AssertionError: assert None == Decimal('28')
+E        +  where None = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='guard-test', unit='IRR', payable=None, paya...: 'sha256:e90070f84d8e219e5ae80a862e46dd3fb92eb488783b16b836ad03f949c2ed12', 'issued_at': '2026-11-01T18:35:55+00:00'}).payable
+E        +  and   Decimal('28') = D(28)
+
+tests\test_guards.py:264: AssertionError
+______ test_a_blocking_uncertainty_never_coexists_with_a_single_payable _______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_a_blocking_uncertainty_never_coexists_with_a_single_payable(kb):
+        result = compute(
+            _case("PARTIAL_DAMAGE", market=4000, insured=3000, gross=400, franchise=40),
+            kb,
+        )
+        assert result.blocking_uncertainties
+        assert result.payable is None
+>       assert result.payable_scenarios
+E       AssertionError: assert []
+E        +  where [] = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='guard-test', unit='IRR', payable=None, paya...: 'sha256:9769747d444d5a03019cb206cdecb25c6feae5732c0f7628384ae69b6189a87d', 'issued_at': '2026-11-01T18:35:55+00:00'}).payable_scenarios
+
+tests\test_guards.py:305: AssertionError
+________ test_surface_unresolved_order_as_a_scenario_set_not_a_number _________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_surface_unresolved_order_as_a_scenario_set_not_a_number(kb):
+        result = compute(
+            _case("PARTIAL_DAMAGE", market=4000, insured=3000, gross=400, depreciation=20, franchise=40),
+            kb,
+        )
+>       assert result.status == "ORDER_UNRESOLVED"
+E       AssertionError: assert 'FRANCHISE_AUTHORITY_REQUIRED' == 'ORDER_UNRESOLVED'
+E         
+E         - ORDER_UNRESOLVED
+E         + FRANCHISE_AUTHORITY_REQUIRED
+
+tests\test_guards.py:322: AssertionError
+________ test_final_payable_rounds_half_up_once_at_the_engine_boundary ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_final_payable_rounds_half_up_once_at_the_engine_boundary(kb):
+        result = compute(
+            {
+                "claim_id": "ROUND-HALF-UP",
+                "unit": "IRR",
+                "classification": {"branch": "PARTIAL_DAMAGE"},
+                "damage": {"gross": 5, "depreciation": 0, "market": 5, "insured": 5},
+                "coverage_gate": {"causal_relationship_established": True},
+                "policy": {
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                    "franchise": {
+                        "mode": "PERCENT",
+                        "rate": 0.5,
+                        "calculation_base": "AFTER_DEPRECIATION",
+                        "source": "POLICY",
+                    }
+                },
+            },
+            kb,
+        )
+>       assert result.fields["franchise"] == D("2.5")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'franchise'
+
+tests\test_money.py:99: KeyError
+___ test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float(kb):
+        result = compute(
+            {
+                "claim_id": "ROUND-SCENARIOS",
+                "unit": "IRR",
+                "classification": {"branch": "PARTIAL_DAMAGE"},
+                "damage": {"gross": 10, "depreciation": 0, "market": 3, "insured": 1},
+                "coverage_gate": {"causal_relationship_established": True},
+                "policy": {
+                    "policy_version": "TEST-v1",
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                    "franchise": {
+                        "mode": "ABSOLUTE",
+                        "absolute_irr": 1,
+                        "source": "POLICY",
+                        "source_reference": "test policy schedule",
+                        "source_version": "TEST-v1",
+                    },
+                },
+            },
+            kb,
+        )
+>       assert result.payable_scenarios == [D(2), D(3)]
+E       AssertionError: assert [] == [Decimal('2'), Decimal('3')]
+E         
+E         Right contains 2 more items, first extra item: Decimal('2')
+E         Use -v to get more diff
+
+tests\test_money.py:125: AssertionError
+________________ test_very_large_integer_irr_does_not_overflow ________________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000023387469CD0>
+
+    def test_very_large_integer_irr_does_not_overflow(kb):
+        amount = 10**100
+        result = compute(
+            {
+                "claim_id": "LARGE-IRR",
+                "unit": "IRR",
+                "classification": {"branch": "PARTIAL_DAMAGE"},
+                "coverage_gate": {"causal_relationship_established": True},
+                "damage": {
+                    "gross": amount,
+                    "depreciation": 0,
+                    "market": amount,
+                    "insured": amount,
+                },
+                "policy": {
+                    "policy_version": "TEST-v1",
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                    "franchise": {
+                        "mode": "ABSOLUTE",
+                        "absolute_irr": 0,
+                        "source": "POLICY",
+                        "source_reference": "test declarations page",
+                        "source_version": "TEST-v1",
+                    },
+                },
+            },
+            kb,
+        )
+>       assert result.payable == D(amount)
+E       AssertionError: assert None == Decimal('10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+E        +  where None = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='LARGE-IRR', unit='IRR', payable=None, payab...: 'sha256:d9dffedbe82664060c6d957cd019ac8c3677bed7e89e2ba4f30a572f2911553a', 'issued_at': '2026-11-01T18:36:36+00:00'}).payable
+E        +  and   Decimal('10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000') = D(100000000000000000...0000000000000000000)
+
+tests\test_money.py:170: AssertionError
+=========================== short test summary info ===========================
+ERROR tests/test_case_comparison.py::test_internal_observation_requires_internal_probe_scope
+ERROR tests/test_case_comparison.py::test_internal_observation_requires_verified_internal_import_origins
+ERROR tests/test_case_comparison.py::test_reference_locators_are_case_relevant
+ERROR tests/test_case_comparison.py::test_manifest_source_ids_resolve_to_registered_sources
+ERROR tests/test_case_comparison.py::test_model_change_with_unchanged_case_hashes_rejects_stale_observation
+ERROR tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount]
+ERROR tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit]
+ERROR tests/test_case_comparison.py::test_c42_rescue_100_to_101_crosses_strict_threshold
+ERROR tests/test_case_comparison.py::test_c45_omitted_rescue_to_explicit_zero_is_detected
+ERROR tests/test_case_comparison.py::test_authorization_granted_to_refused_is_detected
+ERROR tests/test_case_comparison.py::test_payable_change_with_same_branch_is_detected
+ERROR tests/test_case_comparison.py::test_changed_input_digest_without_output_change_is_detected
+ERROR tests/test_case_comparison.py::test_missing_and_duplicate_case_are_rejected
+ERROR tests/test_case_comparison.py::test_changed_material_trace_assertion_is_detected
+ERROR tests/test_case_comparison.py::test_manifest_rejects_duplicate_id_and_float_money
+ERROR tests/test_case_comparison.py::test_cli_exits_nonzero_for_new_mismatch
+ERROR tests/test_inspection_provenance.py::test_valid_cross_checkout_records_complete_evidence_contract
+ERROR tests/test_inspection_provenance.py::test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated
+ERROR tests/test_inspection_provenance.py::test_investigation_rejects_modified_external_c104
+ERROR tests/test_inspection_provenance.py::test_runner_rejects_mutated_caller_probe_definition
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_stale_clean_inspector_revision
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_different_committed_unauthorized_harness
+FAILED tests/test_admission.py::test_mutating_a_case_supplied_at_issuance_cannot_change_the_snapshot
+FAILED tests/test_article19_acceptance.py::test_review_evidenced_zero_salvage_preserves_supported_route
+FAILED tests/test_case_comparison.py::test_internal_observation_requires_internal_probe_scope
+FAILED tests/test_case_comparison.py::test_internal_observation_requires_verified_internal_import_origins
+FAILED tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount]
+FAILED tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit]
+FAILED tests/test_case_comparison.py::test_c42_rescue_100_to_101_crosses_strict_threshold
+FAILED tests/test_case_comparison.py::test_c45_omitted_rescue_to_explicit_zero_is_detected
+FAILED tests/test_case_comparison.py::test_authorization_granted_to_refused_is_detected
+FAILED tests/test_case_comparison.py::test_payable_change_with_same_branch_is_detected
+FAILED tests/test_case_comparison.py::test_changed_input_digest_without_output_change_is_detected
+FAILED tests/test_case_comparison.py::test_missing_and_duplicate_case_are_rejected
+FAILED tests/test_case_comparison.py::test_changed_material_trace_assertion_is_detected
+FAILED tests/test_guards.py::test_salvage_is_not_both_deducted_and_transferred
+FAILED tests/test_guards.py::test_salvage_precedes_franchise_under_the_circular
+FAILED tests/test_guards.py::test_underinsurance_is_never_applied_to_an_already_capped_base
+FAILED tests/test_guards.py::test_insured_sum_ceiling_is_enforced - Assertion...
+FAILED tests/test_guards.py::test_resolving_the_interaction_yields_a_single_number
+FAILED tests/test_guards.py::test_a_blocking_uncertainty_never_coexists_with_a_single_payable
+FAILED tests/test_guards.py::test_surface_unresolved_order_as_a_scenario_set_not_a_number
+FAILED tests/test_money.py::test_final_payable_rounds_half_up_once_at_the_engine_boundary
+FAILED tests/test_money.py::test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float
+FAILED tests/test_money.py::test_very_large_integer_irr_does_not_overflow - A...
+23 failed, 690 passed, 22 errors in 93.06s (0:01:33)

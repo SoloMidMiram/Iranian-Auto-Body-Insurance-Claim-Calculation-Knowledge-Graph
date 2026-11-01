@@ -1,47 +1,66 @@
-# Settlement authority target flows — work in progress
+# Settlement evidence and operator sequencing
 
-These are acceptance requirements, not a claim that all gates are implemented.
+These are bounded software controls. Synthetic records support regression calculations; real source-review assertions still require external authentication and domain acceptance.
 
-```mermaid
-flowchart TD
-  A["Physical total loss established"] --> B{"Explicit supported salvage disposition?"}
-  B -- "Missing, conflicting, unresolved or not applicable" --> N["Evidence required: no single payable"]
-  B -- "Insured retains" --> C{"Supported valuation including evidenced zero?"}
-  C -- "No" --> N
-  C -- "Yes" --> D["Deduct salvage once"]
-  B -- "Insurer ownership route" --> E{"Transfer completed and proof present?"}
-  E -- "No" --> N
-  E -- "Yes" --> F["No salvage deduction on this route"]
-  D --> G["Validate applicable franchise authority"]
-  F --> G
-  G --> H["Settlement with supported rescue and insured ceiling"]
-```
+## Physical total loss
 
 ```mermaid
 flowchart TD
-  A["Proposed monetary franchise"] --> B{"Reference and instrument version identifiable?"}
-  B -- "No" --> N["FRANCHISE_AUTHORITY_REQUIRED: no payable"]
-  B -- "Yes" --> C{"Source authenticated and governs this insurer/product contract?"}
-  C -- "Unknown or no" --> N
-  C -- "Yes" --> D{"Coverage, claim type, policy/event dates and effective version match?"}
-  D -- "No" --> N
-  D -- "Yes" --> E{"Conflicting terms resolved by applicable authority?"}
-  E -- "No" --> N
-  E -- "Yes" --> F{"Mode, amount/rate, named base, minimum and sequence supported?"}
-  F -- "No" --> N
-  F -- "Yes" --> G["Apply the supported term; zero requires the same evidence standard"]
+  A["Complete physical total-loss evidence"] --> B{"Explicit supported disposition?"}
+  B -- "Missing, unresolved or not applicable" --> N["SALVAGE_DISPOSITION_UNRESOLVED: no payable"]
+  B -- "Conflicting facts" --> X["Structured conflicting_alias: no payable; identify documents"]
+  B -- "Insured retains" --> C{"Valuation amount bound?"}
+  C -- "No, even with a source token" --> V["SALVAGE_VALUE_REQUIRED: no payable"]
+  C -- "Yes, including explicit zero" --> D{"Supporting valuation evidence?"}
+  D -- "No" --> E["SALVAGE_VALUATION_EVIDENCE_REQUIRED: no payable"]
+  D -- "Yes" --> F["Deduct salvage once"]
+  B -- "Insurer ownership route" --> G{"Completed transfer AND supporting proof?"}
+  G -- "No, pending, missing or unproved" --> T["TITLE_TRANSFER_REQUIRED: no payable"]
+  G -- "Yes" --> H["No salvage deduction on this route"]
+  F --> J["Validate franchise authority and remaining conditions"]
+  H --> J
+  J --> K["Supported settlement, separate rescue, insured ceiling, zero floor"]
 ```
+
+This does not impose transfer on every physical loss. Whole theft retains separate classification/time/transfer gates and its established ownership route.
+
+## Franchise authority
 
 ```mermaid
 flowchart TD
-  A["Partial damage after supported replacement depreciation"] --> B{"Market and insured sum established?"}
-  B -- "No" --> N["Evidence required: no single payable"]
-  B -- "Yes" --> C["Derive capped Article 10 ratio"]
-  C --> D{"Applicable instrument establishes operator order?"}
-  D -- "No, conflicting or questionnaire token only" --> E["Retain both derivations: 700 and 720 in controlled example"]
-  E --> F["U01 explicit; single payable null; request ordering authority"]
-  D -- "Yes, scope and provenance verified" --> G["Run authorized sequence, supported rescue, limits and floor"]
-  G --> H["Record exact formula, authority and guards"]
+  A["Proposed monetary term"] --> B{"Mode, amount/rate, named base and minimum complete?"}
+  B -- "No" --> N["Structured terms required: no payable"]
+  B -- "Yes" --> C{"Instrument reference and version nonblank?"}
+  C -- "No, positive or zero" --> U["FRANCHISE_AUTHORITY_REQUIRED: no payable; U02"]
+  C -- "Yes" --> D{"Reviewed source status, hash, locator and reviewer?"}
+  D -- "Missing or unresolved" --> U
+  D -- "Recorded review" --> E{"Governs this insurer/product/policy and coverage?"}
+  E -- "No or unknown" --> U
+  E -- "Yes" --> F{"Interval covers BOTH policy and event dates?"}
+  F -- "No, missing date or wrong version" --> U
+  F -- "Yes" --> G{"Exact terms bound and declarations agree?"}
+  G -- "No" --> H["Authority/terms conflict: no payable; retain competing evidence"]
+  G -- "Yes" --> I["Apply supported term and record provenance/guards"]
 ```
 
-Ratio one or equal mathematical outcomes do not prove a universal legal sequence. Whole theft retains its separate ownership/time conditions.
+A manual's existence is insufficient without governing-contract evidence. Unsupported evidence does not establish that a rate is legally invalid. SYNTHETIC_TEST requires matching synthetic context. VERIFIED is a recorded review attestation, not authentication performed by the calculator.
+
+## Partial loss: Article 10 and franchise
+
+```mermaid
+flowchart TD
+  A["Eligible loss after supported replacement depreciation"] --> B{"Market and insured sum established?"}
+  B -- "No" --> N["Value evidence required: no single payable"]
+  B -- "Yes" --> C["Derive capped ratio"]
+  C --> D{"Ratio equals one?"}
+  D -- "Yes" --> E["No numerical ratio effect; ordinary supported arithmetic"]
+  D -- "No" --> F{"Selected order has matching applicable authority record?"}
+  F -- "Token only, absent, inapplicable or conflicting" --> G["Execute both existing plans"]
+  G --> H["Controlled example: preserve 700 and 720; never average or choose lower"]
+  H --> I["ORDER_UNRESOLVED; U01; single payable null; request authority"]
+  F -- "Yes" --> J["Execute only that record's bound order"]
+  E --> K["Supported rescue, limits, floor, trace and result"]
+  J --> K
+```
+
+Controlled arithmetic: `(1,000 × .8) − 100 = 700` and `(1,000 − 100) × .8 = 720`, with rescue zero. Equal amounts in another claim do not prove universal legal order; unresolved underinsured equal alternatives remain explicit.

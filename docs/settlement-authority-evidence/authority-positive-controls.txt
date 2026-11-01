@@ -1,0 +1,38 @@
+........................................................................ [ 32%]
+......................F................................................. [ 64%]
+........................................................................ [ 96%]
+.......                                                                  [100%]
+================================== FAILURES ===================================
+________ test_final_payable_rounds_half_up_once_at_the_engine_boundary ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000016A5DEF12D0>
+
+    def test_final_payable_rounds_half_up_once_at_the_engine_boundary(kb):
+        result = compute(
+            {
+                "claim_id": "ROUND-HALF-UP",
+                "event": {"event_date": "1405-01-01"},
+                "unit": "IRR",
+                "classification": {"branch": "PARTIAL_DAMAGE"},
+                "damage": {"gross": 5, "depreciation": 0, "market": 5, "insured": 5},
+                "coverage_gate": {"causal_relationship_established": True},
+                "policy": {
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                    "franchise": {
+                        "mode": "PERCENT",
+                        "rate": 0.5,
+                        "calculation_base": "AFTER_DEPRECIATION",
+                        "source": "POLICY",
+                    }
+                },
+            },
+            kb,
+        )
+>       assert result.fields["franchise"] == D("2.5")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'franchise'
+
+tests\test_money.py:100: KeyError
+=========================== short test summary info ===========================
+FAILED tests/test_money.py::test_final_payable_rounds_half_up_once_at_the_engine_boundary
+1 failed, 222 passed in 3.52s
