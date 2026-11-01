@@ -1,0 +1,412 @@
+{
+  "claim_id": "INSPECTION-C72-UNDERINSURED-ORDER-LOCKED",
+  "branch": "PARTIAL_DAMAGE",
+  "variant": null,
+  "domain": "BODY",
+  "unit": "IRR",
+  "payable_irr": null,
+  "payable_scenarios_irr": [],
+  "status": "AUTHORIZED_UNCERTAINTY_UNRESOLVED",
+  "reason": "review-live uncertainty was not resolved by a bound calculation artefact",
+  "route": null,
+  "labels": [
+    "AUTHORIZATION_UNCERTAINTY_RECONCILED",
+    "BLOCKING_UNCERTAINTY_SURFACED",
+    "ITEMISED_PARTS_USED",
+    "PARTIAL_DAMAGE",
+    "UNDERINSURANCE_APPLIED"
+  ],
+  "fields": {
+    "after_depreciation": 2025000000,
+    "allowable_rescue_transport": 80000000,
+    "article10_ratio": "0.75",
+    "assessed_gross": 2250000000,
+    "authorization_live_uncertainties": [
+      "U01_ARTICLE10_PARTIAL_ORDER"
+    ],
+    "authorization_uncertainties_added": [
+      "U01_ARTICLE10_PARTIAL_ORDER"
+    ],
+    "classification": {
+      "declared_branch": "PARTIAL_DAMAGE",
+      "declared_canonical_branch": "PARTIAL_DAMAGE",
+      "derived_branch": "PARTIAL_DAMAGE",
+      "outcome": "MATCH",
+      "confidence": 0.85,
+      "basis": [
+        "repair+rescue 2330000000 against 75% threshold 6000000000.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+        "no theft, total-loss, glass or third-party signal matched"
+      ],
+      "reason": "declared and evidence-derived branches agree"
+    },
+    "classification_rescue": 80000000,
+    "classification_rescue_source": "DERIVED_FROM_ACTUAL_RESCUE",
+    "covered_peril_causation_established": true,
+    "depreciation": 225000000,
+    "depreciation_source": "COMPUTED_PER_PART",
+    "eligible_before_other_terms": 2250000000,
+    "execution_plan": [
+      "OP_SPECIAL_PART_CAP",
+      "OP_DEPRECIATION_REPLACEMENT_PART",
+      "OP_UNDERINSURANCE_RATIO",
+      "OP_FRANCHISE",
+      "OP_RESCUE_CAP"
+    ],
+    "execution_plan_branch": "PARTIAL_DAMAGE",
+    "execution_plan_guards": [
+      "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+      "G_RECOVERY_ALLOCATION_CONTAINED",
+      "G_RESCUE_CAP_CEILING",
+      "G_NO_HARDCODED_FRANCHISE_RATE",
+      "G_UNCERTAINTY_MUST_SURFACE"
+    ],
+    "execution_plan_id": "sha256:7e94935aef9010310dd1c30f7d14bf0e23fc60e1299c428671d2b0224ef3c313",
+    "franchise": 202500000,
+    "franchise_calculation_base": 2025000000,
+    "franchise_calculation_base_kind": "AFTER_DEPRECIATION",
+    "franchise_evidence_needed": "policy/product/version franchise schedule or endorsement",
+    "franchise_mode": "PERCENT",
+    "franchise_source": "POLICY",
+    "franchise_source_version": "1403",
+    "glass_depreciation": 0,
+    "gross_eligible": 2250000000,
+    "multiple_insurance_state": "NO",
+    "order_used": "AFTER_DEPRECIATION_BEFORE_FRANCHISE",
+    "other_depreciation": 225000000,
+    "prior_compensation": 0,
+    "rescue_cap": 450000000,
+    "rescue_cap_base": 2250000000,
+    "rescue_cap_base_kind": "ASSESSED_GROSS",
+    "rescue_claimed": 80000000,
+    "rescue_input_kind": "ACTUAL",
+    "rescue_payable_supplied": null,
+    "snapshot_id": "BODY@1404/05/11",
+    "snapshot_rule_ids": [
+      "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+      "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+      "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+      "REG53_ART19_INSURER_TAKES_TITLE",
+      "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+      "REG53_ART19_TOTAL_LOSS_VALUATION",
+      "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+      "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+      "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+      "REG53_POLICY_DEFINED_FRANCHISE",
+      "REG53_RESCUE_TRANSPORT_CAP"
+    ]
+  },
+  "rule_trace": [
+    "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+    "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+    "REG53_ART19B_PARTIAL_LOSS_BASE",
+    "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+    "REG53_RESCUE_TRANSPORT_CAP",
+    "REG53_POLICY_DEFINED_FRANCHISE",
+    "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+  ],
+  "blocking_uncertainties": [
+    "U01_ARTICLE10_PARTIAL_ORDER"
+  ],
+  "formula_confidence": 0.55,
+  "evidence_confidence": 1.0,
+  "provenance": [
+    {
+      "node_id": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR",
+        "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR",
+        "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+      ],
+      "rule": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+      "operator": [],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    },
+    {
+      "node_id": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "21",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR"
+      ],
+      "rule": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+      "operator": [],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    },
+    {
+      "node_id": "REG53_ART19B_PARTIAL_LOSS_BASE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19(b)",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR"
+      ],
+      "rule": "REG53_ART19B_PARTIAL_LOSS_BASE",
+      "operator": [],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    },
+    {
+      "node_id": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "19",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR"
+      ],
+      "rule": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+      "operator": [
+        "OP_DEPRECIATION_REPLACEMENT_PART"
+      ],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    },
+    {
+      "node_id": "REG53_RESCUE_TRANSPORT_CAP",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "rescue/mitigation provision (article number not unambiguously identified in the reviewed compilation)",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.95,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR",
+        "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR",
+        "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+      ],
+      "rule": "REG53_RESCUE_TRANSPORT_CAP",
+      "operator": [
+        "OP_RESCUE_CAP"
+      ],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    },
+    {
+      "node_id": "REG53_POLICY_DEFINED_FRANCHISE",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "franchise definition",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR"
+      ],
+      "rule": "REG53_POLICY_DEFINED_FRANCHISE",
+      "operator": [
+        "OP_FRANCHISE"
+      ],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    },
+    {
+      "node_id": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+      "source_class": "REGULATION",
+      "authority": "High Insurance Council",
+      "instrument": "Regulation 53",
+      "article": "20 note 2",
+      "effective_version": "current-researched-version",
+      "effective_date": "1384/12/09",
+      "confidence": 0.99,
+      "derivation": "PRIMARY_TEXT",
+      "sources": [
+        "SRC_REG53_MIRROR"
+      ],
+      "last_validated": "2026-09-18",
+      "next_revalidation": "2027-09-18",
+      "source": [
+        "SRC_REG53_MIRROR"
+      ],
+      "rule": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+      "operator": [
+        "OP_UNDERINSURANCE_RATIO"
+      ],
+      "execution": {
+        "snapshot_id": "BODY@1404/05/11",
+        "plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ]
+      },
+      "result": null
+    }
+  ],
+  "required_guards": [
+    "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+    "G_RECOVERY_ALLOCATION_CONTAINED",
+    "G_NO_HARDCODED_FRANCHISE_RATE",
+    "G_RESCUE_CAP_CEILING",
+    "G_UNCERTAINTY_MUST_SURFACE"
+  ],
+  "guards_executed": [
+    "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+    "G_RECOVERY_ALLOCATION_CONTAINED",
+    "G_RESCUE_CAP_CEILING",
+    "G_NO_HARDCODED_FRANCHISE_RATE",
+    "G_UNCERTAINTY_MUST_SURFACE"
+  ],
+  "authorization": {
+    "approved_overrides": [],
+    "blocking_conditions": [],
+    "branch": "PARTIAL_DAMAGE",
+    "claim_id": "INSPECTION-C72-UNDERINSURED-ORDER-LOCKED",
+    "classification": {
+      "basis": [
+        "repair+rescue 2330000000 against 75% threshold 6000000000.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+        "no theft, total-loss, glass or third-party signal matched"
+      ],
+      "confidence": 0.85,
+      "declared_branch": "PARTIAL_DAMAGE",
+      "declared_canonical_branch": "PARTIAL_DAMAGE",
+      "derived_branch": "PARTIAL_DAMAGE",
+      "outcome": "MATCH",
+      "reason": "declared and evidence-derived branches agree"
+    },
+    "evidence_confidence_cap": null,
+    "live_uncertainties": [
+      "U01_ARTICLE10_PARTIAL_ORDER"
+    ],
+    "missing_evidence": [
+      "EVT_POLICE_CROQUIS"
+    ],
+    "policy_snapshot": {
+      "endorsements": [],
+      "franchise": {
+        "calculation_base": "AFTER_DEPRECIATION",
+        "claim_sequence_rule": "first claim",
+        "mode": "PERCENT",
+        "rate": 0.1,
+        "source": "POLICY",
+        "source_reference": "synthetic controlled policy term, 1403 franchise",
+        "source_version": "1403"
+      },
+      "insurer": null,
+      "policy_version": null
+    },
+    "review_as_of": null,
+    "review_kind": "CLAIM_FILE",
+    "reviewer": "adjuster: reviewer-02, both scenarios put to the claims department 1404-06-01",
+    "snapshot_id": "BODY@1404/05/11",
+    "tier": "T3",
+    "issuer": "REVIEW_GATE",
+    "decision": "SCENARIO_SET",
+    "claim_hash": "sha256:bf8559a1bc39103e3a3f9e8d5748c40b714a7a11fd6cb0ce75089c289f1167c0",
+    "issued_at": "2026-11-01T15:15:28+00:00"
+  }
+}

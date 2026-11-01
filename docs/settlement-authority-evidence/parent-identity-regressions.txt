@@ -1,0 +1,677 @@
+FFFFFFFFFFFFFFFFFFFFFFFF                                                 [100%]
+================================== FAILURES ===================================
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-0-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 0, field = 'source_reference', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'SCENARIO_SET' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + SCENARIO_SET
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-0-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 0, field = 'source_reference', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'SCENARIO_SET' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + SCENARIO_SET
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-0-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 0, field = 'source_reference', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'SCENARIO_SET' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + SCENARIO_SET
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-100-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 100, field = 'source_reference', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-100-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 100, field = 'source_reference', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-100-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 100, field = 'source_reference'
+value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-0-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 0, field = 'source_version', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'SCENARIO_SET' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + SCENARIO_SET
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-0-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 0, field = 'source_version', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'SCENARIO_SET' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + SCENARIO_SET
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-0-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 0, field = 'source_version', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'SCENARIO_SET' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + SCENARIO_SET
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-100-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 100, field = 'source_version', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-100-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 100, field = 'source_version', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-100-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 100, field = 'source_version', value = None
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -0-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 0, field = 'source_reference', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -0-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 0, field = 'source_reference', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -0-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 0, field = 'source_reference', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -100-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 100, field = 'source_reference', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -100-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 100, field = 'source_reference', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -100-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 100, field = 'source_reference', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version- -0-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 0, field = 'source_version', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version- -0-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 0, field = 'source_version', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version- -0-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 0, field = 'source_version', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version- -100-POLICY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'POLICY', amount = 100, field = 'source_version', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version- -100-ENDORSEMENT] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'ENDORSEMENT', amount = 100, field = 'source_version', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+_ test_review_and_engine_refuse_unidentifiable_franchise[source_version- -100-INSURER_MANUAL] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000026C75C91690>
+source = 'INSURER_MANUAL', amount = 100, field = 'source_version', value = ' '
+
+    @pytest.mark.parametrize("source", ["POLICY", "ENDORSEMENT", "INSURER_MANUAL"])
+    @pytest.mark.parametrize("amount", [0, 100])
+    @pytest.mark.parametrize("field,value", [("source_reference", None), ("source_version", None), ("source_reference", " "), ("source_version", " ")])
+    def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, field, value):
+        payload = json.loads((ROOT / "cases/review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+        payload["answers"]["Q-S6-01"] = "ABSOLUTE"
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            spec = {"mode": "ABSOLUTE", "absolute_irr": amount, "source": source,
+                    "source_reference": "SYNTHETIC contract clause", "source_version": "TEST-v1"}
+            if value is None:
+                spec.pop(field)
+            else:
+                spec[field] = value
+            payload["answers"][question] = spec
+        review = Review(payload, kb)
+>       assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E         
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_settlement_authority.py:31: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-0-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-0-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-0-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-100-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-100-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference-None-100-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-0-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-0-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-0-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-100-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-100-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version-None-100-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -0-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -0-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -0-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -100-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -100-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_reference- -100-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version- -0-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version- -0-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version- -0-INSURER_MANUAL]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version- -100-POLICY]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version- -100-ENDORSEMENT]
+FAILED tests/test_settlement_authority.py::test_review_and_engine_refuse_unidentifiable_franchise[source_version- -100-INSURER_MANUAL]
+24 failed in 0.88s

@@ -1,0 +1,16 @@
+{
+  "baseline": "7cf77db",
+  "identity_candidate": "7cc6cb2bda9d84a0ac3c170bf7e6c16bcba1284d",
+  "qualification": "Identity-layer checkpoint only; applicability and S10 remediation incomplete",
+  "sha256": {
+    "baseline-suite.txt": "7679a19b23a85d60faf5a22faf1e0868fdec111b3581471975bd96a89a0340a3",
+    "identity-focused.txt": "1a923ceb694cfcf4688f8288bc27973dd91974bb3060ce963be2628c5eb9069d",
+    "identity-mutation.txt": "e860778b44e1a203c2b0d8be9c19f77794d61ffdf45f96c3cdae5d68e1c2f349",
+    "identity-regressions.txt": "8e49c4763d44643099fe366836671611d071f24114984fd77a5cdca7ebf13c22",
+    "insurance-law-1316-rendered.txt": "03cf7c78912b5ec87026b270abdc88ebdf59952ec301c3652e65c11468ee6372",
+    "parent-identity-regressions.txt": "838549cbdf135f3fc51b3845e766161826e192effa71fa5aad06fc08e1a16fd5",
+    "parent-s09.json": "e1ef3af2c3ff37564d2fa46fa2eddb0e6c03f5b8d5ae300948546b16e1f3a795",
+    "parent-s10-token.json": "f8cd1eb4504213c326ffb8a8eca686bff4dcf153c5247bf3bc85d872253b7b7a",
+    "parent-stage0.txt": "a32e04156fc1f843846ac33beb9b07bdd4cf2ac5eb9396f2fedefa832e8bc7f9"
+  }
+}
