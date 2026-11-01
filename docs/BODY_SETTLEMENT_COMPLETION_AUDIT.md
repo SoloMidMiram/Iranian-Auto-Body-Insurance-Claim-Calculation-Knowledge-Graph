@@ -21,4 +21,6 @@ The preceding goal turn made progress by completing engineering remediation, cle
 
 The task explicitly requires that the integrated revision pass independent review gates. Automated checks cannot supply that approval. No qualified reviewer, accepted revised-reference disposition or actual insurer contract is present. The user selected no insurer and asked that contractual authority remain unresolved; that preference is preserved.
 
+After reviewing this completion question, the user explicitly selected **Keep independent acceptance pending**. That is not an acceptance record, permission to close a gate, or a request to pause the goal. No approval is inferred.
+
 The next external action is a recorded independent engineering/domain review of this concrete candidate and the 41 original-reference changes. No additional formula changes, fabricated authority records, automatic reference edits, PR approvals or release actions are justified while waiting for that evidence. The goal cannot honestly be marked complete on the current evidence; the broader release remains BLOCKED.
