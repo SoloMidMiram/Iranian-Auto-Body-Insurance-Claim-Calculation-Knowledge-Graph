@@ -1,0 +1,1321 @@
+[
+  {
+    "case": "S03",
+    "input": {
+      "answers": {
+        "Q-S0-01": "SYNTHETIC_INSURER / CONTROLLED BODY CASE 1404",
+        "Q-S0-02": "1404-08-20",
+        "Q-S0-03": "1404-08-20",
+        "Q-S0-04": "ONTIME",
+        "Q-S0-05": "INSURED",
+        "Q-S0-06": "IN_FORCE",
+        "Q-S0-07": "1404-08-25",
+        "Q-S1-01": "PASSENGER_CAR",
+        "Q-S1-02": "LISTED",
+        "Q-S1-03": "INSIDE_IRAN",
+        "Q-S10-01": "adjuster: reviewer-01, decision reconciled 1404-09-02",
+        "Q-S2-01": "COLLISION",
+        "Q-S2-02": "ESTABLISHED",
+        "Q-S2-04": "INSURED_AT_FAULT",
+        "Q-S2-09": "CONSISTENT",
+        "Q-S3-01": "VALID_AND_APPROPRIATE",
+        "Q-S3-02": "NO",
+        "Q-S3-03": "NO",
+        "Q-S3-04": "NONE",
+        "Q-S3-05": "NONE",
+        "Q-S3-06": "NO",
+        "Q-S3-07": "NO",
+        "Q-S3-08": "NO",
+        "Q-S4-01": "ITEMISED",
+        "Q-S4-02": 0,
+        "Q-S4-03": [
+          {
+            "assessed_loss": 7500,
+            "category": "OTHER_REPLACEMENT_PART",
+            "name": "front panel"
+          }
+        ],
+        "Q-S4-05": "COMPUTE_FROM_YEAR",
+        "Q-S4-07": 0,
+        "Q-S4-09": "NOT_APPLICABLE",
+        "Q-S4-10": "REPAIRABLE",
+        "Q-S5-01": 10000,
+        "Q-S5-02": 10000,
+        "Q-S5-03": 1404,
+        "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
+        "Q-S6-01": "PERCENT",
+        "Q-S6-02": {
+          "calculation_base": "AFTER_DEPRECIATION",
+          "claim_sequence_rule": "first claim",
+          "mode": "PERCENT",
+          "rate": 0.1,
+          "source": "POLICY",
+          "source_reference": "synthetic controlled policy term, 1404 franchise",
+          "source_version": "1404"
+        },
+        "Q-S6-03": {
+          "calculation_base": "AFTER_DEPRECIATION"
+        },
+        "Q-S6-04": {
+          "claim_sequence_rule": "first claim",
+          "source_version": "1404",
+          "authority": {
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_version": "1404",
+            "insurer": "SYNTHETIC_INSURER",
+            "product": "SYNTHETIC_BODY",
+            "policy_reference": "synthetic controlled policy term, 1404 franchise",
+            "coverage": [
+              "PARTIAL_DAMAGE"
+            ],
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "source_status": "SYNTHETIC_TEST",
+            "governs_contract": true,
+            "reviewer": "software fixture author; no qualified domain approval",
+            "clause_locator": "explicit synthetic franchise assumption",
+            "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+            "terms": {
+              "mode": "PERCENT",
+              "rate": 0.1,
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim"
+            }
+          }
+        },
+        "Q-S6-05": "NO",
+        "Q-S7-01": "NO_BODY_ONLY",
+        "Q-S8-03": "ASSESSED_GROSS",
+        "Q-S8-04": "CASH",
+        "Q-S9-01": "NO",
+        "Q-S9-02": "NO_THIRD_PARTY",
+        "Q-S9-03": 0
+      },
+      "claim_id": "SYNTHETIC-EXACT-S03",
+      "evidence_present": [
+        "EVT_ASSESSMENT_REPORT",
+        "EVT_CLAIM_FORM",
+        "EVT_LICENCE",
+        "EVT_MARKET_VALUE_EVIDENCE",
+        "EVT_OWNERSHIP_DOCS",
+        "EVT_PHOTOS",
+        "EVT_POLICE_CROQUIS",
+        "EVT_POLICY_COPY",
+        "EVT_PREMIUM_PROOF",
+        "EVT_PRIOR_CLAIM_HISTORY",
+        "EVT_PROPOSAL_FORM",
+        "EVT_REPAIR_INVOICE"
+      ],
+      "note": "C44: the frozen IA-04 counterexample - repair 7,400 plus evidenced rescue 200 = 76%.",
+      "unit": "IRR",
+      "contract_context": {
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "synthetic controlled policy term, 1404 franchise",
+        "policy_date": "1404-08-20",
+        "contract_kind": "SYNTHETIC_TEST"
+      }
+    },
+    "expected_branch": "PARTIAL_DAMAGE",
+    "classification": {
+      "branch": "PARTIAL_DAMAGE",
+      "variant": null,
+      "confidence": 0.85,
+      "basis": [
+        "repair+rescue 7500 against 75% threshold 7500.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+        "no theft, total-loss, glass or third-party signal matched"
+      ]
+    },
+    "branch_matches": true,
+    "decision": {
+      "decision": "COMPUTE",
+      "franchise_authority_gap": null,
+      "branch": "PARTIAL_DAMAGE",
+      "classification_confidence": 0.85,
+      "tier": "T1",
+      "refused_by": [],
+      "open_hard_questions": [],
+      "open_blocking_questions": [],
+      "evidence_blocks": [],
+      "blocking_conditions": [],
+      "live_uncertainties": [],
+      "missing_evidence": []
+    },
+    "emitted_case": {
+      "claim_id": "SYNTHETIC-EXACT-S03",
+      "unit": "IRR",
+      "regulatory_snapshot": {
+        "iranian_year": 1404
+      },
+      "classification": {
+        "domain": "BODY",
+        "branch": "PARTIAL_DAMAGE"
+      },
+      "vehicle": {
+        "market_value_at_event_irr": 10000,
+        "insured_sum_irr": 10000,
+        "production_year_shamsi": 1404
+      },
+      "event": {
+        "event_date": "1404-08-20",
+        "awareness_date": "1404-08-20",
+        "declaration_date": "1404-08-25",
+        "cause": "COLLISION",
+        "peril": "COLLISION",
+        "valid_licence": true,
+        "fault_status": "INSURED_AT_FAULT"
+      },
+      "damage": {
+        "parts": [
+          {
+            "category": "OTHER_REPLACEMENT_PART",
+            "assessed_loss_irr": 7500,
+            "requires_replacement": true,
+            "name": "front panel"
+          }
+        ],
+        "labor_irr": 0,
+        "rescue_transport_actual_irr": 0,
+        "gross_damage_irr": 7500,
+        "repair_total_irr": 7500,
+        "rescue_for_total_loss_test_irr": 0,
+        "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE"
+      },
+      "policy": {
+        "endorsements": [],
+        "franchise": {
+          "mode": "PERCENT",
+          "calculation_base": "AFTER_DEPRECIATION",
+          "claim_sequence_rule": "first claim",
+          "rate": 0.1,
+          "source": "POLICY",
+          "source_reference": "synthetic controlled policy term, 1404 franchise",
+          "source_version": "1404",
+          "authority": {
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_version": "1404",
+            "insurer": "SYNTHETIC_INSURER",
+            "product": "SYNTHETIC_BODY",
+            "policy_reference": "synthetic controlled policy term, 1404 franchise",
+            "coverage": [
+              "PARTIAL_DAMAGE"
+            ],
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "source_status": "SYNTHETIC_TEST",
+            "governs_contract": true,
+            "reviewer": "software fixture author; no qualified domain approval",
+            "clause_locator": "explicit synthetic franchise assumption",
+            "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+            "terms": {
+              "mode": "PERCENT",
+              "rate": 0.1,
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim"
+            }
+          }
+        },
+        "multiple_insurance": {
+          "state": "NO",
+          "prior_compensation": 0
+        },
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "synthetic controlled policy term, 1404 franchise",
+        "policy_date": "1404-08-20",
+        "contract_kind": "SYNTHETIC_TEST"
+      },
+      "evidence": {
+        "EVT_CLAIM_FORM": true,
+        "EVT_LATE_NOTICE_EXCUSE": false,
+        "EVT_POLICY_COPY": true,
+        "EVT_PROPOSAL_FORM": true,
+        "EVT_PREMIUM_PROOF": true,
+        "EVT_OWNERSHIP_DOCS": true,
+        "EVT_LICENCE": true,
+        "EVT_ASSESSMENT_REPORT": true,
+        "EVT_MARKET_VALUE_EVIDENCE": true,
+        "EVT_PHOTOS": true,
+        "EVT_POLICE_CROQUIS": true,
+        "EVT_POLICE_STATION_REPORT": false,
+        "EVT_NON_DISCOVERY_ENQUIRY": false,
+        "EVT_FIRE_CAUSE_REPORT": false,
+        "EVT_JUDICIAL_FINDING": false,
+        "EVT_ENDORSEMENT_WORDING": false,
+        "EVT_TITLE_TRANSFER_PROOF": false,
+        "EVT_SALVAGE_VALUATION": false,
+        "EVT_REPAIR_INVOICE": true,
+        "EVT_REPAIR_CONSENT": false,
+        "EVT_OTHER_POLICIES": false,
+        "EVT_ARBITRATION_OR_COURT_AWARD": false,
+        "EVT_RISK_INTENSIFICATION_RECORD": false,
+        "EVT_PRIOR_CLAIM_HISTORY": true
+      },
+      "coverage_gate": {
+        "causal_relationship_established": true,
+        "risk_intensified": false
+      },
+      "calculation_config": {
+        "rescue_cap_base": "ASSESSED_GROSS",
+        "settlement_mode": "CASH"
+      },
+      "derived": {
+        "article10_ratio": "1"
+      }
+    },
+    "result": {
+      "claim_id": "SYNTHETIC-EXACT-S03",
+      "branch": "PARTIAL_DAMAGE",
+      "variant": null,
+      "domain": "BODY",
+      "unit": "IRR",
+      "payable_irr": 6750,
+      "payable_scenarios_irr": [],
+      "status": null,
+      "reason": null,
+      "route": null,
+      "labels": [
+        "ITEMISED_PARTS_USED",
+        "PARTIAL_DAMAGE"
+      ],
+      "fields": {
+        "after_depreciation": 7500,
+        "allowable_rescue_transport": 0,
+        "article10_ratio": 1,
+        "assessed_gross": 7500,
+        "authorization_live_uncertainties": [],
+        "classification": {
+          "declared_branch": "PARTIAL_DAMAGE",
+          "declared_canonical_branch": "PARTIAL_DAMAGE",
+          "derived_branch": "PARTIAL_DAMAGE",
+          "outcome": "MATCH",
+          "confidence": 0.85,
+          "basis": [
+            "repair+rescue 7500 against 75% threshold 7500.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+            "no theft, total-loss, glass or third-party signal matched"
+          ],
+          "reason": "declared and evidence-derived branches agree"
+        },
+        "classification_rescue": 0,
+        "classification_rescue_source": "DERIVED_FROM_ACTUAL_RESCUE",
+        "covered_peril_causation_established": true,
+        "depreciation": 0,
+        "depreciation_source": "COMPUTED_PER_PART",
+        "eligible_before_other_terms": 7500,
+        "execution_plan": [
+          "OP_SPECIAL_PART_CAP",
+          "OP_DEPRECIATION_REPLACEMENT_PART",
+          "OP_UNDERINSURANCE_RATIO",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP"
+        ],
+        "execution_plan_branch": "PARTIAL_DAMAGE",
+        "execution_plan_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "execution_plan_id": "sha256:7e94935aef9010310dd1c30f7d14bf0e23fc60e1299c428671d2b0224ef3c313",
+        "franchise": 750,
+        "franchise_authority": {
+          "clause_locator": "explicit synthetic franchise assumption",
+          "coverage": [
+            "PARTIAL_DAMAGE"
+          ],
+          "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+          "effective_from": "1300-01-01",
+          "effective_until": "1500-12-29",
+          "governs_contract": true,
+          "insurer": "SYNTHETIC_INSURER",
+          "policy_reference": "synthetic controlled policy term, 1404 franchise",
+          "product": "SYNTHETIC_BODY",
+          "reviewer": "software fixture author; no qualified domain approval",
+          "source_reference": "synthetic controlled policy term, 1404 franchise",
+          "source_status": "SYNTHETIC_TEST",
+          "source_version": "1404",
+          "terms": {
+            "calculation_base": "AFTER_DEPRECIATION",
+            "claim_sequence_rule": "first claim",
+            "mode": "PERCENT",
+            "rate": 0.1
+          }
+        },
+        "franchise_authority_source_status": "SYNTHETIC_TEST",
+        "franchise_calculation_base": 7500,
+        "franchise_calculation_base_kind": "AFTER_DEPRECIATION",
+        "franchise_evidence_needed": "policy/product/version franchise schedule or endorsement",
+        "franchise_mode": "PERCENT",
+        "franchise_source": "POLICY",
+        "franchise_source_version": "1404",
+        "glass_depreciation": 0,
+        "gross_eligible": 7500,
+        "multiple_insurance_state": "NO",
+        "order_used": "RATIO_NOT_APPLICABLE",
+        "other_depreciation": 0,
+        "prior_compensation": 0,
+        "rescue_cap": 1500,
+        "rescue_cap_base": 7500,
+        "rescue_cap_base_kind": "ASSESSED_GROSS",
+        "rescue_claimed": 0,
+        "rescue_input_kind": "ACTUAL",
+        "rescue_payable_supplied": null,
+        "snapshot_id": "BODY@1404/08/20",
+        "snapshot_rule_ids": [
+          "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+          "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+          "REG53_ART19_INSURER_TAKES_TITLE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ]
+      },
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19B_PARTIAL_LOSS_BASE",
+        "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+        "REG53_POLICY_DEFINED_FRANCHISE",
+        "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+      ],
+      "blocking_uncertainties": [],
+      "formula_confidence": 0.99,
+      "evidence_confidence": 1.0,
+      "provenance": [
+        {
+          "node_id": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "19",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "rule": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "operator": [],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ]
+          },
+          "result": 6750
+        },
+        {
+          "node_id": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "21",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "operator": [],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ]
+          },
+          "result": 6750
+        },
+        {
+          "node_id": "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "19(b)",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "operator": [],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ]
+          },
+          "result": 6750
+        },
+        {
+          "node_id": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "19",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "operator": [
+            "OP_DEPRECIATION_REPLACEMENT_PART"
+          ],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ]
+          },
+          "result": 6750
+        },
+        {
+          "node_id": "REG53_POLICY_DEFINED_FRANCHISE",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "franchise definition",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_POLICY_DEFINED_FRANCHISE",
+          "operator": [
+            "OP_FRANCHISE"
+          ],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ]
+          },
+          "result": 6750
+        },
+        {
+          "node_id": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "20 note 2",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "operator": [
+            "OP_UNDERINSURANCE_RATIO"
+          ],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ]
+          },
+          "result": 6750
+        }
+      ],
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_RESCUE_CAP_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "authorization": {
+        "approved_overrides": [],
+        "blocking_conditions": [],
+        "branch": "PARTIAL_DAMAGE",
+        "claim_id": "SYNTHETIC-EXACT-S03",
+        "classification": {
+          "basis": [
+            "repair+rescue 7500 against 75% threshold 7500.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+            "no theft, total-loss, glass or third-party signal matched"
+          ],
+          "confidence": 0.85,
+          "declared_branch": "PARTIAL_DAMAGE",
+          "declared_canonical_branch": "PARTIAL_DAMAGE",
+          "derived_branch": "PARTIAL_DAMAGE",
+          "outcome": "MATCH",
+          "reason": "declared and evidence-derived branches agree"
+        },
+        "evidence_confidence_cap": null,
+        "live_uncertainties": [],
+        "missing_evidence": [],
+        "policy_snapshot": {
+          "endorsements": [],
+          "franchise": {
+            "authority": {
+              "clause_locator": "explicit synthetic franchise assumption",
+              "coverage": [
+                "PARTIAL_DAMAGE"
+              ],
+              "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+              "effective_from": "1300-01-01",
+              "effective_until": "1500-12-29",
+              "governs_contract": true,
+              "insurer": "SYNTHETIC_INSURER",
+              "policy_reference": "synthetic controlled policy term, 1404 franchise",
+              "product": "SYNTHETIC_BODY",
+              "reviewer": "software fixture author; no qualified domain approval",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_status": "SYNTHETIC_TEST",
+              "source_version": "1404",
+              "terms": {
+                "calculation_base": "AFTER_DEPRECIATION",
+                "claim_sequence_rule": "first claim",
+                "mode": "PERCENT",
+                "rate": 0.1
+              }
+            },
+            "calculation_base": "AFTER_DEPRECIATION",
+            "claim_sequence_rule": "first claim",
+            "mode": "PERCENT",
+            "rate": 0.1,
+            "source": "POLICY",
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_version": "1404"
+          },
+          "insurer": "SYNTHETIC_INSURER",
+          "policy_version": null
+        },
+        "review_as_of": null,
+        "review_kind": "CLAIM_FILE",
+        "reviewer": "adjuster: reviewer-01, decision reconciled 1404-09-02",
+        "snapshot_id": "BODY@1404/08/20",
+        "tier": "T1",
+        "issuer": "REVIEW_GATE",
+        "decision": "COMPUTE",
+        "claim_hash": "sha256:e27a10bf715073bc236dcf26e16326c8190026bce54ee3cd8879fe532c1508e5",
+        "issued_at": "2026-11-01T19:47:14+00:00"
+      }
+    }
+  },
+  {
+    "case": "S04",
+    "input": {
+      "answers": {
+        "Q-S0-01": "SYNTHETIC_INSURER / CONTROLLED BODY CASE 1404",
+        "Q-S0-02": "1404-08-20",
+        "Q-S0-03": "1404-08-20",
+        "Q-S0-04": "ONTIME",
+        "Q-S0-05": "INSURED",
+        "Q-S0-06": "IN_FORCE",
+        "Q-S0-07": "1404-08-25",
+        "Q-S1-01": "PASSENGER_CAR",
+        "Q-S1-02": "LISTED",
+        "Q-S1-03": "INSIDE_IRAN",
+        "Q-S10-01": "adjuster: reviewer-01, decision reconciled 1404-09-02",
+        "Q-S2-01": "COLLISION",
+        "Q-S2-02": "ESTABLISHED",
+        "Q-S2-04": "INSURED_AT_FAULT",
+        "Q-S2-09": "CONSISTENT",
+        "Q-S3-01": "VALID_AND_APPROPRIATE",
+        "Q-S3-02": "NO",
+        "Q-S3-03": "NO",
+        "Q-S3-04": "NONE",
+        "Q-S3-05": "NONE",
+        "Q-S3-06": "NO",
+        "Q-S3-07": "NO",
+        "Q-S3-08": "NO",
+        "Q-S4-01": "ITEMISED",
+        "Q-S4-02": 0,
+        "Q-S4-03": [
+          {
+            "assessed_loss": 7400,
+            "category": "OTHER_REPLACEMENT_PART",
+            "name": "front panel"
+          }
+        ],
+        "Q-S4-05": "COMPUTE_FROM_YEAR",
+        "Q-S4-07": 200,
+        "Q-S4-09": "INSURED_RETAINS",
+        "Q-S4-10": "REPAIRABLE",
+        "Q-S5-01": 10000,
+        "Q-S5-02": 10000,
+        "Q-S5-03": 1404,
+        "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
+        "Q-S6-01": "PERCENT",
+        "Q-S6-02": {
+          "calculation_base": "AFTER_SALVAGE",
+          "claim_sequence_rule": "first claim",
+          "mode": "PERCENT",
+          "rate": 0.1,
+          "source": "POLICY",
+          "source_reference": "synthetic controlled policy term, 1404 franchise",
+          "source_version": "1404"
+        },
+        "Q-S6-03": {
+          "calculation_base": "AFTER_SALVAGE"
+        },
+        "Q-S6-04": {
+          "claim_sequence_rule": "first claim",
+          "source_version": "1404",
+          "authority": {
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_version": "1404",
+            "insurer": "SYNTHETIC_INSURER",
+            "product": "SYNTHETIC_BODY",
+            "policy_reference": "synthetic controlled policy term, 1404 franchise",
+            "coverage": [
+              "TOTAL_LOSS"
+            ],
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "source_status": "SYNTHETIC_TEST",
+            "governs_contract": true,
+            "reviewer": "software fixture author; no qualified domain approval",
+            "clause_locator": "explicit synthetic franchise assumption",
+            "document_sha256": "ef88f72ca2bfc46476aa004a1a76b0828922c4bdf44f2562cd8db28cf8c57273",
+            "terms": {
+              "mode": "PERCENT",
+              "rate": 0.1,
+              "calculation_base": "AFTER_SALVAGE",
+              "claim_sequence_rule": "first claim"
+            }
+          }
+        },
+        "Q-S6-05": "NO",
+        "Q-S7-01": "NO_BODY_ONLY",
+        "Q-S8-03": "ASSESSED_GROSS",
+        "Q-S8-04": "CASH",
+        "Q-S9-01": "NO",
+        "Q-S9-02": "NO_THIRD_PARTY",
+        "Q-S9-03": 0,
+        "Q-S4-08": 0
+      },
+      "claim_id": "SYNTHETIC-EXACT-S04",
+      "evidence_present": [
+        "EVT_ASSESSMENT_REPORT",
+        "EVT_CLAIM_FORM",
+        "EVT_LICENCE",
+        "EVT_MARKET_VALUE_EVIDENCE",
+        "EVT_OWNERSHIP_DOCS",
+        "EVT_PHOTOS",
+        "EVT_POLICE_CROQUIS",
+        "EVT_POLICY_COPY",
+        "EVT_PREMIUM_PROOF",
+        "EVT_PRIOR_CLAIM_HISTORY",
+        "EVT_PROPOSAL_FORM",
+        "EVT_REPAIR_INVOICE",
+        "EVT_SALVAGE_VALUATION"
+      ],
+      "note": "C44: the frozen IA-04 counterexample - repair 7,400 plus evidenced rescue 200 = 76%.",
+      "unit": "IRR",
+      "contract_context": {
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "synthetic controlled policy term, 1404 franchise",
+        "policy_date": "1404-08-20",
+        "contract_kind": "SYNTHETIC_TEST"
+      }
+    },
+    "expected_branch": "TOTAL_LOSS",
+    "classification": {
+      "branch": "TOTAL_LOSS",
+      "variant": null,
+      "confidence": 0.97,
+      "basis": [
+        "repair+rescue 7600 against 75% threshold 7500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+      ]
+    },
+    "branch_matches": true,
+    "decision": {
+      "decision": "COMPUTE",
+      "franchise_authority_gap": null,
+      "branch": "TOTAL_LOSS",
+      "classification_confidence": 0.97,
+      "tier": "T2",
+      "refused_by": [],
+      "open_hard_questions": [],
+      "open_blocking_questions": [],
+      "evidence_blocks": [],
+      "blocking_conditions": [],
+      "live_uncertainties": [],
+      "missing_evidence": []
+    },
+    "emitted_case": {
+      "claim_id": "SYNTHETIC-EXACT-S04",
+      "unit": "IRR",
+      "regulatory_snapshot": {
+        "iranian_year": 1404
+      },
+      "classification": {
+        "domain": "BODY",
+        "branch": "TOTAL_LOSS"
+      },
+      "vehicle": {
+        "market_value_at_event_irr": 10000,
+        "insured_sum_irr": 10000,
+        "production_year_shamsi": 1404,
+        "salvage_value_irr": 0,
+        "salvage_disposition": "INSURED_RETAINS"
+      },
+      "event": {
+        "event_date": "1404-08-20",
+        "awareness_date": "1404-08-20",
+        "declaration_date": "1404-08-25",
+        "cause": "COLLISION",
+        "peril": "COLLISION",
+        "valid_licence": true,
+        "fault_status": "INSURED_AT_FAULT"
+      },
+      "damage": {
+        "parts": [
+          {
+            "category": "OTHER_REPLACEMENT_PART",
+            "assessed_loss_irr": 7400,
+            "requires_replacement": true,
+            "name": "front panel"
+          }
+        ],
+        "labor_irr": 0,
+        "rescue_transport_actual_irr": 200,
+        "gross_damage_irr": 7400,
+        "repair_total_irr": 7400,
+        "rescue_for_total_loss_test_irr": 200,
+        "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE"
+      },
+      "policy": {
+        "endorsements": [],
+        "franchise": {
+          "mode": "PERCENT",
+          "calculation_base": "AFTER_SALVAGE",
+          "claim_sequence_rule": "first claim",
+          "rate": 0.1,
+          "source": "POLICY",
+          "source_reference": "synthetic controlled policy term, 1404 franchise",
+          "source_version": "1404",
+          "authority": {
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_version": "1404",
+            "insurer": "SYNTHETIC_INSURER",
+            "product": "SYNTHETIC_BODY",
+            "policy_reference": "synthetic controlled policy term, 1404 franchise",
+            "coverage": [
+              "TOTAL_LOSS"
+            ],
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "source_status": "SYNTHETIC_TEST",
+            "governs_contract": true,
+            "reviewer": "software fixture author; no qualified domain approval",
+            "clause_locator": "explicit synthetic franchise assumption",
+            "document_sha256": "ef88f72ca2bfc46476aa004a1a76b0828922c4bdf44f2562cd8db28cf8c57273",
+            "terms": {
+              "mode": "PERCENT",
+              "rate": 0.1,
+              "calculation_base": "AFTER_SALVAGE",
+              "claim_sequence_rule": "first claim"
+            }
+          }
+        },
+        "multiple_insurance": {
+          "state": "NO",
+          "prior_compensation": 0
+        },
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "synthetic controlled policy term, 1404 franchise",
+        "policy_date": "1404-08-20",
+        "contract_kind": "SYNTHETIC_TEST"
+      },
+      "evidence": {
+        "EVT_CLAIM_FORM": true,
+        "EVT_LATE_NOTICE_EXCUSE": false,
+        "EVT_POLICY_COPY": true,
+        "EVT_PROPOSAL_FORM": true,
+        "EVT_PREMIUM_PROOF": true,
+        "EVT_OWNERSHIP_DOCS": true,
+        "EVT_LICENCE": true,
+        "EVT_ASSESSMENT_REPORT": true,
+        "EVT_MARKET_VALUE_EVIDENCE": true,
+        "EVT_PHOTOS": true,
+        "EVT_POLICE_CROQUIS": true,
+        "EVT_POLICE_STATION_REPORT": false,
+        "EVT_NON_DISCOVERY_ENQUIRY": false,
+        "EVT_FIRE_CAUSE_REPORT": false,
+        "EVT_JUDICIAL_FINDING": false,
+        "EVT_ENDORSEMENT_WORDING": false,
+        "EVT_TITLE_TRANSFER_PROOF": false,
+        "EVT_SALVAGE_VALUATION": true,
+        "EVT_REPAIR_INVOICE": true,
+        "EVT_REPAIR_CONSENT": false,
+        "EVT_OTHER_POLICIES": false,
+        "EVT_ARBITRATION_OR_COURT_AWARD": false,
+        "EVT_RISK_INTENSIFICATION_RECORD": false,
+        "EVT_PRIOR_CLAIM_HISTORY": true
+      },
+      "coverage_gate": {
+        "causal_relationship_established": true,
+        "risk_intensified": false
+      },
+      "calculation_config": {
+        "rescue_cap_base": "ASSESSED_GROSS",
+        "settlement_mode": "CASH"
+      },
+      "derived": {
+        "article10_ratio": "1"
+      }
+    },
+    "result": {
+      "claim_id": "SYNTHETIC-EXACT-S04",
+      "branch": "TOTAL_LOSS",
+      "variant": null,
+      "domain": "BODY",
+      "unit": "IRR",
+      "payable_irr": 9200,
+      "payable_scenarios_irr": [],
+      "status": null,
+      "reason": null,
+      "route": null,
+      "labels": [
+        "TOTAL_LOSS"
+      ],
+      "fields": {
+        "allowable_rescue_transport": 200,
+        "authorization_live_uncertainties": [],
+        "base_after_salvage": 10000,
+        "classification": {
+          "declared_branch": "TOTAL_LOSS",
+          "declared_canonical_branch": "TOTAL_LOSS",
+          "derived_branch": "TOTAL_LOSS",
+          "outcome": "MATCH",
+          "confidence": 0.97,
+          "basis": [
+            "repair+rescue 7600 against 75% threshold 7500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+          ],
+          "reason": "declared and evidence-derived branches agree"
+        },
+        "classification_rescue": 200,
+        "classification_rescue_source": "DERIVED_FROM_ACTUAL_RESCUE",
+        "combined_for_threshold": 7600,
+        "covered_peril_causation_established": true,
+        "execution_plan": [
+          "OP_SALVAGE_DEDUCTION",
+          "OP_FRANCHISE",
+          "OP_RESCUE_CAP",
+          "OP_LIABILITY_CAP_INSURED_SUM"
+        ],
+        "execution_plan_branch": "TOTAL_LOSS",
+        "execution_plan_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "execution_plan_id": "sha256:1c541d109df285184a3abca46f1abdc1493bedc619e6052a718bbdeefd779648",
+        "franchise": 1000,
+        "franchise_authority": {
+          "clause_locator": "explicit synthetic franchise assumption",
+          "coverage": [
+            "TOTAL_LOSS"
+          ],
+          "document_sha256": "ef88f72ca2bfc46476aa004a1a76b0828922c4bdf44f2562cd8db28cf8c57273",
+          "effective_from": "1300-01-01",
+          "effective_until": "1500-12-29",
+          "governs_contract": true,
+          "insurer": "SYNTHETIC_INSURER",
+          "policy_reference": "synthetic controlled policy term, 1404 franchise",
+          "product": "SYNTHETIC_BODY",
+          "reviewer": "software fixture author; no qualified domain approval",
+          "source_reference": "synthetic controlled policy term, 1404 franchise",
+          "source_status": "SYNTHETIC_TEST",
+          "source_version": "1404",
+          "terms": {
+            "calculation_base": "AFTER_SALVAGE",
+            "claim_sequence_rule": "first claim",
+            "mode": "PERCENT",
+            "rate": 0.1
+          }
+        },
+        "franchise_authority_source_status": "SYNTHETIC_TEST",
+        "franchise_calculation_base": 10000,
+        "franchise_calculation_base_kind": "AFTER_SALVAGE",
+        "franchise_evidence_needed": "policy/product/version franchise schedule or endorsement",
+        "franchise_mode": "PERCENT",
+        "franchise_source": "POLICY",
+        "franchise_source_version": "1404",
+        "is_total": true,
+        "multiple_insurance_state": "NO",
+        "prior_compensation": 0,
+        "rescue_cap": 1480,
+        "rescue_cap_base": 7400,
+        "rescue_cap_base_kind": "ASSESSED_GROSS",
+        "rescue_claimed": 200,
+        "rescue_input_kind": "ACTUAL",
+        "rescue_payable_supplied": null,
+        "salvage_deduction": 0,
+        "salvage_disposition": "INSURED_RETAINS",
+        "settlement_base": 10000,
+        "snapshot_id": "BODY@1404/08/20",
+        "snapshot_rule_ids": [
+          "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+          "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+          "REG53_ART19_INSURER_TAKES_TITLE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_RESCUE_TRANSPORT_CAP"
+        ],
+        "threshold_ratio": "0.76",
+        "threshold_value": 7500
+      },
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19_TOTAL_LOSS_VALUATION",
+        "REG53_RESCUE_TRANSPORT_CAP",
+        "REG53_POLICY_DEFINED_FRANCHISE"
+      ],
+      "blocking_uncertainties": [],
+      "formula_confidence": 0.95,
+      "evidence_confidence": 1.0,
+      "provenance": [
+        {
+          "node_id": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "19",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "rule": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "operator": [],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SALVAGE_DEDUCTION",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP",
+              "OP_LIABILITY_CAP_INSURED_SUM"
+            ]
+          },
+          "result": 9200
+        },
+        {
+          "node_id": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "21",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "operator": [],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SALVAGE_DEDUCTION",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP",
+              "OP_LIABILITY_CAP_INSURED_SUM"
+            ]
+          },
+          "result": 9200
+        },
+        {
+          "node_id": "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "19",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "rule": "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "operator": [
+            "OP_SALVAGE_DEDUCTION",
+            "OP_LIABILITY_CAP_INSURED_SUM"
+          ],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SALVAGE_DEDUCTION",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP",
+              "OP_LIABILITY_CAP_INSURED_SUM"
+            ]
+          },
+          "result": 9200
+        },
+        {
+          "node_id": "REG53_RESCUE_TRANSPORT_CAP",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "rescue/mitigation provision (article number not unambiguously identified in the reviewed compilation)",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.95,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR",
+            "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION"
+          ],
+          "rule": "REG53_RESCUE_TRANSPORT_CAP",
+          "operator": [
+            "OP_RESCUE_CAP"
+          ],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SALVAGE_DEDUCTION",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP",
+              "OP_LIABILITY_CAP_INSURED_SUM"
+            ]
+          },
+          "result": 9200
+        },
+        {
+          "node_id": "REG53_POLICY_DEFINED_FRANCHISE",
+          "source_class": "REGULATION",
+          "authority": "High Insurance Council",
+          "instrument": "Regulation 53",
+          "article": "franchise definition",
+          "effective_version": "current-researched-version",
+          "effective_date": "1384/12/09",
+          "confidence": 0.99,
+          "derivation": "PRIMARY_TEXT",
+          "sources": [
+            "SRC_REG53_MIRROR"
+          ],
+          "last_validated": "2026-09-18",
+          "next_revalidation": "2027-09-18",
+          "source": [
+            "SRC_REG53_MIRROR"
+          ],
+          "rule": "REG53_POLICY_DEFINED_FRANCHISE",
+          "operator": [
+            "OP_FRANCHISE"
+          ],
+          "execution": {
+            "snapshot_id": "BODY@1404/08/20",
+            "plan": [
+              "OP_SALVAGE_DEDUCTION",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP",
+              "OP_LIABILITY_CAP_INSURED_SUM"
+            ]
+          },
+          "result": 9200
+        }
+      ],
+      "required_guards": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_RESCUE_CAP_CEILING",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "authorization": {
+        "approved_overrides": [],
+        "blocking_conditions": [],
+        "branch": "TOTAL_LOSS",
+        "claim_id": "SYNTHETIC-EXACT-S04",
+        "classification": {
+          "basis": [
+            "repair+rescue 7600 against 75% threshold 7500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+          ],
+          "confidence": 0.97,
+          "declared_branch": "TOTAL_LOSS",
+          "declared_canonical_branch": "TOTAL_LOSS",
+          "derived_branch": "TOTAL_LOSS",
+          "outcome": "MATCH",
+          "reason": "declared and evidence-derived branches agree"
+        },
+        "evidence_confidence_cap": null,
+        "live_uncertainties": [],
+        "missing_evidence": [],
+        "policy_snapshot": {
+          "endorsements": [],
+          "franchise": {
+            "authority": {
+              "clause_locator": "explicit synthetic franchise assumption",
+              "coverage": [
+                "TOTAL_LOSS"
+              ],
+              "document_sha256": "ef88f72ca2bfc46476aa004a1a76b0828922c4bdf44f2562cd8db28cf8c57273",
+              "effective_from": "1300-01-01",
+              "effective_until": "1500-12-29",
+              "governs_contract": true,
+              "insurer": "SYNTHETIC_INSURER",
+              "policy_reference": "synthetic controlled policy term, 1404 franchise",
+              "product": "SYNTHETIC_BODY",
+              "reviewer": "software fixture author; no qualified domain approval",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_status": "SYNTHETIC_TEST",
+              "source_version": "1404",
+              "terms": {
+                "calculation_base": "AFTER_SALVAGE",
+                "claim_sequence_rule": "first claim",
+                "mode": "PERCENT",
+                "rate": 0.1
+              }
+            },
+            "calculation_base": "AFTER_SALVAGE",
+            "claim_sequence_rule": "first claim",
+            "mode": "PERCENT",
+            "rate": 0.1,
+            "source": "POLICY",
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_version": "1404"
+          },
+          "insurer": "SYNTHETIC_INSURER",
+          "policy_version": null
+        },
+        "review_as_of": null,
+        "review_kind": "CLAIM_FILE",
+        "reviewer": "adjuster: reviewer-01, decision reconciled 1404-09-02",
+        "snapshot_id": "BODY@1404/08/20",
+        "tier": "T2",
+        "issuer": "REVIEW_GATE",
+        "decision": "COMPUTE",
+        "claim_hash": "sha256:3d176698a62064bd77b0360edfb6599ff03c810de2a4e66a0fe4ec6a3c07b5bb",
+        "issued_at": "2026-11-01T19:47:14+00:00"
+      }
+    }
+  }
+]

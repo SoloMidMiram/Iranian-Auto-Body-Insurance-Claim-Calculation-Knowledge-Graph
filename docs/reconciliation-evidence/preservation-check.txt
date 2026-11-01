@@ -1,0 +1,4 @@
+PASS: 47 original input bytes unchanged against 7cf77db.
+PASS: reference manifest has no Git diff against 7cf77db (working-tree line endings are platform dependent).
+PASS: 47 expected objects and known-deviation envelopes preserved in separate manifest.
+PASS: all 41 original mismatches have no single payable and no calculation grant, with FRANCHISE_AUTHORITY_REQUIRED.

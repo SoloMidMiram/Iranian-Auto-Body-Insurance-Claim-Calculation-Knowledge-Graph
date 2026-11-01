@@ -1,0 +1,117 @@
+{
+  "answers": {
+    "Q-S0-01": "SYNTHETIC_INSURER / CONTROLLED BODY CASE 1404",
+    "Q-S0-02": "1404-08-20",
+    "Q-S0-03": "1404-08-20",
+    "Q-S0-04": "ONTIME",
+    "Q-S0-05": "INSURED",
+    "Q-S0-06": "IN_FORCE",
+    "Q-S0-07": "1404-08-25",
+    "Q-S1-01": "PASSENGER_CAR",
+    "Q-S1-02": "LISTED",
+    "Q-S1-03": "INSIDE_IRAN",
+    "Q-S10-01": "adjuster: reviewer-01, decision reconciled 1404-09-02",
+    "Q-S2-01": "COLLISION",
+    "Q-S2-02": "ESTABLISHED",
+    "Q-S2-04": "INSURED_AT_FAULT",
+    "Q-S2-09": "CONSISTENT",
+    "Q-S3-01": "VALID_AND_APPROPRIATE",
+    "Q-S3-02": "NO",
+    "Q-S3-03": "NO",
+    "Q-S3-04": "NONE",
+    "Q-S3-05": "NONE",
+    "Q-S3-06": "NO",
+    "Q-S3-07": "NO",
+    "Q-S3-08": "NO",
+    "Q-S4-01": "ITEMISED",
+    "Q-S4-02": 400000000,
+    "Q-S4-03": [
+      {
+        "assessed_loss": 1200000000,
+        "category": "OTHER_REPLACEMENT_PART",
+        "name": "front panel"
+      }
+    ],
+    "Q-S4-05": "COMPUTE_FROM_YEAR",
+    "Q-S4-07": 100000000,
+    "Q-S4-09": "NOT_APPLICABLE",
+    "Q-S4-10": "REPAIRABLE",
+    "Q-S5-01": 8000000000,
+    "Q-S5-02": 8000000000,
+    "Q-S5-03": 1399,
+    "Q-S5-04": "NO_MATERIAL_DIFFERENCE",
+    "Q-S6-01": "PERCENT",
+    "Q-S6-02": {
+      "calculation_base": "AFTER_DEPRECIATION",
+      "claim_sequence_rule": "first claim",
+      "mode": "PERCENT",
+      "rate": 0.1,
+      "source": "POLICY",
+      "source_reference": "synthetic controlled policy term, 1404 franchise",
+      "source_version": "1404"
+    },
+    "Q-S6-03": {
+      "calculation_base": "AFTER_DEPRECIATION"
+    },
+    "Q-S6-04": {
+      "claim_sequence_rule": "first claim",
+      "source_version": "1404",
+      "authority": {
+        "source_reference": "synthetic controlled policy term, 1404 franchise",
+        "source_version": "1404",
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "synthetic controlled policy term, 1404 franchise",
+        "coverage": [
+          "PARTIAL_DAMAGE"
+        ],
+        "effective_from": "1300-01-01",
+        "effective_until": "1500-12-29",
+        "source_status": "SYNTHETIC_TEST",
+        "governs_contract": true,
+        "reviewer": "software fixture author; no qualified domain approval",
+        "clause_locator": "explicit synthetic franchise assumption",
+        "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+        "terms": {
+          "mode": "PERCENT",
+          "rate": 0.1,
+          "calculation_base": "AFTER_DEPRECIATION",
+          "claim_sequence_rule": "first claim"
+        }
+      }
+    },
+    "Q-S6-05": "NO",
+    "Q-S7-01": "NO_BODY_ONLY",
+    "Q-S8-03": "ASSESSED_GROSS",
+    "Q-S8-04": "CASH",
+    "Q-S9-01": "NO",
+    "Q-S9-02": "NO_THIRD_PARTY",
+    "Q-S9-03": 1600000000
+  },
+  "claim_id": "INSPECTION-C91-PRIOR-FULL-COMPENSATION",
+  "evidence_present": [
+    "EVT_ARBITRATION_OR_COURT_AWARD",
+    "EVT_ASSESSMENT_REPORT",
+    "EVT_CLAIM_FORM",
+    "EVT_LICENCE",
+    "EVT_MARKET_VALUE_EVIDENCE",
+    "EVT_OTHER_POLICIES",
+    "EVT_OWNERSHIP_DOCS",
+    "EVT_PHOTOS",
+    "EVT_POLICE_CROQUIS",
+    "EVT_POLICY_COPY",
+    "EVT_PREMIUM_PROOF",
+    "EVT_PRIOR_CLAIM_HISTORY",
+    "EVT_PROPOSAL_FORM",
+    "EVT_REPAIR_INVOICE"
+  ],
+  "note": "C91: the whole assessed repair was already compensated elsewhere; Q-S6-05 says no other policy.",
+  "unit": "IRR",
+  "contract_context": {
+    "insurer": "SYNTHETIC_INSURER",
+    "product": "SYNTHETIC_BODY",
+    "policy_reference": "synthetic controlled policy term, 1404 franchise",
+    "policy_date": "1404-08-20",
+    "contract_kind": "SYNTHETIC_TEST"
+  }
+}
