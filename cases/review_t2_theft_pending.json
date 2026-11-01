@@ -1,7 +1,7 @@
 {
   "claim_id": "REVIEW-T2-THEFT-PENDING",
   "unit": "IRR",
-  "note": "Rung T2. Thirty-eight days are recorded, but the file does not name whether that count starts at the theft, at awareness, or at declaration. U13 therefore blocks the handoff. A stored day-count, including one near or past sixty, is not an anchored clock.",
+  "note": "Rung T2. Thirty-eight days are recorded, but the file does not name whether that count starts at the theft, at awareness, or at declaration. U13 therefore blocks the handoff. A stored day-count, including one near or past sixty, is not an anchored clock. Contract metadata is an explicit synthetic software assumption, not authenticated insurer authority.",
   "evidence_present": [
     "EVT_CLAIM_FORM",
     "EVT_POLICY_COPY",
@@ -15,7 +15,7 @@
     "EVT_PRIOR_CLAIM_HISTORY"
   ],
   "answers": {
-    "Q-S0-01": "IRAN_INSURANCE / بيمه بدنه 1403",
+    "Q-S0-01": "SYNTHETIC_INSURER / SYNTHETIC_BODY / software control contract",
     "Q-S0-02": "1404-04-20",
     "Q-S0-03": "1404-04-20",
     "Q-S0-04": "ONTIME",

@@ -1,7 +1,7 @@
 {
   "claim_id": "REVIEW-T3-UNDERINSURED-PARTIAL",
   "unit": "IRR",
-  "note": "Rung T3: the same shape of loss as the T1 file, but the vehicle is insured at 600 against a market value of 800. The ratio is below one, so the position of the underinsurance relative to the franchise is now load-bearing - and the regulation does not fix it. The correct output is two sourced scenarios, not one number.",
+  "note": "Rung T3: the same shape of loss as the T1 file, but the vehicle is insured at 600 against a market value of 800. The ratio is below one, so the position of the underinsurance relative to the franchise is now load-bearing - and the regulation does not fix it. The correct output is two sourced scenarios, not one number. Contract metadata is an explicit synthetic software assumption, not authenticated insurer authority.",
   "evidence_present": [
     "EVT_CLAIM_FORM",
     "EVT_POLICY_COPY",
@@ -16,7 +16,7 @@
     "EVT_PRIOR_CLAIM_HISTORY"
   ],
   "answers": {
-    "Q-S0-01": "ASIA / بيمه بدنه 1403",
+    "Q-S0-01": "SYNTHETIC_INSURER / SYNTHETIC_BODY / software control contract",
     "Q-S0-02": "1404-05-11",
     "Q-S0-03": "1404-05-11",
     "Q-S0-04": "ONTIME",

@@ -1,7 +1,7 @@
 {
   "claim_id": "REVIEW-T1-FULLCOVER-PARTIAL",
   "unit": "IRR",
-  "note": "Rung T1: a fully covered partial loss on a sixth-production-year car. Depreciation is computed from the year index, lamp glass is exempt, the ratio is one so the unresolved operator order cannot change the answer, and every franchise term is sourced. This is the simplest file that may issue one number.",
+  "note": "Rung T1: a fully covered partial loss on a sixth-production-year car. Depreciation is computed from the year index, lamp glass is exempt, the ratio is one so the unresolved operator order cannot change the answer, and every franchise term is sourced. This is the simplest file that may issue one number. Contract metadata is an explicit synthetic software assumption, not authenticated insurer authority.",
   "evidence_present": [
     "EVT_CLAIM_FORM",
     "EVT_POLICY_COPY",
@@ -17,7 +17,7 @@
     "EVT_PRIOR_CLAIM_HISTORY"
   ],
   "answers": {
-    "Q-S0-01": "IRAN_INSURANCE / بيمه بدنه 1404",
+    "Q-S0-01": "SYNTHETIC_INSURER / SYNTHETIC_BODY / software control contract",
     "Q-S0-02": "1404-08-20",
     "Q-S0-03": "1404-08-20",
     "Q-S0-04": "ONTIME",
