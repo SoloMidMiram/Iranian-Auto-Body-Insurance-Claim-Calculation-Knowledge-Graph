@@ -135,7 +135,7 @@ def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, 
         ],
         inspector,
     )
-    # Frozen pre-remediation references must reject these three intended
+    # Frozen pre-remediation references must reject these intended
     # containment changes. Do not rewrite the reference manifest to turn green.
     assert compared.returncode == 1, compared.stderr
     _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
@@ -224,17 +224,19 @@ def test_runner_rejects_dirty_internal_probe_shim(tmp_path: Path) -> None:
 
 
 def _assert_bounded_containment_drift(comparison):
-    assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+    assert comparison["derived_counts"] == {"MATCH": 6, "MISMATCH": 41}
     assert comparison["acceptance_gate_passed"] is False
     changed = {row["case_id"]: row for row in comparison["cases"] if row["comparison_verdict"] == "MISMATCH"}
-    assert set(changed) == {
-        "inspection-c61-title-not-transferred",
-        "inspection-c66-disposition-unresolved",
-        "inspection-c67-disposition-not-applicable",
+    preserved = {
+        "inspection-c101-manual-franchise-unversioned", "inspection-c13c-repair-only-flag-true",
+        "inspection-c94-event-date-impossible", "inspection-c95-production-year-future",
+        "inspection-c96-conflicting-money-aliases", "inspection-c99-third-party-split",
     }
+    assert {row["case_id"] for row in comparison["cases"]} - set(changed) == preserved
     for row in changed.values():
         observed = row["observed_behavior"]
-        assert observed["decision"] == "INSUFFICIENT_INFORMATION"
+        assert observed["decision"] in ("INSUFFICIENT_INFORMATION", "REFUSE")
+        assert "FRANCHISE_AUTHORITY_REQUIRED" in observed["blocking_conditions"]
         assert observed["authorization"]["granted"] is False
         assert observed["payable_irr"] is None
         assert observed["process"]["calc_exit"] == 1

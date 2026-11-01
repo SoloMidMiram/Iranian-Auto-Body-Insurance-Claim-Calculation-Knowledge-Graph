@@ -499,11 +499,6 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
         if present and any(value != present[0][1] for _, value in present[1:]):
             issues.append(SchemaIssue(CODE_CONFLICT, present[-1][0],
                                       f"settlement evidence conflicts with {present[0][0]}"))
-    if isinstance(damage.get("franchise"), (int, float)):
-        policy_spec = (payload.get("policy") or {}).get("franchise")
-        if isinstance(policy_spec, dict):
-            issues.append(SchemaIssue(CODE_CONFLICT, "damage.franchise",
-                                      "multiple franchise declarations require an explicit resolved contractual term"))
     actual_rescue = next(
         (
             damage.get(name)

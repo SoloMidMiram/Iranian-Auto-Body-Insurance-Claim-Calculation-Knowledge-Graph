@@ -95,11 +95,15 @@ def _mutated_case_report(
     baseline_observation: dict[str, object],
     case_id: str,
     mutate,
+    *, sourced_control=False,
 ) -> tuple[dict[str, object], dict[str, object]]:
     case_root = _copy_cases(tmp_path)
     case_path = case_root / f"{case_id}.json"
     payload = json.loads(case_path.read_text(encoding="utf-8"))
     mutate(payload)
+    if sourced_control:
+        from contract_assumptions import with_review_contract
+        payload = with_review_contract(payload)
     _write_json(case_path, payload)
 
     observation = copy.deepcopy(baseline_observation)
@@ -296,11 +300,14 @@ def test_standalone_calc_rendered_money_and_unit_are_enforced(
     new: str,
 ) -> None:
     observation = copy.deepcopy(baseline_observation)
-    row = next(
-        item
-        for item in observation["supported_path"]
-        if item["case"] == "inspection-c13d-replacement-control"
-    )
+    from contract_assumptions import with_review_contract
+    case_root = _copy_cases(tmp_path)
+    case_path = case_root / "inspection-c13d-replacement-control.json"
+    _write_json(case_path, with_review_contract(json.loads(case_path.read_text(encoding="utf-8"))))
+    row = inspection._supported_case(ROOT, case_path)
+    observation["supported_path"] = [row if item["case"] == row["case"] else item
+                                     for item in observation["supported_path"]]
+    observation["case_inputs"], _ = provenance.verified_case_corpus(case_root)
     payable_line = next(
         line
         for line in row["calc_stdout"].splitlines()
@@ -312,7 +319,7 @@ def test_standalone_calc_rendered_money_and_unit_are_enforced(
     observation_path = tmp_path / f"standalone-{new}.json"
     _write_json(observation_path, observation)
 
-    report, passed = _compare(MANIFEST, observation_path, ROOT / "cases")
+    report, passed = _compare(MANIFEST, observation_path, case_root)
     result = next(
         item
         for item in report["cases"]
@@ -350,6 +357,7 @@ def test_c45_omitted_rescue_to_explicit_zero_is_detected(
         baseline_observation,
         "inspection-c45-rescue-omitted",
         lambda payload: payload["answers"].__setitem__("Q-S4-07", 0),
+        sourced_control=True,
     )
     assert observed["authorization"]["granted"] is True
     assert "authorization.granted" in _failure_paths(result)
@@ -377,6 +385,7 @@ def test_payable_change_with_same_branch_is_detected(
         baseline_observation,
         "inspection-c42-at-7500",
         lambda payload: payload["answers"].__setitem__("Q-S4-07", 99),
+        sourced_control=True,
     )
     assert observed["review_branch"] == "PARTIAL_DAMAGE"
     assert observed["payable_irr"] == 6759
@@ -433,6 +442,7 @@ def test_changed_material_trace_assertion_is_detected(
         lambda payload: payload["answers"].__setitem__(
             "Q-S2-14", "synthetic alternative clock-source record"
         ),
+        sourced_control=True,
     )
     assert observed["review_branch"] == "THEFT"
     assert observed["status"] == "PENDING_60_DAY_CRITERION"

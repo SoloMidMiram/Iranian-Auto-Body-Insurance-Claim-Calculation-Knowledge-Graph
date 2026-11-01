@@ -205,3 +205,22 @@ def test_engine_demands_supporting_settlement_evidence_even_for_explicit_values(
     result = direct_result(payload, kb)
     assert result.payable is None
     assert result.status in ("TITLE_TRANSFER_REQUIRED", "SALVAGE_VALUATION_EVIDENCE_REQUIRED")
+
+
+def test_equal_order_outcomes_do_not_invent_ordering_authority(kb):
+    from iran_auto_claim.fixtures import _with_synthetic_authority
+    payload = controlled_partial(RATIO_FIRST)
+    payload["policy"]["franchise"]["absolute_irr"] = 0
+    payload["policy"]["franchise"].pop("authority")
+    result = direct_result(_with_synthetic_authority(payload), kb)
+    assert result.payable is None
+    assert result.payable_scenarios == [800, 800]
+    assert "U01_ARTICLE10_PARTIAL_ORDER" in result.blocking_uncertainties
+
+
+def test_ratio_one_preserves_arithmetic_without_asserting_universal_order(kb):
+    payload = controlled_partial(RATIO_FIRST)
+    payload["vehicle"]["insured_sum_irr"] = 10000
+    result = direct_result(payload, kb)
+    assert result.payable == 900
+    assert result.fields["order_used"] == "RATIO_NOT_APPLICABLE"
