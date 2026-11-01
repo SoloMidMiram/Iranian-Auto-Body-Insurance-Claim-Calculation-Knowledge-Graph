@@ -11,6 +11,15 @@ from pathlib import Path
 import subprocess
 import sys
 
+REFERENCES = {
+    "S05": {"payable_irr": 1600, "payable_scenarios_irr": []},
+    "S06": {"payable_irr": None, "payable_scenarios_irr": []},
+    "S07": {"payable_irr": None, "payable_scenarios_irr": []},
+    "S08": {"payable_irr": None, "payable_scenarios_irr": []},
+    "S09": {"payable_irr": None, "payable_scenarios_irr": []},
+    "S10": {"payable_irr": None, "payable_scenarios_irr": [700, 720]},
+}
+
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
@@ -122,12 +131,31 @@ def main():
         review = Review(ri, kb)
         observed = review.calculate()
         rows.append({"case": case_id, "direct_input": raw, "direct_input_sha256": digest(raw),
+                     "independent_reference": REFERENCES[case_id],
+                     "direct_reference_matches": all(result.to_dict()[k] == v for k, v in REFERENCES[case_id].items()),
                      "direct_result": result.to_dict(), "review_input": ri, "review_input_sha256": digest(ri),
                      "review_decision": review.decision(), "review_classification": review.classification(),
                      "review_result": None if observed is None else observed.to_dict()})
+    probes = []
+    for name in ("S06_UNPROVED_COMPLETION", "S08_UNEVIDENCED_ZERO", "S09_IDENTIFIED_NO_APPLICABILITY"):
+        raw, _ = inputs("S10" if name.startswith("S09") else "S05", args.legacy)
+        if name.startswith("S06"):
+            raw["vehicle"].update(salvage_disposition="INSURER_TAKES_TITLE", title_transferred=True)
+            raw["evidence"].pop("EVT_TITLE_TRANSFER_PROOF")
+        elif name.startswith("S08"):
+            raw["vehicle"]["salvage_value_irr"] = 0
+            raw["evidence"]["EVT_SALVAGE_VALUATION"] = False
+        else:
+            raw["vehicle"]["insured_sum_irr"] = 10000
+            raw["policy"]["franchise"].pop("authority", None)
+        observed = engine.compute(_internal_test_direct_authorize(raw, purpose="S05_S10_ADVERSARIAL_ORACLE"), kb)
+        probes.append({"probe": name, "input": raw, "input_sha256": digest(raw),
+                       "reference_payable_irr": None, "result": observed.to_dict(),
+                       "reference_matches": observed.payable is None})
     report = {"revision": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
               "python": sys.version, "engine_origin": str(engine.__file__), "legacy_protocol": args.legacy,
-              "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "cases": rows}
+              "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "cases": rows,
+              "adversarial_probes": probes}
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
     for row in rows:
         direct = row["direct_result"]
