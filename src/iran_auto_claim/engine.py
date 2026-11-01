@@ -34,6 +34,7 @@ from .admission import (
     CalculationAuthorization,
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
+from .authority import franchise_identity_gap
 from .classify import ClassificationEvidenceRequired, classify
 from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
@@ -371,6 +372,13 @@ def _resolve_franchise(
         raise operators.UncertaintyRequired(
             "U02_FRANCHISE_BASE_SCHEDULES",
             "the franchise has no authorised policy, endorsement or insurer-manual source",
+            status="FRANCHISE_AUTHORITY_REQUIRED",
+        )
+
+    if gap := franchise_identity_gap(spec):
+        res.fields["franchise_source"] = source or "UNKNOWN"
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES", gap,
             status="FRANCHISE_AUTHORITY_REQUIRED",
         )
 

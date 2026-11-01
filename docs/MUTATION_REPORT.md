@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, Review operand construction in `review.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **32/32 killed (100.0%)**
+- Result: **33/33 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -42,6 +42,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M31 | KILLED | an incomplete title transfer can use the insurer-title no-salvage route |
 | M32 | KILLED | missing or not-applicable physical salvage disposition bypasses containment |
 | M33 | KILLED | missing retained salvage valuation bypasses its explicit guard |
+| M34 | KILLED | a positive monetary franchise bypasses source identity/version validation |
 
 ## Triaged mutation survivors
 

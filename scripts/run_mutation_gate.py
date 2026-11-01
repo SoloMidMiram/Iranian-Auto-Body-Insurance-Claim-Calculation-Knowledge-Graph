@@ -169,6 +169,12 @@ MUTATIONS += (
              "missing retained salvage valuation bypasses its explicit guard"),
 )
 
+MUTATIONS += (
+    Mutation("M34", "src/iran_auto_claim/engine.py",
+             "if gap := franchise_identity_gap(spec):", "if False:",
+             "a positive monetary franchise bypasses source identity/version validation"),
+)
+
 THRESHOLD = 90.0
 
 

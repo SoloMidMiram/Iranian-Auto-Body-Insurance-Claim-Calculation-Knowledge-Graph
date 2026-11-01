@@ -457,6 +457,14 @@ def main() -> int:
     assert invalid_route_result.payable is None
     assert invalid_route_result.status == "SALVAGE_DISPOSITION_UNRESOLVED"
 
+    unversioned_franchise = copy.deepcopy(total)
+    unversioned_franchise["policy"]["franchise"].pop("source_reference", None)
+    unversioned_franchise["policy"]["franchise"].pop("source_version", None)
+    unversioned_franchise["policy"]["franchise"]["source"] = "INSURER_MANUAL"
+    authority_result = compute(_authorize_fixture_case(unversioned_franchise, kb), kb)
+    assert authority_result.payable is None
+    assert authority_result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+
     # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
     # year; a permissive month-12 check would change theft eligibility.
     assert _dated_theft_clock_days(

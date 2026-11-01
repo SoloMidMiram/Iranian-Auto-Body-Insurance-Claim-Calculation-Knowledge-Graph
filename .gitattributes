@@ -2,3 +2,4 @@
 cases/inspection-*.json text eol=lf
 # Audit manifests hash captured bytes, including original line endings.
 docs/article19-evidence/** -text
+docs/settlement-authority-evidence/** -text

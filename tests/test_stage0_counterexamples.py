@@ -158,7 +158,6 @@ def test_ia07_invalid_chronology_cannot_pay(kb, question, value):
     _assert_review_does_not_pay(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-08: an unversioned manual cannot establish a monetary franchise")
 def test_ia08_unversioned_manual_franchise_cannot_pay(kb):
     payload = _review_case()
     for question in ("Q-S6-02", "Q-S6-04"):

@@ -420,8 +420,10 @@ class Review:
         return branch in (node.get("affects_branches") or [])
 
     def _franchise_complete(self) -> bool:
+        from .authority import franchise_identity_gap
+
         franchise = self._bound.get("PS_FRANCHISE")
-        if not isinstance(franchise, dict):
+        if franchise_identity_gap(franchise) is not None:
             return False
         mode = str(franchise.get("mode") or "").upper()
         if mode in ("", "NOT_STATED"):
@@ -902,6 +904,11 @@ class Review:
             return []
 
         conditions: list[str] = []
+        from .authority import franchise_identity_gap
+
+        franchise = self._bound.get("PS_FRANCHISE")
+        if isinstance(franchise, dict) and franchise_identity_gap(franchise) is not None:
+            conditions.append("FRANCHISE_AUTHORITY_REQUIRED")
         causation = str(self.answer("Q-S2-02") or "").upper()
         if causation == "ASSERTED_ONLY":
             conditions.append("COVERED_PERIL_CAUSATION_NOT_ESTABLISHED")
