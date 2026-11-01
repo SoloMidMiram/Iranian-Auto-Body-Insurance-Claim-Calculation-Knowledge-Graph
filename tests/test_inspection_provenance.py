@@ -135,7 +135,10 @@ def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, 
         ],
         inspector,
     )
-    assert compared.returncode == 0, compared.stderr
+    # Frozen pre-remediation references must reject these three intended
+    # containment changes. Do not rewrite the reference manifest to turn green.
+    assert compared.returncode == 1, compared.stderr
+    _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
     return {
         "temporary": temporary,
         "model": model,
@@ -220,6 +223,23 @@ def test_runner_rejects_dirty_internal_probe_shim(tmp_path: Path) -> None:
     assert not output.exists()
 
 
+def _assert_bounded_containment_drift(comparison):
+    assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+    assert comparison["acceptance_gate_passed"] is False
+    changed = {row["case_id"]: row for row in comparison["cases"] if row["comparison_verdict"] == "MISMATCH"}
+    assert set(changed) == {
+        "inspection-c61-title-not-transferred",
+        "inspection-c66-disposition-unresolved",
+        "inspection-c67-disposition-not-applicable",
+    }
+    for row in changed.values():
+        observed = row["observed_behavior"]
+        assert observed["decision"] == "INSUFFICIENT_INFORMATION"
+        assert observed["authorization"]["granted"] is False
+        assert observed["payable_irr"] is None
+        assert observed["process"]["calc_exit"] == 1
+
+
 def test_valid_cross_checkout_records_complete_evidence_contract(
     valid_cross_checkout: dict[str, Path],
 ) -> None:
@@ -236,8 +256,7 @@ def test_valid_cross_checkout_records_complete_evidence_contract(
         "acceptance_gate"
     ]
     assert observation["inspector"]["harness_sha256"]
-    assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 10, "MATCH": 37}
-    assert comparison["acceptance_gate_passed"] is True
+    _assert_bounded_containment_drift(comparison)
     assert comparison["manifest"]["sha256"]
     assert comparison["manifest"]["known_deviation_envelope_sha256"]
     assert comparison["evidence_contract"]["internal_probe_evidence"] == {
@@ -277,9 +296,9 @@ def test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated(
         ],
         inspector,
     )
-    assert result.returncode == 0, result.stderr
+    assert result.returncode == 1, result.stderr
     report = json.loads(output.read_text(encoding="utf-8"))
-    assert report["acceptance_gate_passed"] is True
+    _assert_bounded_containment_drift(report)
     assert report["evidence_contract"]["internal_probe_evidence"][
         "outcomes_validated_by_acceptance_gate"
     ] is False
