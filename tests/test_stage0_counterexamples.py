@@ -175,7 +175,6 @@ def test_ia15_conflicting_part_aliases_are_rejected(kb):
         Review(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-14: material salvage operands are mandatory at the engine boundary")
 @pytest.mark.parametrize(
     "disposition",
     [None, "INSURED_RETAINS"],

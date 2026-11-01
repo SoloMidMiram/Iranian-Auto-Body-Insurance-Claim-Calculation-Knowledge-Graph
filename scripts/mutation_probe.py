@@ -441,6 +441,16 @@ def main() -> int:
         == "G_SALVAGE_XOR_TITLE_TRANSFER"
     )
 
+    for disposition in (None, "NOT_APPLICABLE", "INSURED_RETAINS"):
+        incomplete_salvage = copy.deepcopy(total)
+        incomplete_salvage["damage"].pop("salvage", None)
+        incomplete_salvage["damage"].pop("salvage_disposition", None)
+        if disposition is not None:
+            incomplete_salvage["damage"]["salvage_disposition"] = disposition
+        blocked = compute(_authorize_fixture_case(incomplete_salvage, kb), kb)
+        assert blocked.payable is None
+        assert blocked.status in ("SALVAGE_DISPOSITION_UNRESOLVED", "SALVAGE_VALUE_REQUIRED")
+
     # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
     # year; a permissive month-12 check would change theft eligibility.
     assert _dated_theft_clock_days(

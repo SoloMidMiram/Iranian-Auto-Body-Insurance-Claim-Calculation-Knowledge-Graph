@@ -730,8 +730,14 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.label("DO_NOT_APPLY_RATIO_TWICE")
     res.note_guard("G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS")
 
-    disposition = case.salvage_disposition
-    if disposition == "UNRESOLVED":
+    # Whole theft has already passed its separate transfer condition. It has no
+    # retained wreck valuation; physical-loss completeness must not invent one.
+    disposition = (
+        "INSURER_TAKES_TITLE"
+        if res.route == "THEFT_TOTAL_SETTLEMENT"
+        else case.salvage_disposition
+    )
+    if disposition not in ("INSURED_RETAINS", "INSURER_TAKES_TITLE"):
         raise operators.UncertaintyRequired(
             "U12_SALVAGE_DISPOSITION",
             "salvage disposition is unresolved, so the settlement base cannot be fixed",
@@ -756,7 +762,13 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.note_rule("REG53_ART19_INSURER_TAKES_TITLE")
         res.label("DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT")
     else:
-        salvage_to_deduct = case.salvage or Decimal(0)
+        if case.salvage is None:
+            raise guards.GuardViolation(
+                "G_SALVAGE_XOR_TITLE_TRANSFER",
+                "retained salvage requires an established valuation; absence is not zero",
+                "SALVAGE_VALUE_REQUIRED",
+            )
+        salvage_to_deduct = case.salvage
         after_salvage = base - salvage_to_deduct
         res.fields["salvage_deduction"] = salvage_to_deduct
         res.fields["salvage_disposition"] = disposition

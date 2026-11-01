@@ -916,6 +916,12 @@ class Review:
                 "YES_SAME_INSURER",
             ):
                 conditions.append("MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED")
+        if branch == "TOTAL_LOSS":
+            disposition = self._bound.get("PS_SALVAGE_DISPOSITION")
+            if disposition not in ("INSURED_RETAINS", "INSURER_TAKES_TITLE"):
+                conditions.append("SALVAGE_DISPOSITION_UNRESOLVED")
+            elif disposition == "INSURED_RETAINS" and self._bound.get("PS_SALVAGE_VALUE") is None:
+                conditions.append("SALVAGE_VALUE_REQUIRED")
         if (
             branch == "TOTAL_LOSS"
             and self._bound.get("PS_SALVAGE_DISPOSITION") == "INSURER_TAKES_TITLE"

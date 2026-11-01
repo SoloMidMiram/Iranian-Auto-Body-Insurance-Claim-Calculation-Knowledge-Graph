@@ -159,6 +159,16 @@ MUTATIONS = (
     ),
 )
 
+MUTATIONS += (
+    Mutation("M32", "src/iran_auto_claim/engine.py",
+             'if disposition not in ("INSURED_RETAINS", "INSURER_TAKES_TITLE"):',
+             'if disposition == "UNRESOLVED":',
+             "missing or not-applicable physical salvage disposition bypasses containment"),
+    Mutation("M33", "src/iran_auto_claim/engine.py",
+             'if case.salvage is None:', 'if False:',
+             "missing retained salvage valuation bypasses its explicit guard"),
+)
+
 THRESHOLD = 90.0
 
 

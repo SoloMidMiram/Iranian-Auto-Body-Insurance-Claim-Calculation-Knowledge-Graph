@@ -140,7 +140,7 @@ def inspector_identity(anchor: Path, scope: Iterable[str]) -> dict[str, Any]:
     inspector_root = Path(
         _git(resolved_anchor.parent, "rev-parse", "--show-toplevel")
     ).resolve()
-    relative_anchor = str(resolved_anchor.relative_to(inspector_root))
+    relative_anchor = resolved_anchor.relative_to(inspector_root).as_posix()
     paths = tuple(scope)
     if relative_anchor not in paths:
         raise ProvenanceError(

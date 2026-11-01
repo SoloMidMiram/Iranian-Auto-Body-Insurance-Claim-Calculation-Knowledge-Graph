@@ -1082,7 +1082,8 @@ def test_total_loss_below_or_at_75_percent_is_a_classification_conflict(kb, repa
 
 def test_total_loss_one_rial_above_75_percent_matches_and_settles(kb):
     result = compute(
-        _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10), kb
+        _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10,
+              salvage=0, salvage_disposition="INSURED_RETAINS"), kb
     )
     classification = result.fields["classification"]
     assert result.payable == D(90)
@@ -1100,6 +1101,8 @@ def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
             repair=70,
             rescue_for_threshold=6,
             franchise=10,
+            salvage=0,
+            salvage_disposition="INSURED_RETAINS",
         ),
         kb,
     )
@@ -1349,7 +1352,8 @@ def test_documented_authorized_override_can_select_declared_total_loss_with_comp
     kb,
 ):
     payload = _case(
-        "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10
+        "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10,
+        salvage=0, salvage_disposition="INSURED_RETAINS"
     )
     payload["classification"]["override"] = {
         "authorized": True,
