@@ -50,4 +50,4 @@ Reproduce using Python 3.11 and PowerShell `$env:PYTHONUTF8='1'`:
 .venv/Scripts/python.exe -m pytest -o addopts='' -q -ra
 ```
 
-Both comparator commands deliberately exit 1. The first attempt at inspection/tests omitted the documented UTF-8 setting and failed on Windows cp1252 decoding; `pytest.txt` records the corrected run. Observations identify their actual pre-publication HEAD and model content; they are not relabeled as exact published-head CI evidence. Independent engineering and qualified domain/contract review remain outstanding.
+Both comparator commands deliberately exit 1. The first attempt at inspection/tests omitted the documented UTF-8 setting and failed on Windows cp1252 decoding; `pytest.txt` records the corrected run: **739 passed, zero xfails**, in 195.96 seconds. `preservation-check.txt` records original-file and nonpayment assertions. Observations identify their actual pre-publication HEAD and model content; they are not relabeled as exact published-head CI evidence. Independent engineering and qualified domain/contract review remain outstanding.
