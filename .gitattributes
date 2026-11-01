@@ -1,2 +1,4 @@
 # Inspection references hash original bytes; preserve them on Windows checkouts.
 cases/inspection-*.json text eol=lf
+# Audit manifests hash captured bytes, including original line endings.
+docs/article19-evidence/** -text
