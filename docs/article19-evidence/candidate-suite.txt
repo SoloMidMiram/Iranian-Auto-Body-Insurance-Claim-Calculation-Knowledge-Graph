@@ -1,0 +1,1178 @@
+.......................................EE..EEEEEEEEEE.E................. [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+................................F....................................... [ 54%]
+...................FFEEEEEE............................................. [ 65%]
+.........................................................F..F........... [ 76%]
+........................................................................ [ 86%]
+........................................................................ [ 97%]
+.........x.....                                                          [100%]
+=================================== ERRORS ====================================
+__ ERROR at setup of test_internal_observation_requires_internal_probe_scope __
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_ ERROR at setup of test_internal_observation_requires_verified_internal_import_origins _
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_ ERROR at setup of test_model_change_with_unchanged_case_hashes_rejects_stale_observation _
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_ ERROR at setup of test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount] _
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_ ERROR at setup of test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit] _
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+____ ERROR at setup of test_c42_rescue_100_to_101_crosses_strict_threshold ____
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+___ ERROR at setup of test_c45_omitted_rescue_to_explicit_zero_is_detected ____
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_____ ERROR at setup of test_authorization_granted_to_refused_is_detected _____
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_____ ERROR at setup of test_payable_change_with_same_branch_is_detected ______
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_ ERROR at setup of test_changed_input_digest_without_output_change_is_detected _
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_______ ERROR at setup of test_missing_and_duplicate_case_are_rejected ________
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_____ ERROR at setup of test_changed_material_trace_assertion_is_detected _____
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+__________ ERROR at setup of test_cli_exits_nonzero_for_new_mismatch __________
+
+    @pytest.fixture(scope="module")
+    def baseline_observation() -> dict[str, object]:
+        case_inputs, _ = provenance.verified_case_corpus(ROOT / "cases")
+        return {
+            "revision": inspection._git_value(ROOT, "HEAD"),
+            "tree": inspection._git_value(ROOT, "HEAD^{tree}"),
+            "python": "3.11",
+            "import_origin_relative": "src/iran_auto_claim/__init__.py",
+            "provenance_profile": "SUPPORTED_ONLY",
+            "model_scope": list(comparator.MODEL_PATHS),
+            "inspector": {"unit_test": True},
+            "case_inputs": case_inputs,
+            "execution_profile": {
+                "supported_review": {
+                    "count": 47,
+                    "acceptance_gate": True,
+                    "assertion_source": "reference_manifest",
+                },
+                "internal_test_direct": {
+                    "count": 0,
+                    "acceptance_gate": False,
+                    "role": "DIAGNOSTIC_NOT_OUTCOME_VALIDATED",
+                },
+            },
+>           "supported_path": inspection._supported_cases(ROOT, ROOT / "cases"),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        }
+
+tests\test_case_comparison.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_case_based_inspection.py:196: in _supported_cases
+    return [
+scripts\run_case_based_inspection.py:197: in <listcomp>
+    _supported_case(root, case_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('F:/Git/body-model-article19')
+case_path = WindowsPath('F:/Git/body-model-article19/cases/inspection-c102-glass-endorsement-token-only.json')
+
+    def _supported_case(root: Path, case_path: Path) -> dict[str, Any]:
+        """Observe one supported-path case without interpreting process status as authority."""
+    
+        raw = case_path.read_bytes()
+        json.loads(raw)
+        review = _command(
+            [sys.executable, "claim.py", "review", str(case_path), "--json", "--calc"],
+            root,
+        )
+        calc = _command([sys.executable, "claim.py", "calc", str(case_path)], root)
+        parsed: dict[str, Any] | None = None
+>       if review.stdout.lstrip().startswith("{"):
+           ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lstrip'
+
+scripts\run_case_based_inspection.py:117: AttributeError
+_ ERROR at setup of test_valid_cross_checkout_records_complete_evidence_contract _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000024DC72AE090>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: executed inspector scripts\run_case_based_inspection.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+_ ERROR at setup of test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000024DC72AE090>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: executed inspector scripts\run_case_based_inspection.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+_____ ERROR at setup of test_investigation_rejects_modified_external_c104 _____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000024DC72AE090>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: executed inspector scripts\run_case_based_inspection.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+____ ERROR at setup of test_runner_rejects_mutated_caller_probe_definition ____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000024DC72AE090>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: executed inspector scripts\run_case_based_inspection.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+__ ERROR at setup of test_comparator_rejects_stale_clean_inspector_revision ___
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000024DC72AE090>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: executed inspector scripts\run_case_based_inspection.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+_ ERROR at setup of test_comparator_rejects_different_committed_unauthorized_harness _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000024DC72AE090>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: executed inspector scripts\run_case_based_inspection.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+================================== FAILURES ===================================
+______ test_total_loss_guards_fire_and_also_run_when_they_do_not_breach _______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000024DC83C8850>
+
+    def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
+        underinsured = compute(
+            {
+                "claim_id": "tl-under",
+                "unit": "IRR",
+                "classification": {"branch": "TOTAL_LOSS"},
+                "event": {"event_date": "1405/06/01"},
+                "damage": {"market": 2000, "insured": 1000, "repair": 1600},
+                "policy": _policy(0),
+            },
+            kb,
+        )
+        assert "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS" in underinsured.guards_executed
+        assert "DO_NOT_APPLY_RATIO_TWICE" in underinsured.labels
+    
+        matched = compute(
+            {
+                "claim_id": "tl-match",
+                "unit": "IRR",
+                "classification": {"branch": "TOTAL_LOSS"},
+                "event": {"event_date": "1405/06/01"},
+                "damage": {"market": 2000, "insured": 2000, "repair": 1600},
+                "policy": _policy(100),
+            },
+            kb,
+        )
+        assert "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS" in matched.guards_executed
+        assert "DO_NOT_APPLY_RATIO_TWICE" not in matched.labels
+>       assert "G_SALVAGE_XOR_TITLE_TRANSFER" in matched.guards_executed
+E       AssertionError: assert 'G_SALVAGE_XOR_TITLE_TRANSFER' in ['G_COVERED_PERIL_CAUSATION_ESTABLISHED', 'G_RECOVERY_ALLOCATION_CONTAINED', 'G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS', 'G_UNCERTAINTY_MUST_SURFACE']
+E        +  where ['G_COVERED_PERIL_CAUSATION_ESTABLISHED', 'G_RECOVERY_ALLOCATION_CONTAINED', 'G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS', 'G_UNCERTAINTY_MUST_SURFACE'] = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='tl-match', unit='IRR', payable=None, payable_sc...: 'sha256:d20d020c94ac581f866163cf52ea27ffc1c0e05ffe6f39e4baefe63b9adc3770', 'issued_at': '2026-11-01T02:01:31+00:00'}).guards_executed
+
+tests\test_guard_paths.py:148: AssertionError
+_ test_investigation_uses_selected_cross_checkout_despite_conflicting_pythonpath _
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223/test_investigation_uses_select0')
+
+    def test_investigation_uses_selected_cross_checkout_despite_conflicting_pythonpath(
+        tmp_path: Path,
+    ) -> None:
+        selected = _copy_model_checkout(tmp_path)
+        inspector = _copy_inspector_checkout(tmp_path / "cross-inspector")
+        output = tmp_path / "investigation.json"
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = str(ROOT / "src")
+        result = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "investigate_total_loss_override.py"),
+                "--root",
+                str(selected),
+                "--cases",
+                str(inspector / "cases"),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--output",
+                str(output),
+            ],
+            inspector,
+            env=environment,
+        )
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: executed inspector scripts\investigate_total_loss_override.py is outside its declared harness scope
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...ut='', stderr='executed inspector scripts\\investigate_total_loss_override.py is outside its declared harness scope\n').returncode
+
+tests\test_inspection_provenance.py:172: AssertionError
+________________ test_runner_rejects_dirty_internal_probe_shim ________________
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1223/test_runner_rejects_dirty_inte0')
+
+    def test_runner_rejects_dirty_internal_probe_shim(tmp_path: Path) -> None:
+        selected = _copy_model_checkout(tmp_path)
+        inspector = _copy_inspector_checkout(tmp_path / "shim-inspector")
+        shim = selected / "tests" / "admission_shim.py"
+        shim.write_text(
+            shim.read_text(encoding="utf-8")
+            + "\n# uncommitted change that can influence internal probes\n",
+            encoding="utf-8",
+        )
+        output = tmp_path / "observation.json"
+        result = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(selected),
+                "--cases",
+                str(selected / "cases"),
+                "--internal",
+                "--output",
+                str(output),
+            ],
+            inspector,
+        )
+    
+        assert result.returncode != 0
+>       assert "tests/admission_shim.py" in result.stderr
+E       AssertionError: assert 'tests/admission_shim.py' in 'executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n'
+E        +  where 'executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n' = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc..., stdout='', stderr='executed inspector scripts\\run_case_based_inspection.py is outside its declared harness scope\n').stderr
+
+tests\test_inspection_provenance.py:218: AssertionError
+____________ test_total_loss_payable_never_exceeds_the_insured_sum ____________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000024DC83C8850>
+
+    def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
+        result = compute(
+            {
+                "claim_id": "cap",
+                "unit": "IRR",
+                "classification": {"branch": "TOTAL_LOSS"},
+                "event": {"event_date": "1405/06/01"},
+                "coverage_gate": {"causal_relationship_established": True},
+                "damage": {
+                    "market": 2000,
+                    "insured": 1500,
+                    "repair": 1800,
+                    "actual_rescue": 900,
+                },
+                "policy": {
+                    "policy_version": "TEST-v1",
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                    "franchise": {
+                        "mode": "ABSOLUTE",
+                        "absolute_irr": 0,
+                        "source": "POLICY",
+                        "source_reference": "test policy schedule",
+                        "source_version": "TEST-v1",
+                    },
+                },
+                "calculation_config": {"rescue_cap_base": "ASSESSED_GROSS"},
+            },
+            kb,
+        )
+>       assert result.payable is not None
+E       AssertionError: assert None is not None
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='cap', unit='IRR', payable=None, payable_scenari...: 'sha256:9e6a61b2627ad3d40308de0ab204278a4fdd5693435ac117c35ee65c22a1e415', 'issued_at': '2026-11-01T02:02:14+00:00'}).payable
+
+tests\test_properties.py:103: AssertionError
+_________ test_generated_total_loss_payables_respect_the_insured_sum __________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000024DC83C8850>
+
+    def test_generated_total_loss_payables_respect_the_insured_sum(kb):
+        for market, franchise, rescue in _generated_values(53):
+            market = max(market, 4)
+            insured = max(1, market // 2)
+            result = compute(
+                {
+                    "claim_id": "generated-cap",
+                    "unit": "IRR",
+                    "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
+                    "event": {"event_date": "1405/06/01"},
+                    "coverage_gate": {"causal_relationship_established": True},
+                    "damage": {
+                        "market": market,
+                        "insured": insured,
+                        "repair": market,
+                        "actual_rescue": rescue,
+                    },
+                    "policy": {
+                        "policy_version": "TEST-v1",
+                        "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                        "franchise": {
+                            "mode": "ABSOLUTE",
+                            "absolute_irr": franchise,
+                            "source": "POLICY",
+                            "source_reference": "generated policy schedule",
+                            "source_version": "TEST-v1",
+                        },
+                    },
+                    "calculation_config": {"rescue_cap_base": "ASSESSED_GROSS"},
+                },
+                kb,
+            )
+>           assert result.payable is not None
+E           AssertionError: assert None is not None
+E            +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='generated-cap', unit='IRR', payable=None, payab...: 'sha256:b0b2b9f0e4ac780b100e3d18c96fdc3fd8de4e4349fc8701a3e6c51073b9e6e3', 'issued_at': '2026-11-01T02:02:18+00:00'}).payable
+
+tests\test_properties.py:186: AssertionError
+============================== warnings summary ===============================
+tests/test_case_comparison.py::test_internal_observation_requires_internal_probe_scope
+  F:\Git\body-model-article19\.venv\Lib\site-packages\_pytest\threadexception.py:54: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-9 (_readerthread)
+  
+  Traceback (most recent call last):
+    File "C:\Users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\Lib\threading.py", line 1038, in _bootstrap_inner
+      self.run()
+    File "C:\Users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\Lib\threading.py", line 975, in run
+      self._target(*self._args, **self._kwargs)
+    File "C:\Users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\Lib\subprocess.py", line 1597, in _readerthread
+      buffer.append(fh.read())
+                    ^^^^^^^^^
+    File "C:\Users\cebit.ir\.pyenv\pyenv-win\versions\3.11.4\Lib\encodings\cp1252.py", line 23, in decode
+      return codecs.charmap_decode(input,self.errors,decoding_table)[0]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  UnicodeDecodeError: 'charmap' codec can't decode byte 0x81 in position 6268: character maps to <undefined>
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_guard_paths.py::test_total_loss_guards_fire_and_also_run_when_they_do_not_breach
+FAILED tests/test_inspection_provenance.py::test_investigation_uses_selected_cross_checkout_despite_conflicting_pythonpath
+FAILED tests/test_inspection_provenance.py::test_runner_rejects_dirty_internal_probe_shim
+FAILED tests/test_properties.py::test_total_loss_payable_never_exceeds_the_insured_sum
+FAILED tests/test_properties.py::test_generated_total_loss_payables_respect_the_insured_sum
+ERROR tests/test_case_comparison.py::test_internal_observation_requires_internal_probe_scope
+ERROR tests/test_case_comparison.py::test_internal_observation_requires_verified_internal_import_origins
+ERROR tests/test_case_comparison.py::test_model_change_with_unchanged_case_hashes_rejects_stale_observation
+ERROR tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount]
+ERROR tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit]
+ERROR tests/test_case_comparison.py::test_c42_rescue_100_to_101_crosses_strict_threshold
+ERROR tests/test_case_comparison.py::test_c45_omitted_rescue_to_explicit_zero_is_detected
+ERROR tests/test_case_comparison.py::test_authorization_granted_to_refused_is_detected
+ERROR tests/test_case_comparison.py::test_payable_change_with_same_branch_is_detected
+ERROR tests/test_case_comparison.py::test_changed_input_digest_without_output_change_is_detected
+ERROR tests/test_case_comparison.py::test_missing_and_duplicate_case_are_rejected
+ERROR tests/test_case_comparison.py::test_changed_material_trace_assertion_is_detected
+ERROR tests/test_case_comparison.py::test_cli_exits_nonzero_for_new_mismatch
+ERROR tests/test_inspection_provenance.py::test_valid_cross_checkout_records_complete_evidence_contract
+ERROR tests/test_inspection_provenance.py::test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated
+ERROR tests/test_inspection_provenance.py::test_investigation_rejects_modified_external_c104
+ERROR tests/test_inspection_provenance.py::test_runner_rejects_mutated_caller_probe_definition
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_stale_clean_inspector_revision
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_different_committed_unauthorized_harness

@@ -1,0 +1,379 @@
+{
+  "original_manifest_preserved": true,
+  "original_gate_passed": false,
+  "candidate": "598e37023b0462ccb765fad2007b8577ea96c355",
+  "technical_disposition": "Three expected fail-closed changes; independently review before accepting a new corpus baseline. No other supported case drift observed.",
+  "rows": [
+    {
+      "case": "inspection-c61-title-not-transferred",
+      "verdict": "MISMATCH",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "TITLE_TRANSFER_INCOMPLETE"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_deviation_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 7200000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_parameters.PS_TITLE_TRANSFERRED.status",
+          "expected": "NOT_TRIGGERED",
+          "actual": "RESOLVED",
+          "reason": "operator equals failed"
+        },
+        {
+          "path": "fields.salvage_deduction",
+          "expected": 0,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        }
+      ],
+      "observed": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "TITLE_TRANSFER_REQUIRED"
+        ],
+        "standalone_calculation": {
+          "applicable": false,
+          "display_unit": null,
+          "irr_per_display_unit": null,
+          "expected_payable": null,
+          "observed_payable": null,
+          "expected_scenarios": [],
+          "observed_scenarios": []
+        },
+        "material_trace": {
+          "fields.salvage_deduction": "<MISSING>",
+          "review_parameters.PS_TITLE_TRANSFERRED.status": "RESOLVED",
+          "review_parameters.PS_TITLE_TRANSFERRED.value": "false"
+        }
+      }
+    },
+    {
+      "case": "inspection-c66-disposition-unresolved",
+      "verdict": "MISMATCH",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "SALVAGE_DISPOSITION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "known_deviation_failures": null,
+      "observed": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [
+          "U12_SALVAGE_DISPOSITION"
+        ],
+        "calculation_blocking_uncertainties": null,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "SALVAGE_DISPOSITION_UNRESOLVED"
+        ],
+        "standalone_calculation": {
+          "applicable": false,
+          "display_unit": null,
+          "irr_per_display_unit": null,
+          "expected_payable": null,
+          "observed_payable": null,
+          "expected_scenarios": [],
+          "observed_scenarios": []
+        },
+        "material_trace": {
+          "review_parameters.PS_SALVAGE_DISPOSITION.value": "UNRESOLVED"
+        }
+      }
+    },
+    {
+      "case": "inspection-c67-disposition-not-applicable",
+      "verdict": "MISMATCH",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-07_DISPOSITION_SEMANTICS"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_deviation_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 6200000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.salvage_disposition",
+          "expected": "NOT_APPLICABLE",
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "fields.franchise_calculation_base",
+          "expected": 8000000000,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        }
+      ],
+      "observed": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "status": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "SALVAGE_DISPOSITION_UNRESOLVED"
+        ],
+        "standalone_calculation": {
+          "applicable": false,
+          "display_unit": null,
+          "irr_per_display_unit": null,
+          "expected_payable": null,
+          "observed_payable": null,
+          "expected_scenarios": [],
+          "observed_scenarios": []
+        },
+        "material_trace": {
+          "fields.franchise_calculation_base": "<MISSING>",
+          "fields.salvage_disposition": "<MISSING>",
+          "review_parameters.PS_SALVAGE_DISPOSITION.value": "NOT_APPLICABLE"
+        }
+      }
+    }
+  ]
+}

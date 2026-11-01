@@ -1,0 +1,52 @@
+PASS P01   PARTIAL_DAMAGE               payable=90.00 m-toman
+PASS P02   PARTIAL_DAMAGE               payable=184.00 m-toman
+PASS P03   PARTIAL_DAMAGE               payable=272.00 m-toman
+PASS P04   PARTIAL_DAMAGE               payable=342.50 m-toman
+PASS P05   PARTIAL_DAMAGE               payable=420.00 m-toman
+PASS P06   PARTIAL_DAMAGE               payable=480.00 m-toman
+PASS P07   PARTIAL_DAMAGE               payable=64.00 m-toman
+PASS P08   PARTIAL_DAMAGE               payable=18.00 m-toman
+PASS P09   PARTIAL_DAMAGE               payable=45.00 m-toman
+PASS P10   PARTIAL_DAMAGE               payable=n/a scenarios=245.00 m-toman,255.00 m-toman status=ORDER_UNRESOLVED
+PASS P11   PARTIAL_DAMAGE               payable=n/a scenarios=195.00 m-toman,220.00 m-toman status=ORDER_UNRESOLVED
+PASS P12   PARTIAL_DAMAGE               payable=220.00 m-toman
+PASS P13   PARTIAL_DAMAGE               payable=0.00 m-toman
+PASS P14   PARTIAL_DAMAGE               payable=n/a status=ENDORSEMENT_TERMS_REQUIRED
+PASS P15   PARTIAL_DAMAGE               payable=0.00 m-toman
+PASS T16   TOTAL_LOSS                   payable=1,650.00 m-toman
+PASS T17   TOTAL_LOSS_TEST              payable=n/a status=CLASSIFICATION_CONFLICT
+PASS T18   TOTAL_LOSS                   payable=1,630.00 m-toman
+PASS T19   TOTAL_LOSS                   payable=1,930.00 m-toman
+PASS T20   TOTAL_LOSS                   payable=1,620.00 m-toman
+PASS T21   TOTAL_LOSS                   payable=1,920.00 m-toman
+PASS T22   TOTAL_THEFT                  payable=n/a status=60_DAY_TOTAL_LOSS_CRITERION_NOT_MET
+PASS T23   TOTAL_THEFT                  payable=1,620.00 m-toman
+PASS G24   GLASS_ONLY                   payable=40.00 m-toman
+PASS G25   GLASS_ONLY                   payable=0.00 m-toman
+PASS G26   PARTIAL_DAMAGE               payable=45.00 m-toman
+PASS G27   GLASS_ONLY                   payable=n/a scenarios=60.00 m-toman,64.00 m-toman status=ENDORSEMENT_AND_ORDER_REQUIRED
+PASS G28   PARTIAL_DAMAGE               payable=52.00 m-toman
+PASS TH29  THEFT                        payable=n/a status=PENDING_60_DAY_CRITERION
+PASS TH30  THEFT                        payable=1,980.00 m-toman
+PASS TH31  THEFT                        payable=45.00 m-toman
+PASS TH32  THEFT                        payable=0.00 m-toman
+PASS TH33  THEFT                        payable=n/a status=ENDORSEMENT_LIMIT_AND_FRANCHISE_REQUIRED
+PASS TP34  THIRD_PARTY_FINANCIAL        payable=60.00 m-toman
+PASS TP35  THIRD_PARTY_FINANCIAL        payable=70.00 m-toman
+PASS TP36  THIRD_PARTY_FINANCIAL        payable=70.00 m-toman
+PASS TP37  THIRD_PARTY_FINANCIAL        payable=n/a status=U06_ARTICLE8_COMPONENT_CATALOGUE
+PASS TP38  THIRD_PARTY_FINANCIAL        payable=30.00 m-toman
+PASS TP39  THIRD_PARTY_FINANCIAL        payable=50.00 m-toman
+PASS A40   ARTICLE_8_NON_CONVENTIONAL   payable=80.00 m-toman
+PASS A41   ARTICLE_8_NON_CONVENTIONAL   payable=180.00 m-toman
+PASS A42   ARTICLE_8_NON_CONVENTIONAL   payable=100.00 m-toman
+PASS A43   ARTICLE_8_NON_CONVENTIONAL   payable=90.00 m-toman
+PASS A44   ARTICLE_8_NON_CONVENTIONAL   payable=200.00 m-toman
+PASS A45   ARTICLE_8_NON_CONVENTIONAL   payable=250.00 m-toman
+PASS A46   ARTICLE_8_NON_CONVENTIONAL   payable=250.00 m-toman
+PASS A47   ARTICLE_8_DUAL_COVERAGE      payable=180.00 m-toman
+PASS A48   ARTICLE_8_DUAL_COVERAGE      payable=180.00 m-toman
+PASS L49   LEGAL_RECOVERY               payable=150.00 m-toman status=INSURER_MAY_PURSUE_RESPONSIBLE_PARTY
+PASS L50   LEGAL_RECOVERY               payable=n/a status=ARTICLE_14_SUBROGATION_IMPAIRMENT_REVIEW
+
+50/50 fixtures passed

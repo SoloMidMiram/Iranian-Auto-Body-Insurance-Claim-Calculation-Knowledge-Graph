@@ -1,0 +1,199 @@
+.........x..........................................FF.................. [ 36%]
+............F.....FF...............F.................................... [ 73%]
+......F.............................................                     [100%]
+================================== FAILURES ===================================
+_ test_shamsi_theft_clock_59_60_61_day_boundaries[60-1403-02-30-None-payable1] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+days = 60, as_of = '1403-02-30', status = None, payable = Decimal('1980')
+
+    @pytest.mark.parametrize(
+        ("days", "as_of", "status", "payable"),
+        [
+            (59, "1403-02-29", "PENDING_60_DAY_CRITERION", None),
+            (60, "1403-02-30", None, D(1980)),
+            (61, "1403-02-31", None, D(1980)),
+        ],
+    )
+    def test_shamsi_theft_clock_59_60_61_day_boundaries(
+        kb, days, as_of, status, payable
+    ):
+        result = compute(
+            _whole_theft_with_clock(start="1403-01-01", as_of=as_of, days=days),
+            kb,
+        )
+        assert result.fields["theft_clock"]["derived_days"] == days
+>       assert result.status == status
+E       AssertionError: assert 'SALVAGE_DISPOSITION_UNRESOLVED' == None
+E        +  where 'SALVAGE_DISPOSITION_UNRESOLVED' = CalcResult(branch='THEFT', variant=None, domain='BODY', claim_id='engine-test', unit='IRR', payable=None, payable_scen...: 'sha256:fa2e9f0c67403b2080eb1be59ddb8aa936c6946dbe2cf2b840d95c0a957cd384', 'issued_at': '2026-11-01T02:00:13+00:00'}).status
+
+tests\test_engine.py:533: AssertionError
+_ test_shamsi_theft_clock_59_60_61_day_boundaries[61-1403-02-31-None-payable2] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+days = 61, as_of = '1403-02-31', status = None, payable = Decimal('1980')
+
+    @pytest.mark.parametrize(
+        ("days", "as_of", "status", "payable"),
+        [
+            (59, "1403-02-29", "PENDING_60_DAY_CRITERION", None),
+            (60, "1403-02-30", None, D(1980)),
+            (61, "1403-02-31", None, D(1980)),
+        ],
+    )
+    def test_shamsi_theft_clock_59_60_61_day_boundaries(
+        kb, days, as_of, status, payable
+    ):
+        result = compute(
+            _whole_theft_with_clock(start="1403-01-01", as_of=as_of, days=days),
+            kb,
+        )
+        assert result.fields["theft_clock"]["derived_days"] == days
+>       assert result.status == status
+E       AssertionError: assert 'SALVAGE_DISPOSITION_UNRESOLVED' == None
+E        +  where 'SALVAGE_DISPOSITION_UNRESOLVED' = CalcResult(branch='THEFT', variant=None, domain='BODY', claim_id='engine-test', unit='IRR', payable=None, payable_scen...: 'sha256:3e272adc2fc7cdc82d570614b36bf1dd25bcbb5f825d0b0d6b001c0ff4011b74', 'issued_at': '2026-11-01T02:00:14+00:00'}).status
+
+tests\test_engine.py:533: AssertionError
+____ test_body_settlement_without_franchise_terms_blocks_on_u02[payload3] _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 65, 'market': 2000, 'insured': 2000, ...}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            _case("PARTIAL_DAMAGE", gross=100),
+            _case("TOTAL_LOSS", market=2000, insured=2000, repair=1600, salvage=100),
+            _case("GLASS_ONLY", glass_endorsement=True, gross=100),
+            _case(
+                "THEFT",
+                theft_type="WHOLE_VEHICLE",
+                days_missing=65,
+                market=2000,
+                insured=2000,
+                title_transferred=True,
+            ),
+        ],
+    )
+    def test_body_settlement_without_franchise_terms_blocks_on_u02(kb, payload):
+        result = compute(payload, kb)
+        assert result.payable is None
+        assert result.payable_scenarios == []
+>       assert result.status == "FRANCHISE_TERMS_REQUIRED"
+E       AssertionError: assert 'SALVAGE_DISP...ON_UNRESOLVED' == 'FRANCHISE_TERMS_REQUIRED'
+E         
+E         - FRANCHISE_TERMS_REQUIRED
+E         + SALVAGE_DISPOSITION_UNRESOLVED
+
+tests\test_engine.py:1011: AssertionError
+________ test_total_loss_one_rial_above_75_percent_matches_and_settles ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+
+    def test_total_loss_one_rial_above_75_percent_matches_and_settles(kb):
+        result = compute(
+            _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10), kb
+        )
+        classification = result.fields["classification"]
+>       assert result.payable == D(90)
+E       AssertionError: assert None == Decimal('90')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='engine-test', unit='IRR', payable=None, payable...: 'sha256:2735a58b7e728e6c38c1a5202241a3b8e065a6076e8a0080be7a501056b2d6a5', 'issued_at': '2026-11-01T02:00:15+00:00'}).payable
+E        +  and   Decimal('90') = D(90)
+
+tests\test_engine.py:1088: AssertionError
+________ test_total_loss_threshold_counts_repair_and_rescue_components ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+
+    def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
+        result = compute(
+            _case(
+                "TOTAL_LOSS",
+                market=100,
+                insured=100,
+                repair=70,
+                rescue_for_threshold=6,
+                franchise=10,
+            ),
+            kb,
+        )
+>       assert result.payable == D(90)
+E       AssertionError: assert None == Decimal('90')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='engine-test', unit='IRR', payable=None, payable...: 'sha256:a0969269f42985d117dd8a745cecf39b029ef17b2b3f324862960fdae916357a', 'issued_at': '2026-11-01T02:00:15+00:00'}).payable
+E        +  and   Decimal('90') = D(90)
+
+tests\test_engine.py:1106: AssertionError
+_ test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+
+    def test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands(
+        kb,
+    ):
+        payload = _case(
+            "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10
+        )
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "destructive inspection made repair estimate unavailable",
+            "source": "review-board-record-2026-41",
+            "timestamp": "2026-10-02T04:00:00Z",
+        }
+        result = compute(payload, kb)
+        classification = result.fields["classification"]
+>       assert result.payable == D(90)
+E       AssertionError: assert None == Decimal('90')
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='engine-test', unit='IRR', payable=None, payable...: 'sha256:60970556626351f9365680f0a9d3eba151cfb38d67cde653efa14d8ac6c93fd3', 'issued_at': '2026-11-01T02:00:15+00:00'}).payable
+E        +  and   Decimal('90') = D(90)
+
+tests\test_engine.py:1363: AssertionError
+____ test_a_complete_sourced_theft_clock_reaches_the_engine_through_review ____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x000002278BCEB6D0>
+
+    def test_a_complete_sourced_theft_clock_reaches_the_engine_through_review(kb):
+        payload = load("review_t2_theft_pending.json")
+        payload["answers"].update(
+            {
+                "Q-S2-08": 60,
+                "Q-S2-09": "CONSISTENT",
+                "Q-S2-10": "THEFT_OCCURRENCE",
+                "Q-S2-11": "1404-04-20",
+                "Q-S2-12": "1404-06-18",
+                "Q-S2-13": "SHAMSI",
+                "Q-S2-14": "police non-discovery enquiry, file 1404/123, dated 1404-06-18",
+                "Q-S4-06": "TRANSFERRED",
+            }
+        )
+        payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+        review = Review(payload, kb)
+    
+        assert "U13_THEFT_CLOCK_ANCHOR" not in review.open_uncertainties()
+        assert review.decision()["decision"] == DECISION_COMPUTE
+        assert review.case_payload()["event"]["theft_clock"] == {
+            "start_event": "THEFT_OCCURRENCE",
+            "start_date": "1404-04-20",
+            "as_of_date": "1404-06-18",
+            "calendar": "SHAMSI",
+            "source": "police non-discovery enquiry, file 1404/123, dated 1404-06-18",
+        }
+    
+        result = review.calculate()
+        assert result is not None
+        assert result.route == "THEFT_TOTAL_SETTLEMENT"
+        assert result.fields["theft_clock"]["derived_days"] == 60
+>       assert result.payable == Decimal(7200000000)
+E       AssertionError: assert None == Decimal('7200000000')
+E        +  where None = CalcResult(branch='THEFT', variant=None, domain='BODY', claim_id='REVIEW-T2-THEFT-PENDING', unit='IRR', payable=None, ...: 'sha256:acf4d1386c7d2e20a4fa1baf088d824a051c44a50d675a03a03bb41762674369', 'issued_at': '2026-11-01T02:00:15+00:00'}).payable
+E        +  and   Decimal('7200000000') = Decimal(7200000000)
+
+tests\test_review.py:506: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_engine.py::test_shamsi_theft_clock_59_60_61_day_boundaries[60-1403-02-30-None-payable1]
+FAILED tests/test_engine.py::test_shamsi_theft_clock_59_60_61_day_boundaries[61-1403-02-31-None-payable2]
+FAILED tests/test_engine.py::test_body_settlement_without_franchise_terms_blocks_on_u02[payload3]
+FAILED tests/test_engine.py::test_total_loss_one_rial_above_75_percent_matches_and_settles
+FAILED tests/test_engine.py::test_total_loss_threshold_counts_repair_and_rescue_components
+FAILED tests/test_engine.py::test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands
+FAILED tests/test_review.py::test_a_complete_sourced_theft_clock_reaches_the_engine_through_review
