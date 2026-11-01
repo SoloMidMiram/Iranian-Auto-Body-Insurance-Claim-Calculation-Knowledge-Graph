@@ -153,7 +153,7 @@ MUTATIONS = (
     Mutation(
         "M31",
         "src/iran_auto_claim/engine.py",
-        "if not case.title_transferred:\n            raise guards.GuardViolation(",
+        'if not case.title_transferred or case.evidence.get("EVT_TITLE_TRANSFER_PROOF") is not True:\n            raise guards.GuardViolation(',
         "if False:\n            raise guards.GuardViolation(",
         "an incomplete title transfer can use the insurer-title no-salvage route",
     ),
@@ -169,10 +169,27 @@ MUTATIONS += (
              "missing retained salvage valuation bypasses its explicit guard"),
 )
 
+# M34 is retired: the full applicability gate independently validates identity.
+# M35 mutates the controlling applicability gate with an identified but unbound term.
 MUTATIONS += (
-    Mutation("M34", "src/iran_auto_claim/engine.py",
-             "if gap := franchise_identity_gap(spec):", "if False:",
-             "a positive monetary franchise bypasses source identity/version validation"),
+    Mutation("M35", "src/iran_auto_claim/engine.py",
+             'if gap := franchise_applicability_gap(spec, case.policy, case.event.get("event_date"), res.branch):',
+             "if False:", "an identified but inapplicable monetary franchise can pay"),
+    Mutation("M36", "src/iran_auto_claim/engine.py", "and order_gap is None", "and True",
+             "a questionnaire/configuration order token replaces applicable authority"),
+    Mutation("M37", "src/iran_auto_claim/engine.py",
+             'or case.evidence.get("EVT_TITLE_TRANSFER_PROOF") is not True', "or False",
+             "claimed completed transfer pays without supporting proof"),
+    Mutation("M38", "src/iran_auto_claim/engine.py",
+             'if case.evidence.get("EVT_SALVAGE_VALUATION") is not True:', "if False:",
+             "an explicit retained valuation pays without supporting evidence"),
+    Mutation("M39", "src/iran_auto_claim/review.py",
+             "if isinstance(franchise, dict) and franchise_applicability_gap(",
+             "if False and franchise_applicability_gap(",
+             "Review authorizes an unverified franchise scenario despite authority gap"),
+    Mutation("M40", "src/iran_auto_claim/review.py",
+             "if key in declared_terms and declared_terms[key] != value:", "if False:",
+             "conflicting policy/endorsement terms are silently merged"),
 )
 
 THRESHOLD = 90.0

@@ -15,6 +15,7 @@ import pytest
 
 from iran_auto_claim.admission import _internal_test_direct_authorize
 from iran_auto_claim.engine import compute
+from iran_auto_claim.fixtures import _with_synthetic_authority
 from iran_auto_claim.review import Review
 from iran_auto_claim.schema_input import InputSchemaError
 
@@ -36,11 +37,12 @@ def _assert_review_does_not_pay(payload: dict, kb) -> None:
 
 
 def _total_loss_direct_case() -> dict:
-    return {
+    return _with_synthetic_authority({
         "claim_id": "stage0-ia14-total",
         "unit": "IRR",
         "classification": {"branch": "TOTAL_LOSS"},
         "event": {"event_date": "1405-01-01"},
+        "evidence": {"EVT_SALVAGE_VALUATION": True},
         "coverage_gate": {"causal_relationship_established": True},
         "vehicle": {
             "market_value_at_event_irr": 2000,
@@ -61,7 +63,7 @@ def _total_loss_direct_case() -> dict:
                 "source_version": "STAGE0-v1",
             },
         },
-    }
+    })
 
 
 def test_stage0_control_supported_review_path_remains_collectable(kb):

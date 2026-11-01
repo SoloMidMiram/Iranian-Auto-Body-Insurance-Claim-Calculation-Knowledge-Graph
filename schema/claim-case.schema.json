@@ -797,16 +797,12 @@
       "additionalProperties": false,
       "properties": {
         "insurer": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string",
+          "minLength": 1
         },
         "policy_version": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string",
+          "minLength": 1
         },
         "third_party_financial_limit_irr": {
           "type": [
@@ -939,6 +935,78 @@
                 "string",
                 "null"
               ]
+            },
+            "authority": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_reference": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "insurer": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "product": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "policy_reference": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_until": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "clause_locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "reviewer": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "document_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "source_status": {
+                  "enum": [
+                    "VERIFIED",
+                    "UNRESOLVED",
+                    "SYNTHETIC_TEST"
+                  ]
+                },
+                "governs_contract": {
+                  "type": "boolean"
+                },
+                "coverage": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "PARTIAL_DAMAGE",
+                      "TOTAL_LOSS",
+                      "GLASS_ONLY",
+                      "THEFT"
+                    ]
+                  },
+                  "uniqueItems": true
+                },
+                "terms": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
             }
           },
           "allOf": [
@@ -968,6 +1036,24 @@
                 }
               }
             }
+          ]
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_date": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_kind": {
+          "enum": [
+            "INSURANCE_CONTRACT",
+            "SYNTHETIC_TEST"
           ]
         }
       }
@@ -1088,6 +1174,78 @@
             "COMPONENT",
             "WHOLE_CAR_RATIO"
           ]
+        },
+        "article10_order_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_reference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "insurer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "product": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policy_reference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "effective_from": {
+              "type": "string",
+              "minLength": 1
+            },
+            "effective_until": {
+              "type": "string",
+              "minLength": 1
+            },
+            "clause_locator": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "document_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "source_status": {
+              "enum": [
+                "VERIFIED",
+                "UNRESOLVED",
+                "SYNTHETIC_TEST"
+              ]
+            },
+            "governs_contract": {
+              "type": "boolean"
+            },
+            "coverage": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "PARTIAL_DAMAGE",
+                  "TOTAL_LOSS",
+                  "GLASS_ONLY",
+                  "THEFT"
+                ]
+              },
+              "uniqueItems": true
+            },
+            "terms": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
         }
       }
     },

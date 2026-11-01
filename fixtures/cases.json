@@ -12,6 +12,13 @@
   "unit": "IRR",
   "note": "Synthetic fixtures, not customer records. Every monetary input and expected amount is integer IRR; ratios, rates, years, and day counts are dimensionless. The fixture harness normalizes each legacy scalar franchise into a versioned synthetic policy term before calling the public engine boundary. The shared body-admission facts below are explicit positive-control facts, not production defaults. Null payables preserve unresolved or blocked outcomes.",
   "shared_body_admission_facts": {
+    "evidence": {
+      "EVT_SALVAGE_VALUATION": true,
+      "EVT_TITLE_TRANSFER_PROOF": true
+    },
+    "event": {
+      "event_date": "1405-01-01"
+    },
     "coverage_gate": {
       "causal_relationship_established": true
     },

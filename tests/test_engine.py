@@ -57,7 +57,13 @@ def _build_case(branch=None, *, default_missing_rescue: bool, **inputs):
     ):
         inputs.setdefault("salvage_disposition", "INSURED_RETAINS")
     franchise = inputs.pop("franchise", None)
-    payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs}
+    payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs,
+               "event": {"event_date": "1405-01-01"}}
+    payload["evidence"] = {}
+    if any(inputs.get(key) is not None for key in ("salvage", "salvage_value", "salvage_value_irr")):
+        payload["evidence"]["EVT_SALVAGE_VALUATION"] = True
+    if inputs.get("title_transferred") is True:
+        payload["evidence"]["EVT_TITLE_TRANSFER_PROOF"] = True
     if franchise is not None:
         payload["policy"] = {
             "policy_version": "TEST-v1",
@@ -320,6 +326,7 @@ def test_missing_market_value_alongside_an_insured_sum_is_an_input_error(kb):
 def test_missing_both_article10_value_anchors_does_not_default_ratio_to_one(kb):
     payload = {
         "claim_id": "missing-economic-anchors",
+        "event": {"event_date": "1405-01-01"},
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE"},
         "damage": {"gross": 100, "depreciation": 0},
@@ -901,6 +908,7 @@ def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_
     payload = _total_loss_with_percentage_franchise(calculation_base)
     payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
     payload["damage"]["title_transferred"] = True
+    payload["evidence"]["EVT_TITLE_TRANSFER_PROOF"] = True
     result = compute(payload, kb)
 
     assert result.fields["salvage_deduction"] == D(0)

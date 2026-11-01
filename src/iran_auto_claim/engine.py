@@ -34,7 +34,7 @@ from .admission import (
     CalculationAuthorization,
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
-from .authority import franchise_identity_gap
+from .authority import applicability_gap, franchise_applicability_gap, franchise_identity_gap
 from .classify import ClassificationEvidenceRequired, classify
 from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
@@ -382,6 +382,15 @@ def _resolve_franchise(
             status="FRANCHISE_AUTHORITY_REQUIRED",
         )
 
+    if gap := franchise_applicability_gap(spec, case.policy, case.event.get("event_date"), res.branch):
+        res.fields["franchise_authority_gap"] = gap
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES", gap,
+            status="FRANCHISE_AUTHORITY_REQUIRED",
+        )
+    res.fields["franchise_authority_source_status"] = spec["authority"]["source_status"]
+    res.fields["franchise_authority"] = dict(spec["authority"])
+
     def _dec(value: Any) -> Decimal | None:
         return None if value is None else money.D(value)
 
@@ -688,7 +697,14 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
         return
 
     sequence = named_sequence(branch_plan, order)
-    if sequence and RATIO in sequence and FRANCHISE in sequence:
+    order_gap = applicability_gap(
+        case.config.get("article10_order_authority"), case.policy,
+        case.event.get("event_date"), "PARTIAL_DAMAGE",
+        {"article10_partial_order": order},
+    )
+    res.fields["article10_order_authority_gap"] = order_gap
+    if sequence and RATIO in sequence and FRANCHISE in sequence and order_gap is None:
+        res.fields["article10_order_authority"] = dict(case.config["article10_order_authority"])
         res.fields["order_used"] = order
         sequence = _activate_body_plan(res, "PARTIAL_DAMAGE", branch_plan, sequence)
         res.payable = graph_partial_payable(
@@ -710,6 +726,7 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
     res.payable_scenarios = scenario_amounts
     res.payable = None
     res.status = "ORDER_UNRESOLVED"
+    res.reason = "supply applicable legal or contractual authority establishing the operator sequence; " + (order_gap or "the selected order is unresolved")
     res.fields["order_used"] = UNRESOLVED_ORDER
     res.block("U01_ARTICLE10_PARTIAL_ORDER")
     res.label("ORDER_UNRESOLVED")
@@ -754,7 +771,7 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
 
     res.require_guard("G_SALVAGE_XOR_TITLE_TRANSFER")
     if disposition == "INSURER_TAKES_TITLE":
-        if not case.title_transferred:
+        if not case.title_transferred or case.evidence.get("EVT_TITLE_TRANSFER_PROOF") is not True:
             raise guards.GuardViolation(
                 "G_SALVAGE_XOR_TITLE_TRANSFER",
                 (
@@ -775,6 +792,12 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
                 "G_SALVAGE_XOR_TITLE_TRANSFER",
                 "retained salvage requires an established valuation; absence is not zero",
                 "SALVAGE_VALUE_REQUIRED",
+            )
+        if case.evidence.get("EVT_SALVAGE_VALUATION") is not True:
+            raise guards.GuardViolation(
+                "G_SALVAGE_XOR_TITLE_TRANSFER",
+                "retained salvage valuation requires supporting assessment evidence",
+                "SALVAGE_VALUATION_EVIDENCE_REQUIRED",
             )
         salvage_to_deduct = case.salvage
         after_salvage = base - salvage_to_deduct

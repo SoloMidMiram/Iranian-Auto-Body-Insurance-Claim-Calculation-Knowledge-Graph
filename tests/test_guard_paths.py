@@ -60,6 +60,11 @@ def compute(payload, kb):
             {"state": "NO", "prior_compensation": 0},
         )
     damage = payload.setdefault("damage", {})
+    evidence = payload.setdefault("evidence", {})
+    if any(damage.get(key) is not None for key in ("salvage", "salvage_value")):
+        evidence["EVT_SALVAGE_VALUATION"] = True
+    if damage.get("title_transferred") is True:
+        evidence["EVT_TITLE_TRANSFER_PROOF"] = True
     if any(key in damage for key in ("repair", "repair_total", "repair_total_irr")) and not any(
         key in damage
         for key in (

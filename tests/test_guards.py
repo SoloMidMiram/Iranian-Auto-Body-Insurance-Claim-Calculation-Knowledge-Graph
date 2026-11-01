@@ -39,10 +39,16 @@ def _case(branch: str, **inputs):
     franchise = inputs.pop("franchise", None)
     payload = {
         "claim_id": "guard-test",
+        "event": {"event_date": "1405-01-01"},
         "unit": "IRR",
         "classification": {"branch": branch},
         "damage": inputs,
     }
+    payload["evidence"] = {}
+    if any(inputs.get(key) is not None for key in ("salvage", "salvage_value")):
+        payload["evidence"]["EVT_SALVAGE_VALUATION"] = True
+    if inputs.get("title_transferred") is True:
+        payload["evidence"]["EVT_TITLE_TRANSFER_PROOF"] = True
     if franchise is not None:
         payload["policy"] = {
             "policy_version": "TEST-v1",

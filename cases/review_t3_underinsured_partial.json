@@ -76,7 +76,30 @@
     },
     "Q-S6-04": {
       "claim_sequence_rule": "first claim",
-      "source_version": "1403"
+      "source_version": "1403",
+      "authority": {
+        "source_reference": "policy schedule 1403, franchise clause",
+        "source_version": "1403",
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "policy schedule 1403, franchise clause",
+        "coverage": [
+          "PARTIAL_DAMAGE"
+        ],
+        "effective_from": "1300-01-01",
+        "effective_until": "1500-12-29",
+        "source_status": "SYNTHETIC_TEST",
+        "governs_contract": true,
+        "reviewer": "software fixture author; no qualified domain approval",
+        "clause_locator": "explicit synthetic franchise assumption",
+        "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+        "terms": {
+          "mode": "PERCENT",
+          "rate": 0.1,
+          "calculation_base": "AFTER_DEPRECIATION",
+          "claim_sequence_rule": "first claim"
+        }
+      }
     },
     "Q-S6-05": "NO",
     "Q-S7-01": "NO_BODY_ONLY",
@@ -87,5 +110,12 @@
     "Q-S9-02": "IDENTIFIED_INSURED",
     "Q-S9-03": 0,
     "Q-S10-01": "adjuster: reviewer-02, both scenarios put to the claims department 1404-06-01"
+  },
+  "contract_context": {
+    "insurer": "SYNTHETIC_INSURER",
+    "product": "SYNTHETIC_BODY",
+    "policy_reference": "policy schedule 1403, franchise clause",
+    "policy_date": "1404-05-11",
+    "contract_kind": "SYNTHETIC_TEST"
   }
 }

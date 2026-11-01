@@ -399,6 +399,8 @@ def main() -> int:
     # AFTER_SALVAGE is a genuinely different typed base when salvage is retained.
     total = {
         "claim_id": "total-loss-franchise-base-probe",
+        "event": {"event_date": "1405-01-01"},
+        "evidence": {"EVT_SALVAGE_VALUATION": True, "EVT_TITLE_TRANSFER_PROOF": True},
         "unit": "IRR",
         "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
         "coverage_gate": {"causal_relationship_established": True},
@@ -464,6 +466,41 @@ def main() -> int:
     authority_result = compute(_authorize_fixture_case(unversioned_franchise, kb), kb)
     assert authority_result.payable is None
     assert authority_result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+
+    from iran_auto_claim.admission import _internal_test_direct_authorize
+    identified_unbound = copy.deepcopy(total)
+    identified_result = compute(_internal_test_direct_authorize(
+        identified_unbound, purpose="IDENTIFIED_BUT_UNBOUND_AUTHORITY_MUTANT"), kb)
+    assert identified_result.payable is None
+    assert identified_result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+
+    unproved_title = copy.deepcopy(total)
+    unproved_title["damage"].update(salvage_disposition="INSURER_TAKES_TITLE", title_transferred=True)
+    unproved_title["evidence"].pop("EVT_TITLE_TRANSFER_PROOF")
+    assert compute(_authorize_fixture_case(unproved_title, kb), kb).status == "TITLE_TRANSFER_REQUIRED"
+    unproved_value = copy.deepcopy(total)
+    unproved_value["evidence"].pop("EVT_SALVAGE_VALUATION")
+    assert compute(_authorize_fixture_case(unproved_value, kb), kb).status == "SALVAGE_VALUATION_EVIDENCE_REQUIRED"
+
+    ordering_case = copy.deepcopy(total)
+    ordering_case["classification"]["branch"] = "PARTIAL_DAMAGE"
+    ordering_case["damage"] = {"gross": 1000, "depreciation": 0, "repair": 1000,
+                              "market": 10000, "insured": 8000, "rescue_for_threshold": 0}
+    ordering_case["policy"]["franchise"] = {"mode": "ABSOLUTE", "absolute_irr": 100,
+                                           "source": "POLICY", "source_reference": "synthetic order control",
+                                           "source_version": "TEST-v1"}
+    ordering_case["calculation_config"] = {"article10_partial_order": "AFTER_DEPRECIATION_BEFORE_FRANCHISE"}
+    ordering_result = compute(_authorize_fixture_case(ordering_case, kb), kb)
+    assert ordering_result.payable is None
+    assert ordering_result.payable_scenarios == [Decimal(700), Decimal(720)]
+
+    authority_review = json.loads((Path(__file__).resolve().parents[1] / "cases" / "review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+    invalid_scope_review = copy.deepcopy(authority_review)
+    invalid_scope_review["answers"]["Q-S6-04"]["authority"]["insurer"] = "WRONG_INSURER"
+    assert Review(invalid_scope_review, kb).decision()["decision"] == "INSUFFICIENT_INFORMATION"
+    conflicting_terms_review = copy.deepcopy(authority_review)
+    conflicting_terms_review["answers"]["Q-S6-02"]["rate"] = 0.2
+    assert "FRANCHISE_TERMS_CONFLICT" in Review(conflicting_terms_review, kb).decision()["blocking_conditions"]
 
     # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
     # year; a permissive month-12 check would change theft eligibility.

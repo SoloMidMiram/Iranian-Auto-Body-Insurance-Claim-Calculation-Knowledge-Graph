@@ -490,6 +490,20 @@ def _claim_issues(payload: Any) -> list[SchemaIssue]:
 
     for group in _CLAIM_MONEY_ALIAS_GROUPS:
         _check_alias_group(payload, group, issues)
+    for paths in (
+        ("vehicle.salvage_disposition", "damage.salvage_disposition"),
+        ("vehicle.title_transferred", "vehicle.title_transferred_to_insurer", "damage.title_transferred"),
+    ):
+        present = [(path, _path_value(payload, path)) for path in paths]
+        present = [(path, value) for path, value in present if value is not None]
+        if present and any(value != present[0][1] for _, value in present[1:]):
+            issues.append(SchemaIssue(CODE_CONFLICT, present[-1][0],
+                                      f"settlement evidence conflicts with {present[0][0]}"))
+    if isinstance(damage.get("franchise"), (int, float)):
+        policy_spec = (payload.get("policy") or {}).get("franchise")
+        if isinstance(policy_spec, dict):
+            issues.append(SchemaIssue(CODE_CONFLICT, "damage.franchise",
+                                      "multiple franchise declarations require an explicit resolved contractual term"))
     actual_rescue = next(
         (
             damage.get(name)

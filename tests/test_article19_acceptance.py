@@ -50,6 +50,8 @@ def test_direct_title_route(kb, transferred):
     payload["vehicle"].update(salvage_disposition="INSURER_TAKES_TITLE", salvage_value_irr=300)
     if transferred is not None:
         payload["vehicle"]["title_transferred"] = transferred
+    if transferred is True:
+        payload["evidence"]["EVT_TITLE_TRANSFER_PROOF"] = True
     result = direct(payload, kb)
     if transferred is True:
         assert result.payable == 1900
@@ -85,9 +87,10 @@ def test_review_completed_title_without_proof_cannot_authorize(kb):
 
 
 def test_review_evidenced_zero_salvage_preserves_supported_route(kb):
+    from contract_assumptions import with_review_contract
     payload = json.loads((Path(__file__).parents[1] / "cases/inspection-c63-retains-after-salvage.json").read_text())
     payload["answers"]["Q-S4-08"] = 0
     assert "EVT_SALVAGE_VALUATION" in payload["evidence_present"]
-    result = Review(payload, kb).calculate()
+    result = Review(with_review_contract(payload, kb), kb).calculate()
     assert result is not None and result.payable is not None
     assert result.fields["salvage_deduction"] == 0

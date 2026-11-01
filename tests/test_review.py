@@ -40,6 +40,7 @@ def load(name: str) -> dict:
 
 
 def insurer_title_total_loss_review(title_answer: str | None) -> dict:
+    from contract_assumptions import with_review_contract
     payload = load("review_t1_fullcover_partial.json")
     payload["answers"]["Q-S4-03"][0]["assessed_loss"] = 6500000000
     payload["answers"]["Q-S4-08"] = 1000000000
@@ -54,7 +55,7 @@ def insurer_title_total_loss_review(title_answer: str | None) -> dict:
     ]
     for question in ("Q-S6-02", "Q-S6-03"):
         payload["answers"][question]["calculation_base"] = "SETTLEMENT_BASE"
-    return payload
+    return with_review_contract(payload)
 
 
 # --------------------------------------------------------------------- structure

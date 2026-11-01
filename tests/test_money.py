@@ -80,6 +80,7 @@ def test_final_payable_rounds_half_up_once_at_the_engine_boundary(kb):
     result = compute(
         {
             "claim_id": "ROUND-HALF-UP",
+            "event": {"event_date": "1405-01-01"},
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "damage": {"gross": 5, "depreciation": 0, "market": 5, "insured": 5},
@@ -91,6 +92,8 @@ def test_final_payable_rounds_half_up_once_at_the_engine_boundary(kb):
                     "rate": 0.5,
                     "calculation_base": "AFTER_DEPRECIATION",
                     "source": "POLICY",
+                    "source_reference": "synthetic rounding contract",
+                    "source_version": "TEST-v1",
                 }
             },
         },
@@ -104,6 +107,7 @@ def test_scenario_order_survives_irr_rounding_and_json_has_no_decimal_float(kb):
     result = compute(
         {
             "claim_id": "ROUND-SCENARIOS",
+            "event": {"event_date": "1405-01-01"},
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "damage": {"gross": 10, "depreciation": 0, "market": 3, "insured": 1},
@@ -144,6 +148,7 @@ def test_very_large_integer_irr_does_not_overflow(kb):
     result = compute(
         {
             "claim_id": "LARGE-IRR",
+            "event": {"event_date": "1405-01-01"},
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "coverage_gate": {"causal_relationship_established": True},

@@ -34,6 +34,7 @@ from .admission import (
     utc_now,
 )
 from .case import PART_CATEGORIES
+from .authority import applicability_gap, franchise_applicability_gap
 from .classify import classify
 from .dates import CalendarDateError, parse_claim_date
 from .engine import CalcResult, compute, reconcile_classification
@@ -384,7 +385,16 @@ class Review:
 
         if uncertainty_id == "U01_ARTICLE10_PARTIAL_ORDER":
             ratio = slot("PS_UNDERINSURANCE_RATIO")
-            return bool(ratio) and branch in ("PARTIAL_DAMAGE", "GLASS_ONLY") and float(ratio) < 1.0
+            if not (bool(ratio) and branch in ("PARTIAL_DAMAGE", "GLASS_ONLY") and float(ratio) < 1.0):
+                return False
+            order = slot("PS_ARTICLE10_PARTIAL_ORDER")
+            return order not in (
+                "AFTER_DEPRECIATION_BEFORE_FRANCHISE", "AFTER_DEPRECIATION_AND_FRANCHISE"
+            ) or applicability_gap(
+                self.payload.get("article10_order_authority"),
+                self.payload.get("contract_context") or {}, slot("PS_EVENT_DATE"),
+                branch, {"article10_partial_order": order},
+            ) is not None
         if uncertainty_id == "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION":
             parts = [item for item in _as_list(slot("PS_PART_CATEGORY")) if isinstance(item, dict)]
             special = any(
@@ -420,10 +430,11 @@ class Review:
         return branch in (node.get("affects_branches") or [])
 
     def _franchise_complete(self) -> bool:
-        from .authority import franchise_identity_gap
-
         franchise = self._bound.get("PS_FRANCHISE")
-        if franchise_identity_gap(franchise) is not None:
+        if franchise_applicability_gap(
+            franchise, self.payload.get("contract_context") or {},
+            self._bound.get("PS_EVENT_DATE"), self.classification().get("branch"),
+        ) is not None:
             return False
         mode = str(franchise.get("mode") or "").upper()
         if mode in ("", "NOT_STATED"):
@@ -668,6 +679,9 @@ class Review:
         if branch:
             classification["branch"] = branch
         payload["classification"] = classification
+        payload["policy"].update(self.payload.get("contract_context") or {})
+        if "article10_order_authority" in self.payload:
+            payload["calculation_config"]["article10_order_authority"] = self.payload["article10_order_authority"]
         return payload
 
     def _domain(self) -> str | None:
@@ -904,10 +918,23 @@ class Review:
             return []
 
         conditions: list[str] = []
-        from .authority import franchise_identity_gap
-
+        declared_terms: dict[str, Any] = {}
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            answer = self.answer(question)
+            if not isinstance(answer, dict):
+                continue
+            for key, value in answer.items():
+                if key == "authority":
+                    continue
+                if key in declared_terms and declared_terms[key] != value:
+                    if "FRANCHISE_TERMS_CONFLICT" not in conditions:
+                        conditions.append("FRANCHISE_TERMS_CONFLICT")
+                declared_terms[key] = value
         franchise = self._bound.get("PS_FRANCHISE")
-        if isinstance(franchise, dict) and franchise_identity_gap(franchise) is not None:
+        if isinstance(franchise, dict) and franchise_applicability_gap(
+            franchise, self.payload.get("contract_context") or {},
+            self._bound.get("PS_EVENT_DATE"), branch,
+        ) is not None:
             conditions.append("FRANCHISE_AUTHORITY_REQUIRED")
         causation = str(self.answer("Q-S2-02") or "").upper()
         if causation == "ASSERTED_ONLY":
@@ -976,6 +1003,12 @@ class Review:
 
         return {
             "decision": kind,
+            "franchise_authority_gap": (
+                franchise_applicability_gap(
+                    self._bound.get("PS_FRANCHISE"), self.payload.get("contract_context") or {},
+                    self._bound.get("PS_EVENT_DATE"), branch,
+                ) if "FRANCHISE_AUTHORITY_REQUIRED" in blocking_conditions else None
+            ),
             "branch": branch,
             "classification_confidence": classification.get("confidence"),
             "tier": self.tier()["assigned"],
