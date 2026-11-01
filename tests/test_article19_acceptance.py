@@ -74,3 +74,20 @@ def test_review_salvage_requires_supported_route_and_value(kb, disposition, valu
     review = Review(payload, kb)
     assert review.decision()["decision"] not in ("COMPUTE", "SCENARIO_SET")
     assert review.calculate() is None
+
+
+def test_review_completed_title_without_proof_cannot_authorize(kb):
+    payload = json.loads((Path(__file__).parents[1] / "cases/inspection-c62-title-transferred.json").read_text())
+    payload["evidence_present"] = [x for x in payload["evidence_present"] if x != "EVT_TITLE_TRANSFER_PROOF"]
+    review = Review(payload, kb)
+    assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+    assert review.calculate() is None
+
+
+def test_review_evidenced_zero_salvage_preserves_supported_route(kb):
+    payload = json.loads((Path(__file__).parents[1] / "cases/inspection-c63-retains-after-salvage.json").read_text())
+    payload["answers"]["Q-S4-08"] = 0
+    assert "EVT_SALVAGE_VALUATION" in payload["evidence_present"]
+    result = Review(payload, kb).calculate()
+    assert result is not None and result.payable is not None
+    assert result.fields["salvage_deduction"] == 0
