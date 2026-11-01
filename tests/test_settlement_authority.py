@@ -139,6 +139,7 @@ def test_review_and_engine_refuse_unidentifiable_franchise(kb, source, amount, f
     ("effective_until", "1403-12-29"), ("effective_from", "1405-01-01"),
     ("source_status", "UNRESOLVED"), ("governs_contract", False),
     ("source_version", "DIFFERENT-VERSION"),
+    ("terms", {"mode": "ABSOLUTE", "absolute_irr": 999}),
 ])
 def test_franchise_applicability_is_required_at_both_boundaries(kb, field, value):
     from contract_assumptions import with_review_contract
@@ -224,3 +225,18 @@ def test_ratio_one_preserves_arithmetic_without_asserting_universal_order(kb):
     result = direct_result(payload, kb)
     assert result.payable == 900
     assert result.fields["order_used"] == "RATIO_NOT_APPLICABLE"
+
+
+@pytest.mark.parametrize("policy_date", [None, "1404-01-01"])
+def test_event_in_interval_does_not_substitute_for_policy_date_applicability(kb, policy_date):
+    payload = controlled_partial()
+    payload["policy"]["franchise"]["authority"]["effective_from"] = "1404-06-01"
+    if policy_date is None:
+        payload["policy"].pop("policy_date")
+    else:
+        payload["policy"]["policy_date"] = policy_date
+    # The event is inside the interval; the missing/earlier policy date alone
+    # must prevent selection of this instrument.
+    result = direct_result(payload, kb)
+    assert result.payable is None
+    assert result.status == "FRANCHISE_AUTHORITY_REQUIRED"
