@@ -623,9 +623,7 @@ def main() -> int:
             },
         },
         "import_origin": import_origin,
-        "import_origin_relative": str(
-            Path(import_origin).resolve().relative_to(root)
-        ),
+        "import_origin_relative": Path(import_origin).resolve().relative_to(root).as_posix(),
         "provenance_profile": (
             "SUPPORTED_PLUS_INTERNAL" if args.internal else "SUPPORTED_ONLY"
         ),
