@@ -1,0 +1,1155 @@
+{
+  "executed_revision": "3c53e749eba679fa26f7d2a08cc17644b1e1283a",
+  "corpus_observation_revision": "c7602aec98ba0f2a1900401b7ba030ac74b19d18",
+  "qualification": "Author-prepared reconciliation, not independent acceptance. No references changed. UNRESOLVED_DOMAIN_ISSUE includes engineering/interface adjudication, not merely legal ambiguity.",
+  "cases": [
+    {
+      "case_id": "inspection-c101-manual-franchise-unversioned",
+      "historical_comparison": "MATCH",
+      "historical_disposition": "UNCHANGED",
+      "historical_reason": "Original frozen expectations match.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-08"
+        ],
+        "description": "An unversioned insurer-manual rate is accepted as contractual authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c102-glass-endorsement-token-only",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c104-theft-60-59-clock",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "KNOWN_DEVIATION",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "THEFT",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 7200000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-06",
+          "RQ-02"
+        ],
+        "description": "Caller-selected theft clock is treated as accepted authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c105-theft-59-days",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c106-theft-clock-unbound",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c13a-repair-only",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c13b-replaced-but-flag-false",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c13c-repair-only-flag-true",
+      "historical_comparison": "MATCH",
+      "historical_disposition": "UNCHANGED",
+      "historical_reason": "Original frozen expectations match.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c13d-replacement-control",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c21mix-four-kinds",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c31u04-unresolved",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c32u04-cap-then-dep",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c33u04-dep-then-cap",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c34u04-cap-only",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c35q404-battery-new-price",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "KNOWN_DEVIATION",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "review_parameters.PS_PART_NEW_PRICE.status",
+          "expected": "RESOLVED",
+          "actual": "NOT_TRIGGERED",
+          "reason": "operator equals failed"
+        },
+        {
+          "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+          "expected": "RESOLVED",
+          "actual": "NOT_TRIGGERED",
+          "reason": "operator equals failed"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-13"
+        ],
+        "description": "Supported Review never binds the supplied new price or interaction answer.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c41-below-7499",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c42-at-7500",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c43-above-7501",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c44-rescue-crosses-7600",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c45-rescue-omitted",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c46-rescue-explicit-zero",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c47-aggregate-only-rescue",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c48-assessed-depreciation-figure",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "KNOWN_DEVIATION",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "PARTIAL_DAMAGE",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 1432000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "ASSESSED_DEPRECIATION_AMOUNT_MISSING"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "review_parameters.PS_ASSESSED_DEPRECIATION.status",
+          "expected": "UNANSWERED",
+          "actual": "NOT_TRIGGERED",
+          "reason": "operator equals failed"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-13"
+        ],
+        "description": "Declared assessed-figure depreciation is ignored and computed-per-part is substituted.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c61-title-not-transferred",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MISMATCH",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "TITLE_TRANSFER_INCOMPLETE"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-05"
+        ],
+        "description": "Insurer-title settlement pays although title transfer is not completed.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c62-title-transferred",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c63-retains-after-salvage",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c64-retains-settlement-base",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "KNOWN_DEVIATION",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "TOTAL_LOSS",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 6200000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-03_FRANCHISE_BASE_AUTHORITY"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-09",
+          "RQ-03"
+        ],
+        "description": "A pre-salvage franchise base settles without accepted authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c65-retains-salvage-missing",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c66-disposition-unresolved",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MISMATCH",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "SALVAGE_DISPOSITION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c67-disposition-not-applicable",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MISMATCH",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-07_DISPOSITION_SEMANTICS"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-09",
+          "RQ-07"
+        ],
+        "description": "NOT_APPLICABLE silently behaves as insured-retains on physical total loss.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c71-underinsured-unresolved",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c72-underinsured-order-locked",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MISMATCH",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "SCENARIO_SET",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "SCENARIO_SET",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "PARTIAL_DAMAGE",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": null,
+          "actual": "ORDER_UNRESOLVED",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [
+            1396250000,
+            1446875000
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "U01",
+          "RQ-04"
+        ],
+        "description": "A bare selection token is accepted as authority for operator order.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c73-overinsured",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c74-underinsured-total-loss",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c81-risk-intensified-yes",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c82-risk-intensified-unknown",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c83-instalment-overdue",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c84-policy-state-unknown",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c91-prior-full-compensation",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c92-prior-zero-documented",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c93-causation-asserted-only",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c94-event-date-impossible",
+      "historical_comparison": "MATCH",
+      "historical_disposition": "UNCHANGED",
+      "historical_reason": "Original frozen expectations match.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c95-production-year-future",
+      "historical_comparison": "MATCH",
+      "historical_disposition": "UNCHANGED",
+      "historical_reason": "Original frozen expectations match.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c96-conflicting-money-aliases",
+      "historical_comparison": "MATCH",
+      "historical_disposition": "UNCHANGED",
+      "historical_reason": "Original frozen expectations match.",
+      "synthetic_comparison": "MATCH",
+      "synthetic_disposition": "REFERENCE_MATCH",
+      "synthetic_reason": "Original frozen expectation satisfied with explicitly synthetic applicability or preserved negative evidence.",
+      "residual_assertions": [],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c97-late-notice-no-excuse",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "KNOWN_DEVIATION",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "PARTIAL_DAMAGE",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 1432000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-05_NOTICE_ADJUDICATION"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-10",
+          "RQ-05"
+        ],
+        "description": "Late notice is labeled but not adjudicated before payment.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c98-recourse-released",
+      "historical_comparison": "MISMATCH",
+      "historical_disposition": "EXPECTED_CONTAINMENT",
+      "historical_reason": "Missing contract applicability blocks payment and grants; this does not dispose of underlying findings.",
+      "synthetic_comparison": "KNOWN_DEVIATION",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "PARTIAL_DAMAGE",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 1432000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-06_SUBROGATION_ADJUDICATION"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": {
+        "finding_ids": [
+          "IA-10",
+          "RQ-06"
+        ],
+        "description": "Subrogation impairment is labeled but not adjudicated before payment.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "independent_disposition": "PENDING"
+    },
+    {
+      "case_id": "inspection-c99-third-party-split",
+      "historical_comparison": "MATCH",
+      "historical_disposition": "UNCHANGED",
+      "historical_reason": "Original frozen expectations match.",
+      "synthetic_comparison": "MISMATCH",
+      "synthetic_disposition": "UNRESOLVED_DOMAIN_ISSUE",
+      "synthetic_reason": "Contract/interface/reference disposition requires independent review; no new regression or legal conclusion inferred.",
+      "residual_assertions": [
+        {
+          "path": "classification",
+          "expected": "THIRD_PARTY_FINANCIAL",
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "known_implementation_defect": null,
+      "independent_disposition": "PENDING"
+    }
+  ]
+}
