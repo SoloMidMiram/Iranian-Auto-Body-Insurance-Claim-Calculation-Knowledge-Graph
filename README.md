@@ -83,7 +83,7 @@ FILE → INVESTIGATION → CLASSIFICATION → PARAMETER LOCK → DECISION
                                             COMPUTE | SCENARIO_SET | REFUSE | INSUFFICIENT
 ```
 
-* `knowledge/review_procedure.json` — 11 stages, 58 discriminating questions, each
+* `knowledge/review_procedure.json` — 11 stages, 63 discriminating questions, each
   with a closed answer vocabulary, the condition under which it is asked, the
   parameter slots its answer binds, the evidence it demands and the rung it belongs to.
 * `knowledge/parameter_slots.json` — every value a calculation consumes, with who is

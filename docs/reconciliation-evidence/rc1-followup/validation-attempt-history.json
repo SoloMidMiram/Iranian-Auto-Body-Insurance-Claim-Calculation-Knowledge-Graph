@@ -1,0 +1,20 @@
+{
+  "failed_attempts_preserved_locally": [
+    {
+      "attempt": "mixed-line-ending",
+      "revision": "77b5515cb440c8d2c57ca745e2dead63665518ce",
+      "command_exit": 1,
+      "raw_log_sha256": "b060952f6486174bbfdf3e79c0e3c935fddc369871842f6af03e3607951d86bd",
+      "resolution": "Authored files normalized to exact committed content and index refreshed"
+    },
+    {
+      "attempt": "relative-path",
+      "revision": "77b5515cb440c8d2c57ca745e2dead63665518ce",
+      "command_exit": 1,
+      "raw_log_sha256": "b3db642646ab80e9116a743fee694ca1686474ce9daf8757a1e5fce979f50033",
+      "resolution": "249cc69 resolves CLI paths before portable hashing"
+    }
+  ],
+  "accepted_execution_revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+  "no_old_outputs_overwritten": true
+}

@@ -1,0 +1,297 @@
+{
+  "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+  "cases": [
+    {
+      "case": "S03",
+      "reference": {
+        "branch": "PARTIAL_DAMAGE",
+        "payable_irr": 6750
+      },
+      "classification": {
+        "branch": "PARTIAL_DAMAGE",
+        "variant": null,
+        "confidence": 0.85,
+        "basis": [
+          "repair+rescue 7500 against 75% threshold 7500.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+          "no theft, total-loss, glass or third-party signal matched"
+        ]
+      },
+      "review_decision": "COMPUTE",
+      "payable_irr": 6750,
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "input_source": "docs/reconciliation-evidence/exact-s03-s04.json"
+    },
+    {
+      "case": "S04",
+      "reference": {
+        "branch": "TOTAL_LOSS",
+        "payable_irr": 9200
+      },
+      "classification": {
+        "branch": "TOTAL_LOSS",
+        "variant": null,
+        "confidence": 0.97,
+        "basis": [
+          "repair+rescue 7600 against 75% threshold 7500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+        ]
+      },
+      "review_decision": "COMPUTE",
+      "payable_irr": 9200,
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "input_source": "docs/reconciliation-evidence/exact-s03-s04.json"
+    },
+    {
+      "case": "S05",
+      "reference": {
+        "payable_irr": 1600,
+        "payable_scenarios_irr": []
+      },
+      "direct_reference_matches": true,
+      "direct_input_sha256": "f8f03e60adcdfa546d51e72e04f3bbd10d25cab3c7a61806f8fe97a5e24ba4b9",
+      "review_input_sha256": "4537556b0a983f4d68fcd7d73333e0dc35f415d2bd6684690d919b26e5f3fd6f",
+      "direct_status": null,
+      "payable_irr": 1600,
+      "scenarios_irr": [],
+      "review_decision": "COMPUTE",
+      "classification": {
+        "branch": "TOTAL_LOSS",
+        "variant": null,
+        "confidence": 0.97,
+        "basis": [
+          "repair+rescue 1600 against 75% threshold 1500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+        ]
+      },
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_INSURED_SUM_CEILING",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19_TOTAL_LOSS_VALUATION",
+        "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+        "REG53_POLICY_DEFINED_FRANCHISE"
+      ]
+    },
+    {
+      "case": "S06",
+      "reference": {
+        "payable_irr": null,
+        "payable_scenarios_irr": []
+      },
+      "direct_reference_matches": true,
+      "direct_input_sha256": "d3f40c119ce885358c05750c524130970ce09d12abf97a52f496f04322c34726",
+      "review_input_sha256": "15424e31be6d177a8954dd80ba6697f2569126e7c444e6eda65363f5923b9fc2",
+      "direct_status": "TITLE_TRANSFER_REQUIRED",
+      "payable_irr": null,
+      "scenarios_irr": [],
+      "review_decision": "INSUFFICIENT_INFORMATION",
+      "classification": {
+        "branch": "TOTAL_LOSS",
+        "variant": null,
+        "confidence": 0.97,
+        "basis": [
+          "repair+rescue 1600 against 75% threshold 1500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+        ]
+      },
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19_TOTAL_LOSS_VALUATION"
+      ]
+    },
+    {
+      "case": "S07",
+      "reference": {
+        "payable_irr": null,
+        "payable_scenarios_irr": []
+      },
+      "direct_reference_matches": true,
+      "direct_input_sha256": "283c40b6a83855abffa042d700520617903fd6b279bd6e9268d98d608ac6d8a7",
+      "review_input_sha256": "a56ecd36b3239e764dddcb7208f2f38bb8fdb1f5c9d155e7105e2f4a4c95aad4",
+      "direct_status": "SALVAGE_DISPOSITION_UNRESOLVED",
+      "payable_irr": null,
+      "scenarios_irr": [],
+      "review_decision": "INSUFFICIENT_INFORMATION",
+      "classification": {
+        "branch": "TOTAL_LOSS",
+        "variant": null,
+        "confidence": 0.97,
+        "basis": [
+          "repair+rescue 1600 against 75% threshold 1500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+        ]
+      },
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19_TOTAL_LOSS_VALUATION"
+      ]
+    },
+    {
+      "case": "S08",
+      "reference": {
+        "payable_irr": null,
+        "payable_scenarios_irr": []
+      },
+      "direct_reference_matches": true,
+      "direct_input_sha256": "ef234013674a8f97fd90352e19884705a6f9e7ad92ddeba769d035b321220e62",
+      "review_input_sha256": "18c26742df0395971884374f793bca2ce8b427c58eeb946184e00728ac7e7766",
+      "direct_status": "SALVAGE_VALUE_REQUIRED",
+      "payable_irr": null,
+      "scenarios_irr": [],
+      "review_decision": "INSUFFICIENT_INFORMATION",
+      "classification": {
+        "branch": "TOTAL_LOSS",
+        "variant": null,
+        "confidence": 0.97,
+        "basis": [
+          "repair+rescue 1600 against 75% threshold 1500.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+        ]
+      },
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+        "G_SALVAGE_XOR_TITLE_TRANSFER",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19_TOTAL_LOSS_VALUATION"
+      ]
+    },
+    {
+      "case": "S09",
+      "reference": {
+        "payable_irr": null,
+        "payable_scenarios_irr": []
+      },
+      "direct_reference_matches": true,
+      "direct_input_sha256": "5cdf6a5d8bf88dfe5bce2556fb9cb48c7831dfce087ed20130c453abdb9857d2",
+      "review_input_sha256": "e8223f957e17fab658541549260f62b4da5fe7017f8925b117119aa425369475",
+      "direct_status": "FRANCHISE_AUTHORITY_REQUIRED",
+      "payable_irr": null,
+      "scenarios_irr": [],
+      "review_decision": "INSUFFICIENT_INFORMATION",
+      "classification": {
+        "branch": "PARTIAL_DAMAGE",
+        "variant": null,
+        "confidence": 0.85,
+        "basis": [
+          "repair+rescue 1000 against 75% threshold 7500.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+          "no theft, total-loss, glass or third-party signal matched"
+        ]
+      },
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19B_PARTIAL_LOSS_BASE"
+      ]
+    },
+    {
+      "case": "S10",
+      "reference": {
+        "payable_irr": null,
+        "payable_scenarios_irr": [
+          700,
+          720
+        ]
+      },
+      "direct_reference_matches": true,
+      "direct_input_sha256": "2da24cfc2c6545ad1e37cf0ce2a8eef426b28f3539995d8279e8b8ace562ba53",
+      "review_input_sha256": "1c9e3202507eb8f378bbd15af5d6e9eb806a0104ca3d2de839053115d34c5720",
+      "direct_status": "ORDER_UNRESOLVED",
+      "payable_irr": null,
+      "scenarios_irr": [
+        700,
+        720
+      ],
+      "review_decision": "SCENARIO_SET",
+      "classification": {
+        "branch": "PARTIAL_DAMAGE",
+        "variant": null,
+        "confidence": 0.85,
+        "basis": [
+          "repair+rescue 1000 against 75% threshold 7500.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+          "no theft, total-loss, glass or third-party signal matched"
+        ]
+      },
+      "guards_executed": [
+        "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+        "G_RECOVERY_ALLOCATION_CONTAINED",
+        "G_RESCUE_CAP_CEILING",
+        "G_NO_HARDCODED_FRANCHISE_RATE",
+        "G_UNCERTAINTY_MUST_SURFACE"
+      ],
+      "rule_trace": [
+        "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+        "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+        "REG53_ART19B_PARTIAL_LOSS_BASE",
+        "REG53_POLICY_DEFINED_FRANCHISE",
+        "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+      ]
+    }
+  ],
+  "adversarial_probes": [
+    {
+      "probe": "S06_UNPROVED_COMPLETION",
+      "matches": true,
+      "payable_irr": null,
+      "status": "TITLE_TRANSFER_REQUIRED"
+    },
+    {
+      "probe": "S08_UNEVIDENCED_ZERO",
+      "matches": true,
+      "payable_irr": null,
+      "status": "SALVAGE_VALUATION_EVIDENCE_REQUIRED"
+    },
+    {
+      "probe": "S09_IDENTIFIED_NO_APPLICABILITY",
+      "matches": true,
+      "payable_irr": null,
+      "status": "FRANCHISE_AUTHORITY_REQUIRED"
+    }
+  ]
+}

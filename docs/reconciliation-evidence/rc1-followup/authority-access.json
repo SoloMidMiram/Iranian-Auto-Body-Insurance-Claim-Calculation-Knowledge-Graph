@@ -13,5 +13,14 @@
     "mcp__playwright_global__browser_navigate",
     "mcp__playwright_global__browser_snapshot",
     "mcp__playwright_global__browser_evaluate"
-  ]
+  ],
+  "retrieved_on_utc": "2026-11-02",
+  "reviewed_on_local": "2026-11-03",
+  "publisher": "Presidential legal publication portal qavanin.ir; regulation issuer Supreme Insurance Council",
+  "qualified_reviewers": [
+    null,
+    null
+  ],
+  "signed_original_authenticated": false,
+  "reg53_publication_url": "https://qavanin.ir/Law/TreeText/?IDS=12020232825033491345"
 }

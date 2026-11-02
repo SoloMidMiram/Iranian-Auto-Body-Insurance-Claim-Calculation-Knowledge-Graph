@@ -1,0 +1,4226 @@
+{
+  "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+  "independent_acceptance": "PENDING",
+  "cases": [
+    {
+      "case_id": "inspection-c104-theft-60-59-clock",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c104-theft-60-59-clock.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c104-theft-60-59-clock.json",
+      "synthetic_input_sha256": "9eb18393b3f973e20b5b317ef0e5059caa5ce326292363dd67d3dcd38cd061c3",
+      "disposition": "CONTRACT_AUTHORITY_PENDING",
+      "explanation": "Date/event binding is consistent, but the governing clock anchor is unauthenticated. Whole-vehicle theft certification remains blocked.",
+      "finding_ids": [
+        "IA-06",
+        "RQ-02",
+        "U13_THEFT_CLOCK_ANCHOR"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19 theft clause",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "U13_THEFT_CLOCK_ANCHOR"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer procedure undated",
+          "synthetic dates in 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "derive elapsed Shamsi days from declared anchor",
+          "apply >= 60 test"
+        ],
+        "derivation": "Day arithmetic is controlled; the legally applicable clock anchor remains unaccepted.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THEFT",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_THEFT_CLOCK_START_EVENT.value",
+            "operator": "equals",
+            "value": "THEFT_OCCURRENCE"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "THEFT",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 7200000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "KNOWN_DEVIATION",
+      "actual": {
+        "case": "inspection-c104-theft-60-59-clock",
+        "sha256": "9eb18393b3f973e20b5b317ef0e5059caa5ce326292363dd67d3dcd38cd061c3",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "review_branch": "THEFT",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "THEFT",
+          "claim_hash": "sha256:f3c49e8f2d44a62c7de083b79ef4a95bc963f986dc77f6dc719c622ae4c70705",
+          "blocking_conditions": []
+        },
+        "calculation_present": true,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": [],
+        "payable_irr": 7200000000,
+        "payable_scenarios_irr": [],
+        "status": null,
+        "reason": null,
+        "labels": [
+          "DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT",
+          "EVIDENCE_CONFIDENCE_REDUCED",
+          "THEFT",
+          "TITLE_TRANSFERRED_TO_INSURER"
+        ],
+        "fields": {
+          "allowable_rescue_transport": 0,
+          "authorization_live_uncertainties": [],
+          "base_after_salvage": 9000000000,
+          "classification": {
+            "declared_branch": "THEFT",
+            "declared_canonical_branch": "THEFT",
+            "derived_branch": "THEFT",
+            "outcome": "MATCH",
+            "confidence": 0.95,
+            "basis": [
+              "theft_type or days_vehicle_missing present"
+            ],
+            "reason": "declared and evidence-derived branches agree"
+          },
+          "covered_peril_causation_established": true,
+          "days_missing": 60,
+          "execution_plan": [
+            "OP_FRANCHISE",
+            "OP_LIABILITY_CAP_INSURED_SUM"
+          ],
+          "execution_plan_branch": "THEFT",
+          "execution_plan_guards": [
+            "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            "G_NO_HARDCODED_FRANCHISE_RATE",
+            "G_INSURED_SUM_CEILING",
+            "G_UNCERTAINTY_MUST_SURFACE"
+          ],
+          "execution_plan_id": "sha256:e0a373c872d1536315b9b14342391c8c8ba39afa2b8a10e12d5bb5eeb688636c",
+          "franchise": 1800000000,
+          "franchise_authority": {
+            "clause_locator": "explicit synthetic franchise assumption",
+            "coverage": [
+              "THEFT"
+            ],
+            "document_sha256": "e3ad166cd7949c12814bd3eec336de3cb3e6c56592ddf353a449f85fa4e5c6d9",
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "governs_contract": true,
+            "insurer": "SYNTHETIC_INSURER",
+            "policy_reference": "synthetic controlled policy term, 1403 theft franchise",
+            "product": "SYNTHETIC_BODY",
+            "reviewer": "software fixture author; no qualified domain approval",
+            "source_reference": "synthetic controlled policy term, 1403 theft franchise",
+            "source_status": "SYNTHETIC_TEST",
+            "source_version": "1403",
+            "terms": {
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "mode": "PERCENT",
+              "rate": 0.2
+            }
+          },
+          "franchise_authority_source_status": "SYNTHETIC_TEST",
+          "franchise_calculation_base": 9000000000,
+          "franchise_calculation_base_kind": "SETTLEMENT_BASE",
+          "franchise_evidence_needed": "policy/product/version franchise schedule or endorsement",
+          "franchise_mode": "PERCENT",
+          "franchise_source": "POLICY",
+          "franchise_source_version": "1403",
+          "multiple_insurance_state": "NO",
+          "prior_compensation": 0,
+          "rescue_cap": 1800000000,
+          "rescue_cap_base": 9000000000,
+          "rescue_cap_base_kind": "CANDIDATES_EQUIVALENT",
+          "rescue_claimed": null,
+          "rescue_input_kind": "NONE",
+          "rescue_payable_supplied": null,
+          "salvage_deduction": 0,
+          "salvage_disposition": "INSURER_TAKES_TITLE",
+          "settlement_base": 9000000000,
+          "snapshot_id": "BODY@1404/04/20",
+          "snapshot_rule_ids": [
+            "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+            "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+            "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+            "REG53_ART19_INSURER_TAKES_TITLE",
+            "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+            "REG53_ART19_TOTAL_LOSS_VALUATION",
+            "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+            "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+            "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+            "REG53_POLICY_DEFINED_FRANCHISE",
+            "REG53_RESCUE_TRANSPORT_CAP"
+          ],
+          "theft_clock": {
+            "start_event": "THEFT_OCCURRENCE",
+            "start_date": "1404-04-20",
+            "as_of_date": "1404-06-18",
+            "calendar": "SHAMSI",
+            "source": "police non-discovery enquiry dated 1404-06-18",
+            "derived_days": 60
+          },
+          "total_loss_criterion": true
+        },
+        "rule_trace": [
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "REG53_ART19_INSURER_TAKES_TITLE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-04-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-04-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-04-21",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "THEFT",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_THEFT_TYPE": {
+            "status": "RESOLVED",
+            "value": "WHOLE_VEHICLE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_DAYS_MISSING": {
+            "status": "RESOLVED",
+            "value": 60,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_THEFT_CLOCK_START_EVENT": {
+            "status": "RESOLVED",
+            "value": "THEFT_OCCURRENCE",
+            "unit": "enum",
+            "authority": "INSURER_PROCEDURE"
+          },
+          "PS_THEFT_CLOCK_START_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-04-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_THEFT_CLOCK_AS_OF_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-06-18",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_THEFT_CLOCK_CALENDAR": {
+            "status": "RESOLVED",
+            "value": "SHAMSI",
+            "unit": "enum",
+            "authority": "EVENT_FACT"
+          },
+          "PS_THEFT_CLOCK_SOURCE": {
+            "status": "RESOLVED",
+            "value": "police non-discovery enquiry dated 1404-06-18",
+            "unit": "text",
+            "authority": "INSURER_PROCEDURE"
+          },
+          "PS_TITLE_TRANSFERRED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "9000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "9000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.2,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1403 theft franchise",
+              "source_version": "1403",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1403 theft franchise",
+                "source_version": "1403",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1403 theft franchise",
+                "coverage": [
+                  "THEFT"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "e3ad166cd7949c12814bd3eec336de3cb3e6c56592ddf353a449f85fa4e5c6d9",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.2,
+                  "calculation_base": "SETTLEMENT_BASE",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "NOT_DRIVING",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c35q404-battery-new-price",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c35q404-battery-new-price.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c35q404-battery-new-price.json",
+      "synthetic_input_sha256": "8b5145d08d15045178da44dca3796eb3c0c1a5f8deb121ad1e9640b082bc3f53",
+      "disposition": "ENGINEERING_DEFECT_CONFIRMED",
+      "explanation": "Itemised categories failed to trigger price/interaction binding. Corrected; inline prices are not requested twice.",
+      "finding_ids": [
+        "IA-13",
+        "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 3",
+          "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer practice artifact unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "50% new-price cap",
+          "depreciation interaction unresolved"
+        ],
+        "derivation": "No insurer manual or claims-department artifact establishes the interaction order.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE"
+        },
+        "calculation": {
+          "present": true,
+          "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "calculation": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_PART_NEW_PRICE.status",
+            "operator": "equals",
+            "value": "RESOLVED"
+          },
+          {
+            "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+            "operator": "equals",
+            "value": "RESOLVED"
+          }
+        ]
+      },
+      "reference_failures": [],
+      "comparison_verdict": "MATCH",
+      "actual": {
+        "case": "inspection-c35q404-battery-new-price",
+        "sha256": "8b5145d08d15045178da44dca3796eb3c0c1a5f8deb121ad1e9640b082bc3f53",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "review_branch": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE",
+          "claim_hash": "sha256:b3230ff18be3d5684aa8ddccdc01fb2267769f1378db31a801f6779139b1cfea",
+          "blocking_conditions": []
+        },
+        "calculation_present": true,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [],
+        "live_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "calculation_blocking_uncertainties": [
+          "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+        ],
+        "payable_irr": null,
+        "payable_scenarios_irr": [],
+        "status": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+        "reason": null,
+        "labels": [
+          "BLOCKING_UNCERTAINTY_SURFACED",
+          "PARTIAL_DAMAGE"
+        ],
+        "fields": {
+          "authorization_live_uncertainties": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "candidate_scenarios": [
+            "CAP_THEN_DEPRECIATE",
+            "DEPRECIATE_THEN_CAP",
+            "CAP_ONLY"
+          ],
+          "classification": {
+            "declared_branch": "PARTIAL_DAMAGE",
+            "declared_canonical_branch": "PARTIAL_DAMAGE",
+            "derived_branch": "PARTIAL_DAMAGE",
+            "outcome": "MATCH",
+            "confidence": 0.85,
+            "basis": [
+              "repair+rescue 120000000 against 75% threshold 6000000000.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+              "no theft, total-loss, glass or third-party signal matched"
+            ],
+            "reason": "declared and evidence-derived branches agree"
+          },
+          "classification_rescue": 0,
+          "classification_rescue_source": "DERIVED_FROM_ACTUAL_RESCUE",
+          "covered_peril_causation_established": true,
+          "multiple_insurance_state": "NO",
+          "prior_compensation": 0,
+          "snapshot_id": "BODY@1404/08/20",
+          "snapshot_rule_ids": [
+            "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+            "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+            "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+            "REG53_ART19_INSURER_TAKES_TITLE",
+            "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+            "REG53_ART19_TOTAL_LOSS_VALUATION",
+            "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+            "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+            "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+            "REG53_POLICY_DEFINED_FRANCHISE",
+            "REG53_RESCUE_TRANSPORT_CAP"
+          ],
+          "uncertainty_message": "BATTERY is old enough to depreciate and is also subject to the 50%-of-new-price cap; the interaction order is not stated in the text"
+        },
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_PRODUCTION_YEAR": {
+            "status": "RESOLVED",
+            "value": 1395,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_GROSS_DAMAGE": {
+            "status": "RESOLVED",
+            "value": "120000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_LABOR": {
+            "status": "RESOLVED",
+            "value": "0",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_PART_CATEGORY": {
+            "status": "RESOLVED",
+            "value": [
+              {
+                "assessed_loss": 120000000,
+                "category": "BATTERY",
+                "name": "battery",
+                "new_price_irr": 200000000
+              }
+            ],
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_PART_NEW_PRICE": {
+            "status": "RESOLVED",
+            "value": "200000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_ASSESSED_DEPRECIATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "0",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "120000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "PARTIAL_DAMAGE"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "AFTER_DEPRECIATION",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_GLASS_CAUSE_PRECEDENCE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "POLICY"
+          },
+          "PS_ARTICLE10_PARTIAL_ORDER": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_BATTERY_TIRE_INTERACTION": {
+            "status": "RESOLVED",
+            "value": "UNRESOLVED",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c48-assessed-depreciation-figure",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c48-assessed-depreciation-figure.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c48-assessed-depreciation-figure.json",
+      "synthetic_input_sha256": "b6c3b72bff81136db5c02501bf2ac5b3c3079d05d6354b4de8291c73972ececf",
+      "disposition": "ENGINEERING_DEFECT_CONFIRMED",
+      "explanation": "Selected assessor-figure intent silently fell back to year depreciation. Missing amount now blocks both boundaries.",
+      "finding_ids": [
+        "IA-13"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "ASSESSED_DEPRECIATION_AMOUNT_MISSING"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_ASSESSED_DEPRECIATION.status",
+            "operator": "equals",
+            "value": "UNANSWERED"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "ASSESSED_DEPRECIATION_AMOUNT_MISSING"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c48-assessed-depreciation-figure",
+        "sha256": "b6c3b72bff81136db5c02501bf2ac5b3c3079d05d6354b4de8291c73972ececf",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "ASSESSED_DEPRECIATION_AMOUNT_REQUIRED"
+        ],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_PRODUCTION_YEAR": {
+            "status": "RESOLVED",
+            "value": 1399,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_GROSS_DAMAGE": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_LABOR": {
+            "status": "RESOLVED",
+            "value": "400000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_PART_CATEGORY": {
+            "status": "RESOLVED",
+            "value": [
+              {
+                "assessed_loss": 1200000000,
+                "category": "OTHER_REPLACEMENT_PART",
+                "name": "front panel"
+              }
+            ],
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_PART_NEW_PRICE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_ASSESSED_DEPRECIATION": {
+            "status": "UNANSWERED",
+            "value": null,
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "100000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "PARTIAL_DAMAGE"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "AFTER_DEPRECIATION",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_GLASS_CAUSE_PRECEDENCE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "POLICY"
+          },
+          "PS_ARTICLE10_PARTIAL_ORDER": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_BATTERY_TIRE_INTERACTION": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c61-title-not-transferred",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c61-title-not-transferred.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c61-title-not-transferred.json",
+      "synthetic_input_sha256": "3f0ab4dd391cb9f981c99d372de1ca0bae1caa4922d23b2c6d11b133b5e08026",
+      "disposition": "INTERFACE_CONTRACT_MISMATCH",
+      "explanation": "Transfer remains mandatory on this route. A blocking condition replaces the frozen uncertainty label.",
+      "finding_ids": [
+        "IA-05"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "TITLE_TRANSFER_INCOMPLETE"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_TITLE_TRANSFERRED.status",
+            "operator": "equals",
+            "value": "RESOLVED"
+          },
+          {
+            "path": "review_parameters.PS_TITLE_TRANSFERRED.value",
+            "operator": "equals",
+            "value": "false"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "TITLE_TRANSFER_INCOMPLETE"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c61-title-not-transferred",
+        "sha256": "3f0ab4dd391cb9f981c99d372de1ca0bae1caa4922d23b2c6d11b133b5e08026",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "TITLE_TRANSFER_REQUIRED"
+        ],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_TITLE_TRANSFERRED": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "0",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "6500000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_VALUE": {
+            "status": "RESOLVED",
+            "value": "1000000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_DISPOSITION": {
+            "status": "RESOLVED",
+            "value": "INSURER_TAKES_TITLE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "TOTAL_LOSS"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "10f3f5640917909c18d9e7ea90c5b9291b0a55c7b9f77e0f4a60073cb9fae09b",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "SETTLEMENT_BASE",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c64-retains-settlement-base",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c64-retains-settlement-base.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c64-retains-settlement-base.json",
+      "synthetic_input_sha256": "8495fdcb6dbfd17841fee0768753a17f26aa06220570ac5e1aa2e8d75bed4fcb",
+      "disposition": "CONTRACT_AUTHORITY_PENDING",
+      "explanation": "Synthetic contract explicitly permits SETTLEMENT_BASE; real clause/circular precedence is not authenticated. That contractual scope is blocked.",
+      "finding_ids": [
+        "IA-09",
+        "RQ-03"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-03_FRANCHISE_BASE_AUTHORITY"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "INSURED_RETAINS"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "COMPUTE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "TOTAL_LOSS",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": null,
+          "actual": 6200000000,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-03_FRANCHISE_BASE_AUTHORITY"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "KNOWN_DEVIATION",
+      "actual": {
+        "case": "inspection-c64-retains-settlement-base",
+        "sha256": "8495fdcb6dbfd17841fee0768753a17f26aa06220570ac5e1aa2e8d75bed4fcb",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "COMPUTE",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "COMPUTE",
+          "branch": "TOTAL_LOSS",
+          "claim_hash": "sha256:6acd2e05d040c22d39c5258886fc5b2627498ab5d2c2ab1aa1a80e202b922647",
+          "blocking_conditions": []
+        },
+        "calculation_present": true,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": [],
+        "payable_irr": 6200000000,
+        "payable_scenarios_irr": [],
+        "status": null,
+        "reason": null,
+        "labels": [
+          "SALVAGE_DEDUCTED_BEFORE_FRANCHISE",
+          "TOTAL_LOSS"
+        ],
+        "fields": {
+          "allowable_rescue_transport": 0,
+          "authorization_live_uncertainties": [],
+          "base_after_salvage": 7000000000,
+          "classification": {
+            "declared_branch": "TOTAL_LOSS",
+            "declared_canonical_branch": "TOTAL_LOSS",
+            "derived_branch": "TOTAL_LOSS",
+            "outcome": "MATCH",
+            "confidence": 0.97,
+            "basis": [
+              "repair+rescue 6500000000 against 75% threshold 6000000000.00 -> total=True; rescue source=DERIVED_FROM_ACTUAL_RESCUE"
+            ],
+            "reason": "declared and evidence-derived branches agree"
+          },
+          "classification_rescue": 0,
+          "classification_rescue_source": "DERIVED_FROM_ACTUAL_RESCUE",
+          "combined_for_threshold": 6500000000,
+          "covered_peril_causation_established": true,
+          "execution_plan": [
+            "OP_SALVAGE_DEDUCTION",
+            "OP_FRANCHISE",
+            "OP_RESCUE_CAP",
+            "OP_LIABILITY_CAP_INSURED_SUM"
+          ],
+          "execution_plan_branch": "TOTAL_LOSS",
+          "execution_plan_guards": [
+            "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+            "G_SALVAGE_XOR_TITLE_TRANSFER",
+            "G_RESCUE_CAP_CEILING",
+            "G_NO_HARDCODED_FRANCHISE_RATE",
+            "G_INSURED_SUM_CEILING",
+            "G_UNCERTAINTY_MUST_SURFACE"
+          ],
+          "execution_plan_id": "sha256:1c541d109df285184a3abca46f1abdc1493bedc619e6052a718bbdeefd779648",
+          "franchise": 800000000,
+          "franchise_authority": {
+            "clause_locator": "explicit synthetic franchise assumption",
+            "coverage": [
+              "TOTAL_LOSS"
+            ],
+            "document_sha256": "10f3f5640917909c18d9e7ea90c5b9291b0a55c7b9f77e0f4a60073cb9fae09b",
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "governs_contract": true,
+            "insurer": "SYNTHETIC_INSURER",
+            "policy_reference": "synthetic controlled policy term, 1404 franchise",
+            "product": "SYNTHETIC_BODY",
+            "reviewer": "software fixture author; no qualified domain approval",
+            "source_reference": "synthetic controlled policy term, 1404 franchise",
+            "source_status": "SYNTHETIC_TEST",
+            "source_version": "1404",
+            "terms": {
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "mode": "PERCENT",
+              "rate": 0.1
+            }
+          },
+          "franchise_authority_source_status": "SYNTHETIC_TEST",
+          "franchise_calculation_base": 8000000000,
+          "franchise_calculation_base_kind": "SETTLEMENT_BASE",
+          "franchise_evidence_needed": "policy/product/version franchise schedule or endorsement",
+          "franchise_mode": "PERCENT",
+          "franchise_source": "POLICY",
+          "franchise_source_version": "1404",
+          "is_total": true,
+          "multiple_insurance_state": "NO",
+          "prior_compensation": 0,
+          "rescue_cap": 1300000000,
+          "rescue_cap_base": 6500000000,
+          "rescue_cap_base_kind": "ASSESSED_GROSS",
+          "rescue_claimed": 0,
+          "rescue_input_kind": "ACTUAL",
+          "rescue_payable_supplied": null,
+          "salvage_deduction": 1000000000,
+          "salvage_disposition": "INSURED_RETAINS",
+          "settlement_base": 8000000000,
+          "snapshot_id": "BODY@1404/08/20",
+          "snapshot_rule_ids": [
+            "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+            "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+            "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+            "REG53_ART19_INSURER_TAKES_TITLE",
+            "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+            "REG53_ART19_TOTAL_LOSS_VALUATION",
+            "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+            "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+            "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+            "REG53_POLICY_DEFINED_FRANCHISE",
+            "REG53_RESCUE_TRANSPORT_CAP"
+          ],
+          "threshold_ratio": "0.8125",
+          "threshold_value": 6000000000
+        },
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "REG53_POLICY_DEFINED_FRANCHISE"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_RESCUE_CAP_CEILING",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
+          "G_SALVAGE_XOR_TITLE_TRANSFER",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_INSURED_SUM_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_TITLE_TRANSFERRED": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "0",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "6500000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_VALUE": {
+            "status": "RESOLVED",
+            "value": "1000000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_DISPOSITION": {
+            "status": "RESOLVED",
+            "value": "INSURED_RETAINS",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "TOTAL_LOSS"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "10f3f5640917909c18d9e7ea90c5b9291b0a55c7b9f77e0f4a60073cb9fae09b",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "SETTLEMENT_BASE",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c66-disposition-unresolved",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c66-disposition-unresolved.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c66-disposition-unresolved.json",
+      "synthetic_input_sha256": "c6baed1a42efdc8955dad140fba170e6186b5de699bfc60d43c942a53614ac4e",
+      "disposition": "CORRECT_FAIL_CLOSED_BEHAVIOR",
+      "explanation": "Unknown ownership route refuses a grant instead of granting an empty scenario set. Reference review required.",
+      "finding_ids": [
+        "IA-14A",
+        "U12_SALVAGE_DISPOSITION"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "ENGINEERING_INVARIANT",
+        "authority_status": "PROJECT_SAFETY_CONTRACT_NOT_LEGAL_AUTHORITY",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_decision": "SCENARIO_SET",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "TOTAL_LOSS"
+        },
+        "calculation": {
+          "present": true,
+          "status": "SALVAGE_DISPOSITION_UNRESOLVED",
+          "payable_irr": null,
+          "payable_scenarios_irr": []
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "calculation": [
+            "U12_SALVAGE_DISPOSITION"
+          ]
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "UNRESOLVED"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "SALVAGE_DISPOSITION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c66-disposition-unresolved",
+        "sha256": "c6baed1a42efdc8955dad140fba170e6186b5de699bfc60d43c942a53614ac4e",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "SALVAGE_DISPOSITION_UNRESOLVED"
+        ],
+        "live_uncertainties": [
+          "U12_SALVAGE_DISPOSITION"
+        ],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_TITLE_TRANSFERRED": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "0",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "6500000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_VALUE": {
+            "status": "RESOLVED",
+            "value": "1000000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_DISPOSITION": {
+            "status": "RESOLVED",
+            "value": "UNRESOLVED",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "TOTAL_LOSS"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "10f3f5640917909c18d9e7ea90c5b9291b0a55c7b9f77e0f4a60073cb9fae09b",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "SETTLEMENT_BASE",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c67-disposition-not-applicable",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c67-disposition-not-applicable.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c67-disposition-not-applicable.json",
+      "synthetic_input_sha256": "09bd44bb3938ca02568328150790800db756bf6128dc9077206c68910f384f02",
+      "disposition": "CORRECT_FAIL_CLOSED_BEHAVIOR",
+      "explanation": "NOT_APPLICABLE is not an evidenced physical ownership route. Payment remains blocked; the interface label differs.",
+      "finding_ids": [
+        "RQ-07"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_CENTINSUR_CAR_INSURANCE_COMPILATION",
+          "SRC_CIC_CIRCULAR_1400_401_146850"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 19",
+          "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "Circular 1400/401/146850"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "Circular effective 1400/09/13",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "min(market value, insured sum)",
+          "salvage deduction when retained",
+          "franchise",
+          "rescue addition",
+          "insured-sum cap"
+        ],
+        "derivation": "Independent integer-IRR arithmetic using the stated disposition and controlled term.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-07_DISPOSITION_SEMANTICS"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SALVAGE_DISPOSITION.value",
+            "operator": "equals",
+            "value": "NOT_APPLICABLE"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-07_DISPOSITION_SEMANTICS"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c67-disposition-not-applicable",
+        "sha256": "09bd44bb3938ca02568328150790800db756bf6128dc9077206c68910f384f02",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "TOTAL_LOSS",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "SALVAGE_DISPOSITION_UNRESOLVED"
+        ],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_TITLE_TRANSFERRED": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "0",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "6500000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_VALUE": {
+            "status": "RESOLVED",
+            "value": "1000000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_SALVAGE_DISPOSITION": {
+            "status": "RESOLVED",
+            "value": "NOT_APPLICABLE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "SETTLEMENT_BASE",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "TOTAL_LOSS"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "10f3f5640917909c18d9e7ea90c5b9291b0a55c7b9f77e0f4a60073cb9fae09b",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "SETTLEMENT_BASE",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c72-underinsured-order-locked",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c72-underinsured-order-locked.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c72-underinsured-order-locked.json",
+      "synthetic_input_sha256": "fffe55cf9de651214a6af5b1c8dc416f3eb28b2554cd1499c165e342a02c7230",
+      "disposition": "CORRECT_FAIL_CLOSED_BEHAVIOR",
+      "explanation": "Unsupported order token retains both scenarios without a single payable. Frozen no-grant expectation needs review.",
+      "finding_ids": [
+        "U01",
+        "RQ-04",
+        "U01_ARTICLE10_PARTIAL_ORDER"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR",
+          "SRC_INSURER_MANUAL_PENDING"
+        ],
+        "rule_locators": [
+          "Regulation 53 Art 20 note 2",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "insurer worksheet unavailable"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "depreciation",
+          "underinsurance/franchise order unresolved"
+        ],
+        "derivation": "Both named exact-IRR scenarios are derived; no authority chooses one.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_ARTICLE10_PARTIAL_ORDER.value",
+            "operator": "equals",
+            "value": "AFTER_DEPRECIATION_BEFORE_FRANCHISE"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 1,
+          "actual": 0,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "INSUFFICIENT_INFORMATION",
+          "actual": "SCENARIO_SET",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": null,
+          "actual": "REVIEW_GATE",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": null,
+          "actual": "SCENARIO_SET",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": null,
+          "actual": "PARTIAL_DAMAGE",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": false,
+          "actual": true,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": null,
+          "actual": "ORDER_UNRESOLVED",
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": null,
+          "actual": [
+            1396250000,
+            1446875000
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": null,
+          "actual": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c72-underinsured-order-locked",
+        "sha256": "fffe55cf9de651214a6af5b1c8dc416f3eb28b2554cd1499c165e342a02c7230",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 0
+        },
+        "review_exit": 0,
+        "calc_exit": 0,
+        "decision": "SCENARIO_SET",
+        "review_branch": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": true,
+          "issuer": "REVIEW_GATE",
+          "decision": "SCENARIO_SET",
+          "branch": "PARTIAL_DAMAGE",
+          "claim_hash": "sha256:a8f3626d5464e6bbe3c6ab7350c3eaddac0b259df1acafea01c9e4706ab2a50d",
+          "blocking_conditions": []
+        },
+        "calculation_present": true,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [],
+        "live_uncertainties": [
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "calculation_blocking_uncertainties": [
+          "U01_ARTICLE10_PARTIAL_ORDER"
+        ],
+        "payable_irr": null,
+        "payable_scenarios_irr": [
+          1396250000,
+          1446875000
+        ],
+        "status": "ORDER_UNRESOLVED",
+        "reason": "supply applicable legal or contractual authority establishing the operator sequence; an applicable reviewed contractual authority record is required",
+        "labels": [
+          "BLOCKING_UNCERTAINTY_SURFACED",
+          "ITEMISED_PARTS_USED",
+          "ORDER_UNRESOLVED",
+          "PARTIAL_DAMAGE",
+          "UNDERINSURANCE_APPLIED"
+        ],
+        "fields": {
+          "after_depreciation": 2025000000,
+          "allowable_rescue_transport": 80000000,
+          "article10_order_authority_gap": "an applicable reviewed contractual authority record is required",
+          "article10_ratio": "0.75",
+          "assessed_gross": 2250000000,
+          "authorization_live_uncertainties": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "classification": {
+            "declared_branch": "PARTIAL_DAMAGE",
+            "declared_canonical_branch": "PARTIAL_DAMAGE",
+            "derived_branch": "PARTIAL_DAMAGE",
+            "outcome": "MATCH",
+            "confidence": 0.85,
+            "basis": [
+              "repair+rescue 2330000000 against 75% threshold 6000000000.00 -> total=False; rescue source=DERIVED_FROM_ACTUAL_RESCUE",
+              "no theft, total-loss, glass or third-party signal matched"
+            ],
+            "reason": "declared and evidence-derived branches agree"
+          },
+          "classification_rescue": 80000000,
+          "classification_rescue_source": "DERIVED_FROM_ACTUAL_RESCUE",
+          "covered_peril_causation_established": true,
+          "depreciation": 225000000,
+          "depreciation_source": "COMPUTED_PER_PART",
+          "eligible_before_other_terms": 2250000000,
+          "execution_plan": [
+            [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_FRANCHISE",
+              "OP_RESCUE_CAP"
+            ],
+            [
+              "OP_SPECIAL_PART_CAP",
+              "OP_DEPRECIATION_REPLACEMENT_PART",
+              "OP_FRANCHISE",
+              "OP_UNDERINSURANCE_RATIO",
+              "OP_RESCUE_CAP"
+            ]
+          ],
+          "execution_plan_branch": "PARTIAL_DAMAGE",
+          "execution_plan_guards": [
+            "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+            "G_RECOVERY_ALLOCATION_CONTAINED",
+            "G_RESCUE_CAP_CEILING",
+            "G_NO_HARDCODED_FRANCHISE_RATE",
+            "G_UNCERTAINTY_MUST_SURFACE"
+          ],
+          "execution_plan_ids": [
+            "sha256:7e94935aef9010310dd1c30f7d14bf0e23fc60e1299c428671d2b0224ef3c313",
+            "sha256:f51a6e0932ff668e8ae96ea1fe145af184028c0b23697bd3fad68aa0b3022779"
+          ],
+          "franchise": 202500000,
+          "franchise_authority": {
+            "clause_locator": "explicit synthetic franchise assumption",
+            "coverage": [
+              "PARTIAL_DAMAGE"
+            ],
+            "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+            "effective_from": "1300-01-01",
+            "effective_until": "1500-12-29",
+            "governs_contract": true,
+            "insurer": "SYNTHETIC_INSURER",
+            "policy_reference": "synthetic controlled policy term, 1403 franchise",
+            "product": "SYNTHETIC_BODY",
+            "reviewer": "software fixture author; no qualified domain approval",
+            "source_reference": "synthetic controlled policy term, 1403 franchise",
+            "source_status": "SYNTHETIC_TEST",
+            "source_version": "1403",
+            "terms": {
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "mode": "PERCENT",
+              "rate": 0.1
+            }
+          },
+          "franchise_authority_source_status": "SYNTHETIC_TEST",
+          "franchise_calculation_base": 2025000000,
+          "franchise_calculation_base_kind": "AFTER_DEPRECIATION",
+          "franchise_evidence_needed": "policy/product/version franchise schedule or endorsement",
+          "franchise_mode": "PERCENT",
+          "franchise_source": "POLICY",
+          "franchise_source_version": "1403",
+          "glass_depreciation": 0,
+          "gross_eligible": 2250000000,
+          "multiple_insurance_state": "NO",
+          "order_used": "UNRESOLVED",
+          "other_depreciation": 225000000,
+          "prior_compensation": 0,
+          "rescue_cap": 450000000,
+          "rescue_cap_base": 2250000000,
+          "rescue_cap_base_kind": "ASSESSED_GROSS",
+          "rescue_claimed": 80000000,
+          "rescue_input_kind": "ACTUAL",
+          "rescue_payable_supplied": null,
+          "scenario_franchise_then_ratio": 1446875000,
+          "scenario_ratio_then_franchise": 1396250000,
+          "snapshot_id": "BODY@1404/05/11",
+          "snapshot_rule_ids": [
+            "ALIAS_ARTICLE10_IS_UNDERINSURANCE_RATIO",
+            "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+            "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION",
+            "REG53_ART19_INSURER_TAKES_TITLE",
+            "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+            "REG53_ART19_TOTAL_LOSS_VALUATION",
+            "REG53_ART19_YEAR_INDEX_INTERPRETATION",
+            "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+            "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP",
+            "REG53_POLICY_DEFINED_FRANCHISE",
+            "REG53_RESCUE_TRANSPORT_CAP"
+          ]
+        },
+        "rule_trace": [
+          "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "REG53_RESCUE_TRANSPORT_CAP",
+          "REG53_POLICY_DEFINED_FRANCHISE",
+          "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO"
+        ],
+        "required_guards": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_RESCUE_CAP_CEILING",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "guards_executed": [
+          "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+          "G_RECOVERY_ALLOCATION_CONTAINED",
+          "G_RESCUE_CAP_CEILING",
+          "G_NO_HARDCODED_FRANCHISE_RATE",
+          "G_UNCERTAINTY_MUST_SURFACE"
+        ],
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-05-11",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-05-11",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-05-14",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "6000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "0.75",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_PRODUCTION_YEAR": {
+            "status": "RESOLVED",
+            "value": 1398,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_GROSS_DAMAGE": {
+            "status": "RESOLVED",
+            "value": "2250000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_LABOR": {
+            "status": "RESOLVED",
+            "value": "300000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_PART_CATEGORY": {
+            "status": "RESOLVED",
+            "value": [
+              {
+                "assessed_loss": 1500000000,
+                "category": "OTHER_REPLACEMENT_PART",
+                "name": "left front door"
+              },
+              {
+                "assessed_loss": 450000000,
+                "category": "GLASS",
+                "name": "windscreen"
+              }
+            ],
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_PART_NEW_PRICE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_ASSESSED_DEPRECIATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "80000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "2250000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1403 franchise",
+              "source_version": "1403",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1403 franchise",
+                "source_version": "1403",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1403 franchise",
+                "coverage": [
+                  "PARTIAL_DAMAGE"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "AFTER_DEPRECIATION",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_GLASS_CAUSE_PRECEDENCE": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "POLICY"
+          },
+          "PS_ARTICLE10_PARTIAL_ORDER": {
+            "status": "RESOLVED",
+            "value": "AFTER_DEPRECIATION_BEFORE_FRANCHISE",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_BATTERY_TIRE_INTERACTION": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c97-late-notice-no-excuse",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c97-late-notice-no-excuse.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c97-late-notice-no-excuse.json",
+      "synthetic_input_sha256": "e0f118b7237948169bcb498e21579e87586e749a9bcd6e874a1fe735b7af23d8",
+      "disposition": "ENGINEERING_DEFECT_CONFIRMED",
+      "explanation": "A late-notice label previously coexisted with payment. Both boundaries now require adjudication, without universal exclusion or zero.",
+      "finding_ids": [
+        "IA-10",
+        "RQ-05"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR"
+        ],
+        "rule_locators": [
+          "REG53_NOTICE_AND_DUTIES",
+          "Q-S0-04 / PS_NOTICE_TIMELINESS",
+          "RQ-05_NOTICE_ADJUDICATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "adjudicate the late-notice consequence",
+          "only then authorize calculation"
+        ],
+        "derivation": "The notice duty is relevant, but the case lacks a reviewed RQ-05 adjudication artifact establishing the consequence of delay.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-05_NOTICE_ADJUDICATION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_NOTICE_TIMELINESS.value",
+            "operator": "equals",
+            "value": "true"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-05_NOTICE_ADJUDICATION"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c97-late-notice-no-excuse",
+        "sha256": "e0f118b7237948169bcb498e21579e87586e749a9bcd6e874a1fe735b7af23d8",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "NOTICE_ADJUDICATION_REQUIRED"
+        ],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_PRODUCTION_YEAR": {
+            "status": "RESOLVED",
+            "value": 1399,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_GROSS_DAMAGE": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_LABOR": {
+            "status": "RESOLVED",
+            "value": "400000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_PART_CATEGORY": {
+            "status": "RESOLVED",
+            "value": [
+              {
+                "assessed_loss": 1200000000,
+                "category": "OTHER_REPLACEMENT_PART",
+                "name": "front panel"
+              }
+            ],
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_PART_NEW_PRICE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_ASSESSED_DEPRECIATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "100000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "PARTIAL_DAMAGE"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "AFTER_DEPRECIATION",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_GLASS_CAUSE_PRECEDENCE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "POLICY"
+          },
+          "PS_ARTICLE10_PARTIAL_ORDER": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_BATTERY_TIRE_INTERACTION": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c98-recourse-released",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c98-recourse-released.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c98-recourse-released.json",
+      "synthetic_input_sha256": "bc3993db80e01ede575937e80f2e7777bf0b9f43a4ff1ab0fe01241259b26e06",
+      "disposition": "ENGINEERING_DEFECT_CONFIRMED",
+      "explanation": "Recovery impairment previously only labelled payment. Both boundaries now require adjudication; documents alone are not an adjudicated decision.",
+      "finding_ids": [
+        "IA-10",
+        "RQ-06"
+      ],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [
+          "SRC_REG53_MIRROR"
+        ],
+        "rule_locators": [
+          "REG53_ART14_SUBROGATION",
+          "Q-S9-01 / PS_SUBROGATION_IMPAIRED",
+          "RQ-06_SUBROGATION_ADJUDICATION"
+        ],
+        "effective_or_applicability_dates": [
+          "Regulation 53 registered effective 1384/12/09",
+          "synthetic event 1404-08-20"
+        ],
+        "unit": "IRR",
+        "operator_order": [
+          "adjudicate the impairment-of-recourse consequence",
+          "only then authorize calculation"
+        ],
+        "derivation": "Article 14 is relevant, but the case lacks a reviewed RQ-06 adjudication artifact establishing the consequence of released recourse.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [
+            "RQ-06_SUBROGATION_ADJUDICATION"
+          ],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "review_parameters.PS_SUBROGATION_IMPAIRED.value",
+            "operator": "equals",
+            "value": "true"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-06_SUBROGATION_ADJUDICATION"
+          ],
+          "actual": [],
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c98-recourse-released",
+        "sha256": "bc3993db80e01ede575937e80f2e7777bf0b9f43a4ff1ab0fe01241259b26e06",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": "PARTIAL_DAMAGE",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [],
+        "evidence_blocks": [],
+        "blocking_conditions": [
+          "SUBROGATION_ADJUDICATION_REQUIRED"
+        ],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_PRODUCTION_YEAR": {
+            "status": "RESOLVED",
+            "value": 1399,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_GROSS_DAMAGE": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_LABOR": {
+            "status": "RESOLVED",
+            "value": "400000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_PART_CATEGORY": {
+            "status": "RESOLVED",
+            "value": [
+              {
+                "assessed_loss": 1200000000,
+                "category": "OTHER_REPLACEMENT_PART",
+                "name": "front panel"
+              }
+            ],
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_PART_NEW_PRICE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_ASSESSED_DEPRECIATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "100000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "PARTIAL_DAMAGE"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "AFTER_DEPRECIATION",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_GLASS_CAUSE_PRECEDENCE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "POLICY"
+          },
+          "PS_ARTICLE10_PARTIAL_ORDER": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_BATTERY_TIRE_INTERACTION": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    },
+    {
+      "case_id": "inspection-c99-third-party-split",
+      "revision": "249cc6918f01548484175d5853f0aa153f4ab851",
+      "original_input": "cases/inspection-c99-third-party-split.json",
+      "synthetic_input": "docs/reconciliation-evidence/synthetic-v1/inspection-c99-third-party-split.json",
+      "synthetic_input_sha256": "42d7709eabb4153e95e6181609163eaa55e58687e154e4533931389fe633eacc",
+      "disposition": "OUT_OF_RELEASE_SCOPE",
+      "explanation": "Third-party split classification is outside the four body branches. No body payment is granted; ordinary body precedence controls remain.",
+      "finding_ids": [],
+      "human_review": "PENDING",
+      "reference_authority": {
+        "basis": "UNRESOLVED",
+        "authority_status": "INDEPENDENT_AUTHORITY_UNAVAILABLE",
+        "source_ids": [],
+        "rule_locators": [
+          "docs/CASE_BASED_INSPECTION.md sections 3-5",
+          "Review fail-closed authorization contract"
+        ],
+        "effective_or_applicability_dates": [
+          "synthetic corpus applicability year 1404"
+        ],
+        "unit": "IRR",
+        "operator_order": [],
+        "derivation": "Project safety invariant derived from typed input/evidence requirements, not a legal payment rule.",
+        "reviewer": null,
+        "review_status": "AWAITING_FRESH_INDEPENDENT_REVIEW"
+      },
+      "reference_expectation": {
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_decision": "INSUFFICIENT_INFORMATION",
+        "classification": "THIRD_PARTY_FINANCIAL",
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null
+        },
+        "calculation": {
+          "present": false,
+          "status": null,
+          "payable_irr": null,
+          "payable_scenarios_irr": null
+        },
+        "blocking_uncertainties": {
+          "review": [],
+          "calculation": null
+        },
+        "trace_assertions": [
+          {
+            "path": "open_blocking_questions",
+            "operator": "contains",
+            "value": "Q-S8-05"
+          }
+        ]
+      },
+      "reference_failures": [
+        {
+          "path": "classification",
+          "expected": "THIRD_PARTY_FINANCIAL",
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "comparison_verdict": "MISMATCH",
+      "actual": {
+        "case": "inspection-c99-third-party-split",
+        "sha256": "42d7709eabb4153e95e6181609163eaa55e58687e154e4533931389fe633eacc",
+        "process": {
+          "review_exit": 0,
+          "calc_exit": 1
+        },
+        "review_exit": 0,
+        "calc_exit": 1,
+        "decision": "INSUFFICIENT_INFORMATION",
+        "review_branch": null,
+        "authorization": {
+          "granted": false,
+          "issuer": null,
+          "decision": null,
+          "branch": null,
+          "claim_hash": null,
+          "blocking_conditions": null
+        },
+        "calculation_present": false,
+        "open_hard_questions": [],
+        "open_blocking_questions": [
+          "Q-S8-05"
+        ],
+        "evidence_blocks": [],
+        "blocking_conditions": [],
+        "live_uncertainties": [],
+        "calculation_blocking_uncertainties": null,
+        "payable_irr": null,
+        "payable_scenarios_irr": null,
+        "status": null,
+        "reason": null,
+        "labels": null,
+        "fields": null,
+        "rule_trace": null,
+        "required_guards": null,
+        "guards_executed": null,
+        "review_parameters": {
+          "PS_EVENT_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "EVENT_FACT"
+          },
+          "PS_AWARENESS_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-20",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_DECLARATION_DATE": {
+            "status": "RESOLVED",
+            "value": "1404-08-25",
+            "unit": "date",
+            "authority": "REGULATION"
+          },
+          "PS_NOTICE_TIMELINESS": {
+            "status": "RESOLVED",
+            "value": "false",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CLAIM_YEAR": {
+            "status": "DERIVED",
+            "value": 1404,
+            "unit": "integer",
+            "authority": "DERIVED"
+          },
+          "PS_PERIL": {
+            "status": "RESOLVED",
+            "value": "COLLISION",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_CAUSATION_ESTABLISHED": {
+            "status": "RESOLVED",
+            "value": "true",
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_MARKET_VALUE": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_INSURED_SUM": {
+            "status": "RESOLVED",
+            "value": "8000000000",
+            "unit": "money",
+            "authority": "POLICY"
+          },
+          "PS_UNDERINSURANCE_RATIO": {
+            "status": "DERIVED",
+            "value": "1",
+            "unit": "ratio",
+            "authority": "DERIVED"
+          },
+          "PS_PRODUCTION_YEAR": {
+            "status": "RESOLVED",
+            "value": 1399,
+            "unit": "integer",
+            "authority": "REGULATION"
+          },
+          "PS_GROSS_DAMAGE": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_LABOR": {
+            "status": "RESOLVED",
+            "value": "400000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_PART_CATEGORY": {
+            "status": "RESOLVED",
+            "value": [
+              {
+                "assessed_loss": 1200000000,
+                "category": "OTHER_REPLACEMENT_PART",
+                "name": "front panel"
+              }
+            ],
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_PART_NEW_PRICE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_ASSESSED_DEPRECIATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_RESCUE_ACTUAL": {
+            "status": "RESOLVED",
+            "value": "100000000",
+            "unit": "money",
+            "authority": "REGULATION"
+          },
+          "PS_RESCUE_CAP_BASE": {
+            "status": "RESOLVED",
+            "value": "ASSESSED_GROSS",
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_REPAIR_TOTAL": {
+            "status": "RESOLVED",
+            "value": "1600000000",
+            "unit": "money",
+            "authority": "ASSESSOR"
+          },
+          "PS_FRANCHISE": {
+            "status": "RESOLVED",
+            "value": {
+              "mode": "PERCENT",
+              "calculation_base": "AFTER_DEPRECIATION",
+              "claim_sequence_rule": "first claim",
+              "rate": 0.1,
+              "source": "POLICY",
+              "source_reference": "synthetic controlled policy term, 1404 franchise",
+              "source_version": "1404",
+              "authority": {
+                "source_reference": "synthetic controlled policy term, 1404 franchise",
+                "source_version": "1404",
+                "insurer": "SYNTHETIC_INSURER",
+                "product": "SYNTHETIC_BODY",
+                "policy_reference": "synthetic controlled policy term, 1404 franchise",
+                "coverage": [
+                  "THIRD_PARTY_FINANCIAL"
+                ],
+                "effective_from": "1300-01-01",
+                "effective_until": "1500-12-29",
+                "source_status": "SYNTHETIC_TEST",
+                "governs_contract": true,
+                "reviewer": "software fixture author; no qualified domain approval",
+                "clause_locator": "explicit synthetic franchise assumption",
+                "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+                "terms": {
+                  "mode": "PERCENT",
+                  "rate": 0.1,
+                  "calculation_base": "AFTER_DEPRECIATION",
+                  "claim_sequence_rule": "first claim"
+                }
+              }
+            },
+            "unit": "object",
+            "authority": "POLICY"
+          },
+          "PS_ENDORSEMENTS": {
+            "status": "RESOLVED",
+            "value": "NONE",
+            "unit": "list",
+            "authority": "POLICY"
+          },
+          "PS_GLASS_CAUSE_PRECEDENCE": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "boolean",
+            "authority": "POLICY"
+          },
+          "PS_ARTICLE10_PARTIAL_ORDER": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_BATTERY_TIRE_INTERACTION": {
+            "status": "NOT_APPLICABLE",
+            "value": null,
+            "unit": "enum",
+            "authority": "ADJUSTER_CONFIG"
+          },
+          "PS_SETTLEMENT_MODE": {
+            "status": "RESOLVED",
+            "value": "CASH",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_MULTIPLE_POLICIES": {
+            "status": "RESOLVED",
+            "value": {
+              "state": "NO",
+              "prior_compensation": 0
+            },
+            "unit": "object",
+            "authority": "REGULATION"
+          },
+          "PS_SUBROGATION_IMPAIRED": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_RISK_INTENSIFICATION": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          },
+          "PS_LICENSE_STATE": {
+            "status": "RESOLVED",
+            "value": "VALID_AND_APPROPRIATE",
+            "unit": "enum",
+            "authority": "REGULATION"
+          },
+          "PS_INTOXICATION_CAUSAL": {
+            "status": "NOT_TRIGGERED",
+            "value": null,
+            "unit": "boolean",
+            "authority": "REGULATION"
+          }
+        },
+        "review_error_codes": []
+      },
+      "finding_id_source": "Frozen reference manifest known-deviation IDs and CASE_BASED_INSPECTION.md sections 7-8; author metadata checked after execution"
+    }
+  ],
+  "metadata_note": "Finding IDs corrected against immutable reference records; observed outputs and reference expectations remain unchanged."
+}

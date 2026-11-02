@@ -12,14 +12,14 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 PACKAGE=ROOT/"docs/reconciliation-evidence/rc1-followup"
 DISPOSITIONS={
-"c104":("CONTRACT_AUTHORITY_PENDING","Date/event binding is consistent, but the governing clock anchor is unauthenticated. Whole-vehicle theft certification remains blocked.",["RQ-02","U13_THEFT_CLOCK_ANCHOR"]),
-"c35":("ENGINEERING_DEFECT_CONFIRMED","Itemised categories failed to trigger price/interaction binding. Corrected; inline prices are not requested twice.",["IA-06","U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]),
-"c48":("ENGINEERING_DEFECT_CONFIRMED","Selected assessor-figure intent silently fell back to year depreciation. Missing amount now blocks both boundaries.",["IA-09","RQ-04"]),
+"c104":("CONTRACT_AUTHORITY_PENDING","Date/event binding is consistent, but the governing clock anchor is unauthenticated. Whole-vehicle theft certification remains blocked.",["IA-06","RQ-02","U13_THEFT_CLOCK_ANCHOR"]),
+"c35":("ENGINEERING_DEFECT_CONFIRMED","Itemised categories failed to trigger price/interaction binding. Corrected; inline prices are not requested twice.",["IA-13","U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]),
+"c48":("ENGINEERING_DEFECT_CONFIRMED","Selected assessor-figure intent silently fell back to year depreciation. Missing amount now blocks both boundaries.",["IA-13"]),
 "c61":("INTERFACE_CONTRACT_MISMATCH","Transfer remains mandatory on this route. A blocking condition replaces the frozen uncertainty label.",["IA-05"]),
-"c64":("CONTRACT_AUTHORITY_PENDING","Synthetic contract explicitly permits SETTLEMENT_BASE; real clause/circular precedence is not authenticated. That contractual scope is blocked.",["IA-13","RQ-03"]),
+"c64":("CONTRACT_AUTHORITY_PENDING","Synthetic contract explicitly permits SETTLEMENT_BASE; real clause/circular precedence is not authenticated. That contractual scope is blocked.",["IA-09","RQ-03"]),
 "c66":("CORRECT_FAIL_CLOSED_BEHAVIOR","Unknown ownership route refuses a grant instead of granting an empty scenario set. Reference review required.",["IA-14A","U12_SALVAGE_DISPOSITION"]),
 "c67":("CORRECT_FAIL_CLOSED_BEHAVIOR","NOT_APPLICABLE is not an evidenced physical ownership route. Payment remains blocked; the interface label differs.",["RQ-07"]),
-"c72":("CORRECT_FAIL_CLOSED_BEHAVIOR","Unsupported order token retains both scenarios without a single payable. Frozen no-grant expectation needs review.",["U01_ARTICLE10_PARTIAL_ORDER"]),
+"c72":("CORRECT_FAIL_CLOSED_BEHAVIOR","Unsupported order token retains both scenarios without a single payable. Frozen no-grant expectation needs review.",["U01","RQ-04","U01_ARTICLE10_PARTIAL_ORDER"]),
 "c97":("ENGINEERING_DEFECT_CONFIRMED","A late-notice label previously coexisted with payment. Both boundaries now require adjudication, without universal exclusion or zero.",["IA-10","RQ-05"]),
 "c98":("ENGINEERING_DEFECT_CONFIRMED","Recovery impairment previously only labelled payment. Both boundaries now require adjudication; documents alone are not an adjudicated decision.",["IA-10","RQ-06"]),
 "c99":("OUT_OF_RELEASE_SCOPE","Third-party split classification is outside the four body branches. No body payment is granted; ordinary body precedence controls remain.",[]),
