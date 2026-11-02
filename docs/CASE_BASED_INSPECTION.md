@@ -677,3 +677,6 @@ For future model revisions:
 6. diff the two JSON observation reports and classify each change as defect, incomplete evidence,
    unresolved authority, unsupported scope or practice-only difference;
 7. keep the release blocked until the applicable engineering and domain reviews are complete.
+
+
+Current follow-up (2026-11-03): see docs/reconciliation-evidence/rc1-followup/CASE_DISPOSITIONS.md and VALIDATION_REPORT.md. The observations above remain pinned historical evidence; this pointer does not rebaseline or relabel them. Canonical release status: docs/RELEASE_STATUS.md, BLOCKED.

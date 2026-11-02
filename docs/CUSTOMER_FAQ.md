@@ -192,7 +192,7 @@ COMPUTE permits one resolved calculation. SCENARIO_SET permits every approved in
 
 **Short answer:** Refusal establishes a defeating condition; insufficiency means the decision cannot yet be made.
 
-A supported non-compensable cause or uncovered endorsed risk may defeat payment. A missing report, unknown exclusion state, unread policy term, or unresolved date is not proof of refusal and must remain insufficient instead.
+A supported non-compensable cause or uncovered endorsed risk may defeat payment. A missing report, unknown exclusion state, unread policy term, or unresolved date is not proof of refusal and must remain insufficient instead. Late-notice and impaired-recovery paths require adjudication before this model calculates; neither automatically means exclusion or zero.
 
 **Customer action:** For insufficiency, obtain the named item; for refusal, request the exact provision and evidence supporting it.
 
@@ -554,7 +554,7 @@ COMPUTE یک محاسبه حل‌شده را مجاز می‌کند. SCENARIO_SE
 
 **پاسخ کوتاه:** رد یعنی مانع پرداخت اثبات شده؛ ناکافی بودن یعنی هنوز امکان تصمیم وجود ندارد.
 
-علت غیرقابل جبران اثبات‌شده یا خطر بدون الحاقیه می‌تواند پرداخت را منتفی کند. نبود گزارش، نامشخص بودن استثنا، نخواندن شرط بیمه‌نامه یا تاریخ حل‌نشده دلیل رد نیست و باید ناکافی باقی بماند.
+علت غیرقابل جبران اثبات‌شده یا خطر بدون الحاقیه می‌تواند پرداخت را منتفی کند. نبود گزارش، نامشخص بودن استثنا، نخواندن شرط بیمه‌نامه یا تاریخ حل‌نشده دلیل رد نیست و باید ناکافی باقی بماند. مسیر اعلام دیرهنگام یا اختلال در حق رجوع، پیش از محاسبه به تصمیم مستند نیاز دارد؛ هیچ‌کدام به‌تنهایی به معنی رد همیشگی یا مبلغ صفر نیست.
 
 **اقدام بعدی مشتری:** برای اطلاعات ناکافی، مورد خواسته‌شده را تهیه کنید؛ برای رد، ماده و مدرک دقیق را مطالبه کنید.
 

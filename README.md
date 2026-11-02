@@ -31,6 +31,10 @@ These are release requirements, not claims of current certification. The
 [research-report/model validation](docs/RESEARCH_REPORT_MODEL_VALIDATION.md)
 records the remaining provenance gaps and amount-affecting defects.
 
+## Current checkpoint — 2026-11-03
+
+Release remains **BLOCKED**. See [canonical release status](docs/RELEASE_STATUS.md) and [RC-1 follow-up](docs/reconciliation-evidence/rc1-followup/VALIDATION_REPORT.md). Published main and the proposed integration have different identities; only a revision-bound report establishes a test count. No independent or qualified authority approval is implied.
+
 ## Quickstart
 
 No runtime dependencies beyond the standard library. The supported interpreter
@@ -59,8 +63,7 @@ python claim.py ingest submissions/example_conflicting_educational.json
 The persistence and engine boundary accepts monetary values only as non-negative
 integer IRR. Toman and million-toman conversion is explicit presentation logic.
 
-Tests: `python -m pytest` (`515 passed, 11 xfailed` in the Python 3.11 Stage 0
-baseline). Install development/test
+Historical Stage 0: 515 passed / 11 xfailed. Current candidate results and exact commands are recorded in the linked RC-1 validation report. Run python -m pytest for this checkout. Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 

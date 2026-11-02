@@ -15,7 +15,11 @@ Until Phase 6 is accepted, the project is **research and adjuster decision
 support only**. It must not be represented as an unattended production payment
 authority.
 
-## One-week body-model completion sprint — 2026-10-07 to 2026-10-13
+## Current completion checkpoint — 2026-11-03
+
+[Canonical release status](RELEASE_STATUS.md): BLOCKED. [RC-1 reconciliation](reconciliation-evidence/rc1-followup/ROADMAP_RECONCILIATION.md) separates open-PR implementation, pending engineering review, pending authority and deferred phases. Issue #49 remains the active dashboard; the following sprint is preserved as historical planning.
+
+## Historical one-week body-model completion sprint — 2026-10-07 to 2026-10-13
 
 The achievable one-week target is `v0.1-body-model`: a reproducible,
 fail-closed research and adjuster decision-support release for

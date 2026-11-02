@@ -1,0 +1,98 @@
+{
+  "checked_revision": "3c26b9b1b769b8cf9ccf5e92e6402d15d3a75ab8",
+  "pr48_is_ancestor": true,
+  "merge_base": "cd7fb39a0b7859f2cec91b94770e240ab62e0b75",
+  "rows": [
+    {
+      "pr": 57,
+      "original_commit": "1fcda6490d46dbb8e487483f00bcd2fad06c5917",
+      "candidate_implementation_commit": "21c1f66bdcdad53304019751178dfe4184d837dc",
+      "original_stable_patch_id": "8cfeb71f878c9ff2f024342e336100b6ac723e40",
+      "local_stable_patch_id": "8cfeb71f878c9ff2f024342e336100b6ac723e40",
+      "local_is_ancestor": true,
+      "range_diff": "1:  1fcda64 = 1:  21c1f66 test(inspection): preserve bounded body claim case matrix\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 57,
+      "original_commit": "fa214d940cbfe79389ff1269800e52a69bff13b8",
+      "candidate_implementation_commit": "ff6bf48ad83710972e94af23acbcb38cd7c8a5b7",
+      "original_stable_patch_id": "566652864cffc2128a75e636af3817d789e0e045",
+      "local_stable_patch_id": "566652864cffc2128a75e636af3817d789e0e045",
+      "local_is_ancestor": true,
+      "range_diff": "1:  fa214d9 = 1:  ff6bf48 docs(inspection): reconcile integration and plan phase B\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 57,
+      "original_commit": "e19a0aec4babaf2f07b02ec4a3fa7aa752c6b3c5",
+      "candidate_implementation_commit": "8b35454cc49aa8185e46f7b2175932826a82475c",
+      "original_stable_patch_id": "dafe0767f49ee9fd4cfdbe6673474c4e9ef67693",
+      "local_stable_patch_id": "dafe0767f49ee9fd4cfdbe6673474c4e9ef67693",
+      "local_is_ancestor": true,
+      "range_diff": "1:  e19a0ae = 1:  8b35454 fix inspection comparator evidence integrity\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 57,
+      "original_commit": "58231f667aac308c0de4da1f989099f3ba6eda30",
+      "candidate_implementation_commit": "4837f0c8893e1ca566500d1eb4ed0082e32544e2",
+      "original_stable_patch_id": "6d0695bae8e33915c91e5cee0620512673152f10",
+      "local_stable_patch_id": "6d0695bae8e33915c91e5cee0620512673152f10",
+      "local_is_ancestor": true,
+      "range_diff": "1:  58231f6 = 1:  4837f0c docs: correct case reference provenance\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 57,
+      "original_commit": "09b07b35e1e20f87ab994ec9b656df379bf85b8d",
+      "candidate_implementation_commit": "6f91579f3e268c17fa25f2c0839b6e7ce5b8a29c",
+      "original_stable_patch_id": "565bd162df601248430667668765f500f262ed30",
+      "local_stable_patch_id": "565bd162df601248430667668765f500f262ed30",
+      "local_is_ancestor": true,
+      "range_diff": "1:  09b07b3 = 1:  6f91579 fix: bind inspection evidence to model output\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 57,
+      "original_commit": "ef3e8c79275238dd70a67775185e75dfb092ed55",
+      "candidate_implementation_commit": "d59cc21ebe9565acbf102f80dd0c79c1a25d7100",
+      "original_stable_patch_id": "2c259b55656a9d173ae9d7931e73d1dc74108e10",
+      "local_stable_patch_id": "2c259b55656a9d173ae9d7931e73d1dc74108e10",
+      "local_is_ancestor": true,
+      "range_diff": "1:  ef3e8c7 = 1:  d59cc21 fix(inspection): bind imports and probe shim provenance\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 57,
+      "original_commit": "cb7bce78e8704378539f915f5d4ffd9be943a597",
+      "candidate_implementation_commit": "0964085210047c544d3a70642c05db0916eaa8d5",
+      "original_stable_patch_id": "77cdb19271696207b66b84cfbfdc680a1cc13ea7",
+      "local_stable_patch_id": "77cdb19271696207b66b84cfbfdc680a1cc13ea7",
+      "local_is_ancestor": true,
+      "range_diff": "1:  cb7bce7 = 1:  0964085 fix(inspection): complete evidence provenance contract\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 58,
+      "original_commit": "49b2446f4ac2674f5bbbd81b5d3bc513e1e77133",
+      "candidate_implementation_commit": "72fca7dafe2f8d0c8bcc1638d887b63f644a30fa",
+      "original_stable_patch_id": "af79d6af3b87f3153d6305b9920d33e40bbe2ffe",
+      "local_stable_patch_id": "af79d6af3b87f3153d6305b9920d33e40bbe2ffe",
+      "local_is_ancestor": true,
+      "range_diff": "1:  49b2446 = 1:  72fca7d fix(P0-05): require evidence for override-selected branch\n",
+      "ordered_delta_exactly_once": true
+    },
+    {
+      "pr": 59,
+      "original_commit": "1e41c67c7f892526f52aecd40267709592383444",
+      "candidate_implementation_commit": "40008705c6bddd25eab5e7277a8e145509bdd4ac",
+      "original_stable_patch_id": "61ea76653403029bda0151480abe0abc732d091d",
+      "local_stable_patch_id": "2f3b1ea2b9237e2e5295b15d10eb8a22472c27f3",
+      "local_is_ancestor": true,
+      "range_diff": "1:  1e41c67 ! 1:  4000870 fix(IA-05): require completed title transfer\n    @@ docs/BODY_CASE_REVIEW_MODEL.md: the evidence it demands and the rung it belongs\n      | Q-S4-08 | What is the probable salvage value, and does the insured accept it? _(asked when: `{\"branch_is\": [\"TOTAL_LOSS\"]}`)_ | money | PS_SALVAGE_VALUE | EVT_SALVAGE_VALUATION | amount | T2 |\n      | Q-S4-09 | Who keeps the wreck? _(asked when: `{\"branch_is\": [\"TOTAL_LOSS\"]}`)_ | NOT_APPLICABLE, INSURED_RETAINS, INSURER_TAKES_TITLE, UNRESOLVED | PS_SALVAGE_DISPOSITION | EVT_SALVAGE_VALUATION | amount | T2 |\n     \n    - ## docs/MUTATION_REPORT.md ##\n    -@@ docs/MUTATION_REPORT.md: body calculation boundary. It is not a claim of exhaustive mutation coverage.\n    - \n    - - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, Review operand construction in `review.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`\n    - - Required score: **90%**\n    --- Result: **29/29 killed (100.0%)**\n    -+- Result: **30/30 killed (100.0%)**\n    - - Command: `python scripts/run_mutation_gate.py --check-report`\n    - \n    - | Mutant | Result | Safety property |\n    -@@ docs/MUTATION_REPORT.md: body calculation boundary. It is not a claim of exhaustive mutation coverage.\n    - | M27 | KILLED | omitted material rescue is treated as zero and allowed to authorize payment |\n    - | M28 | KILLED | a classification override bypasses the unresolved-rescue payment gate |\n    - | M29 | KILLED | an override-selected threshold branch skips the missing-rescue evidence gate |\n    -+| M31 | KILLED | an incomplete title transfer can use the insurer-title no-salvage route |\n    - \n    - A surviving mutant or a score below the threshold fails the gate. The checked-in\n    - report must exactly match a fresh run.\n    -\n      ## docs/PR04_TOTAL_LOSS_TITLE_TRANSFER.md (new) ##\n     @@\n     +# PR-04 physical total-loss title-transfer completion\n    @@ scripts/mutation_probe.py: def main() -> int:\n     \n      ## scripts/run_mutation_gate.py ##\n     @@ scripts/run_mutation_gate.py: MUTATIONS = (\n    -         \"or False\",\n    -         \"an override-selected threshold branch skips the missing-rescue evidence gate\",\n    +         \"and True\",\n    +         \"a classification override bypasses final-selected-branch evidence completeness\",\n          ),\n     +    Mutation(\n     +        \"M31\",\n",
+      "ordered_delta_exactly_once": true
+    }
+  ],
+  "qualification": "Ancestry, independent stable patch IDs and range-diff supplement the earlier ordered-delta proof. Final behavioral validation is separate."
+}

@@ -1,0 +1,108 @@
+FFFFFF.....                                                              [100%]
+================================== FAILURES ===================================
+__________ test_c35_itemised_battery_binds_new_price_and_interaction __________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000131BB6F8F50>
+
+    def test_c35_itemised_battery_binds_new_price_and_interaction(kb):
+        review = Review(case('c35q404-battery-new-price'), kb)
+>       assert review.slot_status('PS_PART_NEW_PRICE').status == 'RESOLVED'
+E       AssertionError: assert 'NOT_TRIGGERED' == 'RESOLVED'
+E
+E         - RESOLVED
+E         + NOT_TRIGGERED
+
+tests\test_rc1_residuals.py:21: AssertionError
+__________ test_c48_selected_assessor_route_cannot_fall_back_to_year __________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000131BB6F8F50>
+
+    def test_c48_selected_assessor_route_cannot_fall_back_to_year(kb):
+        review = Review(case('c48-assessed-depreciation-figure'), kb)
+>       assert review.slot_status('PS_ASSESSED_DEPRECIATION').status == 'UNANSWERED'
+E       AssertionError: assert 'NOT_TRIGGERED' == 'UNANSWERED'
+E
+E         - UNANSWERED
+E         + NOT_TRIGGERED
+
+tests\test_rc1_residuals.py:30: AssertionError
+_ test_unadjudicated_notice_and_recovery_block_review_not_zero[c97-late-notice-no-excuse-NOTICE_ADJUDICATION_REQUIRED] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000131BB6F8F50>
+name = 'c97-late-notice-no-excuse', condition = 'NOTICE_ADJUDICATION_REQUIRED'
+
+    @pytest.mark.parametrize('name,condition', [
+        ('c97-late-notice-no-excuse', 'NOTICE_ADJUDICATION_REQUIRED'),
+        ('c98-recourse-released', 'SUBROGATION_ADJUDICATION_REQUIRED'),
+    ])
+    def test_unadjudicated_notice_and_recovery_block_review_not_zero(kb, name, condition):
+        review = Review(case(name), kb)
+        assert review.refusal_reasons() == []
+>       assert review.decision()['decision'] == 'INSUFFICIENT_INFORMATION'
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_rc1_residuals.py:47: AssertionError
+_ test_unadjudicated_notice_and_recovery_block_review_not_zero[c98-recourse-released-SUBROGATION_ADJUDICATION_REQUIRED] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000131BB6F8F50>
+name = 'c98-recourse-released', condition = 'SUBROGATION_ADJUDICATION_REQUIRED'
+
+    @pytest.mark.parametrize('name,condition', [
+        ('c97-late-notice-no-excuse', 'NOTICE_ADJUDICATION_REQUIRED'),
+        ('c98-recourse-released', 'SUBROGATION_ADJUDICATION_REQUIRED'),
+    ])
+    def test_unadjudicated_notice_and_recovery_block_review_not_zero(kb, name, condition):
+        review = Review(case(name), kb)
+        assert review.refusal_reasons() == []
+>       assert review.decision()['decision'] == 'INSUFFICIENT_INFORMATION'
+E       AssertionError: assert 'COMPUTE' == 'INSUFFICIENT_INFORMATION'
+E
+E         - INSUFFICIENT_INFORMATION
+E         + COMPUTE
+
+tests\test_rc1_residuals.py:47: AssertionError
+_ test_unadjudicated_notice_and_recovery_block_direct_not_zero[c97-late-notice-no-excuse-NOTICE_ADJUDICATION_REQUIRED] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000131BB6F8F50>
+name = 'c97-late-notice-no-excuse', status = 'NOTICE_ADJUDICATION_REQUIRED'
+
+    @pytest.mark.parametrize('name,status', [
+        ('c97-late-notice-no-excuse', 'NOTICE_ADJUDICATION_REQUIRED'),
+        ('c98-recourse-released', 'SUBROGATION_ADJUDICATION_REQUIRED'),
+    ])
+    def test_unadjudicated_notice_and_recovery_block_direct_not_zero(kb, name, status):
+        raw = Review(case(name), kb).case_payload()
+        result = compute(_internal_test_direct_authorize(raw, purpose='RC1_ADJUDICATION_NEGATIVE'), kb)
+>       assert result.payable is None
+E       AssertionError: assert Decimal('1432000000') is None
+E        +  where Decimal('1432000000') = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='INSPECTION-C97-LATE-NOTICE-NO-EXCUSE', unit...: 'sha256:5c301d55097ea6e08a9345984ca96d913d446f522f115b61bb27a3a9ec935118', 'issued_at': '2026-11-02T20:27:33+00:00'}).payable
+
+tests\test_rc1_residuals.py:59: AssertionError
+_ test_unadjudicated_notice_and_recovery_block_direct_not_zero[c98-recourse-released-SUBROGATION_ADJUDICATION_REQUIRED] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000131BB6F8F50>
+name = 'c98-recourse-released', status = 'SUBROGATION_ADJUDICATION_REQUIRED'
+
+    @pytest.mark.parametrize('name,status', [
+        ('c97-late-notice-no-excuse', 'NOTICE_ADJUDICATION_REQUIRED'),
+        ('c98-recourse-released', 'SUBROGATION_ADJUDICATION_REQUIRED'),
+    ])
+    def test_unadjudicated_notice_and_recovery_block_direct_not_zero(kb, name, status):
+        raw = Review(case(name), kb).case_payload()
+        result = compute(_internal_test_direct_authorize(raw, purpose='RC1_ADJUDICATION_NEGATIVE'), kb)
+>       assert result.payable is None
+E       AssertionError: assert Decimal('1432000000') is None
+E        +  where Decimal('1432000000') = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='INSPECTION-C98-RECOURSE-RELEASED', unit='IR...: 'sha256:4b526d6db34e185347453e4a283716a9974f3fa46dba580ee1219495591707e6', 'issued_at': '2026-11-02T20:27:33+00:00'}).payable
+
+tests\test_rc1_residuals.py:59: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_rc1_residuals.py::test_c35_itemised_battery_binds_new_price_and_interaction
+FAILED tests/test_rc1_residuals.py::test_c48_selected_assessor_route_cannot_fall_back_to_year
+FAILED tests/test_rc1_residuals.py::test_unadjudicated_notice_and_recovery_block_review_not_zero[c97-late-notice-no-excuse-NOTICE_ADJUDICATION_REQUIRED]
+FAILED tests/test_rc1_residuals.py::test_unadjudicated_notice_and_recovery_block_review_not_zero[c98-recourse-released-SUBROGATION_ADJUDICATION_REQUIRED]
+FAILED tests/test_rc1_residuals.py::test_unadjudicated_notice_and_recovery_block_direct_not_zero[c97-late-notice-no-excuse-NOTICE_ADJUDICATION_REQUIRED]
+FAILED tests/test_rc1_residuals.py::test_unadjudicated_notice_and_recovery_block_direct_not_zero[c98-recourse-released-SUBROGATION_ADJUDICATION_REQUIRED]
+6 failed, 5 passed in 1.36s

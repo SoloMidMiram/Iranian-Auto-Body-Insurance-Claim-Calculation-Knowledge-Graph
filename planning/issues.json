@@ -1,5 +1,25 @@
 {
   "repository": "SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph",
+  "rc1_checkpoint": {
+    "date": "2026-11-03",
+    "release_tracker": 49,
+    "status": "BLOCKED",
+    "implementation": "IMPLEMENTED_IN_OPEN_PR",
+    "engineering": "ENGINEERING_REVIEW_PENDING",
+    "authority": "DOMAIN_AUTHORITY_PENDING",
+    "canonical_status": "docs/RELEASE_STATUS.md",
+    "evidence": "docs/reconciliation-evidence/rc1-followup",
+    "deferred_issues": [
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "unchanged_closure_criteria": true
+  },
   "labels": [
     {"name": "priority:P0", "color": "b60205", "description": "Release-blocking correctness or integrity risk"},
     {"name": "priority:P1", "color": "d93f0b", "description": "Phase-blocking provenance or operational risk"},

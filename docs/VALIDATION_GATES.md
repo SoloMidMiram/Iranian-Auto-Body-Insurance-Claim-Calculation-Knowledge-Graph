@@ -1,5 +1,7 @@
 # Validation gates and case criteria
 
+Current release status: [BLOCKED](RELEASE_STATUS.md). Current execution evidence is in the [RC-1 follow-up](reconciliation-evidence/rc1-followup/VALIDATION_REPORT.md). Source findings may be nonfatal in the engineering validator while remaining mandatory release blockers under #49.
+
 ## Gate policy
 
 Passing tests is necessary but not sufficient. Each phase produces an evidence
@@ -30,9 +32,6 @@ The issue sync command is a dry run unless `--apply` is explicitly supplied.
 operator, rule, source, authority class, effective date, and branch scope.
 Source tiers are not rewritten. A missing reviewer or a `PRIMARY_MIRROR`
 source is printed as a finding and does not by itself fail the gate.
-Incomplete source metadata (locator, content hash, retrieval date, effective
-interval, revalidation date) is also printed as a finding. A past revalidation
-date does not fail the release gate in this phase.
 Incomplete source metadata (locator, content hash, retrieval date, effective
 interval, revalidation date) is also printed as a finding. A past revalidation
 date does not fail the release gate in this phase.

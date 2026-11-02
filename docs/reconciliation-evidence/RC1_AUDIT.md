@@ -25,3 +25,6 @@ The author dispositions do not declare every residual a calculation bug. C61/C67
 Reproduce: set `PYTHONUTF8=1`, then run `.venv/Scripts/python.exe scripts/run_integration_rc1_audit.py --output <new-output-directory>`. The harness stamps the actual revision; it does not relabel older observations as newly executed corpora. Original/synthetic corpus observations remain pinned to their own recorded revision and equivalent model content.
 
 The full acceptance milestone is not achieved: neither frozen comparator has passed independent disposition, and no independent engineering review or qualified domain signoff is recorded. Publishing the review package satisfies the bounded publication action. It does not supply the outstanding acceptance.
+
+
+Current follow-up (2026-11-03): see docs/reconciliation-evidence/rc1-followup/CASE_DISPOSITIONS.md and VALIDATION_REPORT.md. The observations above remain pinned historical evidence; this pointer does not rebaseline or relabel them. Canonical release status: docs/RELEASE_STATUS.md, BLOCKED.
