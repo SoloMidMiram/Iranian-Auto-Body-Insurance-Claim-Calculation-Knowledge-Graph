@@ -1,0 +1,4 @@
+......................s                                                  [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_inspection_byte_integrity.py:125: Host does not permit creation of symlinks: [WinError 1314] A required privilege is not held by the client: 'F:\\Git\\body model\\.qwen\\worktrees\\rc1-followup\\.runtime\\pytest-bytes-accepted\\test_reject_in_root_symlink_su0\\repo\\original.py' -> 'F:\\Git\\body model\\.qwen\\worktrees\\rc1-followup\\.runtime\\pytest-bytes-accepted\\test_reject_in_root_symlink_su0\\repo\\src\\model.py'
+22 passed, 1 skipped in 16.47s

@@ -1,0 +1,360 @@
+Executed parent inspection_provenance.py from exact 81ee520 blob; new test file unchanged.
+FFFFFFFFFFFF....F.FFFFs                                                  [100%]
+================================== FAILURES ===================================
+_ test_reject_index_flags_even_when_status_is_clean[False---assume-unchanged-src/model.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w0/repo')
+target = 'src/model.py', flag = '--assume-unchanged', modified = False
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[False---assume-unchanged-scripts/runner.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w1/repo')
+target = 'scripts/runner.py', flag = '--assume-unchanged', modified = False
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[False---assume-unchanged-tests/admission_shim.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w2/repo')
+target = 'tests/admission_shim.py', flag = '--assume-unchanged'
+modified = False
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[False---skip-worktree-src/model.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w3/repo')
+target = 'src/model.py', flag = '--skip-worktree', modified = False
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[False---skip-worktree-scripts/runner.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w4/repo')
+target = 'scripts/runner.py', flag = '--skip-worktree', modified = False
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[False---skip-worktree-tests/admission_shim.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w5/repo')
+target = 'tests/admission_shim.py', flag = '--skip-worktree', modified = False
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[True---assume-unchanged-src/model.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w6/repo')
+target = 'src/model.py', flag = '--assume-unchanged', modified = True
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[True---assume-unchanged-scripts/runner.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w7/repo')
+target = 'scripts/runner.py', flag = '--assume-unchanged', modified = True
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[True---assume-unchanged-tests/admission_shim.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w8/repo')
+target = 'tests/admission_shim.py', flag = '--assume-unchanged', modified = True
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[True---skip-worktree-src/model.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w9/repo')
+target = 'src/model.py', flag = '--skip-worktree', modified = True
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[True---skip-worktree-scripts/runner.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w10/repo')
+target = 'scripts/runner.py', flag = '--skip-worktree', modified = True
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_ test_reject_index_flags_even_when_status_is_clean[True---skip-worktree-tests/admission_shim.py] _
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_index_flags_even_w11/repo')
+target = 'tests/admission_shim.py', flag = '--skip-worktree', modified = True
+
+    @pytest.mark.parametrize('target', ['src/model.py', 'scripts/runner.py', 'tests/admission_shim.py'])
+    @pytest.mark.parametrize('flag', ['--assume-unchanged', '--skip-worktree'])
+    @pytest.mark.parametrize('modified', [False, True])
+    def test_reject_index_flags_even_when_status_is_clean(checkout, target, flag, modified):
+        git(checkout, 'update-index', flag, target)
+        if modified:
+            (checkout / target).write_bytes(b'VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='index flag'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:46: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+__________________ test_reject_ignored_untracked_executable ___________________
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_ignored_untracked_0/repo')
+
+    def test_reject_ignored_untracked_executable(checkout):
+        (checkout / 'src/ignored.py').write_text('VALUE = 900\n')
+        assert git(checkout, 'status', '--porcelain') == ''
+>       with pytest.raises(provenance.ProvenanceError, match='untracked'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:70: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+____________ test_actual_blob_comparison_does_not_depend_on_status ____________
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_actual_blob_comparison_do0/repo')
+
+    def test_actual_blob_comparison_does_not_depend_on_status(checkout):
+        (checkout / 'src/model.py').write_bytes(b'VALUE = 9\n')
+        with pytest.raises(provenance.ProvenanceError, match='actual scoped bytes'):
+>           provenance._verify_scoped_content(checkout, ('src',), git(checkout, 'rev-parse', 'HEAD'))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'scripts.inspection_provenance' has no attribute '_verify_scoped_content'
+
+tests\test_inspection_byte_integrity.py:83: AttributeError
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_________________ test_clean_generated_distribution_metadata __________________
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_clean_generated_distribut0/repo')
+
+    def test_clean_generated_distribution_metadata(checkout):
+        metadata = checkout / 'src/model.egg-info'
+        metadata.mkdir()
+        (metadata / 'PKG-INFO').write_text('Metadata-Version: 2.1\n')
+        (metadata / 'top_level.txt').write_text('model\n')
+        # Match the standard install's ignored metadata without hiding executable code.
+        with (checkout / '.gitignore').open('a') as handle:
+            handle.write('*.egg-info/\n')
+        git(checkout, 'add', '.gitignore')
+        git(checkout, 'commit', '-qm', 'ignore build metadata')
+        provenance.model_identity(checkout, ('src',))
+        (metadata / 'evil.py').write_text('VALUE = 900\n')
+>       with pytest.raises(provenance.ProvenanceError, match='untracked'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:98: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+_________________ test_reject_scope_without_committed_inputs __________________
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_scope_without_comm0/repo')
+
+    def test_reject_scope_without_committed_inputs(checkout):
+>       with pytest.raises(provenance.ProvenanceError, match='committed'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:103: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+__________________ test_reject_in_root_hardlink_substitution __________________
+
+checkout = WindowsPath('F:/Git/body model/.qwen/worktrees/rc1-followup/.runtime/pytest-parent-final/test_reject_in_root_hardlink_s0/repo')
+
+    def test_reject_in_root_hardlink_substitution(checkout):
+        target = checkout / 'src/model.py'
+        original = checkout / 'original.py'
+        target.rename(original)
+        os.link(original, target)
+>       with pytest.raises(provenance.ProvenanceError, match='link'):
+E       Failed: DID NOT RAISE ProvenanceError
+
+tests\test_inspection_byte_integrity.py:112: Failed
+---------------------------- Captured stderr setup ----------------------------
+warning: in the working copy of 'scripts/runner.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/model.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/admission_shim.py', LF will be replaced by CRLF the next time Git touches it
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_inspection_byte_integrity.py:123: Host does not permit creation of symlinks: [WinError 1314] A required privilege is not held by the client: 'F:\\Git\\body model\\.qwen\\worktrees\\rc1-followup\\.runtime\\pytest-parent-final\\test_reject_in_root_symlink_su0\\repo\\original.py' -> 'F:\\Git\\body model\\.qwen\\worktrees\\rc1-followup\\.runtime\\pytest-parent-final\\test_reject_in_root_symlink_su0\\repo\\src\\model.py'
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[False---assume-unchanged-src/model.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[False---assume-unchanged-scripts/runner.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[False---assume-unchanged-tests/admission_shim.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[False---skip-worktree-src/model.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[False---skip-worktree-scripts/runner.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[False---skip-worktree-tests/admission_shim.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[True---assume-unchanged-src/model.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[True---assume-unchanged-scripts/runner.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[True---assume-unchanged-tests/admission_shim.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[True---skip-worktree-src/model.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[True---skip-worktree-scripts/runner.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_index_flags_even_when_status_is_clean[True---skip-worktree-tests/admission_shim.py]
+FAILED tests/test_inspection_byte_integrity.py::test_reject_ignored_untracked_executable
+FAILED tests/test_inspection_byte_integrity.py::test_actual_blob_comparison_does_not_depend_on_status
+FAILED tests/test_inspection_byte_integrity.py::test_clean_generated_distribution_metadata
+FAILED tests/test_inspection_byte_integrity.py::test_reject_scope_without_committed_inputs
+FAILED tests/test_inspection_byte_integrity.py::test_reject_in_root_hardlink_substitution

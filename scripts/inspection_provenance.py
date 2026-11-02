@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 import sys
 from types import ModuleType
@@ -101,6 +102,126 @@ def _git(root: Path, *arguments: str) -> str:
     return result.stdout.strip()
 
 
+def _git_bytes(root: Path, *arguments: str, input_bytes: bytes | None = None) -> bytes:
+    result = subprocess.run(
+        ["git", *arguments], cwd=root, input=input_bytes, capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        raise ProvenanceError(
+            f"cannot authenticate committed inputs: {result.stderr.decode('utf-8', errors='replace').strip()}"
+        )
+    return result.stdout
+
+
+def _regular_scoped_path(root: Path, relative: str) -> Path:
+    path = root
+    parts = Path(relative).parts
+    if not parts or Path(relative).is_absolute() or any(p in ('..', '.') for p in parts):
+        raise ProvenanceError(f"unsafe scoped input path: {relative}")
+    for index, part in enumerate(parts):
+        path = path / part
+        try:
+            info = path.lstat()
+        except OSError as error:
+            raise ProvenanceError(f"scoped input is missing: {relative}") from error
+        if (stat.S_ISLNK(info.st_mode)
+                or getattr(info, 'st_file_attributes', 0) & 0x400):
+            raise ProvenanceError(f"unsafe link/path substitution in scoped input: {relative}")
+        if index == len(parts) - 1 and (
+            not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
+        ):
+            raise ProvenanceError(f"scoped input is not an independent regular file (link): {relative}")
+    return path
+
+
+def _batch_blobs(root: Path, entries: list[tuple[str, str]]) -> list[bytes]:
+    requests = b''.join(
+        oid.encode('ascii') + b'\n'
+        for name, oid in entries
+    )
+    data = _git_bytes(root, 'cat-file', '--batch', input_bytes=requests)
+    outputs = []
+    offset = 0
+    for name, oid in entries:
+        end = data.find(b'\n', offset)
+        header = data[offset:end].split()
+        if end < 0 or len(header) != 3 or header[0].decode() != oid or header[1] != b'blob':
+            raise ProvenanceError(f"invalid trusted blob response for {name}")
+        size = int(header[2])
+        offset = end + 1
+        outputs.append(data[offset:offset + size])
+        offset += size
+        if data[offset:offset + 1] != b'\n':
+            raise ProvenanceError(f"truncated trusted blob response for {name}")
+        offset += 1
+    if offset != len(data):
+        raise ProvenanceError('unexpected trailing trusted blob response')
+    return outputs
+
+
+def _verify_scoped_content(root: Path, paths: tuple[str, ...], revision: str) -> None:
+    """Compare real files with trusted blobs independently of index/stat caches.
+
+    Accept the committed form or Git's checkout-filtered form (e.g. LF/CRLF).
+    Never normalize the actual executable through a potentially lossy clean filter.
+    Filters/config are local Git trust dependencies, not authenticated legal data.
+    """
+    if not paths or any(p.startswith(':') or '\n' in p or '\r' in p for p in paths):
+        raise ProvenanceError('invalid committed input scope')
+    records = _git_bytes(root, 'ls-tree', '-r', '-z', revision, '--', *paths)
+    entries = []
+    for record in records.split(b'\0'):
+        if not record:
+            continue
+        meta, raw_name = record.split(b'\t', 1)
+        mode, kind, oid = meta.decode('ascii').split()
+        name = raw_name.decode('utf-8')
+        if kind != 'blob' or mode not in ('100644', '100755') or '\n' in name or '\r' in name:
+            raise ProvenanceError(f'unsafe committed input type/path: {name}')
+        entries.append((name, oid))
+    for scope in paths:
+        prefix = scope.rstrip('/')
+        if not any(n == prefix or n.startswith(prefix + '/') for n, _ in entries):
+            raise ProvenanceError(f'no committed inputs for scope: {scope}')
+    for record in _git_bytes(root, 'ls-files', '-v', '-z', '--', *paths).split(b'\0'):
+        if record and (record[:1].islower() or record[:1] == b'S'):
+            raise ProvenanceError(f'unsafe Git index flag in checked scope: {record.decode("utf-8")}')
+    expected_names = {name for name, _ in entries}
+    # Include ignored inputs: ordinary Git status intentionally omits these.
+    for scope in paths:
+        start = root / scope
+        candidates = start.rglob('*') if start.is_dir() and not start.is_symlink() else [start]
+        for path in candidates:
+            info = path.lstat()
+            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
+                raise ProvenanceError(f'unsafe link/path substitution in checked scope: {path.relative_to(root)}')
+            if path.is_dir() and not path.is_symlink():
+                continue
+            name = path.relative_to(root).as_posix()
+            if name in expected_names:
+                continue
+            # Standard bytecode caches are generated by compileall/imports and
+            # are not source inputs. Arbitrary ignored source/data is rejected.
+            if '__pycache__' in path.parts and path.suffix == '.pyc':
+                continue
+            if any(p.endswith('.egg-info') for p in path.parts) and (
+                path.name == 'PKG-INFO' or path.suffix == '.txt'
+            ):
+                continue
+            raise ProvenanceError(f'untracked input in checked scope: {name}')
+    actual = [_regular_scoped_path(root, name).read_bytes() for name, _ in entries]
+    committed = _batch_blobs(root, entries)
+    different = [i for i, (raw, trusted) in enumerate(zip(actual, committed)) if raw != trusted]
+    # Batch headers report stored sizes, which need not equal filtered sizes.
+    # Use standalone conversion only for files differing from their raw blob.
+    for index in different:
+        name, oid = entries[index]
+        checkout_bytes = _git_bytes(root, 'cat-file', '--filters', '--path=' + name, oid)
+        if actual[index] != checkout_bytes:
+            raise ProvenanceError(f'actual scoped bytes differ from committed input: {entries[index][0]}')
+
+
 def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
     """Return revision/tree only for a clean, exact worktree and input scope."""
 
@@ -130,6 +251,7 @@ def model_identity(root: Path, scope: Iterable[str]) -> tuple[str, str]:
         raise ProvenanceError(
             "model revision and tree must be full lowercase git object IDs"
         )
+    _verify_scoped_content(selected, paths, revision)
     return revision, tree
 
 
@@ -165,6 +287,7 @@ def inspector_identity(anchor: Path, scope: Iterable[str]) -> dict[str, Any]:
         raise ProvenanceError(
             "inspector revision and tree must be full lowercase git object IDs"
         )
+    _verify_scoped_content(inspector_root, paths, revision)
     files = []
     for relative in paths:
         path = (inspector_root / relative).resolve()
@@ -209,7 +332,7 @@ def inspector_digest_view(identity: dict[str, Any]) -> dict[str, Any]:
 def verified_file_identity(path: Path) -> dict[str, Any]:
     """Read one input once and return its resolved content identity."""
 
-    resolved = path.resolve()
+    resolved = _regular_scoped_path(path.parent.resolve(), path.name).resolve()
     raw = resolved.read_bytes()
     return {
         "path": str(resolved),
@@ -236,7 +359,7 @@ def verified_case_corpus(
     files = []
     captured: dict[str, bytes] = {}
     for path in paths:
-        resolved = path.resolve()
+        resolved = _regular_scoped_path(resolved_root, path.name).resolve()
         if resolved.parent != resolved_root:
             raise ProvenanceError(f"case input escapes the selected directory: {path}")
         raw = resolved.read_bytes()
