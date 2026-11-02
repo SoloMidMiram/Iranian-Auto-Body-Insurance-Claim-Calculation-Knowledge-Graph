@@ -225,8 +225,13 @@ def test_model_change_with_unchanged_case_hashes_rejects_stale_observation(
     (model_root / "claim.py").write_text(
         "# synthetic model entry point\n", encoding="utf-8"
     )
+    # This stale-revision control needs a complete committed input scope;
+    # missing scopes are independently rejected by the byte-integrity gate.
+    shutil.copy2(ROOT / "pyproject.toml", model_root / "pyproject.toml")
+    for scope in ("knowledge", "schema", "ontology", "fixtures"):
+        shutil.copytree(ROOT / scope, model_root / scope)
     _git(model_root, "init", "-b", "main")
-    _git(model_root, "add", "claim.py", "src", "cases")
+    _git(model_root, "add", ".")
     _git(
         model_root,
         "-c",

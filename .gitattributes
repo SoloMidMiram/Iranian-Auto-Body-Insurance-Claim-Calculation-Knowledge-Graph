@@ -4,3 +4,5 @@ cases/inspection-*.json text eol=lf
 docs/article19-evidence/** -text
 docs/settlement-authority-evidence/** -text
 docs/reconciliation-evidence/** -text
+# Captured PowerShell logs retain their original CRLF bytes.
+docs/reconciliation-evidence/rc1-followup/** whitespace=cr-at-eol
