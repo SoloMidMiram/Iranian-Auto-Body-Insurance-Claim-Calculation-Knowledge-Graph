@@ -77,8 +77,8 @@ def main():
         else:
             assert row["review_result"] is None
             assert row["review_decision"]["decision"] == "INSUFFICIENT_INFORMATION"
-    original_path = args.original_comparison or evidence / "original-comparison.json"
-    synthetic_path = args.synthetic_comparison or evidence / "synthetic-comparison.json"
+    original_path = (args.original_comparison or evidence / "original-comparison.json").resolve()
+    synthetic_path = (args.synthetic_comparison or evidence / "synthetic-comparison.json").resolve()
     original = load(original_path)
     synthetic = load(synthetic_path)
     if args.original_comparison or args.synthetic_comparison:
@@ -110,9 +110,9 @@ def main():
           "qualification": "Author-prepared reconciliation, not independent acceptance. No references changed. UNRESOLVED_DOMAIN_ISSUE includes engineering/interface adjudication, not merely legal ambiguity.",
           "cases": cases})
     write(out / "manifest.json", {"revision": revision, "tree": git("rev-parse", "HEAD^{tree}"),
-          "engine_origin": str(engine.__file__), "python": sys.version,
+          "engine_origin": Path(engine.__file__).relative_to(ROOT).as_posix(), "python": sys.version,
           "all_s03_s10_assertions_passed": True, "independent_acceptance": "PENDING", "release": "BLOCKED",
-          "inputs_and_outputs_sha256": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+          "inputs_and_outputs_sha256": {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in [out / "s03-s04.json", out / "s05-s10.json", out / "case-dispositions.json",
                            original_path, synthetic_path]}})
     print("PASS: S03-S10 at", revision, "; 47 author dispositions; independent acceptance PENDING")
