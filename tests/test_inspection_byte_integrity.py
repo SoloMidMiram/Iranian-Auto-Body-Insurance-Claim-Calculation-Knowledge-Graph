@@ -26,7 +26,16 @@ def checkout(tmp_path):
     git(root, 'config', 'user.name', 'Provenance test')
     git(root, 'add', '.')
     git(root, 'commit', '-qm', 'trusted content')
-    return root
+    try:
+        yield root
+    finally:
+        # Restore only this fixture's disposable repository, including failures
+        # and skips. No user checkout's flags or files are ever touched.
+        assert root.resolve().parent == tmp_path.resolve()
+        for flag in ('--no-assume-unchanged', '--no-skip-worktree'):
+            git(root, 'update-index', flag, '--', 'src/model.py',
+                'scripts/runner.py', 'tests/admission_shim.py')
+        git(root, 'restore', '--source=HEAD', '--staged', '--worktree', '--', '.')
 
 
 def identity(root, target):
@@ -123,5 +132,9 @@ def test_reject_in_root_symlink_substitution(checkout):
         target.symlink_to(original)
     except OSError as error:
         pytest.skip('Host does not permit creation of symlinks: ' + str(error))
-    with pytest.raises(provenance.ProvenanceError, match='link|substitution'):
+    # Public validation can reject the earlier Git type-change before reaching
+    # the byte checker; both paths must refuse the actual substitution.
+    with pytest.raises(provenance.ProvenanceError):
         provenance.model_identity(checkout, ('src',))
+    with pytest.raises(provenance.ProvenanceError, match='link|substitution'):
+        provenance._verify_scoped_content(checkout, ('src',), git(checkout, 'rev-parse', 'HEAD'))

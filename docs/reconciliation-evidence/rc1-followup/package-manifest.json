@@ -1,6 +1,6 @@
 {
   "executed_revision": "249cc6918f01548484175d5853f0aa153f4ab851",
-  "publication": "PENDING_FINAL_COMMIT_AND_CI",
+  "publication": "See PR #60 for the final head and native CI; this immutable manifest records artifact bytes, not live approval.",
   "human_approval": "PENDING",
   "release": "BLOCKED",
   "artifact_sha256": {
@@ -9,7 +9,7 @@
     "docs/reconciliation-evidence/rc1-followup/BASELINE.md": "94f31463b63dd89edf513a836c820ea2395c49cc871b4552e3e279b5fa463991",
     "docs/reconciliation-evidence/rc1-followup/CASE_DISPOSITIONS.json": "067ea96e3c9cd3a7e37169513ae1e25d40d012e13a750dbfbf2b21e5b08a6857",
     "docs/reconciliation-evidence/rc1-followup/CASE_DISPOSITIONS.md": "afb144ecf0c6f511e82657d8c7db47df9cbfb9aac4e402f3475487d8ae9a2470",
-    "docs/reconciliation-evidence/rc1-followup/COMPLETION_AUDIT.md": "5463b747ee10fee08af4255fa1ff6213ca701880850223e1a1c33d403d612b36",
+    "docs/reconciliation-evidence/rc1-followup/COMPLETION_AUDIT.md": "48dcc735e6d75649f5f6809164b5dab4a8938a04142ff3c69734662b4bbd86bd",
     "docs/reconciliation-evidence/rc1-followup/corpus-summary.json": "b44dd06719adb9c1ee6cf2a46bd10984ea521e5df6820fd31461e8554c58d6ce",
     "docs/reconciliation-evidence/rc1-followup/fix-byte-integrity.txt": "7355b091e852bf4c86046bde510dce79268400cbf91d9f96f0e1634798f58131",
     "docs/reconciliation-evidence/rc1-followup/independent-reference-packet.json": "862f71b1b88d97f257ad525ea62db218d7e7844e30902592a0a82b74e4b830ad",
@@ -20,7 +20,7 @@
     "docs/reconciliation-evidence/rc1-followup/MERGE_PLAN.md": "9ae447b9114ba9e4395721cae4b5273989e336562cf74ede337657a6e8da161f",
     "docs/reconciliation-evidence/rc1-followup/parent-byte-integrity-corrected-control.txt": "c0cf5d8648c0c8d3377b8817a221c1985e2986174bc664901a1f199ee9a2815f",
     "docs/reconciliation-evidence/rc1-followup/parent-financial-tests.txt": "e060c17e11ac382c97f980a55b08ba4df5706ba494aba29f561a702f863548e3",
-    "docs/reconciliation-evidence/rc1-followup/PROVENANCE_SECURITY.md": "86f399a5689026c018c34f1d3d0a3abe2088586e326d30b415b774da71c6e4b1",
+    "docs/reconciliation-evidence/rc1-followup/PROVENANCE_SECURITY.md": "ecb26aaa4bd32f123210d090dfff1f6a8eea0c7ae188025ebbe46f020ecd0828",
     "docs/reconciliation-evidence/rc1-followup/RELEASE_READINESS.md": "95b2ed206414e9527f996a820ff40ba203f93ae4ab614bfad3a6f7f9daf8c185",
     "docs/reconciliation-evidence/rc1-followup/ROADMAP_RECONCILIATION.md": "a0990dfa3ba68ba93bc660685990229059f3003b27646e91a64b5e7e08b63298",
     "docs/reconciliation-evidence/rc1-followup/s03-s10-summary.json": "ad585471a9ef9e49cbf936ddc4e3cd3a215f710127988c6b794e58f51edd48e4",
@@ -29,5 +29,6 @@
     "docs/reconciliation-evidence/rc1-followup/validation-summary.json": "f5854ff1a1521a39b25155498e50bf003a198644da5f13d75326b318ff711c8f",
     "docs/reconciliation-evidence/rc1-followup/VALIDATION_REPORT.md": "0e761cfab27dd348110bb228a3eb6ab91bf2ed7e8f34f47f0dd9fcb2b2bafd5b"
   },
-  "metadata_after_execution": "README count, finding-ID/source metadata and package summaries only; observed data unchanged"
+  "metadata_after_execution": "README count, finding-ID/source metadata and package summaries only; observed data unchanged",
+  "post_execution_test_change": "Native symlink regression now asserts both rejection paths and restores disposable fixture state; production model and frozen inputs unchanged."
 }
