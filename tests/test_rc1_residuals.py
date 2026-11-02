@@ -65,3 +65,13 @@ def test_on_time_no_impaired_recovery_control_still_computes(kb):
     result = Review(payload, kb).calculate()
     assert result is not None
     assert result.payable == 1657000000
+
+@pytest.mark.parametrize('name', ['c31u04-unresolved', 'c32u04-cap-then-dep',
+                                  'c33u04-dep-then-cap', 'c34u04-cap-only'])
+def test_inline_component_prices_are_not_requested_twice(kb, name):
+    review = Review(case(name), kb)
+    assert review.decision()['decision'] == 'SCENARIO_SET'
+    result = review.calculate()
+    assert result is not None
+    assert result.payable is None
+    assert result.status == 'BATTERY_TIRE_INTERACTION_UNRESOLVED'

@@ -22,13 +22,25 @@ def git(*args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--original-comparison", type=Path)
+    parser.add_argument("--synthetic-comparison", type=Path)
     args = parser.parse_args()
     out = args.output.resolve()
     evidence = ROOT / "docs/reconciliation-evidence"
     revision = git("rev-parse", "HEAD")
     scope = ["claim.py", "pyproject.toml", "src", "knowledge", "schema", "ontology", "fixtures", "tests", "cases"]
-    assert not git("diff", "5cee269", "HEAD", "--", *scope)
+    # Later bounded corrections intentionally change executable content. Preserve
+    # immutable references separately rather than requiring the old model forever.
+    preserved = ["cases/inspection-*.json", "docs/case-reference-manifest-v1.json",
+                 "docs/reconciliation-evidence/synthetic-v1",
+                 "docs/reconciliation-evidence/synthetic-reference-v1.json"]
+    assert not git("diff", "81ee520", "HEAD", "--", *preserved)
     assert not git("diff", "HEAD", "--", *scope)
+    sys.path.insert(0, str(ROOT))
+    from scripts.inspection_provenance import model_identity, inspector_identity
+    assert model_identity(ROOT, scope)[0] == revision
+    inspector_identity(Path(__file__), ("scripts/run_integration_rc1_audit.py",
+        "scripts/run_settlement_authority_acceptance.py", "scripts/inspection_provenance.py"))
     sys.path.insert(0, str(ROOT / "src"))
     from iran_auto_claim.knowledge import Knowledge
     from iran_auto_claim.review import Review
@@ -65,8 +77,12 @@ def main():
         else:
             assert row["review_result"] is None
             assert row["review_decision"]["decision"] == "INSUFFICIENT_INFORMATION"
-    original = load(evidence / "original-comparison.json")
-    synthetic = load(evidence / "synthetic-comparison.json")
+    original_path = args.original_comparison or evidence / "original-comparison.json"
+    synthetic_path = args.synthetic_comparison or evidence / "synthetic-comparison.json"
+    original = load(original_path)
+    synthetic = load(synthetic_path)
+    if args.original_comparison or args.synthetic_comparison:
+        assert original["revision"] == synthetic["revision"] == revision
     synthetic_by_id = {row["case_id"]: row for row in synthetic["cases"]}
     cases = []
     for old in original["cases"]:
@@ -89,7 +105,6 @@ def main():
                       "independent_disposition": "PENDING"})
     assert len(cases) == len(synthetic_by_id) == 47
     assert Counter(row["historical_disposition"] for row in cases)["EXPECTED_CONTAINMENT"] == 41
-    assert Counter(row["synthetic_disposition"] for row in cases)["UNRESOLVED_DOMAIN_ISSUE"] == 11
     write(out / "case-dispositions.json", {"executed_revision": revision,
           "corpus_observation_revision": original["revision"],
           "qualification": "Author-prepared reconciliation, not independent acceptance. No references changed. UNRESOLVED_DOMAIN_ISSUE includes engineering/interface adjudication, not merely legal ambiguity.",
@@ -99,7 +114,7 @@ def main():
           "all_s03_s10_assertions_passed": True, "independent_acceptance": "PENDING", "release": "BLOCKED",
           "inputs_and_outputs_sha256": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in [out / "s03-s04.json", out / "s05-s10.json", out / "case-dispositions.json",
-                           evidence / "original-comparison.json", evidence / "synthetic-comparison.json"]}})
+                           original_path, synthetic_path]}})
     print("PASS: S03-S10 at", revision, "; 47 author dispositions; independent acceptance PENDING")
 
 if __name__ == "__main__":

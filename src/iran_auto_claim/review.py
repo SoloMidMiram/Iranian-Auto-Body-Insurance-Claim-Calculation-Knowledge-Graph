@@ -154,6 +154,14 @@ class Review:
         return self.answers.get(question_id)
 
     def is_answered(self, question_id: str) -> bool:
+        if question_id == "Q-S4-04" and question_id not in self.answers:
+            records = [item for item in _as_list(self.answer("Q-S4-03"))
+                       if isinstance(item, dict) and item.get("category") in ("BATTERY", "TIRE")]
+            # Itemised assessments already carry each component's own price.
+            # Do not demand it twice or invent one scalar price for several items.
+            if records and all(_is_number(item.get("new_price_irr", item.get("new_price")))
+                               for item in records):
+                return True
         if question_id not in self.answers:
             return False
         value = self.answers[question_id]
