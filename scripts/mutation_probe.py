@@ -583,6 +583,20 @@ def main() -> int:
     reconciled = compute(review_authorization, kb)
     assert reconciled.payable is None
     assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" in reconciled.blocking_uncertainties
+    # RC-1: selected assessment method and unresolved eligibility adjudications
+    # cannot disappear at either supported Review or diagnostic direct boundary.
+    synthetic = Path(__file__).resolve().parents[1] / "docs/reconciliation-evidence/synthetic-v1"
+    for name in ("c97-late-notice-no-excuse", "c98-recourse-released",
+                 "c48-assessed-depreciation-figure"):
+        payload = json.loads((synthetic / ("inspection-" + name + ".json")).read_text(encoding="utf-8"))
+        review = Review(payload, kb)
+        assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+        assert review.calculate() is None
+        direct = compute(_authorize_fixture_case(review.case_payload(), kb), kb)
+        assert direct.payable is None
+    battery = Review(json.loads((synthetic / "inspection-c35q404-battery-new-price.json").read_text(encoding="utf-8")), kb)
+    assert battery.slot_status("PS_PART_NEW_PRICE").status == "RESOLVED"
+    assert battery.slot_status("PS_BATTERY_TIRE_INTERACTION").status == "RESOLVED"
     return 0
 
 

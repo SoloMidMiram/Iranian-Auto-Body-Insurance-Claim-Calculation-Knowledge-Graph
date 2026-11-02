@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, Review operand construction in `review.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **38/38 killed (100.0%)**
+- Result: **43/43 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -48,6 +48,11 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M38 | KILLED | an explicit retained valuation pays without supporting evidence |
 | M39 | KILLED | Review authorizes an unverified franchise scenario despite authority gap |
 | M40 | KILLED | conflicting policy/endorsement terms are silently merged |
+| M41 | KILLED | unadjudicated notice or recovery impairment reaches body arithmetic |
+| M42 | KILLED | Review authorizes unadjudicated late notice |
+| M43 | KILLED | Review authorizes unadjudicated recovery impairment |
+| M44 | KILLED | Review replaces a selected assessor route with per-part depreciation |
+| M45 | KILLED | direct computation discards the selected assessor depreciation route |
 
 ## Triaged mutation survivors
 

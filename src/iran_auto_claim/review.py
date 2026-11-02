@@ -353,6 +353,10 @@ class Review:
             if answered:
                 binding.status = STATUS_NOT_TRIGGERED
                 binding.note = "answered; the slot is only read when the answer triggers it"
+                if (slot_id == "PS_ASSESSED_DEPRECIATION"
+                        and self.answer("Q-S4-05") == "ASSESSED_FIGURE"):
+                    binding.status = STATUS_UNANSWERED
+                    binding.note = "the assessor route was selected but no monetary figure is bound"
             elif fillers and not applicable:
                 binding.status = STATUS_NOT_APPLICABLE
                 binding.note = "the question that would supply it is not asked for this file"
@@ -606,6 +610,9 @@ class Review:
         if (rescue_actual := slot_value("PS_RESCUE_ACTUAL")) is not None:
             damage["rescue_for_total_loss_test_irr"] = irr(rescue_actual)
             damage["rescue_for_total_loss_test_source"] = "DERIVED_FROM_ACTUAL_RESCUE"
+
+        if self.answer("Q-S4-05") == "ASSESSED_FIGURE":
+            damage["depreciation_method"] = "ASSESSED_FIGURE"
 
         config: dict[str, Any] = {}
         for key, slot in (
@@ -918,6 +925,13 @@ class Review:
             return []
 
         conditions: list[str] = []
+        if str(self._bound.get("PS_NOTICE_TIMELINESS") or "").lower() == "true":
+            conditions.append("NOTICE_ADJUDICATION_REQUIRED")
+        if str(self._bound.get("PS_SUBROGATION_IMPAIRED") or "").lower() == "true":
+            conditions.append("SUBROGATION_ADJUDICATION_REQUIRED")
+        if (branch == "PARTIAL_DAMAGE" and self.answer("Q-S4-05") == "ASSESSED_FIGURE"
+                and self._bound.get("PS_ASSESSED_DEPRECIATION") is None):
+            conditions.append("ASSESSED_DEPRECIATION_AMOUNT_REQUIRED")
         declared_terms: dict[str, Any] = {}
         for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
             answer = self.answer(question)

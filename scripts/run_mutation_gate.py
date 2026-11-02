@@ -190,6 +190,21 @@ MUTATIONS += (
     Mutation("M40", "src/iran_auto_claim/review.py",
              "if key in declared_terms and declared_terms[key] != value:", "if False:",
              "conflicting policy/endorsement terms are silently merged"),
+    Mutation("M41", "src/iran_auto_claim/engine.py",
+             'if res.domain == "BODY" and adjudications:', 'if False:',
+             "unadjudicated notice or recovery impairment reaches body arithmetic"),
+    Mutation("M42", "src/iran_auto_claim/review.py",
+             'conditions.append("NOTICE_ADJUDICATION_REQUIRED")', 'pass',
+             "Review authorizes unadjudicated late notice"),
+    Mutation("M43", "src/iran_auto_claim/review.py",
+             'conditions.append("SUBROGATION_ADJUDICATION_REQUIRED")', 'pass',
+             "Review authorizes unadjudicated recovery impairment"),
+    Mutation("M44", "src/iran_auto_claim/review.py",
+             'if (branch == "PARTIAL_DAMAGE" and self.answer("Q-S4-05") == "ASSESSED_FIGURE"',
+             'if (False', "Review replaces a selected assessor route with per-part depreciation"),
+    Mutation("M45", "src/iran_auto_claim/engine.py",
+             'if case.damage.get("depreciation_method") == "ASSESSED_FIGURE":', 'if False:',
+             "direct computation discards the selected assessor depreciation route"),
 )
 
 THRESHOLD = 90.0
@@ -220,6 +235,7 @@ def _copy_repository(target: Path) -> None:
             "*.pyc",
             "COMMIT_STAGING_DRAFT.txt",
             ".venv",
+            ".runtime",
         ),
     )
 

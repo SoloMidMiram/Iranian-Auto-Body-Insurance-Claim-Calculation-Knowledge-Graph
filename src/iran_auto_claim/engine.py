@@ -541,12 +541,21 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
         res.label("EXCLUDED_WITHOUT_ENDORSEMENT")
         return True
 
+    adjudications: list[str] = []
     if case.late_notice_issue:
         res.label("LATE_NOTICE_REVIEW")
         res.note_rule("REG53_NOTICE_AND_DUTIES")
+        adjudications.append("NOTICE_ADJUDICATION_REQUIRED")
     if case.subrogation_impaired:
         res.label("SUBROGATION_IMPAIRMENT_REVIEW")
         res.note_rule("REG53_ART14_SUBROGATION")
+        adjudications.append("SUBROGATION_ADJUDICATION_REQUIRED")
+    if res.domain == "BODY" and adjudications:
+        res.payable = None
+        res.status = adjudications[0]
+        res.fields["eligibility_blocking_conditions"] = adjudications
+        res.reason = "affected notice/recovery predicates require reviewed adjudication before calculation"
+        return True
     return False
 
 
@@ -593,6 +602,13 @@ def check_risk_intensification(case: Case, kb: Knowledge) -> None:
 def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("PARTIAL_DAMAGE")
     res.note_rule("REG53_ART19B_PARTIAL_LOSS_BASE")
+    if case.damage.get("depreciation_method") == "ASSESSED_FIGURE":
+        if case.assessed_depreciation is None or case.parts:
+            res.payable = None
+            res.status = ("ASSESSED_DEPRECIATION_AMOUNT_REQUIRED" if case.assessed_depreciation is None
+                          else "ASSESSED_DEPRECIATION_METHOD_UNRESOLVED")
+            res.reason = "the selected assessor route cannot silently become computed-per-part depreciation"
+            return
 
     parts = case.parts
     labor = case.labor or Decimal(0)

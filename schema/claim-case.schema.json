@@ -391,6 +391,11 @@
           "type": "boolean",
           "description": "Explicit opt-in for a legacy imported case that historically treated omitted rescue as arithmetic zero. It is not evidence that no rescue occurred and is never emitted by Review."
         },
+        "depreciation_method": {
+          "type": "string",
+          "enum": ["ASSESSED_FIGURE"],
+          "description": "Explicit assessor-route intent; missing figure or conflicting itemised method blocks rather than falling back to year depreciation."
+        },
         "assessed_depreciation_irr": {
           "type": [
             "integer",
