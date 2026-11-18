@@ -30,6 +30,7 @@ from iran_auto_claim.admission import (
     AuthorizationError,
     AuthorizationNotGranted,
     CalculationAuthorization,
+    _issue_review_authorization,
     claim_hash,
 )
 from iran_auto_claim.case import Case
@@ -65,9 +66,11 @@ def test_a_raw_payload_cannot_reach_compute(kb):
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": 1600},
+        "damage": {"gross": 1600, "depreciation": 0, "market": 2000, "insured": 2000},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -219,9 +222,11 @@ def test_dataclasses_replace_cannot_retarget_an_authorization(kb):
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": 1600},
+        "damage": {"gross": 1600, "depreciation": 0, "market": 2000, "insured": 2000},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -249,6 +254,45 @@ def test_dataclasses_replace_cannot_retarget_an_authorization(kb):
 
     # the unedited payload is still admitted, and still gives the same answer
     assert compute(authorization, kb).payable == Decimal(1500)
+
+
+def test_review_live_uncertainty_cannot_disappear_into_a_single_payable(kb):
+    payload = {
+        "claim_id": "authorization-uncertainty-reconciliation",
+        "unit": "IRR",
+        "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
+        "event": {"event_date": "1405/06/01"},
+        "damage": {
+            "gross": 100,
+            "depreciation": 0,
+            "market": 100,
+            "insured": 100,
+        },
+        "policy": {
+            "policy_version": "TEST-v1",
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": 10,
+                "source": "POLICY",
+                "source_reference": "test schedule",
+                "source_version": "TEST-v1",
+            },
+        },
+    }
+    authorization = _issue_review_authorization(
+        payload,
+        decision="SCENARIO_SET",
+        issued_at="2026-10-08T00:00:00+00:00",
+        provenance={"live_uncertainties": ["U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]},
+    )
+    result = compute(authorization, kb)
+    assert result.payable is None
+    assert result.payable_scenarios == []
+    assert result.status == "AUTHORIZED_UNCERTAINTY_UNRESOLVED"
+    assert result.blocking_uncertainties == ["U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
+    assert result.fields["authorization_uncertainties_added"] == [
+        "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -332,9 +376,13 @@ def test_an_unresolved_risk_intensification_blocks_at_the_engine_too(kb):
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
         "damage": {"gross": 1600},
-        "coverage_gate": {"risk_intensified": True},
+        "coverage_gate": {
+            "causal_relationship_established": True,
+            "risk_intensified": True,
+        },
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -400,6 +448,7 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
         return {
             "policy_version": "TEST-v1",
             "endorsements": endorsements,
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,
@@ -411,7 +460,15 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
 
     cases = (
         ("PARTIAL_DAMAGE", {"gross": 1600}),
-        ("TOTAL_LOSS", {"market": 2000, "insured": 2000, "repair": 1900}),
+        (
+            "TOTAL_LOSS",
+            {
+                "market": 2000,
+                "insured": 2000,
+                "repair": 1900,
+                "rescue_for_threshold": 0,
+            },
+        ),
         ("GLASS_ONLY", {"gross": 1600}),
         (
             "THEFT",
@@ -431,7 +488,10 @@ def test_risk_intensification_blocks_every_body_branch_at_the_engine(kb):
             "classification": {"branch": branch, "domain": "BODY"},
             "event": {"event_date": "1405/06/01"},
             "damage": damage,
-            "coverage_gate": {"risk_intensified": True},
+            "coverage_gate": {
+                "causal_relationship_established": True,
+                "risk_intensified": True,
+            },
             "policy": policy(branch),
         }
         result = compute(_authorize_fixture_case(payload, kb), kb)
@@ -516,15 +576,16 @@ def test_authorization_provenance_is_preserved_into_the_result(kb):
     assert record["claim_hash"] == authorization.claim_hash
     assert record["tier"] == "T1"
     assert record["branch"] == "PARTIAL_DAMAGE"
-    # The T1 file dates are dash-separated, which the snapshot resolver does not
-    # read as a Jalali anchor, so it falls back to the recorded Iranian year.
-    assert record["snapshot_id"] == "BODY@1404/12/29"
+    # Legacy dash-separated Shamsi input is now validated and selects the actual
+    # occurrence day; it no longer substitutes the Iranian year's final day.
+    assert record["snapshot_id"] == "BODY@1404/08/20"
     assert record["classification"]["outcome"] == "MATCH"
     assert record["policy_snapshot"]["franchise"]["source"] == "POLICY"
     assert record["live_uncertainties"] == []
     assert record["blocking_conditions"] == []
 
     result = compute(authorization, kb)
+    assert result.payable == T1_PAYABLE
     assert result.authorization["claim_hash"] == authorization.claim_hash
     assert result.authorization["issuer"] == ISSUER_REVIEW
 

@@ -174,7 +174,7 @@ path before they affect acceptance or arithmetic.
 |---|---|---|
 | Missing franchise terms | U02 with no single payable; never zero | Enforced at the shared engine boundary for review-to-engine and the synthetic fixture corpus; explicit zero requires versioned, referenced policy evidence |
 | Missing production year where depreciation can apply | `INSUFFICIENT_INFORMATION`; never assume 0% | Review gate enforced and regression-tested. The claim schema also refuses an itemised-parts case with no `regulatory_snapshot.iranian_year` and no production year |
-| Theft-clock anchor ambiguity | Return pending/anchor scenarios or request the dated source; never pick a clock silently | U13 blocks every whole-vehicle theft in review; no engine handoff until explicit clock inputs are modeled |
+| Theft-clock anchor ambiguity | Request the dated source; never pick a clock silently | Review binds start event/date, as-of date, calendar, and source; U13 blocks incomplete groups, while complete groups reach the engine for derived-day verification |
 | Underinsurance order unresolved | Return both approved scenarios; never choose or average | Enforced by `U01` and the partial-loss engine |
 | Unresolved risk intensification | No payable; never substitute the underinsurance ratio | `Q-S3-07` is a hard review gate: `YES` activates blocking `U15`, while `UNKNOWN` or omission leaves the material fact unresolved. The engine also fails closed on `coverage_gate.risk_intensified` for every body branch. |
 
@@ -200,6 +200,11 @@ after_depreciation = gross_eligible - replacement_part_depreciation
 ratio = min(1, insured_sum / event_date_market_value)
 allowable_rescue = min(actual_rescue, 20% * sourced_cap_base)
 ```
+
+An explicitly supplied `rescue_payable` remains a separate reimbursable
+operand. The engine verifies it against the applicable ceiling and, when actual
+expense is also supplied, against that expense; it is neither copied into
+`actual_rescue` nor capped a second time.
 
 Fully insured, resolved case:
 
@@ -298,26 +303,27 @@ documents are authentic or legally sufficient.
 
 ## 10. Current status and next engineering steps
 
-Validated on 2026-10-05:
+Revalidated on 2026-10-10 under Python 3.11.15:
 
-- knowledge graph integrity passes: 261 registered nodes;
+- knowledge graph integrity passes structurally: 271 registered nodes, with 22
+  body-authority and 48 source-metadata findings retained as release work;
 - all 50 synthetic calculation fixtures pass;
-- the complete automated suite passes: 467 tests;
+- the complete automated suite reports 515 passed and 11 strict expected
+  failures tied to named unresolved audit counterexamples;
 - generated review documentation matches the graph;
 - worked T1 review computes 165.70 million toman;
 - worked T3 review returns 139.625 and 144.6875 million-toman scenarios;
 - missing franchise terms or authority stop every body settlement path on U02;
 - explicit zero franchise is accepted only from versioned, referenced policy evidence;
 - no calculation path reaches the engine without an authorization, and the
-  mutation gate kills hash, decision, and review-issuance bypass mutants (16/16).
+  mutation gate kills all 24 curated high-risk mutants (24/24).
 
 Remaining gaps, in priority order:
 
-1. Make structured event clocks first-class (`start_event`, `start_date`, `as_of`,
-   calendar, elapsed days) and calculate every material theft-clock scenario. The
-   engine still reads `days_vehicle_missing`, which is a derived output rather than
-   a structured clock. The review gate blocks unanchored whole-vehicle theft before
-   authorization, but the underlying field should still be redesigned.
+1. Complete the authority review for theft-clock anchors across insurer/policy
+   versions. Structured `start_event`, `start_date`, `as_of_date`, calendar, and
+   source now flow from review to the engine; U13 blocks an incomplete group and
+   the engine verifies `days_vehicle_missing` against the derived interval.
 2. The evidence id list's `if_absent` token is enforced. Document contents are still
    not verified: the gate trusts `evidence_present` rather than recording identity,
    issuer, date, version, and hash.

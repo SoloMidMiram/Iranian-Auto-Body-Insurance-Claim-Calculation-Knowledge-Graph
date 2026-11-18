@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import copy
+
 import pytest
+from admission_shim import compute as admitted_compute
 
 from iran_auto_claim.engine import CalcResult, _enforce_guard_plan
-
-from admission_shim import compute
 from iran_auto_claim.money import D
 
 
@@ -23,6 +24,8 @@ ALL_GUARDS = [
     "G_NO_MANDATORY_FRANCHISE_WITHOUT_DISCLOSURE",
     "G_NO_GUESSED_ENDORSEMENT_TERMS",
     "G_NO_ASSUMED_CAUSATION",
+    "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+    "G_RECOVERY_ALLOCATION_CONTAINED",
     "G_UNCERTAINTY_MUST_SURFACE",
 ]
 
@@ -40,7 +43,58 @@ def _policy(
         spec["absolute_irr"] = franchise
     else:
         spec["rate"] = "0.10"
+        spec["calculation_base"] = "AFTER_DEPRECIATION"
     return {"policy_version": "TEST-v1", "franchise": spec}
+
+
+def compute(payload, kb):
+    """Make the guard-focused synthetic assumptions explicit."""
+    payload = copy.deepcopy(payload)
+    branch = (payload.get("classification") or {}).get("branch")
+    if branch in ("PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"):
+        payload.setdefault("coverage_gate", {}).setdefault(
+            "causal_relationship_established", True
+        )
+        payload.setdefault("policy", {}).setdefault(
+            "multiple_insurance",
+            {"state": "NO", "prior_compensation": 0},
+        )
+    damage = payload.setdefault("damage", {})
+    if any(key in damage for key in ("repair", "repair_total", "repair_total_irr")) and not any(
+        key in damage
+        for key in (
+            "actual_rescue",
+            "rescue",
+            "rescue_transport_actual_irr",
+            "rescue_for_threshold",
+            "rescue_for_total_loss_test_irr",
+        )
+    ):
+        damage["rescue_for_threshold"] = 0
+    if branch == "PARTIAL_DAMAGE":
+        if not any(key in damage for key in ("market", "insured")):
+            damage["market"] = 10**12
+            damage["insured"] = 10**12
+        if not any(
+            key in damage
+            for key in ("depreciation", "depreciable_parts", "parts", "replacement_parts")
+        ):
+            damage["depreciation"] = 0
+    if branch == "TOTAL_LOSS" and any(
+        key in damage for key in ("salvage", "salvage_value")
+    ):
+        damage.setdefault("salvage_disposition", "INSURED_RETAINS")
+    franchise = ((payload.get("policy") or {}).get("franchise") or {})
+    if str(franchise.get("mode") or "").startswith("PERCENT"):
+        franchise.setdefault("calculation_base", "AFTER_DEPRECIATION")
+    if (damage.get("rescue_payable") or damage.get("actual_rescue")) and branch in (
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+    ):
+        payload.setdefault("calculation_config", {}).setdefault(
+            "rescue_cap_base", "ASSESSED_GROSS"
+        )
+    return admitted_compute(payload, kb)
 
 
 @pytest.mark.parametrize("guard_id", ALL_GUARDS, ids=ALL_GUARDS)
@@ -105,7 +159,7 @@ def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
                 "market": 1000,
                 "insured": 1000,
                 "repair": 800,
-                "rescue_payable": 500,
+                "actual_rescue": 500,
             },
             "policy": _policy(0),
         },
@@ -143,7 +197,7 @@ def test_rescue_cap_runs_when_the_claim_is_under_and_over_the_ceiling(kb):
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 1000, "rescue_payable": 10},
+            "damage": {"gross": 1000, "actual_rescue": 10},
             "policy": _policy(0),
         },
         kb,
@@ -157,7 +211,7 @@ def test_rescue_cap_runs_when_the_claim_is_under_and_over_the_ceiling(kb):
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE"},
             "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 1000, "rescue_payable": 900},
+            "damage": {"gross": 1000, "actual_rescue": 900},
             "policy": _policy(0),
         },
         kb,
@@ -326,6 +380,7 @@ def test_causation_token_excludes_and_narrative_text_does_not(kb):
             "event": {
                 "event_date": "1405/06/01",
                 "cause": "DRIVER_INTOXICATION_CAUSALLY_CONFIRMED",
+                "intoxication_causally_confirmed": True,
             },
             "damage": {"gross": 1000},
             "policy": _policy(10),

@@ -19,9 +19,11 @@ def _partial(
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
         "event": {"event_date": "1405/06/01"},
-        "damage": {"gross": gross, "market": market, "insured": insured},
+        "damage": {"gross": gross, "depreciation": 0, "market": market, "insured": insured},
+        "coverage_gate": {"causal_relationship_established": True},
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": franchise,
@@ -76,14 +78,16 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
             "unit": "IRR",
             "classification": {"branch": "TOTAL_LOSS"},
             "event": {"event_date": "1405/06/01"},
+            "coverage_gate": {"causal_relationship_established": True},
             "damage": {
                 "market": 2000,
                 "insured": 1500,
                 "repair": 1800,
-                "rescue_payable": 900,
+                "actual_rescue": 900,
             },
             "policy": {
                 "policy_version": "TEST-v1",
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                 "franchise": {
                     "mode": "ABSOLUTE",
                     "absolute_irr": 0,
@@ -92,6 +96,7 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
                     "source_version": "TEST-v1",
                 },
             },
+            "calculation_config": {"rescue_cap_base": "ASSESSED_GROSS"},
         },
         kb,
     )
@@ -156,14 +161,16 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                 "unit": "IRR",
                 "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
                 "event": {"event_date": "1405/06/01"},
+                "coverage_gate": {"causal_relationship_established": True},
                 "damage": {
                     "market": market,
                     "insured": insured,
                     "repair": market,
-                    "rescue_payable": rescue,
+                    "actual_rescue": rescue,
                 },
                 "policy": {
                     "policy_version": "TEST-v1",
+                    "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                     "franchise": {
                         "mode": "ABSOLUTE",
                         "absolute_irr": franchise,
@@ -172,6 +179,7 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                         "source_version": "TEST-v1",
                     },
                 },
+                "calculation_config": {"rescue_cap_base": "ASSESSED_GROSS"},
             },
             kb,
         )

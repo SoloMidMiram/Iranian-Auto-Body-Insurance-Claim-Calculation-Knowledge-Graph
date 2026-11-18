@@ -82,8 +82,9 @@ def replacement_part_depreciation_rate(
 
     Glass and lamp glass are expressly exempt. Every other replaced part accrues
     5% per production year beginning with the fifth production year, capped at
-    25%. Absent a production year there is no basis for aging depreciation, so
-    the rate is 0 rather than a guess.
+    25%. Date completeness is enforced at the case/schema boundary. This
+    operator remains total for direct unit use, but settlement code must never
+    treat a missing-date zero as evidence that no depreciation applies.
     """
     if part_category in DEPRECIATION_EXEMPT_CATEGORIES:
         return Decimal(0)
@@ -137,13 +138,19 @@ def eligible_part_loss(
     assessed = D(part["assessed_loss"])
 
     capped = special_part_cap(category, assessed, part.get("new_price"))
+    requires_replacement = bool(
+        part.get("requires_replacement", category != "REPAIR_ONLY")
+    )
 
     override = part.get("depreciation_rate")
-    rate = (
-        D(override)
-        if override is not None
-        else replacement_part_depreciation_rate(production_year, claim_year, category)
-    )
+    if not requires_replacement:
+        rate = Decimal(0)
+    else:
+        rate = (
+            D(override)
+            if override is not None
+            else replacement_part_depreciation_rate(production_year, claim_year, category)
+        )
 
     if category in SPECIAL_CAP_CATEGORIES and rate > 0:
         interaction = cfg.get("battery_tire_depreciation_interaction", "UNRESOLVED")
@@ -158,20 +165,35 @@ def eligible_part_loss(
                 scenarios=["CAP_THEN_DEPRECIATE", "DEPRECIATE_THEN_CAP", "CAP_ONLY"],
             )
         if interaction == "CAP_THEN_DEPRECIATE":
-            base = capped
+            scheduled_depreciation = depreciation_amount(capped, rate)
+            after_depreciation = capped - scheduled_depreciation
         elif interaction == "DEPRECIATE_THEN_CAP":
-            base = special_part_cap(category, assessed - assessed * rate, part.get("new_price"))
-        else:  # CAP_ONLY
+            scheduled_depreciation = depreciation_amount(assessed, rate)
+            after_depreciation = special_part_cap(
+                category, assessed - scheduled_depreciation, part.get("new_price")
+            )
+        elif interaction == "CAP_ONLY":
             rate = Decimal(0)
-            base = capped
+            scheduled_depreciation = Decimal(0)
+            after_depreciation = capped
+        else:
+            raise OperatorError(
+                f"unknown battery/tire depreciation interaction {interaction!r}"
+            )
     else:
-        base = capped
+        scheduled_depreciation = depreciation_amount(capped, rate)
+        after_depreciation = capped - scheduled_depreciation
 
-    depreciation = depreciation_amount(base, rate)
+    # Report the effective deduction from the already capped eligible loss.
+    # In DEPRECIATE_THEN_CAP the cap may absorb some or all of the scheduled
+    # depreciation; subtracting the scheduled amount again would apply it twice.
+    effective_depreciation = capped - after_depreciation
     return {
-        "capped_loss": base,
+        "capped_loss": capped,
+        "loss_after_depreciation": after_depreciation,
         "depreciation_rate": rate,
-        "depreciation_amount": depreciation,
+        "scheduled_depreciation_amount": scheduled_depreciation,
+        "depreciation_amount": effective_depreciation,
     }
 
 

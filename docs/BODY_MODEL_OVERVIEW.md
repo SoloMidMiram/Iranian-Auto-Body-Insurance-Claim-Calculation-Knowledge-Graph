@@ -210,6 +210,11 @@ ratio             = min(1, insured_sum / event_date_market_value)
 allowable_rescue  = min(actual_rescue, 20% * sourced_rescue_cap_base)
 ```
 
+If an upstream adapter instead supplies `rescue_payable`, the engine keeps it
+separate from actual expense and uses it only after verifying that it does not
+exceed the applicable rescue ceiling (or the actual expense when both are
+present). It is never copied into `actual_rescue` or capped a second time.
+
 Resolved order:
 
 ```text
@@ -259,9 +264,10 @@ settlement_base = min(event_date_market_value, insured_sum)
 - Attempted-theft damage routes to `PARTIAL_DAMAGE`.
 - Partial-parts theft requires endorsement limit and franchise terms.
 
-The current stored theft day-count does not itself prove the clock's legal
-anchor. Until structured source-backed start/as-of dates are implemented, U13
-must block the review handoff rather than allow a guessed clock.
+The stored theft day-count does not itself prove the clock's legal anchor.
+Review now requires a sourced start event/date, as-of date, calendar, and source;
+U13 blocks the handoff until that group is complete, and the engine rejects any
+stored day count that differs from the derived interval.
 
 ### 5.2 Finalization pattern
 

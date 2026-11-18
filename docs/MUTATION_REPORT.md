@@ -3,9 +3,9 @@
 This is a reproducible, curated high-risk mutation set for the deterministic
 body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
-- Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, and the authorization boundary in `admission.py`
+- Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, Review operand construction in `review.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **16/16 killed (100.0%)**
+- Result: **29/29 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -26,6 +26,19 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M14 | KILLED | risk intensification is settled at full amount instead of blocked on U15 |
 | M15 | KILLED | an internal or metadata-mismatched capability can masquerade as review-issued |
 | M16 | KILLED | dataclasses.replace can transplant a modified private grant onto another claim |
+| M17 | KILLED | Article 8 explicit zero is replaced by the corresponding-damage cap |
+| M18 | KILLED | one exclusion clause can replace the required causal conjunction |
+| M19 | KILLED | depreciate-then-cap deducts scheduled depreciation a second time |
+| M20 | KILLED | percentage franchise ignores its named calculation base |
+| M21 | KILLED | a review-live uncertainty disappears from the deterministic result |
+| M22 | KILLED | total-loss settlement base is silently aliased to the post-salvage base |
+| M23 | KILLED | a non-leap Shamsi year accepts Esfand 30 |
+| M24 | KILLED | the theft clock can use a date that disagrees with its selected event |
+| M25 | KILLED | repair-only work receives replacement-part depreciation |
+| M26 | KILLED | Review drops evidenced rescue from the total-loss classification numerator |
+| M27 | KILLED | omitted material rescue is treated as zero and allowed to authorize payment |
+| M28 | KILLED | a classification override bypasses the unresolved-rescue payment gate |
+| M29 | KILLED | an override-selected threshold branch skips the missing-rescue evidence gate |
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

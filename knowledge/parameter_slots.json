@@ -3,7 +3,7 @@
   "note": "A value the calculation consumes. This file is the answer to 'how do I select the right parameters for this case': every slot states who is allowed to supply it (`supplied_via`), which authority governs it, which operator reads it, what happens when it is absent, and which uncertainty or guardrail fires. A slot never carries a formula: formulas live in knowledge/operators.json and are selected through branches. The questionnaire can only fill slots, so an intake form can never invent a calculation rule.",
   "authorities": ["REGULATION", "CIRCULAR", "POLICY", "INSURER_PROCEDURE", "ASSESSOR", "ADJUSTER_CONFIG", "DERIVED", "EVENT_FACT"],
   "supply_channels": ["INSURED_ANSWER", "POLICY_SCHEDULE", "ENDORSEMENT_WORDING", "INSURER_MANUAL", "ASSESSOR_REPORT", "AUTHORITY_REPORT", "JUDICIAL_ORDER", "MARKET_EVIDENCE", "DERIVED_FROM_OTHER_SLOTS", "ANNUAL_PARAMETER", "ADJUSTER_CONFIG"],
-  "missing_behaviours": ["DEFAULT_ONE", "TREAT_AS_ZERO", "REFUSE", "SCENARIO_SET", "ASSESSOR_REQUIRED", "ESCALATE_INSURER", "NOT_APPLICABLE", "REVIEW_GATE"],
+  "missing_behaviours": ["DEFAULT_ONE", "TREAT_AS_ZERO", "REFUSE", "SCENARIO_SET", "ASSESSOR_REQUIRED", "ESCALATE_INSURER", "NOT_APPLICABLE", "REVIEW_GATE", "BLOCK_IF_MATERIAL"],
   "slots": [
     {
       "node_id": "PS_EVENT_DATE",
@@ -29,7 +29,8 @@
       "supplied_by": ["Q-S0-03"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "The five-working-day notice clock runs from awareness, not from occurrence. Ask for both and never derive awareness from occurrence."
+      "select": "The five-working-day notice clock runs from awareness, not from occurrence. Ask for both and never derive awareness from occurrence.",
+      "validation": "This is the insured's awareness of this loss, so it cannot precede the occurrence date. It is not a police, assessor, review or document timestamp."
     },
     {
       "node_id": "PS_DECLARATION_DATE",
@@ -41,7 +42,8 @@
       "supplied_via": ["INSURED_ANSWER", "ASSESSOR_REPORT"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "Insurer practice sometimes counts the sixty-day theft clock from declaration while the regulation counts it from the theft. Record the declaration date anyway, because the settlement clocks in the payment provision run from complete documents."
+      "select": "Insurer practice sometimes counts the sixty-day theft clock from declaration while the regulation counts it from the theft. Record the declaration date anyway, because the settlement clocks in the payment provision run from complete documents.",
+      "validation": "This is the insured's declaration of this loss to the insurer. It cannot precede the occurrence or the insured-awareness fact. It is not a police report, assessor, review or complete-documents timestamp."
     },
     {
       "node_id": "PS_NOTICE_TIMELINESS",
@@ -95,7 +97,7 @@
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REFUSE",
       "select": "Causation is a predicate, never a multiplier. If the causal link is asserted but not evidenced, the case routes to review; it does not attract a coefficient.",
-      "guardrail": "G_NO_ASSUMED_CAUSATION"
+      "guardrail": "G_COVERED_PERIL_CAUSATION_ESTABLISHED"
     },
     {
       "node_id": "PS_THEFT_TYPE",
@@ -122,7 +124,77 @@
       "required_for_branches": ["THEFT"],
       "missing_behavior": "REFUSE",
       "blocking_uncertainty": "U13_THEFT_CLOCK_ANCHOR",
-      "select": "Fifty-nine days is pending, sixty is total loss. Record which date the count starts from, because the regulation, the payment provision and insurer practice anchor on different dates."
+      "select": "Fifty-nine days is pending and sixty reaches the time threshold. Treat this integer only as a cross-check: the engine derives the interval from the separately sourced clock and refuses a mismatch."
+    },
+    {
+      "node_id": "PS_THEFT_CLOCK_START_EVENT",
+      "name": "Authoritative event that starts the whole-theft clock",
+      "case_field": "event.theft_clock.start_event",
+      "unit": "enum",
+      "authority": "INSURER_PROCEDURE",
+      "governed_by": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "supplied_by": ["Q-S2-10"],
+      "supplied_via": ["AUTHORITY_REPORT", "INSURER_MANUAL"],
+      "required_for_branches": ["THEFT"],
+      "missing_behavior": "REFUSE",
+      "blocking_uncertainty": "U13_THEFT_CLOCK_ANCHOR",
+      "select": "Select THEFT_OCCURRENCE, AWARENESS, or DECLARATION only from the cited controlling instruction; do not infer the anchor from the stored day count."
+    },
+    {
+      "node_id": "PS_THEFT_CLOCK_START_DATE",
+      "name": "Dated start of the whole-theft clock",
+      "case_field": "event.theft_clock.start_date",
+      "unit": "date",
+      "authority": "EVENT_FACT",
+      "governed_by": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "supplied_by": ["Q-S2-11"],
+      "supplied_via": ["AUTHORITY_REPORT"],
+      "required_for_branches": ["THEFT"],
+      "missing_behavior": "REFUSE",
+      "blocking_uncertainty": "U13_THEFT_CLOCK_ANCHOR",
+      "select": "Copy the date belonging to the selected start event from the cited file artefact."
+    },
+    {
+      "node_id": "PS_THEFT_CLOCK_AS_OF_DATE",
+      "name": "As-of date for the whole-theft clock",
+      "case_field": "event.theft_clock.as_of_date",
+      "unit": "date",
+      "authority": "EVENT_FACT",
+      "governed_by": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "supplied_by": ["Q-S2-12"],
+      "supplied_via": ["AUTHORITY_REPORT"],
+      "required_for_branches": ["THEFT"],
+      "missing_behavior": "REFUSE",
+      "blocking_uncertainty": "U13_THEFT_CLOCK_ANCHOR",
+      "select": "Use the dated non-discovery enquiry or other cited review cut-off; it may not precede the start date."
+    },
+    {
+      "node_id": "PS_THEFT_CLOCK_CALENDAR",
+      "name": "Calendar used by the whole-theft dates",
+      "case_field": "event.theft_clock.calendar",
+      "unit": "enum",
+      "authority": "EVENT_FACT",
+      "governed_by": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "supplied_by": ["Q-S2-13"],
+      "supplied_via": ["AUTHORITY_REPORT"],
+      "required_for_branches": ["THEFT"],
+      "missing_behavior": "REFUSE",
+      "blocking_uncertainty": "U13_THEFT_CLOCK_ANCHOR",
+      "select": "State SHAMSI or GREGORIAN explicitly so identical-looking dates cannot be interpreted under the wrong calendar."
+    },
+    {
+      "node_id": "PS_THEFT_CLOCK_SOURCE",
+      "name": "Source fixing the whole-theft clock",
+      "case_field": "event.theft_clock.source",
+      "unit": "text",
+      "authority": "INSURER_PROCEDURE",
+      "governed_by": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+      "supplied_by": ["Q-S2-14"],
+      "supplied_via": ["AUTHORITY_REPORT", "INSURER_MANUAL"],
+      "required_for_branches": ["THEFT"],
+      "missing_behavior": "REFUSE",
+      "blocking_uncertainty": "U13_THEFT_CLOCK_ANCHOR",
+      "select": "Record the document and locator that support both the selected anchor and the dated observations."
     },
     {
       "node_id": "PS_TITLE_TRANSFERRED",
@@ -232,8 +304,8 @@
       "supplied_via": ["ASSESSOR_REPORT"],
       "required_for_branches": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
       "missing_behavior": "REFUSE",
-      "select": "Closed vocabulary: GLASS, LAMP_GLASS, BATTERY, TIRE, OTHER_REPLACEMENT_PART, REPAIR_ONLY. The category decides exemption from depreciation, the 50%-of-new cap, and whether the item enters the total-loss numerator at all.",
-      "validation": "unknown spellings are rejected rather than defaulted"
+      "select": "Closed vocabulary: GLASS, LAMP_GLASS, BATTERY, TIRE, OTHER_REPLACEMENT_PART, REPAIR_ONLY. Category and work status remain separate: repair-only cost stays eligible but receives zero replacement-part depreciation; battery/tyre caps still apply to eligible damage, and only replaced battery/tyre work activates the cap/depreciation interaction.",
+      "validation": "unknown spellings, REPAIR_ONLY marked for replacement, and REPAIR_ONLY records in replacement-only carriers are rejected rather than defaulted"
     },
     {
       "node_id": "PS_PART_NEW_PRICE",
@@ -275,8 +347,8 @@
       "supplied_by": ["Q-S4-07"],
       "supplied_via": ["ASSESSOR_REPORT", "INSURED_ANSWER"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
-      "missing_behavior": "TREAT_AS_ZERO",
-      "select": "Claimed cost is not payable cost: it is added after the 20% ceiling is applied, and the same figure is part of the total-loss numerator."
+      "missing_behavior": "BLOCK_IF_MATERIAL",
+      "select": "Claimed actual cost is not payable cost. The evidenced actual amount is the classification fallback when no distinct threshold operand is selected, while settlement applies the separate 20% ceiling. Ordinary omission is unresolved and blocks engine payment; explicit imported-case legacy compatibility is separately marked and is not evidence that no rescue occurred."
     },
     {
       "node_id": "PS_RESCUE_CAP_BASE",
@@ -289,9 +361,9 @@
       "supplied_by": ["Q-S8-03"],
       "supplied_via": ["ADJUSTER_CONFIG", "INSURER_MANUAL"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
-      "missing_behavior": "DEFAULT_ONE",
+      "missing_behavior": "BLOCK_IF_MATERIAL",
       "blocking_uncertainty": "U05_RESCUE_DENOMINATOR",
-      "select": "The regulation says 20% of total damage without defining the denominator. Default is the assessed gross; record the choice, because depreciation, the ratio and total-loss classification each produce a different base."
+      "select": "The regulation says 20% of total damage without defining the denominator. Record the selected base. If no base is supplied, continue only when every candidate base produces the same capped rescue amount; otherwise surface U05."
     },
     {
       "node_id": "PS_REPAIR_TOTAL",
@@ -304,7 +376,7 @@
       "supplied_via": ["ASSESSOR_REPORT"],
       "required_for_branches": ["TOTAL_LOSS", "PARTIAL_DAMAGE"],
       "missing_behavior": "ASSESSOR_REQUIRED",
-      "select": "The numerator is repair and replacement cost WITH rescue and transport included, against 75% of the value on the accident date. A declared total loss without this evidence must not settle."
+      "select": "This operand is repair and replacement cost excluding rescue and transport. The classifier adds the separately evidenced classification-rescue operand exactly once and compares the result with 75% of event-date value. A declared total loss without this evidence must not settle."
     },
     {
       "node_id": "PS_SALVAGE_VALUE",
@@ -449,7 +521,8 @@
       "supplied_via": ["INSURED_ANSWER", "POLICY_SCHEDULE"],
       "required_for_branches": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
       "missing_behavior": "REVIEW_GATE",
-      "select": "Record both whether another policy covers the same risk and every amount already received for this loss. Without fraudulent intent the paying insurer settles and then pursues contribution; the insured may never recover twice."
+      "select": "Record two distinct facts: state says whether another policy covers the same risk, while prior_compensation is the amount already received for this same damage from any source. A positive amount may coexist with state=NO. Without fraudulent intent Article 21 allows the paying insurer to settle and then pursue contribution; until that allocation is implemented, any YES_* state or positive prior compensation routes to review rather than payment.",
+      "guardrail": "G_RECOVERY_ALLOCATION_CONTAINED"
     },
     {
       "node_id": "PS_SUBROGATION_IMPAIRED",
@@ -506,4 +579,3 @@
     }
   ]
 }
-

@@ -14,6 +14,28 @@ from iran_auto_claim.money import D
 
 
 def _case(branch: str, **inputs):
+    if any(key in inputs for key in ("repair", "repair_total", "repair_total_irr")) and not any(
+        key in inputs
+        for key in (
+            "actual_rescue",
+            "rescue",
+            "rescue_transport_actual_irr",
+            "rescue_for_threshold",
+            "rescue_for_total_loss_test_irr",
+        )
+    ):
+        inputs["rescue_for_threshold"] = 0
+    if branch == "PARTIAL_DAMAGE":
+        if not any(key in inputs for key in ("market", "insured")):
+            inputs["market"] = 10**12
+            inputs["insured"] = 10**12
+        if not any(
+            key in inputs
+            for key in ("depreciation", "depreciable_parts", "parts", "replacement_parts", "battery_loss", "tire_loss")
+        ):
+            inputs["depreciation"] = 0
+    if branch == "TOTAL_LOSS" and any(key in inputs for key in ("salvage", "salvage_value")):
+        inputs.setdefault("salvage_disposition", "INSURED_RETAINS")
     franchise = inputs.pop("franchise", None)
     payload = {
         "claim_id": "guard-test",
@@ -32,6 +54,19 @@ def _case(branch: str, **inputs):
                 "source_version": "TEST-v1",
             },
         }
+    if branch in (
+        "PARTIAL_DAMAGE",
+        "TOTAL_LOSS",
+        "GLASS_ONLY",
+        "THEFT",
+    ):
+        payload["coverage_gate"] = {"causal_relationship_established": True}
+        payload.setdefault("policy", {})["multiple_insurance"] = {
+            "state": "NO",
+            "prior_compensation": 0,
+        }
+    if any(key in inputs for key in ("rescue_payable", "actual_rescue", "rescue")):
+        payload["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
     return payload
 
 
@@ -219,6 +254,8 @@ def test_resolving_the_interaction_yields_a_single_number(kb):
         franchise=2,
     )
     payload["regulatory_snapshot"] = {"iranian_year": 1405}
+    payload["damage"]["market"] = 4000
+    payload["damage"]["insured"] = 4000
     payload["calculation_config"] = {"battery_tire_depreciation_interaction": "CAP_THEN_DEPRECIATE"}
     result = compute(payload, kb)
     # cap = 0.5 * 80 = 40; rate = min(0.25, 0.05 * 10) = 0.25; dep = 10
@@ -233,6 +270,25 @@ def test_operator_refuses_the_interaction_directly():
         operators.eligible_part_loss(part, 1392, 1405, {"battery_tire_depreciation_interaction": "UNRESOLVED"})
     info = operators.eligible_part_loss(part, 1392, 1405, {"battery_tire_depreciation_interaction": "CAP_ONLY"})
     assert info["depreciation_amount"] == D(0)
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected_after", "expected_effective_depreciation"),
+    [
+        ("CAP_THEN_DEPRECIATE", 75, 25),
+        ("DEPRECIATE_THEN_CAP", 90, 10),
+        ("CAP_ONLY", 100, 0),
+    ],
+)
+def test_battery_tire_modes_apply_depreciation_once(
+    mode, expected_after, expected_effective_depreciation
+):
+    part = {"category": "TIRE", "assessed_loss": D(120), "new_price": D(200)}
+    info = operators.eligible_part_loss(
+        part, 1392, 1405, {"battery_tire_depreciation_interaction": mode}
+    )
+    assert info["loss_after_depreciation"] == D(expected_after)
+    assert info["depreciation_amount"] == D(expected_effective_depreciation)
 
 
 # ------------------------------------------- uncertainty propagation guard

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "status": "RESEARCH_AND_ADJUSTER_DECISION_SUPPORT",
     "scope": "BODY_ONLY",
     "mode": "EXPLANATORY_ONLY",
@@ -94,7 +94,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RECOG-001",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "How does the model recognize what kind of body claim I have?",
@@ -105,7 +105,7 @@
           },
           {
             "faq_id": "FAQ-RECOG-002",
-            "order": 2,
+            "order": 1,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "What are the four supported body-claim branches?",
@@ -121,8 +121,8 @@
             "applies_to": ["ALL"],
             "question": "What happens if the branch written on my claim conflicts with the evidence?",
             "answer_summary": "Calculation stops unless a documented, authorized override resolves the conflict.",
-            "answer": "The reconciliation outcome becomes a conflict or insufficient evidence, so no branch arithmetic is allowed. An override is acceptable only when it records the responsible actor, reason, time, and supporting source.",
-            "customer_action": "Ask the reviewer to explain the derived branch and correct the evidence or record a properly authorized override.",
+            "answer": "The reconciliation outcome becomes a conflict or insufficient evidence, so no branch arithmetic is allowed. For a total-loss threshold conflict, repair/replacement and classification rescue must be separated and rescue counted exactly once. An override is acceptable only when it records the responsible actor, reason, time, and supporting source.",
+            "customer_action": "Ask the reviewer to explain the derived branch, identify the separate classification-rescue operand, and correct the evidence or record a properly authorized override.",
             "knowledge_refs": ["S7_BRANCH_SELECTION", "S10_QUALITY_GATE", "G_NO_ASSUMED_CAUSATION"]
           },
           {
@@ -132,8 +132,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
             "question": "When does repair damage become a total loss?",
             "answer_summary": "Only when repair and replacement cost plus threshold rescue is strictly greater than 75% of event-day market value.",
-            "answer": "Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date, and the threshold test is separate from the later settlement formula.",
-            "customer_action": "Obtain the event-day market valuation and itemized repair/replacement assessment; check the strict greater-than comparison.",
+            "answer": "Equality at exactly 75% is not total loss. Market value must be the transactional value on the event date. Repair/replacement excludes rescue, and the evidenced classification-rescue amount is added exactly once; settlement later caps its own rescue operand separately.",
+            "customer_action": "Obtain the event-day market valuation, repair/replacement assessment excluding rescue, and rescue invoices; check the strict greater-than comparison and that rescue was not counted twice.",
             "knowledge_refs": ["REG53_ART19_TOTAL_LOSS_THRESHOLD", "PS_REPAIR_TOTAL", "PS_MARKET_VALUE"]
           },
           {
@@ -180,7 +180,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-003",
-            "order": 4,
+            "order": 5,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "What does COMPUTE mean?",
@@ -191,7 +191,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-004",
-            "order": 5,
+            "order": 6,
             "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "When is a scenario set allowed?",
@@ -210,6 +210,17 @@
             "answer": "These inputs can change the branch, deductions, ratio, or whether payment is due at all. The model records them as missing or uncertain rather than replacing them with zero, the current year, or a remembered market practice.",
             "customer_action": "Provide the policy schedule and endorsements, event and notice dates, vehicle year, assessment, market valuation, and theft records as applicable.",
             "knowledge_refs": ["PS_FRANCHISE", "PS_EVENT_DATE", "PS_PRODUCTION_YEAR", "PS_MARKET_VALUE", "PS_ENDORSEMENTS", "U13_THEFT_CLOCK_ANCHOR"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-006",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "How do causation and compensation already received affect admission?",
+            "answer_summary": "Covered-peril causation must be established, and prior compensation must be recorded independently of other-policy status.",
+            "answer": "An asserted or unknown causal link is insufficient information; a contradicted link can support refusal. That positive admission test is separate from proving causation for an exclusion. Compensation already received for the same damage may come from any source and can coexist with no other policy. A positive amount is currently routed to review because allocation is not implemented. Another-policy cases are also routed to review until contribution is implemented, even though Article 21 can allow settlement followed by contribution.",
+            "customer_action": "Provide the causation report, declare both other-policy status and the exact prior-compensation amount (including zero), and request authorized allocation review if either recovery fact blocks calculation.",
+            "knowledge_refs": ["PS_CAUSATION_ESTABLISHED", "PS_MULTIPLE_POLICIES", "G_COVERED_PERIL_CAUSATION_ESTABLISHED", "G_RECOVERY_ALLOCATION_CONTAINED", "G_NO_ASSUMED_CAUSATION", "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION"]
           }
         ]
       },
@@ -222,8 +233,8 @@
         "faqs": [
           {
             "faq_id": "FAQ-CALC-001",
-            "order": 2,
-            "priority": "P1",
+            "order": 1,
+            "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE"],
             "question": "What is the basic partial-damage calculation pattern?",
             "answer_summary": "Eligible parts and labor are reduced by applicable depreciation, then policy ratio/franchise order is applied, and allowable rescue is added.",
@@ -238,8 +249,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "How does replacement-part depreciation work?",
             "answer_summary": "It applies to replaced parts by vehicle-year index, with glass and lamp glass exempt and the rate capped at 25%.",
-            "answer": "The model uses zero before the fifth production-year index, then 5% per year up to 25%. Repair-only labor is not replacement-part depreciation, and battery/tyre cap interaction on older vehicles may remain uncertain.",
-            "customer_action": "Verify the production year, event year, part category, new-part price where relevant, and whether the item was replaced or repaired.",
+            "answer": "The model uses zero before the fifth production-year index, then 5% per year up to 25%. Repair-only labor is not replacement-part depreciation. For a battery or tyre, the sourced policy interpretation must choose one supported cap/depreciation interaction; the model does not deduct both paths or silently stack depreciation twice.",
+            "customer_action": "Verify the production year, event year, part category, new-part price, whether the item was replaced or repaired, and the sourced battery/tyre interaction rule where applicable.",
             "knowledge_refs": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
           },
           {
@@ -255,13 +266,13 @@
           },
           {
             "faq_id": "FAQ-CALC-004",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "Is there one universal franchise rate for all body claims?",
             "answer_summary": "No. Franchise must come from the applicable policy, endorsement, product, claim sequence, and source version.",
-            "answer": "The regulation does not create one universal body or glass percentage. A percentage also needs a calculation base and any minimum; using a remembered rate from another insurer or policy version is unsafe.",
-            "customer_action": "Request the policy declarations page, private conditions, endorsement schedule, and the exact franchise base and minimum.",
+            "answer": "The regulation does not create one universal body or glass percentage. A percentage also needs a named calculation base and any minimum because the same rate can produce a different deduction against gross loss, loss after depreciation, or another authorized stage. Using a remembered rate or an unnamed base is unsafe.",
+            "customer_action": "Request the policy declarations page, private conditions, endorsement schedule, exact franchise rate, named calculation base, minimum, and source version.",
             "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "U02_FRANCHISE_BASE_SCHEDULES", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_UNIVERSAL_GLASS_FRANCHISE"]
           },
           {
@@ -271,8 +282,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
             "question": "How are rescue and transport costs treated?",
             "answer_summary": "Reasonable actual cost is added only up to 20% of the sourced cap base.",
-            "answer": "The engine records the actual amount, selected denominator, ceiling, and allowed amount. The meaning of total damage used as the denominator can be material and remains an explicit uncertainty in edge cases.",
-            "customer_action": "Keep invoices and ask the reviewer to identify whether assessed gross, eligible gross, or settlement base was used for the ceiling.",
+            "answer": "The engine keeps actual expense, total-loss classification rescue, and capped settlement rescue separate. Evidenced actual rescue is the classification fallback when no distinct threshold interpretation is selected; the settlement amount remains subject to its ceiling and is never copied back into classification. The denominator can remain a material uncertainty.",
+            "customer_action": "Keep invoices and an assessment that separates repair from rescue. Ask the reviewer to identify the classification operand and whether assessed gross, eligible gross, or settlement base was used for the settlement ceiling.",
             "knowledge_refs": ["REG53_RESCUE_TRANSPORT_CAP", "G_RESCUE_CAP_CEILING", "U05_RESCUE_DENOMINATOR", "PS_RESCUE_ACTUAL", "PS_RESCUE_CAP_BASE"]
           },
           {
@@ -297,7 +308,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RESULT-001",
-            "order": 4,
+            "order": 5,
             "priority": "P1",
             "applies_to": ["GLASS_ONLY"],
             "question": "How is standalone glass handled?",
@@ -308,18 +319,18 @@
           },
           {
             "faq_id": "FAQ-RESULT-002",
-            "order": 5,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["THEFT"],
             "question": "When can whole-vehicle theft reach settlement?",
             "answer_summary": "Only after the sourced 60-day condition and required title transfer are established.",
-            "answer": "Before the condition is met, the outcome is pending; after it is met without title transfer, title transfer is required. The current model does not treat a stored elapsed-day number as proof of the legal clock anchor, so an unsourced anchor blocks review authorization.",
-            "customer_action": "Provide theft occurrence/awareness/declaration records, the non-discovery enquiry, evaluation date, and title-transfer proof.",
+            "answer": "Before the sourced 60-day condition is met, the outcome is pending; after it is met without title transfer, title transfer is required. The model derives completed days from a named start event and date through an as-of date in the stated Gregorian or Shamsi calendar. A bare elapsed-day number, a missing source, or a mismatch between stored and derived days blocks calculation.",
+            "customer_action": "Provide the theft occurrence, awareness, and declaration records; identify the legally applicable clock start; provide the start date, as-of date, calendar, source reference, non-discovery enquiry, and title-transfer proof.",
             "knowledge_refs": ["THEFT", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "U13_THEFT_CLOCK_ANCHOR", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_TITLE_TRANSFER_PROOF"]
           },
           {
             "faq_id": "FAQ-RESULT-003",
-            "order": 2,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "Why did I receive two amounts instead of one?",
@@ -341,7 +352,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-005",
-            "order": 3,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["ALL"],
             "question": "What does result confidence mean?",
@@ -515,7 +526,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RECOG-001",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "مدل چگونه نوع پرونده بیمه بدنه را تشخیص می‌دهد؟",
@@ -526,7 +537,7 @@
           },
           {
             "faq_id": "FAQ-RECOG-002",
-            "order": 2,
+            "order": 1,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "چهار شاخه پشتیبانی‌شده بیمه بدنه کدام‌اند؟",
@@ -542,8 +553,8 @@
             "applies_to": ["ALL"],
             "question": "اگر شاخه نوشته‌شده در پرونده با مدارک ناسازگار باشد چه می‌شود؟",
             "answer_summary": "محاسبه متوقف می‌شود، مگر اینکه تغییر شاخه با مجوز و مستندات کامل ثبت شود.",
-            "answer": "نتیجه تطبیق، تعارض یا کمبود مدرک خواهد بود و محاسبه شاخه مجاز نیست. تغییر مجاز فقط زمانی پذیرفتنی است که شخص مسئول، دلیل، زمان و منبع پشتیبان ثبت شده باشد.",
-            "customer_action": "از بازبین بخواهید مبنای شاخه استخراج‌شده را توضیح دهد و مدرک را اصلاح یا تغییر مجاز را رسمی ثبت کند.",
+            "answer": "نتیجه تطبیق، تعارض یا کمبود مدرک خواهد بود و محاسبه شاخه مجاز نیست. در تعارض مربوط به آستانه خسارت کلی، هزینه تعمیر و تعویض باید از هزینه نجاتِ مربوط به تشخیص جدا باشد و هزینه نجات دقیقاً یک بار محاسبه شود. تغییر مجاز فقط زمانی پذیرفتنی است که شخص مسئول، دلیل، زمان و منبع پشتیبان ثبت شده باشد.",
+            "customer_action": "از بازبین بخواهید مبنای شاخه استخراج‌شده و مبلغ جداگانه هزینه نجاتِ تشخیص را توضیح دهد و مدرک را اصلاح یا تغییر مجاز را رسمی ثبت کند.",
             "knowledge_refs": ["S7_BRANCH_SELECTION", "S10_QUALITY_GATE", "G_NO_ASSUMED_CAUSATION"]
           },
           {
@@ -553,8 +564,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS"],
             "question": "چه زمانی خسارت تعمیر به خسارت کلی تبدیل می‌شود؟",
             "answer_summary": "فقط وقتی هزینه تعمیر و تعویض به‌علاوه هزینه نجات مربوط به آزمون، بیش از ۷۵٪ ارزش روز حادثه باشد.",
-            "answer": "برابری دقیق با ۷۵٪ خسارت کلی نیست. ارزش خودرو باید ارزش معاملاتی در تاریخ حادثه باشد و آزمون آستانه از فرمول نهایی تسویه جدا است.",
-            "customer_action": "ارزش روز حادثه و برآورد ریز تعمیر و تعویض را بگیرید و شرط «بیشتر از» را بررسی کنید.",
+            "answer": "برابری دقیق با ۷۵٪ خسارت کلی نیست. ارزش خودرو باید ارزش معاملاتی در تاریخ حادثه باشد. مبلغ تعمیر و تعویض باید هزینه نجات را در بر نگیرد و هزینه نجات مستندِ مربوط به تشخیص فقط یک بار به آن افزوده شود؛ هزینه نجاتِ تسویه نیز جداگانه مشمول سقف خود می‌شود.",
+            "customer_action": "ارزش روز حادثه، برآورد تعمیر و تعویض بدون هزینه نجات و اسناد هزینه نجات را بگیرید؛ شرط «بیشتر از» و عدم احتساب دوباره هزینه نجات را بررسی کنید.",
             "knowledge_refs": ["REG53_ART19_TOTAL_LOSS_THRESHOLD", "PS_REPAIR_TOTAL", "PS_MARKET_VALUE"]
           },
           {
@@ -601,7 +612,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-003",
-            "order": 4,
+            "order": 5,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "تصمیم COMPUTE چه معنایی دارد؟",
@@ -612,7 +623,7 @@
           },
           {
             "faq_id": "FAQ-ACCEPT-004",
-            "order": 5,
+            "order": 6,
             "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "چه زمانی مجموعه سناریو مجاز است؟",
@@ -631,6 +642,17 @@
             "answer": "این ورودی‌ها می‌توانند شاخه، کسورات، نسبت یا اصل زمان پرداخت را تغییر دهند. مدل آنها را به‌صورت مفقود یا مبهم ثبت می‌کند و با صفر، سال جاری یا رویه به‌یادمانده جایگزین نمی‌کند.",
             "customer_action": "حسب مورد جدول بیمه‌نامه و الحاقیه، تاریخ حادثه و اعلام، سال خودرو، گزارش ارزیابی، ارزش بازار و اسناد سرقت را ارائه کنید.",
             "knowledge_refs": ["PS_FRANCHISE", "PS_EVENT_DATE", "PS_PRODUCTION_YEAR", "PS_MARKET_VALUE", "PS_ENDORSEMENTS", "U13_THEFT_CLOCK_ANCHOR"]
+          },
+          {
+            "faq_id": "FAQ-ACCEPT-006",
+            "order": 4,
+            "priority": "P0",
+            "applies_to": ["ALL"],
+            "question": "رابطه سببیت و جبران قبلی چه اثری بر پذیرش پرونده دارند؟",
+            "answer_summary": "رابطه خطر تحت پوشش با خسارت باید اثبات شود و جبران قبلی مستقل از وضعیت بیمه‌نامه دیگر ثبت گردد.",
+            "answer": "رابطه سببیت صرفاً ادعایی یا نامعلوم، اطلاعات ناکافی است؛ رابطه ردشده می‌تواند مبنای رد باشد. این آزمون مثبت پذیرش از اثبات رابطه سببیت برای اجرای یک استثنا جداست. جبران دریافتی برای همان خسارت ممکن است از هر منبعی باشد و می‌تواند با نبود بیمه‌نامه دیگر هم‌زمان باشد. مبلغ مثبت فعلاً به بازبینی ارجاع می‌شود، چون تخصیص آن پیاده‌سازی نشده است. پرونده دارای بیمه‌نامه دیگر نیز تا پیاده‌سازی مشارکت به بازبینی می‌رود، هرچند ماده ۲۱ می‌تواند تسویه و سپس مطالبه سهم را مجاز بداند.",
+            "customer_action": "گزارش سببیت را ارائه کنید، وضعیت بیمه‌نامه دیگر و مبلغ دقیق جبران قبلی ــ حتی صفر ــ را جداگانه اعلام کنید و اگر هرکدام مانع محاسبه شد، بازبینی مجاز تخصیص را بخواهید.",
+            "knowledge_refs": ["PS_CAUSATION_ESTABLISHED", "PS_MULTIPLE_POLICIES", "G_COVERED_PERIL_CAUSATION_ESTABLISHED", "G_RECOVERY_ALLOCATION_CONTAINED", "G_NO_ASSUMED_CAUSATION", "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION"]
           }
         ]
       },
@@ -643,8 +665,8 @@
         "faqs": [
           {
             "faq_id": "FAQ-CALC-001",
-            "order": 2,
-            "priority": "P1",
+            "order": 1,
+            "priority": "P0",
             "applies_to": ["PARTIAL_DAMAGE"],
             "question": "الگوی پایه محاسبه خسارت جزئی چیست؟",
             "answer_summary": "قطعات قابل قبول و اجرت با استهلاک مجاز تعدیل می‌شوند، سپس ترتیب نسبت و فرانشیز اجرا و هزینه نجات مجاز افزوده می‌شود.",
@@ -659,8 +681,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "استهلاک قطعات تعویضی چگونه اعمال می‌شود؟",
             "answer_summary": "بر اساس شاخص سال خودرو محاسبه می‌شود؛ شیشه و چراغ از آن معاف‌اند و نرخ حداکثر ۲۵٪ است.",
-            "answer": "مدل پیش از شاخص سال پنجم صفر و سپس سالانه ۵٪ تا سقف ۲۵٪ اعمال می‌کند. اجرت تعمیر، استهلاک قطعه تعویضی نیست و تداخل سقف باتری/لاستیک با استهلاک در خودروهای قدیمی ممکن است مبهم بماند.",
-            "customer_action": "سال ساخت، سال حادثه، گروه قطعه، قیمت قطعه نو و تعویض یا تعمیر بودن آن را کنترل کنید.",
+            "answer": "مدل پیش از شاخص سال پنجم صفر و سپس سالانه ۵٪ تا سقف ۲۵٪ اعمال می‌کند. اجرت تعمیر، استهلاک قطعه تعویضی نیست. برای باتری یا لاستیک، تفسیر مستند بیمه‌نامه باید یکی از روش‌های پشتیبانی‌شده تعامل سقف و استهلاک را انتخاب کند؛ مدل دو مسیر را با هم کسر نمی‌کند و استهلاک را دوبار اعمال نمی‌کند.",
+            "customer_action": "سال ساخت، سال حادثه، گروه قطعه، قیمت قطعه نو، تعویضی یا تعمیری بودن و در صورت لزوم قاعده مستند تعامل سقف باتری/لاستیک را بررسی کنید.",
             "knowledge_refs": ["REG53_ART19_REPLACEMENT_PART_DEPRECIATION", "REG53_ART19_GLASS_DEPRECIATION_EXEMPTION", "REG53_ART3_5_BATTERY_TIRE_SPECIAL_CAP", "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"]
           },
           {
@@ -676,13 +698,13 @@
           },
           {
             "faq_id": "FAQ-CALC-004",
-            "order": 1,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["ALL"],
             "question": "آیا برای همه خسارت‌های بدنه یک نرخ فرانشیز عمومی وجود دارد؟",
             "answer_summary": "خیر؛ فرانشیز باید از بیمه‌نامه، الحاقیه، محصول، سابقه خسارت و نسخه منبع مربوط گرفته شود.",
-            "answer": "مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی همچنین به مبنای محاسبه و حداقل احتمالی نیاز دارد؛ استفاده از نرخ بیمه‌گر یا نسخه دیگر ناامن است.",
-            "customer_action": "صفحه مشخصات، شرایط خصوصی، جدول فرانشیز و مبنا و حداقل دقیق را درخواست کنید.",
+            "answer": "مقررات یک درصد عمومی برای بدنه یا شیشه تعیین نمی‌کند. فرانشیز درصدی به مبنای محاسبه نام‌گذاری‌شده و حداقل احتمالی نیاز دارد، زیرا همان نرخ روی خسارت ناخالص، خسارت پس از استهلاک یا مرحله مجاز دیگری مبلغ متفاوتی می‌دهد. استفاده از نرخ حفظ‌شده در ذهن یا مبنای نامشخص ناامن است.",
+            "customer_action": "صفحه مشخصات، شرایط خصوصی، جدول الحاقیه، نرخ دقیق فرانشیز، مبنای محاسبه نام‌گذاری‌شده، حداقل و نسخه منبع را درخواست کنید.",
             "knowledge_refs": ["REG53_POLICY_DEFINED_FRANCHISE", "U02_FRANCHISE_BASE_SCHEDULES", "G_NO_HARDCODED_FRANCHISE_RATE", "G_NO_UNIVERSAL_GLASS_FRANCHISE"]
           },
           {
@@ -692,8 +714,8 @@
             "applies_to": ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"],
             "question": "هزینه نجات و حمل چگونه محاسبه می‌شود؟",
             "answer_summary": "هزینه واقعی متعارف فقط تا سقف ۲۰٪ مبنای مستند پذیرفته و افزوده می‌شود.",
-            "answer": "موتور مبلغ واقعی، مخرج انتخاب‌شده، سقف و مبلغ مجاز را ثبت می‌کند. معنای «کل خسارت» به‌عنوان مخرج در موارد مرزی می‌تواند مؤثر و همچنان ابهام صریح باشد.",
-            "customer_action": "فاکتورها را نگه دارید و بپرسید مخرج سقف، خسارت ارزیابی‌شده، خسارت قابل قبول یا مبنای تسویه بوده است.",
+            "answer": "موتور هزینه واقعی، هزینه نجاتِ مربوط به تشخیص خسارت کلی و هزینه نجاتِ سقف‌خورده در تسویه را جدا نگه می‌دارد. اگر تفسیر جداگانه‌ای برای مبلغ آستانه انتخاب نشده باشد، هزینه واقعی مستند مبنای تشخیص است؛ مبلغ تسویه همچنان مشمول سقف خود است و هرگز به ورودی تشخیص بازگردانده نمی‌شود. مخرج سقف نیز در موارد مرزی می‌تواند ابهامی مؤثر باقی بماند.",
+            "customer_action": "فاکتورها و ارزیابی‌ای را نگه دارید که تعمیر را از هزینه نجات جدا می‌کند. از بازبین بخواهید مبلغ مورد استفاده در تشخیص و مخرج سقف تسویه—خسارت ناخالص ارزیابی‌شده، خسارت قابل قبول یا مبنای تسویه—را مشخص کند.",
             "knowledge_refs": ["REG53_RESCUE_TRANSPORT_CAP", "G_RESCUE_CAP_CEILING", "U05_RESCUE_DENOMINATOR", "PS_RESCUE_ACTUAL", "PS_RESCUE_CAP_BASE"]
           },
           {
@@ -718,7 +740,7 @@
         "faqs": [
           {
             "faq_id": "FAQ-RESULT-001",
-            "order": 4,
+            "order": 5,
             "priority": "P1",
             "applies_to": ["GLASS_ONLY"],
             "question": "شکست شیشه به‌تنهایی چگونه بررسی می‌شود؟",
@@ -729,18 +751,18 @@
           },
           {
             "faq_id": "FAQ-RESULT-002",
-            "order": 5,
+            "order": 2,
             "priority": "P0",
             "applies_to": ["THEFT"],
             "question": "سرقت کامل خودرو چه زمانی می‌تواند به تسویه برسد؟",
             "answer_summary": "پس از احراز شرط شصت‌روزه با مبدأ مستند و انتقال سند لازم.",
-            "answer": "پیش از تحقق شرط، نتیجه در انتظار است؛ پس از تحقق شرط و بدون انتقال سند، انتقال سند لازم است. مدل فعلی عدد روز سپری‌شده را به‌تنهایی دلیل مبدأ قانونی ساعت نمی‌داند و مبدأ نامستند، مجوز محاسبه را متوقف می‌کند.",
-            "customer_action": "اسناد وقوع، اطلاع و اعلام سرقت، استعلام عدم کشف، تاریخ ارزیابی و مدرک انتقال سند را ارائه کنید.",
+            "answer": "پیش از تحقق شرط شصت‌روزه مستند، نتیجه در انتظار است؛ پس از تحقق شرط و بدون انتقال سند، انتقال سند لازم است. مدل تعداد روزهای کامل را از رویداد و تاریخ شروع نام‌گذاری‌شده تا تاریخ ارزیابی و بر اساس تقویم میلادی یا شمسی اعلام‌شده استخراج می‌کند. عدد روزِ بدون منبع، منبع مفقود یا ناسازگاری روز ذخیره‌شده با روز استخراج‌شده، محاسبه را متوقف می‌کند.",
+            "customer_action": "اسناد وقوع، اطلاع و اعلام سرقت را ارائه کنید؛ مبدأ قانونی ساعت، تاریخ شروع، تاریخ ارزیابی، تقویم، مرجع منبع، استعلام عدم کشف و مدرک انتقال سند را مشخص کنید.",
             "knowledge_refs": ["THEFT", "REG53_ART19_THEFT_TOTAL_LOSS_60D", "U13_THEFT_CLOCK_ANCHOR", "EVT_POLICE_STATION_REPORT", "EVT_NON_DISCOVERY_ENQUIRY", "EVT_TITLE_TRANSFER_PROOF"]
           },
           {
             "faq_id": "FAQ-RESULT-003",
-            "order": 2,
+            "order": 3,
             "priority": "P1",
             "applies_to": ["PARTIAL_DAMAGE", "GLASS_ONLY"],
             "question": "چرا به‌جای یک مبلغ، دو مبلغ دریافت کرده‌ام؟",
@@ -762,7 +784,7 @@
           },
           {
             "faq_id": "FAQ-RESULT-005",
-            "order": 3,
+            "order": 4,
             "priority": "P1",
             "applies_to": ["ALL"],
             "question": "اطمینان نتیجه چه معنایی دارد؟",

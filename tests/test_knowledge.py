@@ -158,7 +158,20 @@ def test_every_guardrail_is_executable_and_observable(kb):
     for guard_id, guard in kb.guards.items():
         assert callable(resolve_callable(guard["enforced_in"])), guard_id
         assert guard.get("triggered_label"), guard_id
-        assert guard.get("violation_status"), guard_id
+        has_single_status = "violation_status" in guard
+        has_multiple_statuses = "violation_statuses" in guard
+        single_status = guard.get("violation_status")
+        multiple_statuses = guard.get("violation_statuses")
+        assert has_single_status != has_multiple_statuses, guard_id
+        if has_single_status:
+            assert isinstance(single_status, str) and single_status, guard_id
+        else:
+            assert isinstance(multiple_statuses, list), guard_id
+            assert multiple_statuses, guard_id
+            assert all(
+                isinstance(status, str) and status for status in multiple_statuses
+            ), guard_id
+            assert len(multiple_statuses) == len(set(multiple_statuses)), guard_id
 
 
 def test_every_exclusion_is_one_of_the_two_states(kb):
@@ -276,6 +289,12 @@ def test_snapshot_follows_the_event_date_and_not_a_current_year(kb):
     assert dated is not None
     assert dated["snapshot_id"] == "BODY@1405/06/01"
     assert dated["rule_ids"]
+    assert kb.resolve_snapshot("1405-06-01", 1405)["snapshot_id"] == "BODY@1405/06/01"
+    assert kb.resolve_snapshot("2026-08-02", 1405)["snapshot_id"] == "BODY@1405/05/11"
+    # Year-only synthetic cases retain the open snapshot; they do not fabricate
+    # a 12/29 occurrence date.
+    assert kb.resolve_snapshot(None, 1405)["snapshot_id"] == "BODY@open"
+    assert kb.resolve_snapshot("1404-99-99", 1404) is None
     assert kb.resolve_snapshot("1200/01/01", None) is None
 
 

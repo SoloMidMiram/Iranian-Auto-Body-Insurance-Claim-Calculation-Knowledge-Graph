@@ -4,11 +4,18 @@
 
 **Research baseline:** `Iranian Auto Insurance Claim Calculation Knowledge Graph.md` (as-of 2026-09-18)
 
-**Model baseline:** the current workspace, including the knowledge graph, schemas, review gate, calculation runtime, and 50-case fixture corpus
+**Model baseline:** the pre-remediation workspace audited in PR #47, including the knowledge graph, schemas, review gate, calculation runtime, and 50-case fixture corpus
 
-## Executive verdict
+## Baseline findings before PR #48 runtime remediation
 
-The executable model is a strong structural implementation of the research report, but it is **not yet a validated production implementation of that report**.
+This section preserves the defect evidence observed before PR #48. It is
+historical audit evidence, not a statement that every listed defect remains in
+the current runtime. The current post-remediation disposition is recorded in
+the dedicated section below.
+
+At that baseline, the executable model was a strong structural implementation
+of the research report, but it was **not a validated production implementation
+of that report**.
 
 The principal architecture is aligned:
 
@@ -18,7 +25,13 @@ The principal architecture is aligned:
 - the four body branches use graph-selected calculation plans and fail closed on several unresolved terms;
 - the review gate, immutable calculation authorization, guard trace, IRR boundary, and bilingual documentation extend the report in useful ways.
 
-The implementation nevertheless has amount-affecting defects in paths it currently exposes, and several report claims are broader than the implemented scope. The most urgent defects are Article 8 overpayment when actual loss is below the correspondence assessment, causation-required exclusions firing without the required causal fact, incorrect `DEPRECIATE_THEN_CAP` behavior for batteries/tyres, and ignored percentage-franchise base semantics. These are release blockers, not documentation-only gaps.
+The baseline implementation nevertheless had amount-affecting defects in paths
+it exposed, and several report claims were broader than the implemented scope.
+The most urgent reproduced defects were Article 8 overpayment when actual loss
+was below the correspondence assessment, causation-required exclusions firing
+without the required causal fact, incorrect `DEPRECIATE_THEN_CAP` behavior for
+batteries/tyres, and ignored percentage-franchise base semantics. They were
+runtime release blockers, not documentation-only gaps.
 
 The report is also not a complete audit artefact. Its final source-register entry is physically truncated, and its `turn...` citation markers are response-local references rather than durable source locators. This audit compares the report's stated rules to the model; it does **not** independently re-verify Iranian law or policy wording against the internet.
 
@@ -32,7 +45,7 @@ The report is also not a complete audit artefact. Its final source-register entr
 | `DEFECT` | Current behavior can contradict the report or a declared model invariant. |
 | `DEFERRED` | Intentionally outside the currently supported/released scope. |
 
-## Coverage summary
+### Baseline coverage summary
 
 | Area | Finding | Status |
 |---|---|---|
@@ -50,7 +63,7 @@ The report is also not a complete audit artefact. Its final source-register entr
 | Ingestion | Closed submission fields, hierarchy checks, and contradiction discovery exist; writes are not atomic, recursive, or concurrency-safe. | `PARTIAL` |
 | Retrieval/product layer | Deterministic graph queries exist; GraphRAG, authenticated API, UI, monitoring, and pilot controls are deferred. | `DEFERRED` |
 
-## Rule and calculation trace
+### Baseline rule and calculation trace
 
 | Report requirement | Current implementation | Result | Required action |
 |---|---|---|---|
@@ -73,7 +86,7 @@ The report is also not a complete audit artefact. Its final source-register entr
 | Endorsable exclusions can proceed when a valid endorsement supplies terms | The gate distinguishes the two exclusion states, but an endorsable exclusion with an endorsement always returns `ENDORSEMENT_TERMS_REQUIRED`; it never consumes supplied terms. | `PARTIAL` | Introduce a versioned endorsement adapter and only block when a required term is absent. |
 | A live blocking uncertainty cannot coexist with a single payable | Engine-local uncertainties are guarded. Review-authorized live uncertainties are recorded in authorization provenance but are not all imported into `CalcResult.blocking_uncertainties`. | `DEFECT` | Bind the authorization's live uncertainty set to the calculation, require an explicit runtime resolution for each, and compare resolved IDs at finalization. |
 
-## Architecture trace
+### Baseline architecture trace
 
 | Report architecture | Model state | Gap / decision |
 |---|---|---|
@@ -90,7 +103,7 @@ The report is also not a complete audit artefact. Its final source-register entr
 | Explanation with trace/confidence | Result has rule trace, provenance, formula/evidence confidence, guards, and authorization. | Derive confidence from every amount/eligibility dependency; do not omit annual/assessor/policy confidence. |
 | Human escalation | CLI review returns compute/scenario/refuse/insufficient decisions. | Add domain-specific review procedures and later an authenticated adjuster workflow. |
 
-## Source, schema, and corpus findings
+### Baseline source, schema, and corpus findings
 
 ### Source integrity
 
@@ -116,7 +129,9 @@ The report needs its own repairs:
 The repository schema correctly adds `additionalProperties: false`, IRR-only persistence, aliases used by legacy fixtures, and several conditional requirements. It is still too permissive as a single cross-domain admission contract:
 
 - only `claim_id` and `unit` are universally required;
-- event dates are plain strings in the claim schema while snapshot resolution expects Jalali `YYYY/MM/DD` or falls back to the supplied Iranian year;
+- event dates remain legacy strings in the claim schema, but the runtime now applies
+  a closed Shamsi/Gregorian compatibility contract, validates calendar dates, and
+  resolves the actual event day without a supplied-year-end substitution;
 - `days_vehicle_missing` is a number and is truncated with `int()`, rather than being validated as an integer derived from dates;
 - cause/peril remain free strings at the calculation boundary;
 - evidence presence is stored as booleans, not immutable evidence records;
@@ -135,6 +150,27 @@ All 50 IDs are present and currently pass. The executable corpus intentionally c
 - changes T17 from a direct strict-threshold assertion to `CLASSIFICATION_CONFLICT`.
 
 These are mostly safety improvements, but only the L49 spelling correction is listed in `corrections_applied`. Add a machine-readable transformation manifest and keep an independent report-oracle layer so normalization cannot silently rewrite expected behavior.
+
+## Current implementation state after PR #48 runtime remediation
+
+| RMV | Current implementation state | Verification |
+|---|---|---|
+| RMV-001 | Fixed: Article 8 preserves explicit zero and caps insurer payment by actual, corresponding, and policy-limit amounts. | Zero-loss regression plus existing below/equal/above fixtures. |
+| RMV-002 | Fixed: clauses inside an exclusion predicate are conjunctive; intoxication needs both the coded cause and causal authority finding. | Bare-token and confirmed-causal regressions. |
+| RMV-003 | Fixed: cap-then-depreciate, depreciate-then-cap, and cap-only compute independent one-pass results. | Discriminating 75/90/100 operator regression. |
+| RMV-004 | Fixed at the shared engine boundary: percentage modes require a typed supported base and record the selected base/value. Total-loss `SETTLEMENT_BASE` is the pre-salvage `min(market, insured)` and is distinct from `AFTER_SALVAGE`. | Schema rejection for omitted/unsupported bases plus amount-sensitive partial and nonzero-salvage total-loss regressions. |
+| RMV-005 | Fixed: authorization-live uncertainties missing from runtime output force a blocked result and clear any unsupported payable/scenario set. | Review-issued authorization reconciliation regression. |
+| RMV-006 | Fixed for the named defaults: missing Article 10 anchors, aggregate depreciation, material rescue denominator, and salvage disposition fail closed. | Missing-input and materially different denominator regressions; 50/50 updated explicit fixtures. |
+| RMV-008 | Partially fixed: the normal review questionnaire now binds and emits the whole-theft start event/date, as-of date, calendar, and source; U13 clears only for a complete group and the engine derives/verifies whole days. Shamsi validation distinguishes leap-year Esfand 30 and covers 59/60/61-day and cross-year intervals. Regulatory and policy effective-date completion remains in #8. | Review-to-engine reachability plus Gregorian/Shamsi equivalence, leap/common-year, boundary, reverse-date, malformed-input, and stored/derived mismatch regressions. |
+
+The implementation remains decision support. These fixes do not supply insurer
+manuals, primary authority artifacts, independent reviewers, or governed
+product/version adapters.
+
+The current mutation gate includes explicit mutants for the pre/post-salvage
+franchise-base distinction and non-leap Esfand 30 rejection. These runtime
+repairs do not resolve the authority, provenance, graph-parity, or independent
+acceptance gates tracked in #49 and the open roadmap issues.
 
 ## Prioritized fix register
 
@@ -237,10 +273,12 @@ The deterministic defect repair can fit inside the existing body-model sprint; l
 |---|---|
 | `python3 claim.py validate` | Graph structurally OK; 22 body-authority and 48 source-metadata findings. |
 | `python3 claim.py fixtures` | 50/50 pass. |
-| Article 8 diagnostic | Actual loss `0`, corresponding `80`, limit `200` returned `80`; actual `50` also returned `80`. Confirms RMV-001. |
-| Causation diagnostic | Cause token `INTOXICATION` without causal confirmation returned zero/non-compensable. Confirms RMV-002. |
-| Battery/tyre diagnostic | On a discriminating input, configured `DEPRECIATE_THEN_CAP` produced net `56.25` instead of the one-pass `75`; confirms RMV-003. |
-| Full pytest suite | Not run in this workspace because the available Python environments do not contain `pytest`; do not infer a current full-suite pass from this audit. |
+| Article 8 diagnostic | Original reproduction returned `80` for explicit zero; the follow-up regression now returns `0` and preserves the zero in result fields. |
+| Causation diagnostic | Original reproduction denied from a bare token; the follow-up requires both token and causal finding. |
+| Battery/tyre diagnostic | Original `DEPRECIATE_THEN_CAP` result double-deducted; the follow-up discriminating case returns 75/90/100 for the three configured modes. |
+| Fixture corpus | 50/50 pass after legacy fixture assumptions were made explicit. |
+| Full pytest suite | Python 3.11 Stage 0 reproduction: 515 passed and 11 strict expected failures; all 11 map to named unresolved audit counterexamples and none unexpectedly passed. |
+| Curated mutation gate | 24/24 killed (100%), including settlement-base aliasing, non-leap Esfand 30, and theft-clock selected-event binding mutants. |
 
 ## Release conclusion
 

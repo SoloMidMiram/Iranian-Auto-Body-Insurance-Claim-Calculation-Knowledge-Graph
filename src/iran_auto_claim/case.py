@@ -193,18 +193,60 @@ class Case:
     @property
     def rescue_actual(self) -> Decimal | None:
         return self._money(
-            (
-                "rescue_transport_actual",
-                "rescue_transport_actual_irr",
-                "actual_rescue",
-                "rescue_payable",
-                "rescue",
-            )
+            ("rescue_transport_actual", "rescue_transport_actual_irr", "actual_rescue", "rescue")
         )
 
     @property
-    def rescue_for_threshold(self) -> Decimal:
-        return self._money(("rescue_for_threshold", "rescue_for_total_loss_test_irr")) or Decimal(0)
+    def rescue_payable(self) -> Decimal | None:
+        """A separately supplied reimbursable rescue amount, never actual cost."""
+        return self._money(("rescue_payable",))
+
+    @property
+    def rescue_for_threshold(self) -> Decimal | None:
+        amount, _, unresolved = self.classification_rescue()
+        if unresolved is not None:
+            raise CaseInputError(unresolved)
+        return amount
+
+    def classification_rescue(self) -> tuple[Decimal | None, str, str | None]:
+        """Resolve the classification operand without reading settlement payable.
+
+        The explicit threshold amount and actual expense are distinct operands.
+        Review's evidenced actual-expense answer is the documented fallback when
+        no explicit threshold selection exists. Ordinary omission remains
+        unresolved; only an explicit imported-case compatibility flag selects
+        the historical arithmetic-zero behavior.
+        """
+        explicit = self._money(
+            ("rescue_for_threshold", "rescue_for_total_loss_test_irr")
+        )
+        actual = self.rescue_actual
+        configured_source = self.damage.get("rescue_for_total_loss_test_source")
+
+        if self.damage.get("repair_total_includes_rescue") is True and (
+            (explicit is not None and explicit > 0)
+            or (actual is not None and actual > 0)
+        ):
+            return (
+                None,
+                "UNRESOLVED_EMBEDDED_RESCUE",
+                "repair/replacement already includes rescue; an evidenced decomposition is required before rescue can be added to the threshold numerator",
+            )
+
+        if explicit is not None and actual is not None and explicit != actual:
+            return (
+                None,
+                "UNRESOLVED_RESCUE_SCOPE_INTERPRETATION",
+                "actual and explicit classification rescue differ; a scope assessment, applicable authority and accepted interpretation are required",
+            )
+        if explicit is not None:
+            source = str(configured_source or "EXPLICIT_THRESHOLD_OPERAND")
+            return explicit, source, None
+        if actual is not None:
+            return actual, "DERIVED_FROM_ACTUAL_RESCUE", None
+        if self.damage.get("rescue_omission_legacy_compatibility") is True:
+            return Decimal(0), "EXPLICIT_LEGACY_DEFAULT_ZERO", None
+        return None, "UNRESOLVED_MISSING_RESCUE", None
 
     @property
     def salvage(self) -> Decimal | None:
@@ -215,7 +257,7 @@ class Case:
         given = self._find(("salvage_disposition",))
         if given:
             return str(given)
-        return "INSURED_RETAINS" if self.salvage is not None else "NOT_APPLICABLE"
+        return "UNRESOLVED" if self.salvage is not None else "NOT_APPLICABLE"
 
     @property
     def title_transferred(self) -> bool:
@@ -261,6 +303,9 @@ class Case:
 
     @property
     def victim_vehicle_value(self) -> Decimal | None:
+        # Market value is a branch-specific fallback when the damaged vehicle is
+        # the victim vehicle, not a second spelling that must equal an explicitly
+        # supplied victim valuation.
         return self._money(("victim_vehicle_value", "vehicle_value")) or self.market_value
 
     # -------------------------------------------------------- event / policy
@@ -283,6 +328,11 @@ class Case:
     @property
     def days_missing(self) -> int | None:
         return _num(self._find(("days_missing", "days_vehicle_missing")))
+
+    @property
+    def theft_clock(self) -> dict[str, Any] | None:
+        value = self.event.get("theft_clock")
+        return dict(value) if isinstance(value, dict) else None
 
     @property
     def intoxication_causally_confirmed(self) -> bool:
@@ -343,12 +393,44 @@ class Case:
 
     @property
     def franchise_raw(self) -> Any:
+        # These are legacy/structured contractual carriers with different
+        # provenance, not true monetary aliases.  Authority validation owns
+        # their interpretation and remains outside IA-15.
         return self._find(("franchise", "franchise_from_policy", "franchise_amount"))
 
     @property
     def policy_franchise(self) -> dict[str, Any] | None:
         value = self.policy.get("franchise")
         return dict(value) if isinstance(value, dict) else None
+
+    @property
+    def covered_peril_causation_established(self) -> bool | None:
+        """Positive coverage causation, distinct from any exclusion predicate."""
+        if "causal_relationship_established" not in self.coverage:
+            return None
+        value = self.coverage["causal_relationship_established"]
+        return value if isinstance(value, bool) else None
+
+    @property
+    def multiple_insurance(self) -> dict[str, Any] | None:
+        value = self.policy.get("multiple_insurance")
+        return dict(value) if isinstance(value, dict) else None
+
+    @property
+    def multiple_insurance_state(self) -> str | None:
+        facts = self.multiple_insurance
+        if facts is None or facts.get("state") in (None, ""):
+            return None
+        return str(facts["state"])
+
+    @property
+    def prior_compensation(self) -> Decimal | None:
+        """Compensation already received for this damage, from any source."""
+        facts = self.multiple_insurance
+        if facts is None or "prior_compensation" not in facts:
+            return None
+        value = facts["prior_compensation"]
+        return None if value is None else D(value)
 
     def endorsement_tokens(self) -> set[str]:
         tokens: set[str] = set()
@@ -404,7 +486,12 @@ class Case:
                         "category": _category(entry.get("category", "OTHER_REPLACEMENT_PART")),
                         "assessed_loss": D(loss),
                         "new_price": None if new_price is None else D(new_price),
-                        "requires_replacement": bool(entry.get("requires_replacement", True)),
+                        "requires_replacement": bool(
+                            entry.get(
+                                "requires_replacement",
+                                entry.get("category") != "REPAIR_ONLY",
+                            )
+                        ),
                     }
                 )
 

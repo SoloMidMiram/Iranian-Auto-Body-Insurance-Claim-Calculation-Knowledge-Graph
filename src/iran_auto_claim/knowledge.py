@@ -15,6 +15,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable
 
+from .dates import CalendarDateError, parse_claim_date
 from .money import D
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[2]
@@ -93,6 +94,7 @@ MISSING_BEHAVIOURS = (
     "ESCALATE_INSURER",
     "NOT_APPLICABLE",
     "REVIEW_GATE",
+    "BLOCK_IF_MATERIAL",
 )
 OUTCOME_CLASSES = (
     "SINGLE_PAYABLE",
@@ -285,12 +287,12 @@ def source_integrity_findings_for(source_id: str, source: dict[str, Any]) -> lis
 
 
 def _jalali_date(value: str | None) -> str | None:
-    if not isinstance(value, str) or len(value) != 10 or value[4] != "/" or value[7] != "/":
+    if value in (None, ""):
         return None
-    year, month, day = value[:4], value[5:7], value[8:]
-    if not (year.isdigit() and month.isdigit() and day.isdigit()):
+    try:
+        return parse_claim_date(value).snapshot_anchor
+    except CalendarDateError:
         return None
-    return value
 
 
 def resolve_callable(dotted: str) -> Any:
@@ -427,8 +429,11 @@ class Knowledge:
         if not rules:
             return None
         anchor = _jalali_date(event_date)
-        if anchor is None and iranian_year is not None:
-            anchor = f"{int(iranian_year):04d}/12/29"
+        # A supplied annual year is a consistency check, never a substitute for
+        # the missing event day.  The old 12/29 fallback could select a later
+        # effective rule than the occurrence actually permits.
+        if anchor is None and event_date not in (None, ""):
+            return None
         selected: list[dict[str, Any]] = []
         for rule in rules:
             start = str(rule.get("effective_date") or "")
@@ -909,6 +914,34 @@ class Knowledge:
                     issues.append(f"guard {guard_id}: enforced_in {enforced_in!r} -> {exc}")
             if not node.get("triggered_label"):
                 issues.append(f"guard {guard_id}: no triggered_label, so the guard is unobservable")
+            has_violation_status = "violation_status" in node
+            has_violation_statuses = "violation_statuses" in node
+            violation_status = node.get("violation_status")
+            violation_statuses = node.get("violation_statuses")
+            if has_violation_status == has_violation_statuses:
+                issues.append(
+                    f"guard {guard_id}: declare exactly one of violation_status or "
+                    "violation_statuses"
+                )
+            elif has_violation_status and (
+                not isinstance(violation_status, str) or not violation_status
+            ):
+                issues.append(
+                    f"guard {guard_id}: violation_status must be a non-empty string"
+                )
+            elif has_violation_statuses and (
+                not isinstance(violation_statuses, list)
+                or not violation_statuses
+                or any(
+                    not isinstance(status, str) or not status
+                    for status in violation_statuses
+                )
+                or len(violation_statuses) != len(set(violation_statuses))
+            ):
+                issues.append(
+                    f"guard {guard_id}: violation_statuses must be a non-empty list of "
+                    "unique strings"
+                )
 
         for node in self.exclusions.values():
             exclusion_id = node.get("node_id", "<missing id>")

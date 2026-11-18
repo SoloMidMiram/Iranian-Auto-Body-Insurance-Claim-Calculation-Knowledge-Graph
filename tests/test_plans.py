@@ -121,9 +121,16 @@ def test_compute_refuses_a_broken_active_body_sequence(kb, mutation):
             "unit": "IRR",
             "classification": {"branch": "PARTIAL_DAMAGE", "domain": "BODY"},
             "event": {"event_date": "1405/06/01"},
-            "damage": {"gross": 1000, "market": 2000, "insured": 1000},
+            "coverage_gate": {"causal_relationship_established": True},
+            "damage": {
+                "gross": 1000,
+                "depreciation": 0,
+                "market": 2000,
+                "insured": 1000,
+            },
             "policy": {
                 "policy_version": "TEST-v1",
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
                 "franchise": {
                     "mode": "ABSOLUTE",
                     "absolute_irr": 100,
@@ -152,6 +159,7 @@ def _glass_case(config: dict | None) -> dict:
         "unit": "IRR",
         "classification": {"branch": "GLASS_ONLY"},
         "event": {"event_date": "1405/06/01"},
+        "coverage_gate": {"causal_relationship_established": True},
         "damage": {
             "glass_endorsement": True,
             "gross": 1000,
@@ -160,6 +168,7 @@ def _glass_case(config: dict | None) -> dict:
         },
         "policy": {
             "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
             "franchise": {
                 "mode": "ABSOLUTE",
                 "absolute_irr": 100,

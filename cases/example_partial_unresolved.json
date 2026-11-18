@@ -47,6 +47,7 @@
     "franchise": {
       "mode": "PERCENT",
       "rate": 0.1,
+      "calculation_base": "AFTER_DEPRECIATION",
       "source": "POLICY",
       "source_reference": "policy schedule 1404, clause 4"
     }

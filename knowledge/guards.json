@@ -1,6 +1,6 @@
 {
   "node_class": "Guardrail",
-  "note": "Executable guardrails. Each guard has a check the engine actually runs or a label it actually emits, so a guardrail can never be decorative. `triggered_label` is the token the engine attaches to a result when the guard is live; `violation_status` is set when the guard is breached.",
+  "note": "Executable guardrails. Each guard has a check the engine actually runs or a label it actually emits, so a guardrail can never be decorative. `triggered_label` is the token the engine attaches to a result when the guard is live. A guard declares exactly one of `violation_status` for a single breach outcome or `violation_statuses` for multiple named breach outcomes.",
   "guards": [
     {
       "node_id": "G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS",
@@ -147,6 +147,36 @@
       "related_uncertainties": ["U10_IMMEDIATE_CAUSE_TERMINOLOGY"],
       "exercised_by": ["P15", "tests/test_guard_paths.py"],
       "severity": "HIGH"
+    },
+    {
+      "node_id": "G_COVERED_PERIL_CAUSATION_ESTABLISHED",
+      "prevents": "Authorising a body-policy calculation when the claimed covered peril has not been established as the cause of the damage",
+      "enforced_in": "iran_auto_claim.guards.check_covered_peril_causation",
+      "check": "coverage_gate.causal_relationship_established must be exactly true before any BODY branch arithmetic is authorised",
+      "triggered_label": "COVERED_PERIL_CAUSATION_REQUIRED",
+      "violation_status": "COVERED_PERIL_CAUSATION_REQUIRED",
+      "related_rules": [],
+      "related_operators": [],
+      "exercised_by": ["tests/test_engine.py", "tests/test_review.py", "tests/test_guard_paths.py"],
+      "severity": "CRITICAL",
+      "note": "This positive admission predicate is separate from G_NO_ASSUMED_CAUSATION, which only controls whether a causation-dependent exclusion may fire."
+    },
+    {
+      "node_id": "G_RECOVERY_ALLOCATION_CONTAINED",
+      "prevents": "Authorising payment while prior compensation is positive or multiple-policy contribution handling is unsupported",
+      "enforced_in": "iran_auto_claim.guards.check_recovery_allocation",
+      "check": "Both recovery facts must be explicit; prior_compensation must be zero and state must be NO until an approved allocation or contribution implementation exists",
+      "triggered_label": "G_RECOVERY_ALLOCATION_CONTAINED",
+      "violation_statuses": [
+        "RECOVERY_FACTS_REQUIRED",
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"
+      ],
+      "related_rules": ["REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION"],
+      "related_operators": [],
+      "exercised_by": ["tests/test_engine.py", "tests/test_review.py", "tests/test_guard_paths.py"],
+      "severity": "CRITICAL",
+      "note": "prior_compensation means compensation for the same damage from any source, so a positive amount can coexist with state=NO. Blocking YES_* is an implementation limitation, not a statement that Article 21 forbids settlement before contribution."
     },
     {
       "node_id": "G_UNCERTAINTY_MUST_SURFACE",

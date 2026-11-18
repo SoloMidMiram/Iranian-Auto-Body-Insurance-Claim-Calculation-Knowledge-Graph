@@ -35,6 +35,7 @@ from .admission import (
 )
 from .case import PART_CATEGORIES
 from .classify import classify
+from .dates import CalendarDateError, parse_claim_date
 from .engine import CalcResult, compute, reconcile_classification
 from .knowledge import Knowledge
 from .schema_input import load_json_document, validate_review, validated_case
@@ -307,10 +308,9 @@ class Review:
 
     def _derive(self, slot_id: str, derivation: str) -> None:
         if derivation == "iranian_year_of_event":
-            raw = str(self.answer("Q-S0-02") or "")
-            year = int(raw[:4]) if raw[:4].isdigit() else None
-            if year is not None and 1300 <= year <= 1500:
-                self._bound[slot_id] = year
+            raw = self.answer("Q-S0-02")
+            if raw not in (None, ""):
+                self._bound[slot_id] = parse_claim_date(raw).iranian_year
         elif derivation == "underinsurance_ratio":
             market = self._bound.get("PS_MARKET_VALUE")
             insured = self._bound.get("PS_INSURED_SUM")
@@ -387,7 +387,11 @@ class Review:
             return bool(ratio) and branch in ("PARTIAL_DAMAGE", "GLASS_ONLY") and float(ratio) < 1.0
         if uncertainty_id == "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION":
             parts = [item for item in _as_list(slot("PS_PART_CATEGORY")) if isinstance(item, dict)]
-            special = any(str(item.get("category")) in ("BATTERY", "TIRE") for item in parts)
+            special = any(
+                str(item.get("category")) in ("BATTERY", "TIRE")
+                and bool(item.get("requires_replacement", True))
+                for item in parts
+            )
             year = slot("PS_PRODUCTION_YEAR")
             claim_year = slot("PS_CLAIM_YEAR")
             index = (int(claim_year) - int(year) + 1) if year is not None and claim_year is not None else 0
@@ -397,7 +401,10 @@ class Review:
         if uncertainty_id == "U12_SALVAGE_DISPOSITION":
             return str(slot("PS_SALVAGE_DISPOSITION") or "") == "UNRESOLVED"
         if uncertainty_id == "U13_THEFT_CLOCK_ANCHOR":
-            return str(slot("PS_THEFT_TYPE") or "") == "WHOLE_VEHICLE"
+            return (
+                str(slot("PS_THEFT_TYPE") or "") == "WHOLE_VEHICLE"
+                and self._theft_clock() is None
+            )
         if uncertainty_id == "U14_GLASS_INSURED_AT_VALUE_CONDITION":
             return branch == "GLASS_ONLY" and str(slot("PS_GLASS_VALUATION_CONDITION") or "") == (
                 "REQUIRES_INSURED_AT_MARKET_VALUE"
@@ -422,7 +429,7 @@ class Review:
         if franchise.get("source") not in ("POLICY", "ENDORSEMENT", "INSURER_MANUAL"):
             return False
         if mode.startswith("PERCENT"):
-            if franchise.get("rate") is None:
+            if franchise.get("rate") is None or franchise.get("calculation_base") is None:
                 return False
             if mode == "PERCENT_WITH_MINIMUM" and franchise.get(
                 "minimum_irr", franchise.get("minimum")
@@ -440,6 +447,44 @@ class Review:
                 and franchise.get("source_version")
             )
         return True
+
+    def _theft_clock(self) -> dict[str, Any] | None:
+        """Return the complete, source-bound whole-theft clock or no clock.
+
+        A partial group must never reach the case schema: the review remains
+        blocked by its unanswered questions and U13 until all five fields exist
+        and the selected start event agrees with its canonical case date.
+        """
+        fields = {
+            "start_event": self._bound.get("PS_THEFT_CLOCK_START_EVENT"),
+            "start_date": self._bound.get("PS_THEFT_CLOCK_START_DATE"),
+            "as_of_date": self._bound.get("PS_THEFT_CLOCK_AS_OF_DATE"),
+            "calendar": self._bound.get("PS_THEFT_CLOCK_CALENDAR"),
+            "source": self._bound.get("PS_THEFT_CLOCK_SOURCE"),
+        }
+        if any(value in (None, "", [], {}) for value in fields.values()):
+            return None
+        start_event = str(fields["start_event"])
+        event_date_slot = {
+            "THEFT_OCCURRENCE": "PS_EVENT_DATE",
+            "AWARENESS": "PS_AWARENESS_DATE",
+            "DECLARATION": "PS_DECLARATION_DATE",
+        }.get(start_event)
+        if event_date_slot is None:
+            return None
+        canonical_date = self._bound.get(event_date_slot)
+        if canonical_date in (None, ""):
+            return None
+        try:
+            start_key = parse_claim_date(
+                fields["start_date"], calendar=str(fields["calendar"])
+            ).chronology_key
+            event_key = parse_claim_date(canonical_date).chronology_key
+        except CalendarDateError:
+            return None
+        if start_key != event_key:
+            return None
+        return {key: str(value) for key, value in fields.items()}
 
     # ------------------------------------------------------------ case emission
 
@@ -460,7 +505,9 @@ class Review:
                     record: dict[str, Any] = {
                         "category": category,
                         "assessed_loss_irr": irr(item.get("assessed_loss", item.get("assessed_loss_irr", 0))),
-                        "requires_replacement": bool(item.get("requires_replacement", True)),
+                        "requires_replacement": bool(
+                            item.get("requires_replacement", category != "REPAIR_ONLY")
+                        ),
                     }
                     if isinstance(item.get("name"), str) and item["name"]:
                         record["name"] = item["name"]
@@ -499,8 +546,10 @@ class Review:
         if peril := slot_value("PS_PERIL"):
             event["cause"] = peril
             event["peril"] = peril
-        if days := slot_value("PS_DAYS_MISSING"):
+        if (days := slot_value("PS_DAYS_MISSING")) is not None:
             event["days_vehicle_missing"] = days
+        if theft_clock := self._theft_clock():
+            event["theft_clock"] = theft_clock
         licence = slot_value("PS_LICENSE_STATE")
         if licence is not None:
             token = str(_as_list(licence)[0]) if not isinstance(licence, str) else str(licence)
@@ -541,6 +590,9 @@ class Review:
         ):
             if (value := slot_value(slot)) is not None:
                 damage[key] = irr(value)
+        if (rescue_actual := slot_value("PS_RESCUE_ACTUAL")) is not None:
+            damage["rescue_for_total_loss_test_irr"] = irr(rescue_actual)
+            damage["rescue_for_total_loss_test_source"] = "DERIVED_FROM_ACTUAL_RESCUE"
 
         config: dict[str, Any] = {}
         for key, slot in (
@@ -844,6 +896,28 @@ class Review:
         """
         return False
 
+    def _eligibility_blocking_conditions(self, branch: str | None) -> list[str]:
+        """Contain IA-01/02 before an immutable authorization can be issued."""
+        if branch not in ("PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"):
+            return []
+
+        conditions: list[str] = []
+        causation = str(self.answer("Q-S2-02") or "").upper()
+        if causation == "ASSERTED_ONLY":
+            conditions.append("COVERED_PERIL_CAUSATION_NOT_ESTABLISHED")
+
+        recovery = self._bound.get("PS_MULTIPLE_POLICIES")
+        if isinstance(recovery, dict):
+            prior = recovery.get("prior_compensation")
+            if prior is not None and money.D(prior) > 0:
+                conditions.append("PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED")
+            if str(recovery.get("state") or "").upper() in (
+                "YES_OTHER_POLICIES",
+                "YES_SAME_INSURER",
+            ):
+                conditions.append("MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED")
+        return conditions
+
     def decision(self) -> dict[str, Any]:
         """What the pipeline may issue now. This is the only gate that answers it."""
         classification = self.classification()
@@ -857,7 +931,7 @@ class Review:
         refused_by = self.refusal_reasons()
 
         evidence_blocks = self.stopping_evidence()
-        blocking_conditions = []
+        blocking_conditions = self._eligibility_blocking_conditions(branch)
         if str(self.answer("Q-S0-06") or "").upper() == "INSTALMENT_OVERDUE":
             blocking_conditions.append("POLICY_CANCELLATION_STATUS_UNRESOLVED")
         if self.uncertainty_is_live("U13_THEFT_CLOCK_ANCHOR"):

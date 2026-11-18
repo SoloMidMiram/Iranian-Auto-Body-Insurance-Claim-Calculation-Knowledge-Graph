@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 
+from iran_auto_claim.admission import AuthorizationNotGranted
 from iran_auto_claim.schema_input import InputSchemaError
 from iran_auto_claim.review import (
     DECISION_COMPUTE,
@@ -170,6 +171,124 @@ def test_the_derived_case_round_trips_through_the_engine(kb):
     assert recomputed.authorization["claim_hash"] == authorization.claim_hash
 
 
+@pytest.mark.parametrize("answer", ["ASSERTED_ONLY", "UNKNOWN", None])
+def test_positive_covered_peril_causation_must_be_established(answer, kb):
+    payload = load("review_t1_fullcover_partial.json")
+    if answer is None:
+        payload["answers"].pop("Q-S2-02")
+    else:
+        payload["answers"]["Q-S2-02"] = answer
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    if answer == "ASSERTED_ONLY":
+        assert decision["blocking_conditions"] == [
+            "COVERED_PERIL_CAUSATION_NOT_ESTABLISHED"
+        ]
+    else:
+        assert "Q-S2-02" in decision["open_blocking_questions"]
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_contradicted_covered_peril_causation_remains_a_refusal(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S2-02"] = "CONTRADICTED"
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_REFUSE
+    assert any("contradicted" in reason for reason in decision["refused_by"])
+
+
+def test_established_causation_without_required_assessment_evidence_is_incomplete(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["evidence_present"].remove("EVT_ASSESSMENT_REPORT")
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "EVT_ASSESSMENT_REPORT" in decision["evidence_blocks"]
+    assert review.calculate() is None
+
+
+@pytest.mark.parametrize("prior_compensation", [1, 925000000, 1850000000])
+def test_positive_prior_compensation_blocks_without_inventing_policy_conflict(
+    prior_compensation, kb
+):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-05"] = "NO"
+    payload["answers"]["Q-S9-03"] = prior_compensation
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert decision["refused_by"] == []
+    assert decision["blocking_conditions"] == [
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"
+    ]
+    assert review.case_payload()["policy"]["multiple_insurance"] == {
+        "state": "NO",
+        "prior_compensation": prior_compensation,
+    }
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+@pytest.mark.parametrize("state", ["YES_OTHER_POLICIES", "YES_SAME_INSURER"])
+def test_multiple_policy_path_is_blocked_as_an_implementation_limitation(state, kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-05"] = state
+    payload["answers"]["Q-S9-03"] = 0
+    payload["evidence_present"].append("EVT_OTHER_POLICIES")
+
+    review = Review(payload, kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert decision["refused_by"] == []
+    assert decision["blocking_conditions"] == [
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"
+    ]
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_prior_compensation_and_another_policy_remain_two_recorded_blocks(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S6-05"] = "YES_OTHER_POLICIES"
+    payload["answers"]["Q-S9-03"] = 1
+    payload["evidence_present"].append("EVT_OTHER_POLICIES")
+
+    decision = Review(payload, kb).decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert decision["refused_by"] == []
+    assert decision["blocking_conditions"] == [
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
+        "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED",
+    ]
+
+
+@pytest.mark.parametrize("question", ["Q-S6-05", "Q-S9-03"])
+def test_missing_recovery_fact_never_defaults_to_no_policy_or_zero(question, kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"].pop(question)
+
+    decision = Review(payload, kb).decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert question in decision["open_blocking_questions"]
+
+
 def test_questions_gated_off_by_earlier_answers_are_not_asked(kb):
     review = Review.from_file(CASES / "review_t1_fullcover_partial.json", kb)
     open_ids = {item["id"] for item in review.next_questions()}
@@ -298,6 +417,100 @@ def test_the_pending_theft_file_stops_before_the_unanchored_clock_reaches_the_en
     assert review.tier()["assigned"] == "T2"
     assert review.decision()["decision"] == DECISION_INSUFFICIENT
     assert "U13_THEFT_CLOCK_ANCHOR" in review.open_uncertainties()
+    assert {
+        "Q-S2-10",
+        "Q-S2-11",
+        "Q-S2-12",
+        "Q-S2-13",
+        "Q-S2-14",
+    }.issubset({item["id"] for item in review.next_questions()})
+    assert "theft_clock" not in review.case_payload()["event"]
+    assert review.calculate() is None
+
+
+def test_a_complete_sourced_theft_clock_reaches_the_engine_through_review(kb):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].update(
+        {
+            "Q-S2-08": 60,
+            "Q-S2-09": "CONSISTENT",
+            "Q-S2-10": "THEFT_OCCURRENCE",
+            "Q-S2-11": "1404-04-20",
+            "Q-S2-12": "1404-06-18",
+            "Q-S2-13": "SHAMSI",
+            "Q-S2-14": "police non-discovery enquiry, file 1404/123, dated 1404-06-18",
+            "Q-S4-06": "TRANSFERRED",
+        }
+    )
+    payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+    review = Review(payload, kb)
+
+    assert "U13_THEFT_CLOCK_ANCHOR" not in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_COMPUTE
+    assert review.case_payload()["event"]["theft_clock"] == {
+        "start_event": "THEFT_OCCURRENCE",
+        "start_date": "1404-04-20",
+        "as_of_date": "1404-06-18",
+        "calendar": "SHAMSI",
+        "source": "police non-discovery enquiry, file 1404/123, dated 1404-06-18",
+    }
+
+    result = review.calculate()
+    assert result is not None
+    assert result.route == "THEFT_TOTAL_SETTLEMENT"
+    assert result.fields["theft_clock"]["derived_days"] == 60
+    assert result.payable == Decimal(7200000000)
+
+
+@pytest.mark.parametrize("event_date", ["1404/04/20", "2025-07-11"])
+def test_review_binds_theft_clock_by_calendar_value(kb, event_date):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].update(
+        {
+            "Q-S0-02": event_date,
+            "Q-S2-08": 60,
+            "Q-S2-09": "CONSISTENT",
+            "Q-S2-10": "THEFT_OCCURRENCE",
+            "Q-S2-11": "1404-04-20",
+            "Q-S2-12": "1404-06-18",
+            "Q-S2-13": "SHAMSI",
+            "Q-S2-14": "calendar-equivalent synthetic police record",
+            "Q-S4-06": "TRANSFERRED",
+        }
+    )
+    payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+
+    review = Review(payload, kb)
+
+    assert "U13_THEFT_CLOCK_ANCHOR" not in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_COMPUTE
+    result = review.calculate()
+    assert result is not None
+    assert result.fields["theft_clock"]["derived_days"] == 60
+
+
+def test_review_rejects_a_theft_clock_date_that_disagrees_with_selected_event(kb):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].update(
+        {
+            "Q-S2-08": 60,
+            "Q-S2-09": "CONSISTENT",
+            "Q-S2-10": "DECLARATION",
+            # The theft occurred on 1404-04-20, but this file's declaration
+            # date is 1404-04-21. Using the former would reach 60 one day early.
+            "Q-S2-11": "1404-04-20",
+            "Q-S2-12": "1404-06-18",
+            "Q-S2-13": "SHAMSI",
+            "Q-S2-14": "police non-discovery enquiry, file 1404/123",
+            "Q-S4-06": "TRANSFERRED",
+        }
+    )
+    payload["evidence_present"].append("EVT_TITLE_TRANSFER_PROOF")
+    review = Review(payload, kb)
+
+    assert "U13_THEFT_CLOCK_ANCHOR" in review.open_uncertainties()
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert "theft_clock" not in review.case_payload()["event"]
     assert review.calculate() is None
 
 
@@ -366,6 +579,75 @@ def test_missing_event_year_stays_unknown_for_special_parts(kb):
     assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" not in review.open_uncertainties()
     assert review.decision()["decision"] == DECISION_INSUFFICIENT
     assert review.calculate() is None
+
+
+def test_nonreplacement_special_part_does_not_activate_u04(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S4-03"] = [
+        {
+            "category": "TIRE",
+            "assessed_loss": 120,
+            "new_price": 200,
+            "requires_replacement": False,
+        }
+    ]
+    review = Review(payload, kb)
+    assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" not in review.open_uncertainties()
+
+
+def test_review_emits_actual_and_classification_rescue_as_distinct_operands(kb):
+    review = Review.from_file(CASES / "review_t1_fullcover_partial.json", kb)
+    payload = review.case_payload()
+    actual = payload["damage"]["rescue_transport_actual_irr"]
+    assert payload["damage"]["rescue_for_total_loss_test_irr"] == actual
+    assert (
+        payload["damage"]["rescue_for_total_loss_test_source"]
+        == "DERIVED_FROM_ACTUAL_RESCUE"
+    )
+    assert "rescue_payable" not in payload["damage"]
+
+
+def test_missing_rescue_assessment_evidence_blocks_authorization(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["evidence_present"].remove("EVT_ASSESSMENT_REPORT")
+    review = Review(payload, kb)
+    assert any(
+        item["item"] == "EVT_ASSESSMENT_REPORT"
+        for item in review.missing_evidence()
+    )
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+
+
+def test_review_omitted_rescue_stays_missing_and_cannot_authorize(kb):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"].pop("Q-S4-07")
+    review = Review(payload, kb)
+
+    emitted = review.case_payload()
+    assert "rescue_transport_actual_irr" not in emitted["damage"]
+    assert "rescue_for_total_loss_test_irr" not in emitted["damage"]
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+@pytest.mark.parametrize(
+    "rescue,expected",
+    [(99, "PARTIAL_DAMAGE"), (100, "PARTIAL_DAMAGE"), (101, "TOTAL_LOSS")],
+)
+def test_review_rescue_uses_strict_total_loss_boundary(kb, rescue, expected):
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S5-01"] = 10000
+    payload["answers"]["Q-S5-02"] = 10000
+    payload["answers"]["Q-S5-03"] = 1404
+    payload["answers"]["Q-S4-02"] = 0
+    payload["answers"]["Q-S4-03"] = [
+        {"category": "OTHER_REPLACEMENT_PART", "assessed_loss": 7400}
+    ]
+    payload["answers"]["Q-S4-07"] = rescue
+    assert Review(payload, kb).classification()["branch"] == expected
 
 
 def test_emission_preserves_sourced_dates_causation_mode_ratio_and_year(kb):

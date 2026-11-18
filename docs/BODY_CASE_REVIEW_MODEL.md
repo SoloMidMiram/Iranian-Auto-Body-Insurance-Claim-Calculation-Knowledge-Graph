@@ -58,8 +58,9 @@ Three invariants hold everywhere in this layer:
 3. **The decision belongs to the review layer; the outcome belongs to the engine.**
    Review says whether a file may be run. The engine then says what the claim is
    worth — including "pending" and "nothing payable", which are outcomes, not
-   review failures. The whole-vehicle theft file currently remains insufficient:
+   review failures. An unanchored whole-vehicle theft file remains insufficient:
    its stored day-count does not identify a clock anchor, so U13 stops the handoff.
+   A complete review can now bind and emit the sourced clock instead.
 
 ## 2. Execution model
 
@@ -122,11 +123,12 @@ resolved; `LAPSED` still refuses before arithmetic.
 Two stops are enforced by review but not yet by direct `calc`. A missing
 production year still yields depreciation of 0, and a missing franchise is
 stored as 0 when calculation is called without the review gate. Review blocks
-both incomplete inputs. U13 is now live for every whole-vehicle theft, and
-review returns `INSUFFICIENT_INFORMATION` without invoking the engine. A count
-of 70 or a confirmed title transfer cannot clear it. The questionnaire still
-records only an integer; explicit theft-date and as-of-date inputs remain
-work for P1-02/P2-01. A missing event year is omitted from review emission,
+both incomplete inputs. U13 remains live for a whole-vehicle theft until the
+questionnaire binds the start event, start date, as-of date, calendar, and source.
+A count of 70 or a confirmed title transfer cannot clear it by itself. Once all
+five clock fields exist, review emits `event.theft_clock`, U13 clears for that
+file, and the engine verifies the stored day count against the derived interval.
+A missing event year is omitted from review emission,
 while direct `calc` still defaults to 1405 and remains work for P0-01/P1-02.
 
 ### 2.2 Knowledge graph to calculation engine
@@ -164,8 +166,8 @@ flowchart TD
 Selection order is theft, then the 75% test, then standalone glass, then partial
 damage. A repair that is not above 75% is not yet a partial loss: glass is
 still open. Regulation wording and insurer procedure do not currently give this
-repository one normalized anchor for the 60-day theft clock, so `U13` must surface
-whenever the anchor can change the outcome. Reaching 60 days under a sourced anchor
+repository one universal anchor for the 60-day theft clock, so `U13` must surface
+whenever a case lacks a complete sourced clock. Reaching 60 days under that clock
 without a title transfer is `TITLE_TRANSFER_REQUIRED`, which is a different stop
 from `PENDING_60_DAY_CRITERION`. The declaration date also starts the insurer's
 payment period; that is a separate clock.
@@ -269,7 +271,12 @@ the evidence it demands and the rung it belongs to
 | Q-S2-05 | Did the glass break on its own, or together with other damage from the same event? _(asked when: `{"any": [{"answer_is": ["Q-S2-01", "INDEPENDENT_GLASS_BREAKAGE"]}, {"slot_present": "PS_PART_CATEGORY", "category": "GLASS"}]}`)_ | ALONE, WITH_OTHER_DAMAGE, UNKNOWN | PS_GLASS_CAUSE_PRECEDENCE, PS_GLASS_CAUSE_PRECEDENCE | EVT_PHOTOS, EVT_ASSESSMENT_REPORT | hard | T1 |
 | Q-S2-06 | For fire, lightning or explosion: is there an authority report establishing the cause? _(asked when: `{"answer_is": ["Q-S2-01", ["FIRE", "LIGHTNING", "EXPLOSION"]]}`)_ | REPORT_WITH_CAUSE, REPORT_NO_CAUSE, NO_REPORT, NOT_APPLICABLE | - | EVT_FIRE_CAUSE_REPORT | amount | T1 |
 | Q-S2-07 | Which theft situation applies? _(asked when: `{"answer_is": ["Q-S2-01", ["THEFT", "ATTEMPTED_THEFT_DAMAGE"]]}`)_ | WHOLE_VEHICLE, ATTEMPTED_VEHICLE_THEFT_DAMAGE, PARTIAL_PARTS_THEFT, PARTS_STOLEN_AFTER_ACCIDENT, NOT_A_THEFT | PS_THEFT_TYPE | EVT_POLICE_STATION_REPORT, EVT_NON_DISCOVERY_ENQUIRY | hard | T1 |
-| Q-S2-08 | How many days have passed since the vehicle went missing, and counted from which date? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | integer | PS_DAYS_MISSING | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
+| Q-S2-08 | What elapsed whole-day count is recorded for the missing vehicle? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | integer | PS_DAYS_MISSING | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
+| Q-S2-10 | Which sourced event starts the sixty-day whole-vehicle theft clock? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | THEFT_OCCURRENCE, AWARENESS, DECLARATION | PS_THEFT_CLOCK_START_EVENT | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
+| Q-S2-11 | What is the sourced start date for that selected theft-clock event? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | date | PS_THEFT_CLOCK_START_DATE | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
+| Q-S2-12 | Through which sourced as-of date has the vehicle remained undiscovered? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | date | PS_THEFT_CLOCK_AS_OF_DATE | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
+| Q-S2-13 | Which calendar do the theft-clock dates use? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | SHAMSI, GREGORIAN | PS_THEFT_CLOCK_CALENDAR | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
+| Q-S2-14 | Which document and locator authorize this theft-clock anchor and its dates? _(asked when: `{"answer_is": ["Q-S2-07", "WHOLE_VEHICLE"]}`)_ | text | PS_THEFT_CLOCK_SOURCE | EVT_NON_DISCOVERY_ENQUIRY | hard | T2 |
 | Q-S2-09 | Is the reported damage consistent with the stated event, or is there a discrepancy? | CONSISTENT, DISCREPANCY_PRE_EXISTING, DISCREPANCY_UNEXPLAINED, NOT_REVIEWED | - | EVT_PHOTOS, EVT_ASSESSMENT_REPORT | review | T1 |
 | Q-S3-01 | What was the licence position of the driver at the time of the event? | VALID_AND_APPROPRIATE, EXPIRED, VOID_OR_SUSPENDED, WRONG_CLASS, UNLICENSED, NOT_DRIVING, UNKNOWN | PS_LICENSE_STATE | EVT_LICENCE | hard | T0 |
 | Q-S3-02 | Is there a competent-authority finding that alcohol or drugs were used, with a causal link to the loss? | CONFIRMED_AND_CAUSAL, CONFIRMED_NOT_CAUSAL, SUSPECTED_NO_REPORT, NO, UNKNOWN | PS_INTOXICATION_CAUSAL | EVT_JUDICIAL_FINDING | hard | T0 |
@@ -289,7 +296,7 @@ the evidence it demands and the rung it belongs to
 | Q-S4-08 | What is the probable salvage value, and does the insured accept it? _(asked when: `{"branch_is": ["TOTAL_LOSS"]}`)_ | money | PS_SALVAGE_VALUE | EVT_SALVAGE_VALUATION | amount | T2 |
 | Q-S4-09 | Who keeps the wreck? _(asked when: `{"branch_is": ["TOTAL_LOSS"]}`)_ | NOT_APPLICABLE, INSURED_RETAINS, INSURER_TAKES_TITLE, UNRESOLVED | PS_SALVAGE_DISPOSITION | EVT_SALVAGE_VALUATION | amount | T2 |
 | Q-S4-10 | Is the vehicle repairable at all, or is repair technically impossible? _(asked when: `{"not": {"slot_present": "PS_DAYS_MISSING"}}`)_ | REPAIRABLE, TECHNICALLY_IRREPAIRABLE, ECONOMICALLY_TOTAL, UNKNOWN | - | EVT_ASSESSMENT_REPORT | hard | T2 |
-| Q-S4-11 | Where the assessment cannot be itemised, what is the aggregate repair-and-replacement figure? _(asked when: `{"answer_is": ["Q-S4-01", "AGGREGATE_ONLY"]}`)_ | money | PS_GROSS_DAMAGE, PS_REPAIR_TOTAL | EVT_ASSESSMENT_REPORT | hard | T0 |
+| Q-S4-11 | Where the assessment cannot be itemised, what is the aggregate repair-and-replacement figure excluding rescue and transport? _(asked when: `{"answer_is": ["Q-S4-01", "AGGREGATE_ONLY"]}`)_ | money | PS_GROSS_DAMAGE, PS_REPAIR_TOTAL | EVT_ASSESSMENT_REPORT | hard | T0 |
 | Q-S5-01 | What was the transactional value of the vehicle on the day of the event, and on what evidence? | money | PS_MARKET_VALUE | EVT_MARKET_VALUE_EVIDENCE, EVT_ASSESSMENT_REPORT | hard | T0 |
 | Q-S5-02 | What insured sum does the policy state for the year of the event? | money | PS_INSURED_SUM | EVT_POLICY_COPY | hard | T0 |
 | Q-S5-03 | What is the production (model) year, taken from the registration or the policy schedule? | integer | PS_PRODUCTION_YEAR | EVT_OWNERSHIP_DOCS, EVT_POLICY_COPY | amount | T1 |
@@ -334,7 +341,7 @@ where people most often get it wrong.
 | PS_ASSESSED_DEPRECIATION | money | ASSESSOR | Q-S4-05 | NOT_APPLICABLE | - | - | PARTIAL_DAMAGE |
 | PS_AWARENESS_DATE | date | REGULATION | Q-S0-03 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_BATTERY_TIRE_INTERACTION | enum | ADJUSTER_CONFIG | Q-S8-02 | SCENARIO_SET | U04_BATTERY_TIRE_CAP_VS_DEPRECIATION | - | PARTIAL_DAMAGE |
-| PS_CAUSATION_ESTABLISHED | boolean | REGULATION | Q-S2-02 | REFUSE | - | G_NO_ASSUMED_CAUSATION | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
+| PS_CAUSATION_ESTABLISHED | boolean | REGULATION | Q-S2-02 | REFUSE | - | G_COVERED_PERIL_CAUSATION_ESTABLISHED | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_CLAIM_YEAR | integer | DERIVED | Q-S0-02 | REFUSE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_DAYS_MISSING | integer | REGULATION | Q-S2-08 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
 | PS_DECLARATION_DATE | date | REGULATION | Q-S0-07 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
@@ -349,20 +356,25 @@ where people most often get it wrong.
 | PS_LABOR | money | ASSESSOR | Q-S4-02 | TREAT_AS_ZERO | - | - | PARTIAL_DAMAGE |
 | PS_LICENSE_STATE | enum | REGULATION | Q-S3-01 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_MARKET_VALUE | money | REGULATION | Q-S5-01 | ASSESSOR_REQUIRED | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
-| PS_MULTIPLE_POLICIES | object | REGULATION | Q-S6-05, Q-S9-03 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
+| PS_MULTIPLE_POLICIES | object | REGULATION | Q-S6-05, Q-S9-03 | REVIEW_GATE | - | G_RECOVERY_ALLOCATION_CONTAINED | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_NOTICE_TIMELINESS | enum | REGULATION | Q-S0-04 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_PART_CATEGORY | enum | REGULATION | Q-S4-03 | REFUSE | - | - | PARTIAL_DAMAGE, GLASS_ONLY |
 | PS_PART_NEW_PRICE | money | REGULATION | Q-S4-04 | REFUSE | U04_BATTERY_TIRE_CAP_VS_DEPRECIATION | - | PARTIAL_DAMAGE |
 | PS_PERIL | enum | REGULATION | Q-S2-01 | REFUSE | - | G_NO_ASSUMED_CAUSATION | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_PRODUCTION_YEAR | integer | REGULATION | Q-S5-03 | ASSESSOR_REQUIRED | - | - | PARTIAL_DAMAGE, GLASS_ONLY |
 | PS_REPAIR_TOTAL | money | ASSESSOR | Q-S4-01, Q-S4-11 | ASSESSOR_REQUIRED | - | - | TOTAL_LOSS, PARTIAL_DAMAGE |
-| PS_RESCUE_ACTUAL | money | REGULATION | Q-S4-07 | TREAT_AS_ZERO | - | - | PARTIAL_DAMAGE, TOTAL_LOSS |
-| PS_RESCUE_CAP_BASE | enum | ADJUSTER_CONFIG | Q-S8-03 | DEFAULT_ONE | U05_RESCUE_DENOMINATOR | - | PARTIAL_DAMAGE, TOTAL_LOSS |
+| PS_RESCUE_ACTUAL | money | REGULATION | Q-S4-07 | BLOCK_IF_MATERIAL | - | - | PARTIAL_DAMAGE, TOTAL_LOSS |
+| PS_RESCUE_CAP_BASE | enum | ADJUSTER_CONFIG | Q-S8-03 | BLOCK_IF_MATERIAL | U05_RESCUE_DENOMINATOR | - | PARTIAL_DAMAGE, TOTAL_LOSS |
 | PS_RISK_INTENSIFICATION | boolean | REGULATION | Q-S3-07 | REVIEW_GATE | - | G_NO_ASSUMED_CAUSATION | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY, THEFT |
 | PS_SALVAGE_DISPOSITION | enum | REGULATION | Q-S4-09 | SCENARIO_SET | U12_SALVAGE_DISPOSITION | - | TOTAL_LOSS |
 | PS_SALVAGE_VALUE | money | ASSESSOR | Q-S4-08 | REFUSE | - | G_SALVAGE_XOR_TITLE_TRANSFER | TOTAL_LOSS |
 | PS_SETTLEMENT_MODE | enum | REGULATION | Q-S8-04 | NOT_APPLICABLE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS |
 | PS_SUBROGATION_IMPAIRED | boolean | REGULATION | Q-S9-01 | REVIEW_GATE | - | - | PARTIAL_DAMAGE, TOTAL_LOSS, THEFT, LEGAL_RECOVERY |
+| PS_THEFT_CLOCK_AS_OF_DATE | date | EVENT_FACT | Q-S2-12 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
+| PS_THEFT_CLOCK_CALENDAR | enum | EVENT_FACT | Q-S2-13 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
+| PS_THEFT_CLOCK_SOURCE | text | INSURER_PROCEDURE | Q-S2-14 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
+| PS_THEFT_CLOCK_START_DATE | date | EVENT_FACT | Q-S2-11 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
+| PS_THEFT_CLOCK_START_EVENT | enum | INSURER_PROCEDURE | Q-S2-10 | REFUSE | U13_THEFT_CLOCK_ANCHOR | - | THEFT |
 | PS_THEFT_TYPE | enum | REGULATION | Q-S2-07 | REFUSE | - | - | THEFT |
 | PS_TITLE_TRANSFERRED | boolean | REGULATION | Q-S4-06 | REFUSE | - | G_SALVAGE_XOR_TITLE_TRANSFER | THEFT, TOTAL_LOSS |
 | PS_UNDERINSURANCE_RATIO | ratio | DERIVED | - | SCENARIO_SET | U01_ARTICLE10_PARTIAL_ORDER | - | PARTIAL_DAMAGE, TOTAL_LOSS, GLASS_ONLY |
@@ -473,7 +485,7 @@ authority for anything above that. That matches the release posture in
 |---|---|---|---|
 | `review_t0_intake_partial.json` | T4 | `INSUFFICIENT_INFORMATION` | 27 questions still open, earliest is in S1/S2; the ladder already sees that nobody has read the franchise schedule |
 | `review_t1_fullcover_partial.json` | T1 | `COMPUTE` | 165.70 m-toman single payable, trace of five rules, confidence 0.95 |
-| `review_t2_theft_pending.json` | T2 | `INSUFFICIENT_INFORMATION` | U13 blocks every unanchored whole-vehicle theft; engine is not invoked |
+| `review_t2_theft_pending.json` | T2 | `INSUFFICIENT_INFORMATION` | U13 blocks this unanchored whole-vehicle theft; a complete five-field clock now has a tested review-to-engine path |
 | `review_t3_underinsured_partial.json` | T3 | `SCENARIO_SET` | 139.625 / 144.6875 m-toman, `U01` live, confidence capped at 0.55 |
 | `review_t4_glass_terms_missing.json` | T4 | `INSUFFICIENT_INFORMATION` | coverage exists through the endorsement, its schedule does not; `U02`/`U03`/`U11` live |
 | `review_refuse_wrong_licence.json` | T0 | `REFUSE` | licence class wrong: no depreciation, franchise or ratio is ever computed |
@@ -563,4 +575,3 @@ amount-affecting):**
   judgement (`Q-S0-04`) rather than computing it.
 * **Free-text answers are confined to identification and sign-off** (`Q-S0-01`,
   `Q-S10-01`). A narrative field can never move an amount, by construction.
-

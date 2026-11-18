@@ -254,8 +254,8 @@
       "topic": "THEFT_SIXTY_DAY_CLOCK_ANCHOR",
       "question": "From which date does the sixty-day unrecovered-vehicle clock run: the theft, the insured's awareness, or the declaration to the insurer?",
       "blocking": true,
-      "engine_status": "REQUIRES_CASE_INPUT_AND_TEXT_REVALIDATION",
-      "config_field": "event.days_vehicle_missing",
+      "engine_status": "RESOLVED_PER_CASE_BY_SOURCE_BOUND_CLOCK",
+      "config_field": "event.theft_clock",
       "blocks": ["OP_LIABILITY_CAP_INSURED_SUM"],
       "affects_branches": ["THEFT"],
       "scenarios": [
@@ -263,13 +263,13 @@
         "From the declaration to the insurer, as the payment clause and one insurer's published procedure count",
         "From the non-discovery enquiry date used by the claims department"
       ],
-      "known": "The general conditions make an unrecovered whole vehicle a total loss at a minimum of sixty days after the theft, while the payment provision carries a separate clock that starts on declaration of complete documents. Insurer practice pages have been observed anchoring the sixty days on the declaration. The engine models one integer and cannot tell which clock produced it.",
+      "known": "The general conditions make an unrecovered whole vehicle a total loss at a minimum of sixty days after the theft, while the payment provision carries a separate clock that starts on declaration of complete documents. Insurer practice pages have been observed anchoring the sixty days on the declaration. The review must therefore bind the selected start event, start date, as-of date, calendar, and source; the engine derives and verifies the elapsed days.",
       "resolved_by": ["SRC_REG53_MIRROR", "SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS", "SRC_BIMEDAY_BODY_CLAIM_PROCEDURE"],
       "resolution_artefact": "The regulation text with article numbers quoted verbatim from an official copy, plus the insurer's claims instruction stating which date its sixty-day count starts from.",
       "confidence_of_single_interpretation": 0.5,
       "affected_outputs": ["status", "payable"],
       "release_effect": "decides whether a theft claim is pending or settleable",
-      "live_only_when": "theft_type == WHOLE_VEHICLE until an explicit clock anchor and as-of date are modeled"
+      "live_only_when": "theft_type == WHOLE_VEHICLE and any source-bound theft-clock field is missing"
     },
     {
       "node_id": "U14_GLASS_INSURED_AT_VALUE_CONDITION",
@@ -315,4 +315,3 @@
     }
   ]
 }
-

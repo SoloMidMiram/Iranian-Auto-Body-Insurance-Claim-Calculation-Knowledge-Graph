@@ -29,7 +29,8 @@ payment authority, or production certification; those remain in Phases 3-6.
 
 In scope:
 
-- issues `#7`, `#8`, `#10`-`#15` and the release checklist in `#6`;
+- issues `#7`, `#8`, `#10`-`#15` and the active release checklist in `#49`;
+  closed issue `#6` remains the historical repository-baseline record;
 - primary-source authority records and hashes for every executable body rule;
 - effective-dated snapshots and sourced theft-clock dates;
 - closed claim/evidence taxonomy for the four supported branches;
@@ -60,7 +61,7 @@ more than two workstreams active and designate one integrator for the release.
 | Oct 10 | Claim model | `#12` | Close the four-branch taxonomy and add 59/60/61-day theft boundary tests. Refuse contradictory or unmapped evidence. |
 | Oct 11 | Execution | `#13`, `#14` | Make graph operator order/config authoritative, then prove every public path invokes admission, computation, and consistency guards. |
 | Oct 12 | Validation | `#15` | Pass deterministic, property, mutation, and direct/graph parity suites; assemble the release manifest and evidence dossier. |
-| Oct 13 | Release | `#6` checklist | Independent re-review, clean repository gate, zero unresolved P0/P1 body-model blockers, merge freeze, and tag `v0.1-body-model` only if every hard gate passes. |
+| Oct 13 | Release | `#49` checklist | Independent re-review, clean repository gate, zero unresolved P0/P1 body-model blockers, merge freeze, and tag `v0.1-body-model` only if every hard gate passes. |
 
 ### Operating rules and hard gates
 
@@ -86,7 +87,7 @@ more than two workstreams active and designate one integrator for the release.
 The sprint is complete only when all of the following are true:
 
 1. Issues `#7`, `#8`, and `#10`-`#15` meet their acceptance criteria and close
-   with reproducible evidence; `#6`'s release checklist is fully checked.
+   with reproducible evidence; `#49`'s release checklist is fully checked.
 2. All four supported branches have review-to-validated-case-to-engine
    coverage and explicit unsupported-state behavior.
 3. Two human reviewers sign the authority pack; every executable body rule has
@@ -98,22 +99,30 @@ The sprint is complete only when all of the following are true:
    versions, and the tag states that the release is research/decision-support
    only.
 
-### Research/model validation checkpoint — 2026-10-08
+### Research/model validation and runtime-repair checkpoint — 2026-10-08
 
 The cross-check in
 [`RESEARCH_REPORT_MODEL_VALIDATION.md`](RESEARCH_REPORT_MODEL_VALIDATION.md)
-found four amount/eligibility defects that precede the remaining sprint work:
+found four amount/eligibility defects that preceded the remaining sprint work:
 
 - Article 8 does not yet cap by actual loss and treats explicit zero as absent;
 - a causation-required exclusion can fire from a bare cause token;
 - configured `DEPRECIATE_THEN_CAP` applies battery/tyre depreciation twice;
 - percentage-franchise base semantics are collected but not executed.
 
-It also found that review-authorized live uncertainties are not universally
-reconciled with the result's blocking-uncertainty set. Treat RMV-001 through
-RMV-006 in that audit as release stops. They refine the existing P0/P2/P3 issue
-scope and must be repaired or explicitly removed from supported scope before the
-Oct 11 feature freeze; passing the original 50 fixtures does not close them.
+The focused `fix/body-runtime-blockers` follow-up now repairs RMV-001 through
+RMV-006 and the theft-clock portion of RMV-008. Percentage franchises execute a
+typed named base; missing ratio/depreciation/salvage facts fail closed; rescue
+denominator omission blocks only when material; battery/tyre modes apply
+depreciation once; authorization-live uncertainties are reconciled; Article 8
+uses `min(actual, corresponding, limit)`; causal exclusions are conjunctive; and
+whole-theft day counts are derived from a sourced calendar snapshot.
+
+These code repairs do not close the broader roadmap issues by themselves.
+RMV-007 and the regulatory/policy effective-date parts of RMV-008 remain release
+stops, as do the complete provenance, taxonomy, guard-mutation, and independent
+authority-review gates. The original 50 fixtures plus the full regression suite
+must stay green on the runtime PR and its eventual merge commit.
 
 ### Practical roadmap after `v0.1-body-model`
 

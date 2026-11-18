@@ -23,9 +23,10 @@ Design commitments enforced here:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any, Callable
+from typing import Any
 
 from . import guards, money, operators
 from .admission import (
@@ -33,7 +34,8 @@ from .admission import (
     CalculationAuthorization,
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
-from .classify import classify
+from .classify import ClassificationEvidenceRequired, classify
+from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
 from .plans import (
     FRANCHISE,
@@ -189,28 +191,94 @@ def _enforce_guard_plan(res: CalcResult) -> None:
 # --------------------------------------------------------------------- helpers
 
 
-def _rescue(case: Case, res: CalcResult, cap_base: Decimal) -> Decimal:
-    actual = case.rescue_actual or Decimal(0)
-    cap = operators.allowable_rescue_transport(actual, cap_base)
-    res.fields["rescue_cap"] = operators.RESCUE_CAP_RATIO * cap_base if cap_base > 0 else Decimal(0)
-    res.fields["allowable_rescue_transport"] = cap
+def _rescue(
+    case: Case,
+    res: CalcResult,
+    candidate_bases: dict[str, Decimal],
+) -> Decimal:
+    actual = case.rescue_actual
+    supplied_payable = case.rescue_payable
+    if actual is not None and supplied_payable is not None and supplied_payable > actual:
+        raise operators.OperatorError(
+            "supplied rescue payable exceeds the separately supplied actual expense"
+        )
+    configured = case.config.get("rescue_cap_base")
+    if configured is None:
+        if supplied_payable is not None:
+            candidate_amounts = {
+                name: (
+                    min(supplied_payable, operators.RESCUE_CAP_RATIO * base)
+                    if base > 0
+                    else Decimal(0)
+                )
+                for name, base in candidate_bases.items()
+            }
+        else:
+            candidate_amounts = {
+                name: operators.allowable_rescue_transport(actual, base)
+                for name, base in candidate_bases.items()
+            }
+        if len(set(candidate_amounts.values())) > 1:
+            res.fields["rescue_candidate_amounts"] = candidate_amounts
+            raise operators.UncertaintyRequired(
+                "U05_RESCUE_DENOMINATOR",
+                (
+                    "the rescue ceiling denominator is missing and the candidate "
+                    "bases change the payable amount"
+                ),
+                status="RESCUE_DENOMINATOR_UNRESOLVED",
+                scenarios=list(candidate_bases),
+            )
+        cap_kind = "CANDIDATES_EQUIVALENT"
+        cap_base = min(candidate_bases.values()) if candidate_bases else Decimal(0)
+    else:
+        cap_kind = str(configured).upper()
+        if cap_kind not in candidate_bases:
+            raise operators.OperatorError(
+                f"rescue cap base {cap_kind!r} is not available for this calculation branch"
+            )
+        cap_base = candidate_bases[cap_kind]
+
+    cap_limit = operators.RESCUE_CAP_RATIO * cap_base if cap_base > 0 else Decimal(0)
+    if supplied_payable is not None:
+        if supplied_payable > cap_limit:
+            raise operators.OperatorError(
+                "supplied rescue payable exceeds the applicable rescue ceiling"
+            )
+        rescue = supplied_payable
+    else:
+        rescue = operators.allowable_rescue_transport(actual, cap_base)
+    res.fields["rescue_cap_base_kind"] = cap_kind
+    res.fields["rescue_cap_base"] = cap_base
+    res.fields["rescue_cap"] = cap_limit
+    res.fields["allowable_rescue_transport"] = rescue
     res.fields["rescue_claimed"] = actual
+    res.fields["rescue_payable_supplied"] = supplied_payable
+    res.fields["rescue_input_kind"] = (
+        "ACTUAL_AND_PAYABLE"
+        if actual is not None and supplied_payable is not None
+        else "ACTUAL"
+        if actual is not None
+        else "PAYABLE"
+        if supplied_payable is not None
+        else "NONE"
+    )
     res.note_guard("G_RESCUE_CAP_CEILING")
-    if actual > 0:
+    if (actual or Decimal(0)) > 0 or (supplied_payable or Decimal(0)) > 0:
         res.note_rule("REG53_RESCUE_TRANSPORT_CAP")
-        if cap < actual:
+        if supplied_payable is None and actual is not None and rescue < actual:
             res.label("RESCUE_CAPPED")
-    return cap
+    return rescue
 
 
 def _ratio(case: Case, res: CalcResult) -> Decimal:
-    """Apply the underinsurance ratio, or record that it was not assessable."""
+    """Apply the underinsurance ratio only from both required value anchors."""
     market = case.market_value
     insured = case.insured_sum
     if market is None and insured is None:
-        res.fields["article10_ratio"] = Decimal(1)
-        res.label("UNDERINSURANCE_NOT_ASSESSED")
-        return Decimal(1)
+        raise operators.OperatorError(
+            "market value and insured sum are required to assess the Article 10 underinsurance ratio"
+        )
     ratio = operators.underinsurance_ratio(insured, market)
     res.fields["article10_ratio"] = ratio
     res.note_rule("REG53_ART20_NOTE2_UNDERINSURANCE_RATIO")
@@ -219,7 +287,11 @@ def _ratio(case: Case, res: CalcResult) -> Decimal:
     return ratio
 
 
-def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
+def _resolve_franchise(
+    case: Case,
+    res: CalcResult,
+    bases: dict[str, Decimal],
+) -> Decimal:
     raw = case.franchise_raw
     spec: dict[str, Any] | None = None
     source: str | None = None
@@ -261,6 +333,21 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
             "the percentage franchise rate is missing from the applicable policy schedule",
             status="FRANCHISE_TERMS_REQUIRED",
         )
+    calculation_base = spec.get("calculation_base")
+    if mode in ("PERCENT", "PERCENT_WITH_MINIMUM"):
+        if calculation_base is None:
+            raise operators.UncertaintyRequired(
+                "U02_FRANCHISE_BASE_SCHEDULES",
+                "the percentage franchise calculation base is missing from the policy schedule",
+                status="FRANCHISE_BASE_REQUIRED",
+            )
+        calculation_base = str(calculation_base).upper()
+        if calculation_base not in bases:
+            raise operators.UncertaintyRequired(
+                "U02_FRANCHISE_BASE_SCHEDULES",
+                f"franchise calculation base {calculation_base!r} is not available for this branch",
+                status="FRANCHISE_BASE_UNSUPPORTED",
+            )
     if mode == "PERCENT_WITH_MINIMUM" and spec.get("minimum_irr", spec.get("minimum")) is None:
         raise operators.UncertaintyRequired(
             "U02_FRANCHISE_BASE_SCHEDULES",
@@ -290,9 +377,10 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
     def _dec(value: Any) -> Decimal | None:
         return None if value is None else money.D(value)
 
+    selected_base = bases.get(str(calculation_base).upper()) if calculation_base else None
     amount = operators.franchise_amount(
         mode,
-        base=base,
+        base=selected_base,
         rate=_dec(spec.get("rate")),
         absolute=_dec(spec.get("absolute_irr", spec.get("absolute"))),
         minimum=_dec(spec.get("minimum_irr", spec.get("minimum"))),
@@ -316,6 +404,11 @@ def _resolve_franchise(case: Case, res: CalcResult, base: Decimal) -> Decimal:
     res.fields["franchise"] = amount
     res.fields["franchise_mode"] = mode
     res.fields["franchise_source"] = source or "UNKNOWN"
+    res.fields["franchise_calculation_base_kind"] = (
+        str(calculation_base).upper() if calculation_base else "NOT_APPLICABLE"
+    )
+    if selected_base is not None:
+        res.fields["franchise_calculation_base"] = selected_base
     if spec.get("source_version"):
         res.fields["franchise_source_version"] = spec["source_version"]
     res.note_rule("REG53_POLICY_DEFINED_FRANCHISE")
@@ -337,24 +430,55 @@ def _threshold(case: Case, kb: Knowledge) -> Decimal | None:
 
 def _exclusion_matches(case: Case, exclusion: dict[str, Any]) -> bool:
     predicate = exclusion.get("cause_predicate") or {}
+    checks: list[bool] = []
 
     theft_types = predicate.get("theft_type_in")
-    if theft_types and case.theft_type in theft_types:
-        return True
+    if theft_types:
+        checks.append(case.theft_type in theft_types)
 
     field = predicate.get("field")
     if field:
         value = case.field_value(field)
-        if value is not None and value == predicate.get("equals"):
-            return True
+        checks.append(value is not None and value == predicate.get("equals"))
 
     tokens = predicate.get("cause_in") or []
-    observed = {
-        str(value).casefold()
-        for value in (case.cause, case.peril)
-        if value not in (None, "")
-    }
-    return any(str(token).casefold() in observed for token in tokens)
+    if tokens:
+        observed = {
+            str(value).casefold()
+            for value in (case.cause, case.peril)
+            if value not in (None, "")
+        }
+        checks.append(any(str(token).casefold() in observed for token in tokens))
+
+    # Clauses in one predicate describe one factual condition. Intoxication,
+    # for example, needs both the coded cause and the causal authority finding.
+    return bool(checks) and all(checks)
+
+
+def enforce_body_eligibility_admission(case: Case, res: CalcResult) -> None:
+    """Run body admission predicates that must hold before any exclusion or amount.
+
+    Positive covered-peril causation and exclusion causation are different facts.
+    The former is checked here; ``evaluate_coverage_gate`` retains the latter.
+    Recovery containment likewise chooses no allocation formula: it only prevents
+    an unsupported recovery or contribution state from reaching settlement.
+    """
+    # Register each guard immediately before its check. If the first predicate
+    # fails, the second predicate has not run and must not replace the
+    # defect-specific status with GUARD_PLAN_INCOMPLETE during finalization.
+    res.require_guard("G_COVERED_PERIL_CAUSATION_ESTABLISHED")
+    res.fields["covered_peril_causation_established"] = (
+        case.covered_peril_causation_established
+    )
+    guards.check_covered_peril_causation(case)
+    res.note_guard("G_COVERED_PERIL_CAUSATION_ESTABLISHED")
+
+    res.require_guard("G_RECOVERY_ALLOCATION_CONTAINED")
+    res.fields["multiple_insurance_state"] = case.multiple_insurance_state
+    res.fields["prior_compensation"] = case.prior_compensation
+    res.note_rule("REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION")
+    guards.check_recovery_allocation(case)
+    res.note_guard("G_RECOVERY_ALLOCATION_CONTAINED")
 
 
 def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
@@ -505,8 +629,9 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
         res.fields["depreciation_source"] = "BASE_TIMES_RATE"
         res.note_rule("REG53_ART19_REPLACEMENT_PART_DEPRECIATION")
     else:
-        depreciation = Decimal(0)
-        res.fields["depreciation_source"] = "NONE"
+        raise operators.OperatorError(
+            "aggregate partial damage requires explicit assessed depreciation or a depreciation base and rate"
+        )
 
     after_depreciation = eligible - depreciation
     res.fields["assessed_gross"] = assessed
@@ -515,19 +640,28 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
     res.fields["depreciation"] = depreciation
     res.fields["after_depreciation"] = after_depreciation
 
-    cap_kind = str(case.config.get("rescue_cap_base", "ASSESSED_GROSS")).upper()
-    if cap_kind == "ELIGIBLE_GROSS":
-        cap_base = eligible
-    elif cap_kind == "SETTLEMENT_BASE":
-        cap_base = after_depreciation
-    else:
-        cap_base = assessed
-    res.fields["rescue_cap_base_kind"] = cap_kind
-    if cap_base != eligible:
+    if assessed != eligible:
         res.label("RESCUE_DENOMINATOR_CONFIGURED")
-    rescue = _rescue(case, res, cap_base)
+    rescue = _rescue(
+        case,
+        res,
+        {
+            "ASSESSED_GROSS": assessed,
+            "ELIGIBLE_GROSS": eligible,
+            "SETTLEMENT_BASE": after_depreciation,
+        },
+    )
 
-    franchise = _resolve_franchise(case, res, after_depreciation)
+    franchise = _resolve_franchise(
+        case,
+        res,
+        {
+            "ASSESSED_GROSS": assessed,
+            "GROSS_ELIGIBLE": eligible,
+            "AFTER_DEPRECIATION": after_depreciation,
+            "SETTLEMENT_BASE": after_depreciation,
+        },
+    )
     ratio = _ratio(case, res)
     order = str(case.config.get("article10_partial_order", UNRESOLVED_ORDER)).upper()
 
@@ -623,8 +757,24 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.fields["base_after_salvage"] = after_salvage
 
     repair = case.repair_total
-    rescue = _rescue(case, res, repair if repair is not None else base)
-    franchise = _resolve_franchise(case, res, after_salvage)
+    rescue = _rescue(
+        case,
+        res,
+        {
+            "ASSESSED_GROSS": repair if repair is not None else base,
+            "ELIGIBLE_GROSS": base,
+            "SETTLEMENT_BASE": base,
+        },
+    )
+    franchise = _resolve_franchise(
+        case,
+        res,
+        {
+            "AFTER_SALVAGE": after_salvage,
+            "SETTLEMENT_BASE": base,
+            "GROSS_ELIGIBLE": base,
+        },
+    )
 
     sequence = _activate_body_plan(
         res,
@@ -657,10 +807,15 @@ def calculate_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("TOTAL_LOSS")
     market = case.market_value
     repair = case.repair_total
+    classification_rescue, rescue_source, unresolved = case.classification_rescue()
+    if unresolved is not None:
+        raise ClassificationEvidenceRequired(unresolved)
     is_total, combined, threshold = operators.is_total_loss(
-        repair, case.rescue_for_threshold, market
+        repair, classification_rescue, market
     )
     if combined is not None:
+        res.fields["classification_rescue"] = classification_rescue
+        res.fields["classification_rescue_source"] = rescue_source
         res.fields["combined_for_threshold"] = combined
         res.fields["threshold_value"] = threshold
         res.fields["threshold_ratio"] = combined / market if market else None
@@ -729,8 +884,25 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.fields["glass_depreciation"] = Decimal(0)
     res.fields["depreciation_source"] = "GLASS_EXEMPT_BY_RULE"
 
-    rescue = _rescue(case, res, gross)
-    franchise = _resolve_franchise(case, res, gross)
+    rescue = _rescue(
+        case,
+        res,
+        {
+            "ASSESSED_GROSS": gross,
+            "ELIGIBLE_GROSS": gross,
+            "SETTLEMENT_BASE": gross,
+        },
+    )
+    franchise = _resolve_franchise(
+        case,
+        res,
+        {
+            "ASSESSED_GROSS": gross,
+            "GROSS_ELIGIBLE": gross,
+            "AFTER_DEPRECIATION": gross,
+            "SETTLEMENT_BASE": gross,
+        },
+    )
     ratio = _ratio(case, res)
     res.note_guard("G_GLASS_ARTICLE10_NOT_AUTO_EXEMPT")
     order = str(case.config.get("article10_partial_order", UNRESOLVED_ORDER)).upper()
@@ -786,6 +958,95 @@ def calculate_glass(case: Case, kb: Knowledge, res: CalcResult) -> None:
 # --------------------------------------------------------------------- theft
 
 
+# Borkowski/Jalaali break table, used by the established deterministic
+# JalCal algorithm. The bounded range is deliberate: an unsupported year must
+# fail closed instead of silently switching to an approximate 33-year cycle.
+def _is_shamsi_leap_year(year: int) -> bool:
+    """Return JalCal's leap-year result for a supported Shamsi year."""
+    try:
+        return is_shamsi_leap_year(year)
+    except CalendarDateError as error:
+        raise operators.OperatorError(
+            f"unsupported SHAMSI theft-clock year {year!r}"
+        ) from error
+
+
+def _shamsi_ordinal(value: str) -> int:
+    """Return a consistent day ordinal after validating a Shamsi date."""
+    try:
+        return parse_claim_date(value, calendar="SHAMSI").chronology_key
+    except CalendarDateError as error:
+        raise operators.OperatorError(
+            f"invalid SHAMSI theft-clock date {value!r}"
+        ) from error
+
+
+def _dated_theft_clock_days(clock: dict[str, Any]) -> int:
+    """Derive an elapsed whole-day count from a bound calendar snapshot."""
+
+    start = str(clock.get("start_date") or "")
+    as_of = str(clock.get("as_of_date") or "")
+    calendar = str(clock.get("calendar") or "").upper()
+    try:
+        start_date = parse_claim_date(start, calendar=calendar)
+        as_of_date = parse_claim_date(as_of, calendar=calendar)
+        elapsed = as_of_date.chronology_key - start_date.chronology_key
+    except CalendarDateError as error:
+        if calendar not in ("GREGORIAN", "SHAMSI"):
+            raise operators.OperatorError(
+                f"unsupported theft-clock calendar {calendar!r}"
+            ) from error
+        label = "Gregorian" if calendar == "GREGORIAN" else "SHAMSI"
+        raise operators.OperatorError(
+            f"invalid {label} theft-clock date: {error}"
+        ) from error
+    if elapsed < 0:
+        raise operators.OperatorError("theft-clock as_of_date precedes its start_date")
+    return elapsed
+
+
+_THEFT_CLOCK_EVENT_DATE_FIELDS = {
+    "THEFT_OCCURRENCE": "event_date",
+    "AWARENESS": "awareness_date",
+    "DECLARATION": "declaration_date",
+}
+
+
+def _validate_theft_clock_start_event(case: Case, clock: dict[str, Any]) -> None:
+    """Bind the selected clock event to its canonical date in the case file."""
+
+    start_event = str(clock.get("start_event") or "")
+    event_date_field = _THEFT_CLOCK_EVENT_DATE_FIELDS.get(start_event)
+    if event_date_field is None:
+        raise operators.OperatorError(
+            f"unsupported theft-clock start_event {start_event!r}"
+        )
+
+    event_date = case.event.get(event_date_field)
+    if not isinstance(event_date, str) or not event_date:
+        raise operators.UncertaintyRequired(
+            "U13_THEFT_CLOCK_ANCHOR",
+            f"theft-clock start_event {start_event} requires event.{event_date_field}",
+            status="THEFT_CLOCK_ANCHOR_UNRESOLVED",
+        )
+
+    start_date = str(clock.get("start_date") or "")
+    try:
+        start_key = parse_claim_date(
+            start_date, calendar=str(clock.get("calendar") or "")
+        ).chronology_key
+        event_key = parse_claim_date(event_date).chronology_key
+    except CalendarDateError as error:
+        raise operators.OperatorError(
+            "theft-clock start event contains an invalid calendar date"
+        ) from error
+    if start_key != event_key:
+        raise operators.OperatorError(
+            f"theft-clock start_date ({start_date}) does not match "
+            f"event.{event_date_field} ({event_date}) for {start_event}"
+        )
+
+
 def calculate_theft(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("THEFT")
     theft_type = case.theft_type
@@ -798,6 +1059,27 @@ def calculate_theft(case: Case, kb: Knowledge, res: CalcResult) -> None:
         days = case.days_missing
         if days is None:
             raise operators.OperatorError("days_vehicle_missing is required for whole-vehicle theft")
+        clock = case.theft_clock
+        if clock is None:
+            raise operators.UncertaintyRequired(
+                "U13_THEFT_CLOCK_ANCHOR",
+                "whole-vehicle theft needs a sourced start event, start date and as-of date",
+                status="THEFT_CLOCK_ANCHOR_UNRESOLVED",
+            )
+        _validate_theft_clock_start_event(case, clock)
+        derived_days = _dated_theft_clock_days(clock)
+        if derived_days != days:
+            raise operators.OperatorError(
+                f"days_vehicle_missing ({days}) does not match the bound theft clock ({derived_days})"
+            )
+        res.fields["theft_clock"] = {
+            "start_event": clock["start_event"],
+            "start_date": clock["start_date"],
+            "as_of_date": clock["as_of_date"],
+            "calendar": clock["calendar"],
+            "source": clock["source"],
+            "derived_days": derived_days,
+        }
         res.fields["days_missing"] = days
         res.note_rule("REG53_ART19_THEFT_TOTAL_LOSS_60D")
         if days < 60:
@@ -904,15 +1186,20 @@ def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
     if limit is None:
         raise operators.OperatorError("the third-party policy financial limit is required")
 
-    actual = case.actual_damage or corresponding
-    insurer_payable = min(corresponding, limit)
+    actual = case.actual_damage
+    if actual is None:
+        actual = corresponding
+    insurer_payable = min(actual, corresponding, limit)
     excess = max(Decimal(0), actual - corresponding)
 
     res.fields["actual_damage"] = actual
     res.fields["corresponding_damage"] = corresponding
     res.fields["insurer_payable"] = insurer_payable
     res.fields["tp_insurer_payable"] = insurer_payable
-    res.fields["remaining_inside_article8_cap"] = max(Decimal(0), corresponding - insurer_payable)
+    damage_inside_article8_cap = min(actual, corresponding)
+    res.fields["remaining_inside_article8_cap"] = max(
+        Decimal(0), damage_inside_article8_cap - insurer_payable
+    )
     res.fields["non_corresponding_excess"] = excess
     res.fields["own_body_excess_candidate"] = excess
     res.fields["own_body_non_corresponding_excess_candidate"] = excess
@@ -945,7 +1232,7 @@ def calculate_article8(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.fields["non_corresponding_residual"] = excess
         res.label("AT_FAULT_CAP_APPLIED")
         res.note_rule("TPL_LAW_1395_ART8_AT_FAULT_CAP")
-        res.payable = corresponding
+        res.payable = insurer_payable
         return
 
     res.payable = insurer_payable
@@ -990,6 +1277,7 @@ DISPATCH: dict[str, Callable[[Case, Knowledge, CalcResult], None]] = {
 }
 
 BODY_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"}
+RESCUE_THRESHOLD_BRANCHES = {"PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY"}
 
 
 def _classification_evidence_gap(
@@ -1019,19 +1307,60 @@ def _classification_evidence_gap(
 def reconcile_classification(
     case: Case, kb: Knowledge
 ) -> tuple[dict[str, Any], str | None, str | None]:
-    verdict = classify(case, kb)
+    try:
+        verdict = classify(case, kb)
+    except ClassificationEvidenceRequired as error:
+        reason = str(error)
+        return (
+            {
+                "declared_branch": case.declared_branch,
+                "declared_canonical_branch": case.branch,
+                "derived_branch": None,
+                "outcome": "INSUFFICIENT_EVIDENCE",
+                "confidence": 0.0,
+                "basis": [reason],
+                "reason": reason,
+            },
+            None,
+            reason,
+        )
     derived = verdict["branch"]
     declared = case.branch
-    gap = _classification_evidence_gap(case, declared, derived)
+    classification_rescue, rescue_source, unresolved_rescue = (
+        case.classification_rescue()
+    )
+    override = case.classification_override
+    threshold_classification_participates = (
+        derived in RESCUE_THRESHOLD_BRANCHES
+        or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)
+    )
+    unresolved_rescue_gate = (
+        unresolved_rescue is not None
+        and (declared == "TOTAL_LOSS" or threshold_classification_participates)
+    ) or (
+        threshold_classification_participates
+        and case.repair_total is not None
+        and case.market_value is not None
+        and classification_rescue is None
+        and rescue_source == "UNRESOLVED_MISSING_RESCUE"
+    )
+    if unresolved_rescue_gate:
+        gap = unresolved_rescue or (
+            "classification rescue is missing; a non-negative amount could change the "
+            "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
+            "payment and this evidence gate cannot be overridden"
+        )
+    else:
+        gap = _classification_evidence_gap(case, declared, derived)
 
-    if declared is None:
-        outcome = "MATCH"
-        selected = derived
-        reason = "no branch was declared; the evidence-derived branch is authoritative"
-    elif gap:
+    if gap:
         outcome = "INSUFFICIENT_EVIDENCE"
         selected = None
         reason = gap
+    elif declared is None:
+        outcome = "MATCH"
+        selected = derived
+        reason = "no branch was declared; the evidence-derived branch is authoritative"
     elif declared == derived:
         outcome = "MATCH"
         selected = declared
@@ -1041,8 +1370,11 @@ def reconcile_classification(
         selected = None
         reason = f"declared {declared} conflicts with evidence-derived {derived}"
 
-    override = case.classification_override
-    if outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE") and override is not None:
+    if (
+        outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE")
+        and override is not None
+        and not unresolved_rescue_gate
+    ):
         outcome = "AUTHORIZED_OVERRIDE"
         selected = declared
         reason = "documented classification override authorizes the declared branch"
@@ -1146,6 +1478,33 @@ def _apply_authorization_confidence_cap(res: CalcResult) -> None:
         res.label("EVIDENCE_CONFIDENCE_REDUCED")
 
 
+def _reconcile_authorization_uncertainties(res: CalcResult) -> None:
+    """Keep review-live uncertainties visible at the calculation boundary.
+
+    A review authorization is an immutable statement of what remained open.
+    The engine may reproduce those uncertainties, but it may not silently lose
+    one and emit a deterministic payable. Any authorization uncertainty not
+    already surfaced by runtime is therefore added as a blocking result.
+    """
+    authorized = [
+        str(item)
+        for item in (res.authorization.get("live_uncertainties") or [])
+        if item
+    ]
+    res.fields["authorization_live_uncertainties"] = authorized
+    missing = [item for item in authorized if item not in res.blocking_uncertainties]
+    if not missing:
+        return
+    for uncertainty_id in missing:
+        res.block(uncertainty_id)
+    res.fields["authorization_uncertainties_added"] = missing
+    res.payable = None
+    res.payable_scenarios = []
+    res.status = "AUTHORIZED_UNCERTAINTY_UNRESOLVED"
+    res.reason = "review-live uncertainty was not resolved by a bound calculation artefact"
+    res.label("AUTHORIZATION_UNCERTAINTY_RECONCILED")
+
+
 def _flat_plan(plan: Any) -> list[str]:
     if not isinstance(plan, list):
         return []
@@ -1210,6 +1569,12 @@ def compute(
         res.fields["classification"] = reconciliation
         if case.repair_total is not None and case.market_value is not None:
             res.note_rule("REG53_ART19_TOTAL_LOSS_THRESHOLD")
+            classification_rescue, rescue_source, unresolved_rescue = (
+                case.classification_rescue()
+            )
+            if unresolved_rescue is None:
+                res.fields["classification_rescue"] = classification_rescue
+                res.fields["classification_rescue_source"] = rescue_source
         if reconciliation["outcome"] == "CONFLICT":
             res.payable = None
             res.status = "CLASSIFICATION_CONFLICT"
@@ -1254,6 +1619,8 @@ def compute(
             and not _bind_body_snapshot(case, kb, res)
         ):
             classification_blocked = True
+        if not classification_blocked and res.branch in BODY_BRANCHES:
+            enforce_body_eligibility_admission(case, res)
         if not classification_blocked and not evaluate_coverage_gate(case, kb, res):
             if res.branch in BODY_BRANCHES:
                 check_risk_intensification(case, kb)
@@ -1285,6 +1652,15 @@ def compute(
         res.reason = str(error)
         res.fields["execution_plan_error"] = str(error)
         res.label("EXECUTION_PLAN_INVALID")
+    except ClassificationEvidenceRequired as error:
+        res.payable = None
+        res.status = "CLASSIFICATION_EVIDENCE_REQUIRED"
+        res.reason = str(error)
+        classification = res.fields.get("classification")
+        if isinstance(classification, dict):
+            classification["outcome"] = "INSUFFICIENT_EVIDENCE"
+            classification["reason"] = str(error)
+        res.label("CLASSIFICATION_EVIDENCE_REQUIRED")
     except operators.OperatorError as error:
         res.payable = None
         res.status = "INPUT_ERROR"
@@ -1293,6 +1669,8 @@ def compute(
         res.payable = None
         res.status = "INPUT_ERROR"
         res.reason = str(error)
+
+    _reconcile_authorization_uncertainties(res)
 
     try:
         if res.branch in BODY_BRANCHES:

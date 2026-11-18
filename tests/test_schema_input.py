@@ -119,6 +119,398 @@ def test_review_money_rejects_fractional_irr_and_numeric_strings(kb):
 
 
 @pytest.mark.parametrize(
+    "value",
+    ["1404-99-99", "1404-12-30", "2025-02-29", "1501-01-01"],
+)
+def test_event_dates_reject_impossible_or_calendar_ambiguous_values(value):
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(
+            {"claim_id": "X", "unit": "IRR", "event": {"event_date": value}}
+        )
+    assert caught.value.errors[0].code == "invalid_date"
+    assert caught.value.errors[0].path == "event.event_date"
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["1403-12-30", "1403/12/30", "2024-02-29"],
+)
+def test_supported_shamsi_and_gregorian_date_spellings_are_valid(value):
+    validate_claim(
+        {"claim_id": "X", "unit": "IRR", "event": {"event_date": value}}
+    )
+
+
+def test_review_dates_use_the_same_calendar_contract(kb):
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "answers": {"Q-S0-02": "1404-12-30"},
+            },
+            kb,
+        )
+    assert caught.value.errors[0].to_dict() == {
+        "code": "invalid_date",
+        "path": "answers.Q-S0-02",
+        "message": "invalid Shamsi day",
+    }
+
+
+def test_event_chronology_uses_field_specific_predicates(kb):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S0-02": "1404-02-02",
+            "Q-S0-03": "1404-02-01",
+            "Q-S0-07": "1404-01-31",
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    errors = {(item.code, item.path) for item in caught.value.errors}
+    assert ("invalid_chronology", "answers.Q-S0-03") in errors
+    assert ("invalid_chronology", "answers.Q-S0-07") in errors
+
+
+def test_claim_chronology_applies_only_to_the_canonical_claim_sequence():
+    same_day = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "regulatory_snapshot": {"as_of_date": "2020-01-01"},
+        "classification": {
+            "override": {
+                "authorized": True,
+                "actor": "reviewer",
+                "reason": "chronology control",
+                "source": "test record",
+                "timestamp": "2019-01-01T00:00:00Z",
+            }
+        },
+        "event": {
+            "event_date": "1404-02-01",
+            "awareness_date": "1404-02-01",
+            "declaration_date": "1404-02-01",
+        },
+    }
+    # Evaluation and override provenance can predate the represented event in a
+    # synthetic file; PR-01 validates their own formats but does not make them a
+    # legal clock or part of the insured's event/awareness/declaration sequence.
+    validate_claim(same_day)
+
+    declaration_before_awareness = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "event": {
+            "awareness_date": "1404-02-02",
+            "declaration_date": "1404-02-01",
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(declaration_before_awareness)
+    assert caught.value.errors[0].to_dict() == {
+        "code": "invalid_chronology",
+        "path": "event.declaration_date",
+        "message": "declaration date precedes awareness of the loss",
+    }
+
+
+def test_gregorian_occurrence_without_supported_shamsi_mapping_refuses_cleanly():
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "event": {"event_date": "9999-12-31"},
+            }
+        )
+    assert caught.value.errors[0].code == "invalid_date"
+    assert caught.value.errors[0].path == "event.event_date"
+
+
+def test_event_year_and_production_year_must_reconcile():
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "regulatory_snapshot": {"iranian_year": 1404},
+        "vehicle": {"production_year_shamsi": 1406},
+        "event": {"event_date": "2026-03-21"},
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    errors = {(item.code, item.path) for item in caught.value.errors}
+    # 2026-03-21 is 1405-01-01, so both the supplied claim year and the
+    # production/event ordering are checked against the converted event fact.
+    assert ("conflicting_year", "regulatory_snapshot.iranian_year") in errors
+    assert ("invalid_chronology", "vehicle.production_year_shamsi") in errors
+
+
+def test_equal_true_aliases_pass_and_unequal_true_aliases_reject():
+    equal = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "regulatory_snapshot": {"iranian_year": 1405},
+        "vehicle": {"production_year_shamsi": 1405},
+        "damage": {
+            "parts": [
+                {
+                    "category": "OTHER_REPLACEMENT_PART",
+                    "assessed_loss": 100,
+                    "assessed_loss_irr": 100,
+                }
+            ]
+        },
+    }
+    case = validated_case(equal)
+    assert case.parts == [
+        {
+            "name": None,
+            "category": "OTHER_REPLACEMENT_PART",
+            "assessed_loss": 100,
+            "new_price": None,
+            "requires_replacement": True,
+        }
+    ]
+    equal["damage"]["parts"][0]["assessed_loss_irr"] = 99
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(equal)
+    assert caught.value.errors[0].code == "conflicting_alias"
+    assert caught.value.errors[0].path == "damage.parts[0].assessed_loss_irr"
+
+
+def test_distinct_money_operands_and_contractual_carriers_are_not_aliases():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "regulatory_snapshot": {
+                "iranian_year": 1405,
+                "conventional_vehicle_threshold_irr": 1400,
+            },
+            "vehicle": {"market_value_at_event_irr": 2000},
+            "damage": {
+                "rescue_transport_actual_irr": 100,
+                "rescue_payable": 80,
+                "rescue_for_total_loss_test_irr": 50,
+                "victim_vehicle_value": 1000,
+                "conventional_threshold": 1500,
+                "franchise": 10,
+            },
+            "policy": {
+                "franchise": {
+                    "mode": "ABSOLUTE",
+                    "absolute_irr": 20,
+                    "source": "POLICY",
+                }
+            },
+        }
+    )
+
+
+def test_repair_only_status_defaults_false_and_contradictions_reject():
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "regulatory_snapshot": {"iranian_year": 1405},
+        "vehicle": {"production_year_shamsi": 1400},
+        "damage": {"parts": [{"category": "REPAIR_ONLY", "assessed_loss": 100}]},
+    }
+    assert validated_case(payload).parts[0]["requires_replacement"] is False
+
+    payload["damage"]["parts"][0]["requires_replacement"] = True
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.parts[0].requires_replacement"
+        for issue in caught.value.errors
+    )
+
+    payload["damage"] = {
+        "replacement_parts": [{"type": "REPAIR_ONLY", "loss": 100}]
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.replacement_parts[0].type"
+        for issue in caught.value.errors
+    )
+
+    payload["damage"] = {
+        "replacement_parts": [{"category": "REPAIR_ONLY", "loss": 100}]
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.replacement_parts[0].category"
+        for issue in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize(
+    "actual_rescue",
+    [None, 100],
+    ids=("missing-actual", "mismatched-actual"),
+)
+def test_derived_classification_rescue_requires_matching_actual_expense(actual_rescue):
+    damage = {
+        "rescue_for_total_loss_test_irr": 101,
+        "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE",
+    }
+    if actual_rescue is not None:
+        damage["rescue_transport_actual_irr"] = actual_rescue
+    payload = {"claim_id": "X", "unit": "IRR", "damage": damage}
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.rescue_for_total_loss_test_source"
+        for issue in caught.value.errors
+    )
+
+
+def test_derived_classification_rescue_accepts_matching_actual_expense():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "damage": {
+                "rescue_transport_actual_irr": 101,
+                "rescue_for_total_loss_test_irr": 101,
+                "rescue_for_total_loss_test_source": "DERIVED_FROM_ACTUAL_RESCUE",
+            },
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    "actual_rescue",
+    [None, 101],
+    ids=("without-actual", "with-incidental-actual"),
+)
+def test_explicit_classification_rescue_source_requires_threshold_operand(
+    actual_rescue,
+):
+    damage = {
+        "rescue_for_total_loss_test_source": "EXPLICIT_THRESHOLD_OPERAND",
+    }
+    if actual_rescue is not None:
+        damage["rescue_transport_actual_irr"] = actual_rescue
+    payload = {"claim_id": "X", "unit": "IRR", "damage": damage}
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(payload)
+
+    assert any(
+        issue.code == "contradictory_input"
+        and issue.path == "damage.rescue_for_total_loss_test_source"
+        for issue in caught.value.errors
+    )
+
+
+def test_explicit_classification_rescue_source_accepts_threshold_operand():
+    validate_claim(
+        {
+            "claim_id": "X",
+            "unit": "IRR",
+            "damage": {
+                "rescue_for_total_loss_test_irr": 101,
+                "rescue_for_total_loss_test_source": "EXPLICIT_THRESHOLD_OPERAND",
+            },
+        }
+    )
+
+
+def test_review_rejects_repair_only_marked_as_replacement(kb):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S4-03": [
+                {
+                    "category": "REPAIR_ONLY",
+                    "assessed_loss": 100,
+                    "requires_replacement": True,
+                }
+            ]
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    assert any(issue.code == "contradictory_input" for issue in caught.value.errors)
+
+
+def test_review_part_new_price_aliases_must_agree(kb):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S4-03": [
+                {
+                    "category": "BATTERY",
+                    "assessed_loss": 100,
+                    "new_price": 200,
+                    "new_price_irr": 201,
+                }
+            ]
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    assert any(
+        item.code == "conflicting_alias"
+        and item.path == "answers.Q-S4-03[0].new_price_irr"
+        for item in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize("malformed", [[], {}], ids=("list", "object"))
+def test_malformed_review_money_aliases_return_structured_errors(kb, malformed):
+    payload = {
+        "claim_id": "X",
+        "unit": "IRR",
+        "answers": {
+            "Q-S4-03": [
+                {
+                    "category": "BATTERY",
+                    "assessed_loss": malformed,
+                    "assessed_loss_irr": 100,
+                }
+            ]
+        },
+    }
+    with pytest.raises(InputSchemaError) as caught:
+        validate_review(payload, kb)
+    assert any(
+        item.code == "invalid_type"
+        and item.path == "answers.Q-S4-03[0].assessed_loss"
+        for item in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize("malformed", [[], {}], ids=("list", "object"))
+def test_malformed_claim_money_aliases_return_structured_errors(malformed):
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "damage": {"gross": malformed, "gross_damage_irr": 100},
+            }
+        )
+    assert any(
+        item.code == "invalid_type" and item.path == "damage.gross"
+        for item in caught.value.errors
+    )
+
+
+@pytest.mark.parametrize(
     ("part", "path"),
     [
         ("not-an-object", "damage.parts[0]"),
@@ -185,6 +577,27 @@ def test_review_emits_every_previously_missing_case_field(kb):
 
     glass = Review.from_file(CASES / "review_t4_glass_terms_missing.json", kb).case_payload()
     assert glass["policy"]["glass_valuation_condition"] == "WORDING_NOT_OBTAINED"
+
+
+@pytest.mark.parametrize("missing", ["state", "prior_compensation"])
+def test_multiple_insurance_object_requires_both_distinct_facts(missing):
+    multiple_insurance = {"state": "NO", "prior_compensation": 0}
+    multiple_insurance.pop(missing)
+
+    with pytest.raises(InputSchemaError) as caught:
+        validate_claim(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "policy": {"multiple_insurance": multiple_insurance},
+            }
+        )
+
+    assert any(
+        item.code == "missing_field"
+        and item.path == f"policy.multiple_insurance.{missing}"
+        for item in caught.value.errors
+    )
 
 
 def test_theft_without_a_type_is_rejected():

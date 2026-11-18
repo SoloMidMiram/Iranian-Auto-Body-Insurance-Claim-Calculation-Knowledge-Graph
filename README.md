@@ -33,7 +33,8 @@ records the remaining provenance gaps and amount-affecting defects.
 
 ## Quickstart
 
-No dependencies beyond the standard library. Python 3.10+.
+No runtime dependencies beyond the standard library. The supported interpreter
+for installation and validation is Python 3.11 only.
 
 ```bash
 python claim.py validate              # integrity gate over the whole graph
@@ -58,7 +59,8 @@ python claim.py ingest submissions/example_conflicting_educational.json
 The persistence and engine boundary accepts monetary values only as non-negative
 integer IRR. Toman and million-toman conversion is explicit presentation logic.
 
-Tests: `python -m pytest` (467 tests). Install development/test
+Tests: `python -m pytest` (`515 passed, 11 xfailed` in the Python 3.11 Stage 0
+baseline). Install development/test
 dependencies with `pip install -e ".[test]"`; `pip install -e .` installs only
 the dependency-free runtime and the `iran-claim` console script.
 
