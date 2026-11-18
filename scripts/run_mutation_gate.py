@@ -144,11 +144,11 @@ MUTATIONS = (
         "a classification override bypasses the unresolved-rescue payment gate",
     ),
     Mutation(
-        "M29",
+        "M30",
         "src/iran_auto_claim/engine.py",
-        "or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)",
-        "or False",
-        "an override-selected threshold branch skips the missing-rescue evidence gate",
+        "and final_selected_branch_gap is None",
+        "and True",
+        "a classification override bypasses final-selected-branch evidence completeness",
     ),
 )
 
@@ -224,6 +224,16 @@ def _render(results: list[tuple[Mutation, bool]]) -> str:
     )
     rows.extend(
         [
+            "",
+            "## Triaged mutation survivors",
+            "",
+            "- **M27 was missing coverage, not equivalent.** The probe now includes an ordinary",
+            "  evidence-derived threshold route without an override. Mutating its omitted-rescue",
+            "  gate produces a payable and is killed.",
+            "- **M29 was equivalent under the corrected final-branch contract and is retired.**",
+            "  Its candidate-branch disjunct duplicated `_final_selected_branch_evidence_gap`;",
+            "  removing that disjunct leaves the focused and complete probes unchanged. M30",
+            "  directly mutates the controlling final-selected-branch condition and is killed.",
             "",
             "A surviving mutant or a score below the threshold fails the gate. The checked-in",
             "report must exactly match a fresh run.",
