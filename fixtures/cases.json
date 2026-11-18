@@ -409,6 +409,7 @@
         "repair": 16000000000,
         "rescue_for_threshold": 0,
         "salvage_disposition": "INSURER_TAKES_TITLE",
+        "title_transferred": true,
         "franchise": 1000000000,
         "rescue_payable": 200000000
       },

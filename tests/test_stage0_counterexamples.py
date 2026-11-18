@@ -132,7 +132,6 @@ def test_ia04_rescue_crossing_the_strict_threshold_classifies_total_loss(kb):
     assert Review(payload, kb).classification()["branch"] == "TOTAL_LOSS"
 
 
-@pytest.mark.xfail(strict=True, reason="IA-05: insurer-title settlement requires completed transfer")
 def test_ia05_incomplete_title_transfer_cannot_pay_total_loss(kb):
     payload = _review_case()
     payload["answers"]["Q-S4-03"][0]["assessed_loss"] = 6500000000

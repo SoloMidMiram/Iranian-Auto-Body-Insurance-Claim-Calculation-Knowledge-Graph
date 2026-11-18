@@ -900,6 +900,7 @@ def test_total_loss_percentage_franchise_distinguishes_settlement_base_from_afte
 def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_base):
     payload = _total_loss_with_percentage_franchise(calculation_base)
     payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    payload["damage"]["title_transferred"] = True
     result = compute(payload, kb)
 
     assert result.fields["salvage_deduction"] == D(0)
@@ -908,6 +909,23 @@ def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_
     assert result.fields["franchise_calculation_base"] == D(2000)
     assert result.fields["franchise"] == D(200)
     assert result.payable == D(1800)
+
+
+@pytest.mark.parametrize("title_transferred", [False, None], ids=("false", "missing"))
+def test_physical_total_loss_requires_completed_title_transfer(
+    kb, title_transferred
+):
+    payload = _total_loss_with_percentage_franchise("SETTLEMENT_BASE")
+    payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    if title_transferred is not None:
+        payload["damage"]["title_transferred"] = title_transferred
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "TITLE_TRANSFER_REQUIRED"
+    assert result.fields["guard_violation"] == "G_SALVAGE_XOR_TITLE_TRANSFER"
+    assert "G_SALVAGE_XOR_TITLE_TRANSFER" in result.guards_executed
 
 
 def test_total_loss_percentage_franchise_rejects_an_unsupported_base(kb):

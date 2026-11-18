@@ -738,7 +738,17 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
             status="SALVAGE_DISPOSITION_UNRESOLVED",
         )
 
+    res.require_guard("G_SALVAGE_XOR_TITLE_TRANSFER")
     if disposition == "INSURER_TAKES_TITLE":
+        if not case.title_transferred:
+            raise guards.GuardViolation(
+                "G_SALVAGE_XOR_TITLE_TRANSFER",
+                (
+                    "the insurer-title settlement route requires completed title transfer "
+                    "before salvage can be omitted"
+                ),
+                "TITLE_TRANSFER_REQUIRED",
+            )
         salvage_to_deduct = Decimal(0)
         after_salvage = base
         res.fields["salvage_deduction"] = Decimal(0)
