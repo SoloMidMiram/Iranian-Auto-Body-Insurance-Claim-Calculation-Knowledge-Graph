@@ -1,7 +1,7 @@
 {
   "claim_id": "REVIEW-T1-FULLCOVER-PARTIAL",
   "unit": "IRR",
-  "note": "Rung T1: a fully covered partial loss on a sixth-production-year car. Depreciation is computed from the year index, lamp glass is exempt, the ratio is one so the unresolved operator order cannot change the answer, and every franchise term is sourced. This is the simplest file that may issue one number.",
+  "note": "Rung T1: a fully covered partial loss on a sixth-production-year car. Depreciation is computed from the year index, lamp glass is exempt, the ratio is one so the unresolved operator order cannot change the answer, and every franchise term is sourced. This is the simplest file that may issue one number. Contract metadata is an explicit synthetic software assumption, not authenticated insurer authority.",
   "evidence_present": [
     "EVT_CLAIM_FORM",
     "EVT_POLICY_COPY",
@@ -17,7 +17,7 @@
     "EVT_PRIOR_CLAIM_HISTORY"
   ],
   "answers": {
-    "Q-S0-01": "IRAN_INSURANCE / بيمه بدنه 1404",
+    "Q-S0-01": "SYNTHETIC_INSURER / SYNTHETIC_BODY / software control contract",
     "Q-S0-02": "1404-08-20",
     "Q-S0-03": "1404-08-20",
     "Q-S0-04": "ONTIME",
@@ -84,7 +84,30 @@
       "claim_sequence_rule": "first claim",
       "source": "POLICY",
       "source_reference": "policy schedule 1404, franchise clause",
-      "source_version": "1404"
+      "source_version": "1404",
+      "authority": {
+        "source_reference": "policy schedule 1404, franchise clause",
+        "source_version": "1404",
+        "insurer": "SYNTHETIC_INSURER",
+        "product": "SYNTHETIC_BODY",
+        "policy_reference": "policy schedule 1404, franchise clause",
+        "coverage": [
+          "PARTIAL_DAMAGE"
+        ],
+        "effective_from": "1300-01-01",
+        "effective_until": "1500-12-29",
+        "source_status": "SYNTHETIC_TEST",
+        "governs_contract": true,
+        "reviewer": "software fixture author; no qualified domain approval",
+        "clause_locator": "explicit synthetic franchise assumption",
+        "document_sha256": "9e51d77c56e3aa363f1d60b76aa1e990416d602f7a7856216d0be5308cabbae8",
+        "terms": {
+          "mode": "PERCENT",
+          "rate": 0.1,
+          "calculation_base": "AFTER_DEPRECIATION",
+          "claim_sequence_rule": "first claim"
+        }
+      }
     },
     "Q-S6-05": "NO",
     "Q-S7-01": "NO_BODY_ONLY",
@@ -94,5 +117,12 @@
     "Q-S9-02": "NO_THIRD_PARTY",
     "Q-S9-03": 0,
     "Q-S10-01": "adjuster: reviewer-01, decision reconciled 1404-09-02"
+  },
+  "contract_context": {
+    "insurer": "SYNTHETIC_INSURER",
+    "product": "SYNTHETIC_BODY",
+    "policy_reference": "policy schedule 1404, franchise clause",
+    "policy_date": "1404-08-20",
+    "contract_kind": "SYNTHETIC_TEST"
   }
 }

@@ -144,12 +144,67 @@ MUTATIONS = (
         "a classification override bypasses the unresolved-rescue payment gate",
     ),
     Mutation(
-        "M29",
+        "M30",
         "src/iran_auto_claim/engine.py",
-        "or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)",
-        "or False",
-        "an override-selected threshold branch skips the missing-rescue evidence gate",
+        "and final_selected_branch_gap is None",
+        "and True",
+        "a classification override bypasses final-selected-branch evidence completeness",
     ),
+    Mutation(
+        "M31",
+        "src/iran_auto_claim/engine.py",
+        'if not case.title_transferred or case.evidence.get("EVT_TITLE_TRANSFER_PROOF") is not True:\n            raise guards.GuardViolation(',
+        "if False:\n            raise guards.GuardViolation(",
+        "an incomplete title transfer can use the insurer-title no-salvage route",
+    ),
+)
+
+MUTATIONS += (
+    Mutation("M32", "src/iran_auto_claim/engine.py",
+             'if disposition not in ("INSURED_RETAINS", "INSURER_TAKES_TITLE"):',
+             'if disposition == "UNRESOLVED":',
+             "missing or not-applicable physical salvage disposition bypasses containment"),
+    Mutation("M33", "src/iran_auto_claim/engine.py",
+             'if case.salvage is None:', 'if False:',
+             "missing retained salvage valuation bypasses its explicit guard"),
+)
+
+# M34 is retired: the full applicability gate independently validates identity.
+# M35 mutates the controlling applicability gate with an identified but unbound term.
+MUTATIONS += (
+    Mutation("M35", "src/iran_auto_claim/engine.py",
+             'if gap := franchise_applicability_gap(spec, case.policy, case.event.get("event_date"), res.branch):',
+             "if False:", "an identified but inapplicable monetary franchise can pay"),
+    Mutation("M36", "src/iran_auto_claim/engine.py", "and order_gap is None", "and True",
+             "a questionnaire/configuration order token replaces applicable authority"),
+    Mutation("M37", "src/iran_auto_claim/engine.py",
+             'or case.evidence.get("EVT_TITLE_TRANSFER_PROOF") is not True', "or False",
+             "claimed completed transfer pays without supporting proof"),
+    Mutation("M38", "src/iran_auto_claim/engine.py",
+             'if case.evidence.get("EVT_SALVAGE_VALUATION") is not True:', "if False:",
+             "an explicit retained valuation pays without supporting evidence"),
+    Mutation("M39", "src/iran_auto_claim/review.py",
+             "if isinstance(franchise, dict) and franchise_applicability_gap(",
+             "if False and franchise_applicability_gap(",
+             "Review authorizes an unverified franchise scenario despite authority gap"),
+    Mutation("M40", "src/iran_auto_claim/review.py",
+             "if key in declared_terms and declared_terms[key] != value:", "if False:",
+             "conflicting policy/endorsement terms are silently merged"),
+    Mutation("M41", "src/iran_auto_claim/engine.py",
+             'if res.domain == "BODY" and adjudications:', 'if False:',
+             "unadjudicated notice or recovery impairment reaches body arithmetic"),
+    Mutation("M42", "src/iran_auto_claim/review.py",
+             'conditions.append("NOTICE_ADJUDICATION_REQUIRED")', 'pass',
+             "Review authorizes unadjudicated late notice"),
+    Mutation("M43", "src/iran_auto_claim/review.py",
+             'conditions.append("SUBROGATION_ADJUDICATION_REQUIRED")', 'pass',
+             "Review authorizes unadjudicated recovery impairment"),
+    Mutation("M44", "src/iran_auto_claim/review.py",
+             'if (branch == "PARTIAL_DAMAGE" and self.answer("Q-S4-05") == "ASSESSED_FIGURE"',
+             'if (False', "Review replaces a selected assessor route with per-part depreciation"),
+    Mutation("M45", "src/iran_auto_claim/engine.py",
+             'if case.damage.get("depreciation_method") == "ASSESSED_FIGURE":', 'if False:',
+             "direct computation discards the selected assessor depreciation route"),
 )
 
 THRESHOLD = 90.0
@@ -180,6 +235,7 @@ def _copy_repository(target: Path) -> None:
             "*.pyc",
             "COMMIT_STAGING_DRAFT.txt",
             ".venv",
+            ".runtime",
         ),
     )
 
@@ -224,6 +280,16 @@ def _render(results: list[tuple[Mutation, bool]]) -> str:
     )
     rows.extend(
         [
+            "",
+            "## Triaged mutation survivors",
+            "",
+            "- **M27 was missing coverage, not equivalent.** The probe now includes an ordinary",
+            "  evidence-derived threshold route without an override. Mutating its omitted-rescue",
+            "  gate produces a payable and is killed.",
+            "- **M29 was equivalent under the corrected final-branch contract and is retired.**",
+            "  Its candidate-branch disjunct duplicated `_final_selected_branch_evidence_gap`;",
+            "  removing that disjunct leaves the focused and complete probes unchanged. M30",
+            "  directly mutates the controlling final-selected-branch condition and is killed.",
             "",
             "A surviving mutant or a score below the threshold fails the gate. The checked-in",
             "report must exactly match a fresh run.",

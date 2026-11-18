@@ -57,7 +57,13 @@ def _build_case(branch=None, *, default_missing_rescue: bool, **inputs):
     ):
         inputs.setdefault("salvage_disposition", "INSURED_RETAINS")
     franchise = inputs.pop("franchise", None)
-    payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs}
+    payload = {"claim_id": "engine-test", "unit": "IRR", "damage": inputs,
+               "event": {"event_date": "1405-01-01"}}
+    payload["evidence"] = {}
+    if any(inputs.get(key) is not None for key in ("salvage", "salvage_value", "salvage_value_irr")):
+        payload["evidence"]["EVT_SALVAGE_VALUATION"] = True
+    if inputs.get("title_transferred") is True:
+        payload["evidence"]["EVT_TITLE_TRANSFER_PROOF"] = True
     if franchise is not None:
         payload["policy"] = {
             "policy_version": "TEST-v1",
@@ -320,6 +326,7 @@ def test_missing_market_value_alongside_an_insured_sum_is_an_input_error(kb):
 def test_missing_both_article10_value_anchors_does_not_default_ratio_to_one(kb):
     payload = {
         "claim_id": "missing-economic-anchors",
+        "event": {"event_date": "1405-01-01"},
         "unit": "IRR",
         "classification": {"branch": "PARTIAL_DAMAGE"},
         "damage": {"gross": 100, "depreciation": 0},
@@ -900,6 +907,8 @@ def test_total_loss_percentage_franchise_distinguishes_settlement_base_from_afte
 def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_base):
     payload = _total_loss_with_percentage_franchise(calculation_base)
     payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    payload["damage"]["title_transferred"] = True
+    payload["evidence"]["EVT_TITLE_TRANSFER_PROOF"] = True
     result = compute(payload, kb)
 
     assert result.fields["salvage_deduction"] == D(0)
@@ -908,6 +917,23 @@ def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_
     assert result.fields["franchise_calculation_base"] == D(2000)
     assert result.fields["franchise"] == D(200)
     assert result.payable == D(1800)
+
+
+@pytest.mark.parametrize("title_transferred", [False, None], ids=("false", "missing"))
+def test_physical_total_loss_requires_completed_title_transfer(
+    kb, title_transferred
+):
+    payload = _total_loss_with_percentage_franchise("SETTLEMENT_BASE")
+    payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    if title_transferred is not None:
+        payload["damage"]["title_transferred"] = title_transferred
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "TITLE_TRANSFER_REQUIRED"
+    assert result.fields["guard_violation"] == "G_SALVAGE_XOR_TITLE_TRANSFER"
+    assert "G_SALVAGE_XOR_TITLE_TRANSFER" in result.guards_executed
 
 
 def test_total_loss_percentage_franchise_rejects_an_unsupported_base(kb):
@@ -1064,7 +1090,8 @@ def test_total_loss_below_or_at_75_percent_is_a_classification_conflict(kb, repa
 
 def test_total_loss_one_rial_above_75_percent_matches_and_settles(kb):
     result = compute(
-        _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10), kb
+        _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10,
+              salvage=0, salvage_disposition="INSURED_RETAINS"), kb
     )
     classification = result.fields["classification"]
     assert result.payable == D(90)
@@ -1082,6 +1109,8 @@ def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
             repair=70,
             rescue_for_threshold=6,
             franchise=10,
+            salvage=0,
+            salvage_disposition="INSURED_RETAINS",
         ),
         kb,
     )
@@ -1226,6 +1255,79 @@ def test_override_into_threshold_branch_cannot_bypass_missing_rescue(
     assert "preliminary zero cannot authorize payment" in result.reason
 
 
+def _theft_derived_total_loss_override(**inputs):
+    payload = _case_without_rescue_default(
+        "TOTAL_LOSS",
+        theft_type="WHOLE_VEHICLE",
+        days_missing=10,
+        market=10000,
+        insured=10000,
+        gross=7400,
+        salvage_value=0,
+        salvage_disposition="INSURED_RETAINS",
+        franchise=1000,
+        **inputs,
+    )
+    payload["classification"]["override"] = {
+        "authorized": True,
+        "actor": "senior-adjuster-17",
+        "reason": "documented total-loss branch selection",
+        "source": "review-board-record-2026-45",
+        "timestamp": "2026-10-13T06:00:00Z",
+    }
+    return payload
+
+
+@pytest.mark.parametrize(
+    "rescue_inputs",
+    [
+        {"rescue_for_threshold": 0},
+        {"actual_rescue": 200},
+        {},
+    ],
+    ids=("explicit-zero-rescue", "actual-rescue", "rescue-omitted"),
+)
+def test_override_selected_total_loss_requires_repair_assessment(kb, rescue_inputs):
+    result = compute(_theft_derived_total_loss_override(**rescue_inputs), kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "repair-and-replacement assessment" in result.reason
+
+
+def test_override_selected_total_loss_requires_event_market_value(kb):
+    payload = _theft_derived_total_loss_override(
+        repair=7400,
+        rescue_for_threshold=0,
+    )
+    payload["damage"].pop("market")
+
+    result = compute(payload, kb)
+
+    assert result.payable is None
+    assert result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "INSUFFICIENT_EVIDENCE"
+    assert "event-date market value" in result.reason
+
+
+def test_theft_derived_total_loss_override_with_complete_operands_remains_available(kb):
+    result = compute(
+        _theft_derived_total_loss_override(
+            repair=7400,
+            rescue_for_threshold=0,
+        ),
+        kb,
+    )
+
+    assert result.payable == D(9000)
+    assert result.fields["classification"]["derived_branch"] == "THEFT"
+    assert result.fields["classification"]["outcome"] == "AUTHORIZED_OVERRIDE"
+    assert result.fields["total_loss_threshold_override"] is True
+
+
 def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
     payload = _case(
         "PARTIAL_DAMAGE",
@@ -1258,7 +1360,8 @@ def test_documented_authorized_override_can_select_declared_total_loss_with_comp
     kb,
 ):
     payload = _case(
-        "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10
+        "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10,
+        salvage=0, salvage_disposition="INSURED_RETAINS"
     )
     payload["classification"]["override"] = {
         "authorized": True,

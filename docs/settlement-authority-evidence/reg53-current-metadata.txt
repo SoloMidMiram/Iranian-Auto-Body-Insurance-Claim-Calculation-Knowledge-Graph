@@ -1,0 +1,10 @@
+### Result
+{
+  "url": "https://qavanin.ir/Law/Attribute/?IDS=12020232825033491345",
+  "title": "",
+  "text": "در ﺣﺎل اﻧﺘﻘﺎل ﺑﻪ ﺳﺎﯾﺖ ﻣﻮرد ﻧﻈﺮ ﻫﺴﺘﯿﺪ..."
+}
+### Ran Playwright code
+```js
+await page.evaluate('() => ({url:location.href,title:document.title,text:document.body.innerText})');
+```

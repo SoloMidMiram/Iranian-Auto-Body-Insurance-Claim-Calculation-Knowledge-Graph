@@ -5,7 +5,7 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 
 - Target modules: `plans.py`, `operators.py`, the guard-plan gate in `engine.py`, Review operand construction in `review.py`, canonical calendar validation in `dates.py`, and the authorization boundary in `admission.py`
 - Required score: **90%**
-- Result: **29/29 killed (100.0%)**
+- Result: **43/43 killed (100.0%)**
 - Command: `python scripts/run_mutation_gate.py --check-report`
 
 | Mutant | Result | Safety property |
@@ -38,7 +38,31 @@ body calculation boundary. It is not a claim of exhaustive mutation coverage.
 | M26 | KILLED | Review drops evidenced rescue from the total-loss classification numerator |
 | M27 | KILLED | omitted material rescue is treated as zero and allowed to authorize payment |
 | M28 | KILLED | a classification override bypasses the unresolved-rescue payment gate |
-| M29 | KILLED | an override-selected threshold branch skips the missing-rescue evidence gate |
+| M30 | KILLED | a classification override bypasses final-selected-branch evidence completeness |
+| M31 | KILLED | an incomplete title transfer can use the insurer-title no-salvage route |
+| M32 | KILLED | missing or not-applicable physical salvage disposition bypasses containment |
+| M33 | KILLED | missing retained salvage valuation bypasses its explicit guard |
+| M35 | KILLED | an identified but inapplicable monetary franchise can pay |
+| M36 | KILLED | a questionnaire/configuration order token replaces applicable authority |
+| M37 | KILLED | claimed completed transfer pays without supporting proof |
+| M38 | KILLED | an explicit retained valuation pays without supporting evidence |
+| M39 | KILLED | Review authorizes an unverified franchise scenario despite authority gap |
+| M40 | KILLED | conflicting policy/endorsement terms are silently merged |
+| M41 | KILLED | unadjudicated notice or recovery impairment reaches body arithmetic |
+| M42 | KILLED | Review authorizes unadjudicated late notice |
+| M43 | KILLED | Review authorizes unadjudicated recovery impairment |
+| M44 | KILLED | Review replaces a selected assessor route with per-part depreciation |
+| M45 | KILLED | direct computation discards the selected assessor depreciation route |
+
+## Triaged mutation survivors
+
+- **M27 was missing coverage, not equivalent.** The probe now includes an ordinary
+  evidence-derived threshold route without an override. Mutating its omitted-rescue
+  gate produces a payable and is killed.
+- **M29 was equivalent under the corrected final-branch contract and is retired.**
+  Its candidate-branch disjunct duplicated `_final_selected_branch_evidence_gap`;
+  removing that disjunct leaves the focused and complete probes unchanged. M30
+  directly mutates the controlling final-selected-branch condition and is killed.
 
 A surviving mutant or a score below the threshold fails the gate. The checked-in
 report must exactly match a fresh run.

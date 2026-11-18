@@ -1,0 +1,7 @@
+colorama==0.4.6
+iniconfig==2.3.1
+-e git+https://github.com/SoloMidMiram/Iranian-Auto-Body-Insurance-Claim-Calculation-Knowledge-Graph.git@5cee269bce51653adb4b1e216ee0fad15db5144e#egg=iran_auto_claim&subdirectory=..\..\..\body-model-settlement-authority-clean
+packaging==26.3
+pluggy==1.7.0
+Pygments==2.21.0
+pytest==9.2.0

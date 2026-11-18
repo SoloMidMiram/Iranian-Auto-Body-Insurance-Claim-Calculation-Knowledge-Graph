@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.2.0",
+    "version": "1.2.1",
     "status": "RESEARCH_AND_ADJUSTER_DECISION_SUPPORT",
     "scope": "BODY_ONLY",
     "mode": "EXPLANATORY_ONLY",
@@ -174,7 +174,7 @@
             "applies_to": ["ALL"],
             "question": "What is the difference between refusal and insufficient information?",
             "answer_summary": "Refusal establishes a defeating condition; insufficiency means the decision cannot yet be made.",
-            "answer": "A supported non-compensable cause or uncovered endorsed risk may defeat payment. A missing report, unknown exclusion state, unread policy term, or unresolved date is not proof of refusal and must remain insufficient instead.",
+            "answer": "A supported non-compensable cause or uncovered endorsed risk may defeat payment. A missing report, unknown exclusion state, unread policy term, or unresolved date is not proof of refusal and must remain insufficient instead. Late-notice and impaired-recovery paths require adjudication before this model calculates; neither automatically means exclusion or zero.",
             "customer_action": "For insufficiency, obtain the named item; for refusal, request the exact provision and evidence supporting it.",
             "knowledge_refs": ["S3_EXCLUSION_GATE", "REG53_ART5_ENDORSABLE_EXCLUSIONS", "REG53_ART6_NON_COMPENSABLE"]
           },
@@ -606,7 +606,7 @@
             "applies_to": ["ALL"],
             "question": "تفاوت رد خسارت با ناکافی بودن اطلاعات چیست؟",
             "answer_summary": "رد یعنی مانع پرداخت اثبات شده؛ ناکافی بودن یعنی هنوز امکان تصمیم وجود ندارد.",
-            "answer": "علت غیرقابل جبران اثبات‌شده یا خطر بدون الحاقیه می‌تواند پرداخت را منتفی کند. نبود گزارش، نامشخص بودن استثنا، نخواندن شرط بیمه‌نامه یا تاریخ حل‌نشده دلیل رد نیست و باید ناکافی باقی بماند.",
+            "answer": "علت غیرقابل جبران اثبات‌شده یا خطر بدون الحاقیه می‌تواند پرداخت را منتفی کند. نبود گزارش، نامشخص بودن استثنا، نخواندن شرط بیمه‌نامه یا تاریخ حل‌نشده دلیل رد نیست و باید ناکافی باقی بماند. مسیر اعلام دیرهنگام یا اختلال در حق رجوع، پیش از محاسبه به تصمیم مستند نیاز دارد؛ هیچ‌کدام به‌تنهایی به معنی رد همیشگی یا مبلغ صفر نیست.",
             "customer_action": "برای اطلاعات ناکافی، مورد خواسته‌شده را تهیه کنید؛ برای رد، ماده و مدرک دقیق را مطالبه کنید.",
             "knowledge_refs": ["S3_EXCLUSION_GATE", "REG53_ART5_ENDORSABLE_EXCLUSIONS", "REG53_ART6_NON_COMPENSABLE"]
           },

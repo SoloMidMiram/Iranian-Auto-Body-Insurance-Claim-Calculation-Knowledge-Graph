@@ -1,0 +1,90 @@
+knowledge graph OK
+  body authority findings: 22
+    - operator OP_DEPRECIATION_REPLACEMENT_PART: declared body branch list ['PARTIAL_DAMAGE', 'TOTAL_LOSS'] differs from branches that compose it ['PARTIAL_DAMAGE']; left unchanged
+    - operator OP_DEPRECIATION_REPLACEMENT_PART: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_DEPRECIATION_REPLACEMENT_PART: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_FRANCHISE: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_FRANCHISE: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_UNDERINSURANCE_RATIO: declared body branch list ['GLASS_ONLY', 'PARTIAL_DAMAGE', 'TOTAL_LOSS'] differs from branches that compose it ['GLASS_ONLY', 'PARTIAL_DAMAGE']; left unchanged
+    - operator OP_UNDERINSURANCE_RATIO: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_UNDERINSURANCE_RATIO: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_SALVAGE_DEDUCTION: declared body branch list ['THEFT', 'TOTAL_LOSS'] differs from branches that compose it ['TOTAL_LOSS']; left unchanged
+    - operator OP_SALVAGE_DEDUCTION: source SRC_CIC_CIRCULAR_1400_401_146850 has no reviewer
+    - operator OP_SALVAGE_DEDUCTION: source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION has no reviewer
+    - operator OP_SALVAGE_DEDUCTION: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_SALVAGE_DEDUCTION: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_RESCUE_CAP: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_RESCUE_CAP: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_RESCUE_CAP: source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION has no reviewer
+    - operator OP_SPECIAL_PART_CAP: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_SPECIAL_PART_CAP: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_SPECIAL_PART_CAP: source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION has no reviewer
+    - operator OP_LIABILITY_CAP_INSURED_SUM: source SRC_REG53_MIRROR remains PRIMARY_MIRROR; tier was not upgraded
+    - operator OP_LIABILITY_CAP_INSURED_SUM: source SRC_REG53_MIRROR has no reviewer
+    - operator OP_LIABILITY_CAP_INSURED_SUM: source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION has no reviewer
+  source metadata findings: 48
+    - source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION: content hash missing
+    - source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION: effective interval incomplete
+    - source SRC_CENTINSUR_CAR_INSURANCE_COMPILATION: revalidation date missing
+    - source SRC_IRANINSURANCE_REG53: content hash missing
+    - source SRC_IRANINSURANCE_REG53: effective interval incomplete
+    - source SRC_IRANINSURANCE_REG53: revalidation date missing
+    - source SRC_REG53_MIRROR: content hash missing
+    - source SRC_REG53_MIRROR: effective interval incomplete
+    - source SRC_REG53_MIRROR: revalidation date missing
+    - source SRC_HIC_ARTICLE8_INSTRUCTION: content hash missing
+    - source SRC_HIC_ARTICLE8_INSTRUCTION: effective interval incomplete
+    - source SRC_HIC_ARTICLE8_INSTRUCTION: revalidation date missing
+    - source SRC_CIC_CIRCULAR_1404_06_10: content hash missing
+    - source SRC_CIC_CIRCULAR_1404_06_10: effective interval incomplete
+    - source SRC_CIC_CIRCULAR_1404_06_10: revalidation date missing
+    - source SRC_CIC_CIRCULAR_1400_401_146850: content hash missing
+    - source SRC_CIC_CIRCULAR_1400_401_146850: effective interval incomplete
+    - source SRC_CIC_CIRCULAR_1400_401_146850: revalidation date missing
+    - source SRC_TPL_LAW_1395: content hash missing
+    - source SRC_TPL_LAW_1395: effective interval incomplete
+    - source SRC_TPL_LAW_1395: revalidation date missing
+    - source SRC_IRANINSURANCE_CLAIMS_FAQ: content hash missing
+    - source SRC_IRANINSURANCE_CLAIMS_FAQ: effective interval incomplete
+    - source SRC_IRANINSURANCE_CLAIMS_FAQ: revalidation date missing
+    - source SRC_1405_DIYAH_SECONDARY: content hash missing
+    - source SRC_1405_DIYAH_SECONDARY: effective interval incomplete
+    - source SRC_1405_DIYAH_SECONDARY: revalidation date missing
+    - source SRC_INSURER_MANUAL_PENDING: content hash missing
+    - source SRC_INSURER_MANUAL_PENDING: effective interval incomplete
+    - source SRC_INSURER_MANUAL_PENDING: revalidation date missing
+    - source SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS: content hash missing
+    - source SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS: effective interval incomplete
+    - source SRC_IRANINSURANCE_BODY_GENERAL_CONDITIONS: revalidation date missing
+    - source SRC_IRANINSURANCE_BODY_ENDORSEMENT_TERMS: content hash missing
+    - source SRC_IRANINSURANCE_BODY_ENDORSEMENT_TERMS: effective interval incomplete
+    - source SRC_IRANINSURANCE_BODY_ENDORSEMENT_TERMS: revalidation date missing
+    - source SRC_IRANINSURANCE_BODY_FRANCHISE_SCHEDULE: content hash missing
+    - source SRC_IRANINSURANCE_BODY_FRANCHISE_SCHEDULE: effective interval incomplete
+    - source SRC_IRANINSURANCE_BODY_FRANCHISE_SCHEDULE: revalidation date missing
+    - source SRC_BIMEDAY_BODY_CLAIM_PROCEDURE: content hash missing
+    - source SRC_BIMEDAY_BODY_CLAIM_PROCEDURE: effective interval incomplete
+    - source SRC_BIMEDAY_BODY_CLAIM_PROCEDURE: revalidation date missing
+    - source SRC_REG53_MIRROR_DAVOUDABADI: content hash missing
+    - source SRC_REG53_MIRROR_DAVOUDABADI: effective interval incomplete
+    - source SRC_REG53_MIRROR_DAVOUDABADI: revalidation date missing
+    - source SRC_HIC_DIMINUTION_INSTRUCTION_1403: content hash missing
+    - source SRC_HIC_DIMINUTION_INSTRUCTION_1403: effective interval incomplete
+    - source SRC_HIC_DIMINUTION_INSTRUCTION_1403: revalidation date missing
+  nodes: 273
+    AnnualParameter 3
+    Branch          7
+    CaseTier        7
+    Contradiction   13
+    EvidenceItem    24
+    Exclusion       17
+    Guardrail       15
+    LegalRule       31
+    Operator        10
+    ParameterSlot   41
+    ReviewQuestion  63
+    ReviewStage     11
+    Source          16
+    Uncertainty     15
+  blocking uncertainties: 10
+  contradiction nodes: 13

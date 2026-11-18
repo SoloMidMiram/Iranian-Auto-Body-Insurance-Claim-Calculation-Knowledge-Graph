@@ -1,0 +1,288 @@
+{
+  "corpus_id": "inspection-synthetic-applicability-v1",
+  "qualification": "Software assumptions only. Synthetic applicability is complete for identifiable franchise terms; intentional negative evidence gaps remain. No legal authentication or independent review claimed.",
+  "cases": [
+    {
+      "case": "inspection-c101-manual-franchise-unversioned",
+      "original_sha256": "05316e9ebac1cc199fa7742c172128e017fde80ca6eaa5b9203f39ca7f30fb3e",
+      "synthetic_sha256": "05316e9ebac1cc199fa7742c172128e017fde80ca6eaa5b9203f39ca7f30fb3e",
+      "disposition": "Negative identity control: no authority invented for unidentifiable terms."
+    },
+    {
+      "case": "inspection-c102-glass-endorsement-token-only",
+      "original_sha256": "f3f5d55b7fd4e163eddb50f967887bea4da7f7cf5dcae6556519b7c0e4ae9297",
+      "synthetic_sha256": "de0982d7b9c7041a9fa9b7ce334ed4e94808286f2be01981cdf9dc40031cb46e",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c104-theft-60-59-clock",
+      "original_sha256": "85400a7bf8e6484c08f70d02a2a07fa37235b538cac542f4b831d71000d52895",
+      "synthetic_sha256": "9eb18393b3f973e20b5b317ef0e5059caa5ce326292363dd67d3dcd38cd061c3",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c105-theft-59-days",
+      "original_sha256": "3db7872e9de20ce6fb6c674bc7e28b7778880b9eb1b49a31c364d521e42f6261",
+      "synthetic_sha256": "1391817859fbd503e7761ccd54bea7fa5265a6452910cf6150ae7293f179256a",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c106-theft-clock-unbound",
+      "original_sha256": "a28986645826de4fd428c2b836eb0ef871ff6db2e19a7e192da034dfaa8cbddc",
+      "synthetic_sha256": "c32fb7493daa7319d073ecda2b181a318109fbb16ba7fc534d704d6479c94607",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c13a-repair-only",
+      "original_sha256": "26d63d6c891a0a4aba778a1ed2da4a1d2844adc02083f794ec9867946473555c",
+      "synthetic_sha256": "1c6829f70634a6e97592eeb163b5d08b55e9bb2c82cb68504890da50d35d280e",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c13b-replaced-but-flag-false",
+      "original_sha256": "d29f47bafb1763e610aaaf66323fdc1835ffa8da7b049999867b4f14833c1158",
+      "synthetic_sha256": "cc54dbcfcd5b3bf0d722321a73bf858402550a92f1246dfa306c5433d85d4487",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c13c-repair-only-flag-true",
+      "original_sha256": "737a7ca8f18bc9a3a3829d08b053031aef0859d4f95b80cf3b981982cb22c6a4",
+      "synthetic_sha256": "737a7ca8f18bc9a3a3829d08b053031aef0859d4f95b80cf3b981982cb22c6a4",
+      "disposition": "Negative identity control: no authority invented for unidentifiable terms."
+    },
+    {
+      "case": "inspection-c13d-replacement-control",
+      "original_sha256": "144228295be21ad87a305c12b21548a996a790d1eab06be74800da3fc5c55b48",
+      "synthetic_sha256": "2bfb814f1f19f6cd07259f869a1ade6ef9808d3f53e314f776039bc757bf712b",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c21mix-four-kinds",
+      "original_sha256": "49ba540c3d9e6a221fff59a5f6472aed9df51e5d72804149f990379da47c2eea",
+      "synthetic_sha256": "3a5f1c5c499081ac04fbff62ccb09d6a6d76ad6c00203af9c6764397e2fe6e16",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c31u04-unresolved",
+      "original_sha256": "cc61e89c40e10e81ecf2222385c7d7aa2736fc22e4a54af4dd2ffbe9204509d3",
+      "synthetic_sha256": "848cffa7d88d80a1aefcf03c07059a0db62d43713a6a2821d1bf133f0361f8ae",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c32u04-cap-then-dep",
+      "original_sha256": "49ea0519aa898bc74ad129ab52d4c719cd3192fcd56b0a2c0ca532008cb63d5c",
+      "synthetic_sha256": "6ed438f079c5460d30ebed1182f07ac06a886d7a89d54e7be46ac6d31aa2fbe0",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c33u04-dep-then-cap",
+      "original_sha256": "b9f6671bdbfbd768587925e36181179414d9fa3f1b5b50c7295b548c981d79a0",
+      "synthetic_sha256": "1ff0de8b7d5fbee0136897e15716d0c3b3b82732b861c73a0009dd40f49963d2",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c34u04-cap-only",
+      "original_sha256": "fec9c411cca2657db32c39f9e48794e2908e477dc71338175f0962c3dc58a3c1",
+      "synthetic_sha256": "b52a717eccd7eb3ca738bef847c45f95e57ca9db1956097610d9c6efcba3d988",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c35q404-battery-new-price",
+      "original_sha256": "b9ae0647ee6a824155570e8d8a9e615787f2aa1467d8cca5c8c5bc42707f71d4",
+      "synthetic_sha256": "8b5145d08d15045178da44dca3796eb3c0c1a5f8deb121ad1e9640b082bc3f53",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c41-below-7499",
+      "original_sha256": "26c256fecb7391ac58a26b2e13697d49a6f39da77115da416ca60cb016e119b0",
+      "synthetic_sha256": "9430e9099a4e5e142ec72a337434a77263a3f6797840379f1241237ecca50251",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c42-at-7500",
+      "original_sha256": "dd61139e55545c274c3b038879609140171860333ca0023b3cf259193ad7f78d",
+      "synthetic_sha256": "1f69268f29ce8ba6efb85a0fb67ccf2d8ab2299825a1aeae90fa4a907aa113d6",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c43-above-7501",
+      "original_sha256": "3821317644084ffb9210894ea535307d51f9f4a4e789cfe75d8fe8c59e834f06",
+      "synthetic_sha256": "bac9f40cc9e85e4c44fd0472b5aa90bd4d03c471845c5a3937a258c5c693bc87",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c44-rescue-crosses-7600",
+      "original_sha256": "db3646ed562196723bbf70dec14ccb5cba59e8cd264c6b308a56e20160576d6b",
+      "synthetic_sha256": "2d0effd714cda45cb7882a89ec54f0fc17a786b03f590050e9045973b0d4d112",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c45-rescue-omitted",
+      "original_sha256": "12786999319df80acb5853fa38f047d027262afb50f2bed998994a0da2685e83",
+      "synthetic_sha256": "4837f4d706175b1df451a7c3a28bc042f58e570665b718eb1d5dd37ebb7a821b",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c46-rescue-explicit-zero",
+      "original_sha256": "c6a93d3286d84df0b643aef6397f021c067f04b87d78eb37cd7888238de77b1e",
+      "synthetic_sha256": "e3ae78c9fc9d01a222f18cfdd34f7927ab53e9ef1c60e77f4eb03def8dd34a77",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c47-aggregate-only-rescue",
+      "original_sha256": "e2012fd4319adc4d807af4f3f26abe611f9c9847396f2504412dad5105ac9efd",
+      "synthetic_sha256": "f4d3e8f346306820f7eb3eccae0ca6765d214a71f6c5ac8f78385566756c8b56",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c48-assessed-depreciation-figure",
+      "original_sha256": "9540923711177f29ad13cafa25b61a84277cc53974202237cc6b75e8dac8f0d3",
+      "synthetic_sha256": "b6c3b72bff81136db5c02501bf2ac5b3c3079d05d6354b4de8291c73972ececf",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c61-title-not-transferred",
+      "original_sha256": "97e7862aaecc913fef890635331b0cf3929d83028ac4a4654eaf65b03b1236d8",
+      "synthetic_sha256": "3f0ab4dd391cb9f981c99d372de1ca0bae1caa4922d23b2c6d11b133b5e08026",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c62-title-transferred",
+      "original_sha256": "d78dcfbed713cc66bdd130998df62490ccce5962e9705f52e668fbf333f409a8",
+      "synthetic_sha256": "d1578066d68c96b1ef49a04012ae9aabde461eb60fec5115615c8f0b8864e1f5",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c63-retains-after-salvage",
+      "original_sha256": "2a12919471dd7f8055a8e8ba2196378303fb60200fd59019f7deb6955712f75a",
+      "synthetic_sha256": "054d841c3df6fcdf142819d799226273c5d25f3a0293198421ffd49ca57edff7",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c64-retains-settlement-base",
+      "original_sha256": "8bad08490a94b6fa625dc0466f318c410e69d41a85f566c0cda509432b862597",
+      "synthetic_sha256": "8495fdcb6dbfd17841fee0768753a17f26aa06220570ac5e1aa2e8d75bed4fcb",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c65-retains-salvage-missing",
+      "original_sha256": "b848c4c44c7aa4db841001434893a1c3cfc72b3d88465dc6d7bed938f1bb55f1",
+      "synthetic_sha256": "ac950e2ebca033aa9f97a40a293f4c709af32655e70fb047a453ffa14f245cdc",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c66-disposition-unresolved",
+      "original_sha256": "d9f929e3aab79b9e0ecf90764aebdb4b58673650dc7eabe3d91e9d5d0774938b",
+      "synthetic_sha256": "c6baed1a42efdc8955dad140fba170e6186b5de699bfc60d43c942a53614ac4e",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c67-disposition-not-applicable",
+      "original_sha256": "f13d7ac3a5cae5ea1843c1ca1062077c9b35275d06cf7c275004a823603edd46",
+      "synthetic_sha256": "09bd44bb3938ca02568328150790800db756bf6128dc9077206c68910f384f02",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c71-underinsured-unresolved",
+      "original_sha256": "b2539abf950ccf9344260d59b415ee95fa40e330c7b1ce215c654fdf286f3223",
+      "synthetic_sha256": "c95fab11c43402483f8d7a4819a8bfabaae92690cdcfe23e889649a653370347",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c72-underinsured-order-locked",
+      "original_sha256": "34534983734a01cd73603e8f6d7fc482d3cf5a7056721f82b52ae4d5fae1aa10",
+      "synthetic_sha256": "fffe55cf9de651214a6af5b1c8dc416f3eb28b2554cd1499c165e342a02c7230",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c73-overinsured",
+      "original_sha256": "648b455836f19fe92c664a00910ee7a88232c6f5dee7059ed01c6a806b7fa473",
+      "synthetic_sha256": "74fadc641d9df73e5afb45feb97ce8530c9ab08c429a8c705de582b7ebc52000",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c74-underinsured-total-loss",
+      "original_sha256": "96a3d5761819dad859b7b59bfe3ca6fa88e7b792628fcd339b4f19eba00655e4",
+      "synthetic_sha256": "7898348e936c686cd7090ff7387bd085f756f05e5d3d7f83fd11db2ac76e0076",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c81-risk-intensified-yes",
+      "original_sha256": "564b54ce03eb4ba740dcf75262f71d536a10bcea1adab5d92939526a90b66999",
+      "synthetic_sha256": "a08f8743f13cee9298c35d1a4125d8238c71207ec408fe2b7cfd00dfe27d5afa",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c82-risk-intensified-unknown",
+      "original_sha256": "02b99991f665af3252b17246610e45496ea7148d9cc511e6a70b60ec3051bf4d",
+      "synthetic_sha256": "404de41fdb63012f8470879ad9af2c9d5b846831ce18b8c3c1df10e180f1e97d",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c83-instalment-overdue",
+      "original_sha256": "60d18ac32dc98de661947d9fbe14a00dd317b1237ad30650d7dd6836bf35b694",
+      "synthetic_sha256": "e2eec5485ea27d2d893e31d71e2b4cfc95b354ed2973ff9689106b9b3529ac23",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c84-policy-state-unknown",
+      "original_sha256": "e110ef7f59885f80d96f365e6a66ca77180cbc339be18ef8f4c1d86649b49a6a",
+      "synthetic_sha256": "2345e206d6acff7d3d696db947bba4644f90c9c2f373e34ad429d2c18c960bb4",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c91-prior-full-compensation",
+      "original_sha256": "1073a82fee9e4bc5d746200c554958ff98fa4c241982d8ff284e5aa7d39f6330",
+      "synthetic_sha256": "93a82f0122347a8c7dacafc6e521d605687f83a383bb47f411d3448966579415",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c92-prior-zero-documented",
+      "original_sha256": "8b03d474a4b90c4a0512db0b429471a099426b95313909409e63a73dd3c9863f",
+      "synthetic_sha256": "99682bb90953bef7587e1073faf474cff228f8c4239558f9b83adfe9860b237b",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c93-causation-asserted-only",
+      "original_sha256": "8f552ca5a43b5b43fd14018ea352e783dd2a54e105d691246e91c7b72f3923fe",
+      "synthetic_sha256": "2185e17724250ef02afe161417d3c94b6fe7f3fb305a80a05bf7779d2808b510",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c94-event-date-impossible",
+      "original_sha256": "6becf935aa0c2b8fdef4a65f47898942a8de267c5c5596d423e68a1f4708bdca",
+      "synthetic_sha256": "6becf935aa0c2b8fdef4a65f47898942a8de267c5c5596d423e68a1f4708bdca",
+      "disposition": "Negative identity control: no authority invented for unidentifiable terms."
+    },
+    {
+      "case": "inspection-c95-production-year-future",
+      "original_sha256": "e5addec28b04eff44bdad92e35402d2f283b2947458419505a23159375d1633f",
+      "synthetic_sha256": "e5addec28b04eff44bdad92e35402d2f283b2947458419505a23159375d1633f",
+      "disposition": "Negative identity control: no authority invented for unidentifiable terms."
+    },
+    {
+      "case": "inspection-c96-conflicting-money-aliases",
+      "original_sha256": "2627fc6398dfca7732d194d76a25b3b56cd03e4e5dc9583cf5929b56e1367a38",
+      "synthetic_sha256": "2627fc6398dfca7732d194d76a25b3b56cd03e4e5dc9583cf5929b56e1367a38",
+      "disposition": "Negative identity control: no authority invented for unidentifiable terms."
+    },
+    {
+      "case": "inspection-c97-late-notice-no-excuse",
+      "original_sha256": "5d9e9c8436725ec28158c153b300288bdc26a5c93d2e7c17f460b3b4c1aaaf00",
+      "synthetic_sha256": "e0f118b7237948169bcb498e21579e87586e749a9bcd6e874a1fe735b7af23d8",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c98-recourse-released",
+      "original_sha256": "11971f8614b318d9ca7d3aabd6c7689eef4b7a2d5f3decbd7f13d16d534b32dd",
+      "synthetic_sha256": "bc3993db80e01ede575937e80f2e7777bf0b9f43a4ff1ab0fe01241259b26e06",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    },
+    {
+      "case": "inspection-c99-third-party-split",
+      "original_sha256": "744ac8f15a16c936e948e23133fe15fedc15d24d639cc0f141a917edf3b34fca",
+      "synthetic_sha256": "42d7709eabb4153e95e6181609163eaa55e58687e154e4533931389fe633eacc",
+      "disposition": "Explicit synthetic franchise applicability supplied; all other operands preserved."
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import pytest
 
 from iran_auto_claim.admission import _internal_test_direct_authorize
 from iran_auto_claim.engine import compute
+from iran_auto_claim.fixtures import _with_synthetic_authority
 from iran_auto_claim.review import Review
 from iran_auto_claim.schema_input import InputSchemaError
 
@@ -36,11 +37,12 @@ def _assert_review_does_not_pay(payload: dict, kb) -> None:
 
 
 def _total_loss_direct_case() -> dict:
-    return {
+    return _with_synthetic_authority({
         "claim_id": "stage0-ia14-total",
         "unit": "IRR",
         "classification": {"branch": "TOTAL_LOSS"},
         "event": {"event_date": "1405-01-01"},
+        "evidence": {"EVT_SALVAGE_VALUATION": True},
         "coverage_gate": {"causal_relationship_established": True},
         "vehicle": {
             "market_value_at_event_irr": 2000,
@@ -61,7 +63,7 @@ def _total_loss_direct_case() -> dict:
                 "source_version": "STAGE0-v1",
             },
         },
-    }
+    })
 
 
 def test_stage0_control_supported_review_path_remains_collectable(kb):
@@ -132,7 +134,6 @@ def test_ia04_rescue_crossing_the_strict_threshold_classifies_total_loss(kb):
     assert Review(payload, kb).classification()["branch"] == "TOTAL_LOSS"
 
 
-@pytest.mark.xfail(strict=True, reason="IA-05: insurer-title settlement requires completed transfer")
 def test_ia05_incomplete_title_transfer_cannot_pay_total_loss(kb):
     payload = _review_case()
     payload["answers"]["Q-S4-03"][0]["assessed_loss"] = 6500000000
@@ -159,7 +160,6 @@ def test_ia07_invalid_chronology_cannot_pay(kb, question, value):
     _assert_review_does_not_pay(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-08: an unversioned manual cannot establish a monetary franchise")
 def test_ia08_unversioned_manual_franchise_cannot_pay(kb):
     payload = _review_case()
     for question in ("Q-S6-02", "Q-S6-04"):
@@ -176,7 +176,6 @@ def test_ia15_conflicting_part_aliases_are_rejected(kb):
         Review(payload, kb)
 
 
-@pytest.mark.xfail(strict=True, reason="IA-14: material salvage operands are mandatory at the engine boundary")
 @pytest.mark.parametrize(
     "disposition",
     [None, "INSURED_RETAINS"],

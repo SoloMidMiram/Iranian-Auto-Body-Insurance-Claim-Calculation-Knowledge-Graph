@@ -34,6 +34,7 @@ from .admission import (
     CalculationAuthorization,
 )
 from .case import DOMAIN_BY_BRANCH, Case, CaseInputError
+from .authority import applicability_gap, franchise_applicability_gap, franchise_identity_gap
 from .classify import ClassificationEvidenceRequired, classify
 from .dates import CalendarDateError, is_shamsi_leap_year, parse_claim_date
 from .knowledge import Knowledge
@@ -374,6 +375,22 @@ def _resolve_franchise(
             status="FRANCHISE_AUTHORITY_REQUIRED",
         )
 
+    if gap := franchise_identity_gap(spec):
+        res.fields["franchise_source"] = source or "UNKNOWN"
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES", gap,
+            status="FRANCHISE_AUTHORITY_REQUIRED",
+        )
+
+    if gap := franchise_applicability_gap(spec, case.policy, case.event.get("event_date"), res.branch):
+        res.fields["franchise_authority_gap"] = gap
+        raise operators.UncertaintyRequired(
+            "U02_FRANCHISE_BASE_SCHEDULES", gap,
+            status="FRANCHISE_AUTHORITY_REQUIRED",
+        )
+    res.fields["franchise_authority_source_status"] = spec["authority"]["source_status"]
+    res.fields["franchise_authority"] = dict(spec["authority"])
+
     def _dec(value: Any) -> Decimal | None:
         return None if value is None else money.D(value)
 
@@ -524,12 +541,21 @@ def evaluate_coverage_gate(case: Case, kb: Knowledge, res: CalcResult) -> bool:
         res.label("EXCLUDED_WITHOUT_ENDORSEMENT")
         return True
 
+    adjudications: list[str] = []
     if case.late_notice_issue:
         res.label("LATE_NOTICE_REVIEW")
         res.note_rule("REG53_NOTICE_AND_DUTIES")
+        adjudications.append("NOTICE_ADJUDICATION_REQUIRED")
     if case.subrogation_impaired:
         res.label("SUBROGATION_IMPAIRMENT_REVIEW")
         res.note_rule("REG53_ART14_SUBROGATION")
+        adjudications.append("SUBROGATION_ADJUDICATION_REQUIRED")
+    if res.domain == "BODY" and adjudications:
+        res.payable = None
+        res.status = adjudications[0]
+        res.fields["eligibility_blocking_conditions"] = adjudications
+        res.reason = "affected notice/recovery predicates require reviewed adjudication before calculation"
+        return True
     return False
 
 
@@ -576,6 +602,13 @@ def check_risk_intensification(case: Case, kb: Knowledge) -> None:
 def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None:
     res.label("PARTIAL_DAMAGE")
     res.note_rule("REG53_ART19B_PARTIAL_LOSS_BASE")
+    if case.damage.get("depreciation_method") == "ASSESSED_FIGURE":
+        if case.assessed_depreciation is None or case.parts:
+            res.payable = None
+            res.status = ("ASSESSED_DEPRECIATION_AMOUNT_REQUIRED" if case.assessed_depreciation is None
+                          else "ASSESSED_DEPRECIATION_METHOD_UNRESOLVED")
+            res.reason = "the selected assessor route cannot silently become computed-per-part depreciation"
+            return
 
     parts = case.parts
     labor = case.labor or Decimal(0)
@@ -680,7 +713,14 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
         return
 
     sequence = named_sequence(branch_plan, order)
-    if sequence and RATIO in sequence and FRANCHISE in sequence:
+    order_gap = applicability_gap(
+        case.config.get("article10_order_authority"), case.policy,
+        case.event.get("event_date"), "PARTIAL_DAMAGE",
+        {"article10_partial_order": order},
+    )
+    res.fields["article10_order_authority_gap"] = order_gap
+    if sequence and RATIO in sequence and FRANCHISE in sequence and order_gap is None:
+        res.fields["article10_order_authority"] = dict(case.config["article10_order_authority"])
         res.fields["order_used"] = order
         sequence = _activate_body_plan(res, "PARTIAL_DAMAGE", branch_plan, sequence)
         res.payable = graph_partial_payable(
@@ -702,6 +742,7 @@ def calculate_partial_damage(case: Case, kb: Knowledge, res: CalcResult) -> None
     res.payable_scenarios = scenario_amounts
     res.payable = None
     res.status = "ORDER_UNRESOLVED"
+    res.reason = "supply applicable legal or contractual authority establishing the operator sequence; " + (order_gap or "the selected order is unresolved")
     res.fields["order_used"] = UNRESOLVED_ORDER
     res.block("U01_ARTICLE10_PARTIAL_ORDER")
     res.label("ORDER_UNRESOLVED")
@@ -730,15 +771,31 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.label("DO_NOT_APPLY_RATIO_TWICE")
     res.note_guard("G_NO_DOUBLE_UNDERINSURANCE_IN_TOTAL_LOSS")
 
-    disposition = case.salvage_disposition
-    if disposition == "UNRESOLVED":
+    # Whole theft has already passed its separate transfer condition. It has no
+    # retained wreck valuation; physical-loss completeness must not invent one.
+    disposition = (
+        "INSURER_TAKES_TITLE"
+        if res.route == "THEFT_TOTAL_SETTLEMENT"
+        else case.salvage_disposition
+    )
+    if disposition not in ("INSURED_RETAINS", "INSURER_TAKES_TITLE"):
         raise operators.UncertaintyRequired(
             "U12_SALVAGE_DISPOSITION",
             "salvage disposition is unresolved, so the settlement base cannot be fixed",
             status="SALVAGE_DISPOSITION_UNRESOLVED",
         )
 
+    res.require_guard("G_SALVAGE_XOR_TITLE_TRANSFER")
     if disposition == "INSURER_TAKES_TITLE":
+        if not case.title_transferred or case.evidence.get("EVT_TITLE_TRANSFER_PROOF") is not True:
+            raise guards.GuardViolation(
+                "G_SALVAGE_XOR_TITLE_TRANSFER",
+                (
+                    "the insurer-title settlement route requires completed title transfer "
+                    "before salvage can be omitted"
+                ),
+                "TITLE_TRANSFER_REQUIRED",
+            )
         salvage_to_deduct = Decimal(0)
         after_salvage = base
         res.fields["salvage_deduction"] = Decimal(0)
@@ -746,7 +803,19 @@ def _settle_total_loss(case: Case, kb: Knowledge, res: CalcResult) -> None:
         res.note_rule("REG53_ART19_INSURER_TAKES_TITLE")
         res.label("DO_NOT_DEDUCT_SALVAGE_AND_TRANSFER_IT")
     else:
-        salvage_to_deduct = case.salvage or Decimal(0)
+        if case.salvage is None:
+            raise guards.GuardViolation(
+                "G_SALVAGE_XOR_TITLE_TRANSFER",
+                "retained salvage requires an established valuation; absence is not zero",
+                "SALVAGE_VALUE_REQUIRED",
+            )
+        if case.evidence.get("EVT_SALVAGE_VALUATION") is not True:
+            raise guards.GuardViolation(
+                "G_SALVAGE_XOR_TITLE_TRANSFER",
+                "retained salvage valuation requires supporting assessment evidence",
+                "SALVAGE_VALUATION_EVIDENCE_REQUIRED",
+            )
+        salvage_to_deduct = case.salvage
         after_salvage = base - salvage_to_deduct
         res.fields["salvage_deduction"] = salvage_to_deduct
         res.fields["salvage_disposition"] = disposition
@@ -1304,6 +1373,53 @@ def _classification_evidence_gap(
     return None
 
 
+def _missing_classification_rescue_reason() -> str:
+    return (
+        "classification rescue is missing; a non-negative amount could change the "
+        "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
+        "payment and this evidence gate cannot be overridden"
+    )
+
+
+def _final_selected_branch_evidence_gap(
+    case: Case, selected_branch: str | None
+) -> str | None:
+    """Require the classification operands consumed by an override-selected route.
+
+    An override supplies authority to select a branch; it does not supply the
+    evidence that branch needs. Threshold-dependent body routes therefore need
+    their repair, market and classification-rescue operands before the override
+    can become calculation authorization.
+    """
+    if selected_branch not in RESCUE_THRESHOLD_BRANCHES:
+        return None
+
+    missing = []
+    if case.repair_total is None:
+        missing.append("repair-and-replacement assessment")
+    if case.market_value is None:
+        missing.append("event-date market value")
+
+    classification_rescue, rescue_source, unresolved_rescue = (
+        case.classification_rescue()
+    )
+    if unresolved_rescue is not None:
+        return unresolved_rescue
+    if classification_rescue is None and (
+        rescue_source == "UNRESOLVED_MISSING_RESCUE"
+    ):
+        missing.append("classification rescue")
+
+    if not missing:
+        return None
+    if missing == ["classification rescue"]:
+        return _missing_classification_rescue_reason()
+    return (
+        f"override-selected {selected_branch} classification needs "
+        + ", ".join(missing)
+    )
+
+
 def reconcile_classification(
     case: Case, kb: Knowledge
 ) -> tuple[dict[str, Any], str | None, str | None]:
@@ -1330,10 +1446,10 @@ def reconcile_classification(
         case.classification_rescue()
     )
     override = case.classification_override
-    threshold_classification_participates = (
-        derived in RESCUE_THRESHOLD_BRANCHES
-        or (override is not None and declared in RESCUE_THRESHOLD_BRANCHES)
-    )
+    # Candidate branches selected by an override are checked independently by
+    # _final_selected_branch_evidence_gap. Keep this predicate about the
+    # evidence-derived route so the two gates do not encode the same condition.
+    threshold_classification_participates = derived in RESCUE_THRESHOLD_BRANCHES
     unresolved_rescue_gate = (
         unresolved_rescue is not None
         and (declared == "TOTAL_LOSS" or threshold_classification_participates)
@@ -1344,12 +1460,15 @@ def reconcile_classification(
         and classification_rescue is None
         and rescue_source == "UNRESOLVED_MISSING_RESCUE"
     )
+    final_selected_branch_gap = (
+        _final_selected_branch_evidence_gap(case, declared)
+        if override is not None and not unresolved_rescue_gate
+        else None
+    )
     if unresolved_rescue_gate:
-        gap = unresolved_rescue or (
-            "classification rescue is missing; a non-negative amount could change the "
-            "strict 75% branch or the settlement, so the preliminary zero cannot authorize "
-            "payment and this evidence gate cannot be overridden"
-        )
+        gap = unresolved_rescue or _missing_classification_rescue_reason()
+    elif final_selected_branch_gap is not None:
+        gap = final_selected_branch_gap
     else:
         gap = _classification_evidence_gap(case, declared, derived)
 
@@ -1374,6 +1493,7 @@ def reconcile_classification(
         outcome in ("CONFLICT", "INSUFFICIENT_EVIDENCE")
         and override is not None
         and not unresolved_rescue_gate
+        and final_selected_branch_gap is None
     ):
         outcome = "AUTHORIZED_OVERRIDE"
         selected = declared

@@ -1,0 +1,238 @@
+................F.EEEEEE                                                 [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_valid_cross_checkout_records_complete_evidence_contract _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001CCE0F9FE10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: internal probe module origins differ from the required provenance map
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...tion.json'], returncode=1, stdout='', stderr='internal probe module origins differ from the required provenance map\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+_ ERROR at setup of test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001CCE0F9FE10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: internal probe module origins differ from the required provenance map
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...tion.json'], returncode=1, stdout='', stderr='internal probe module origins differ from the required provenance map\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+_____ ERROR at setup of test_investigation_rejects_modified_external_c104 _____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001CCE0F9FE10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: internal probe module origins differ from the required provenance map
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...tion.json'], returncode=1, stdout='', stderr='internal probe module origins differ from the required provenance map\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+____ ERROR at setup of test_runner_rejects_mutated_caller_probe_definition ____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001CCE0F9FE10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: internal probe module origins differ from the required provenance map
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...tion.json'], returncode=1, stdout='', stderr='internal probe module origins differ from the required provenance map\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+__ ERROR at setup of test_comparator_rejects_stale_clean_inspector_revision ___
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001CCE0F9FE10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: internal probe module origins differ from the required provenance map
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...tion.json'], returncode=1, stdout='', stderr='internal probe module origins differ from the required provenance map\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+_ ERROR at setup of test_comparator_rejects_different_committed_unauthorized_harness _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001CCE0F9FE10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+>       assert runner.returncode == 0, runner.stderr
+E       AssertionError: internal probe module origins differ from the required provenance map
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...tion.json'], returncode=1, stdout='', stderr='internal probe module origins differ from the required provenance map\n').returncode
+
+tests\test_inspection_provenance.py:122: AssertionError
+================================== FAILURES ===================================
+_ test_investigation_uses_selected_cross_checkout_despite_conflicting_pythonpath _
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1226/test_investigation_uses_select0')
+
+    def test_investigation_uses_selected_cross_checkout_despite_conflicting_pythonpath(
+        tmp_path: Path,
+    ) -> None:
+        selected = _copy_model_checkout(tmp_path)
+        inspector = _copy_inspector_checkout(tmp_path / "cross-inspector")
+        output = tmp_path / "investigation.json"
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = str(ROOT / "src")
+        result = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "investigate_total_loss_override.py"),
+                "--root",
+                str(selected),
+                "--cases",
+                str(inspector / "cases"),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--output",
+                str(output),
+            ],
+            inspector,
+            env=environment,
+        )
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: C104 input digest differs from the reference manifest: expected 85400a7bf8e6484c08f70d02a2a07fa37235b538cac542f4b831d71000d52895, observed 205dcd62b9ef771947a085b4b724569bf2d910c19c295041df89c5aee9e2efe1
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['F:\\Git\\body-model-article19\\.venv\\Scripts\\python.exe', 'C:\\Users\\cebit.ir\\AppData\\Loc...a2a07fa37235b538cac542f4b831d71000d52895, observed 205dcd62b9ef771947a085b4b724569bf2d910c19c295041df89c5aee9e2efe1\n').returncode
+
+tests\test_inspection_provenance.py:172: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_inspection_provenance.py::test_investigation_uses_selected_cross_checkout_despite_conflicting_pythonpath
+ERROR tests/test_inspection_provenance.py::test_valid_cross_checkout_records_complete_evidence_contract
+ERROR tests/test_inspection_provenance.py::test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated
+ERROR tests/test_inspection_provenance.py::test_investigation_rejects_modified_external_c104
+ERROR tests/test_inspection_provenance.py::test_runner_rejects_mutated_caller_probe_definition
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_stale_clean_inspector_revision
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_different_committed_unauthorized_harness

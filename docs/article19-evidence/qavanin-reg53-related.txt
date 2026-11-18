@@ -1,0 +1,18 @@
+### Result
+{
+  "url": "https://qavanin.ir/Law/RelatedIndex/?IDS=12020232825033491345",
+  "text": "\t\nآئين ‌نامه شماره 53 درخصوص شرايط عمومي بيمه نامه بدنه وسايل نقليه زميني\nمصوب 1384/12/09 شوراي عالي بيمه\nاطلاعات پایه\nمتن\nتصویر\nکدهای موضوعی\nاطلاعات تنقیحی\nقوانین ومقررات مرتبط\n\n\nقوانین مرتبط\nردیف\tعنوان\tتاریخ\n\tقانون تأسيس بيمه مركزي ايران و بيمه گري\t1350/03/30\nمقررات، آراء و نظرات مرتبط\nردیف\tعنوان\tتاریخ\n1\tرأي شماره 3011738 هيأت تخصصي كار، بيمه و تأمين اجتماعي ديوان عدالت اداري با موضوع رد شكايت ابطال بند 1 ماده 6 آيين نامه شماره 53 شوراي عالي بيمه\t1402/11/17\nتماس با ما\nتهران - خیابان حضرت ولی عصر(عجل الله تعالی فرجه الشریف) نرسیده به تقاطع خیابان جمهوری اسلامی(از جنوب به شمال) شماره 1160\nتلفن فروشگاه : 66492708\nدورنگار : 66492707\nرایانامه : DOTI@IRIPO . IR\nپیوندها\nمعاونت حقوقی رییس جمهور\nپایگاه ملی اطلاع رسانی قوانین و مقررات\nفروشگاه اینترنتی محصولات نرم افزاری\nسامانه رایانامه حقوقی کشور\nانتشارات معاونت تدوین ، تنقیح و انتشار قوانین و مقررات\nکتابخانه دیجیتال قوانین و مقررات\n \nکلیه حقوق برای معاونت تدوین، تنقیح و انتشار قوانین و مقررات معاونت حقوقی ریاست جمهوری محفوظ است"
+}
+### Ran Playwright code
+```js
+await page.evaluate('() => ({url:location.href,text:document.body.innerText})');
+```
+### Open tabs
+- 0: [سامانه ملی قوانین و مقررات جمهوری اسلامی ایران](https://qavanin.ir/?CAPTION=%D8%B4%D8%B1%D8%A7%DB%8C%D8%B7+%D8%B9%D9%85%D9%88%D9%85%DB%8C+%D8%A8%DB%8C%D9%85%D9%87+%D8%A8%D8%AF%D9%86%D9%87&Zone=&IsTitleSearch=true&IsTitleSearch=false&IsTextSearch=false&_isLaw=false&_isRegulation=false&_IsVote=false&_isOpenion=false&SeachTextType=3&fromApproveDate=&APPROVEDATE=&IsTitleSubject=False&IsMain=&COMMANDNO=&fromCommandDate=&COMMANDDATE=&NEWSPAPERNO=&fromNewspaperDate=&NEWSPAPERDATE=&SortColumn=APPROVEDATE&SortDesc=True&Report_ID=&PageNumber=1&page=1&size=25&txtZone=&txtSubjects=&txtExecutors=&txtApprovers=&txtLawStatus=&txtLawTypes=)
+- 1: (current) [قوانین و مقررات مرتبط با آئين ‌نامه شماره 53 درخصوص شرايط عمومي بيمه نامه بدنه وسايل نقليه زميني](https://qavanin.ir/Law/RelatedIndex/?IDS=12020232825033491345)
+### Page
+- Page URL: https://qavanin.ir/Law/RelatedIndex/?IDS=12020232825033491345
+- Page Title: قوانین و مقررات مرتبط با آئين ‌نامه شماره 53 درخصوص شرايط عمومي بيمه نامه بدنه وسايل نقليه زميني
+- Console: 1 errors, 1 warnings
+### Events
+- New console entries: .playwright-mcp\console-2026-11-01T01-58-16-779Z.log#L83-L92

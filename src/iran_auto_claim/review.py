@@ -34,6 +34,7 @@ from .admission import (
     utc_now,
 )
 from .case import PART_CATEGORIES
+from .authority import applicability_gap, franchise_applicability_gap
 from .classify import classify
 from .dates import CalendarDateError, parse_claim_date
 from .engine import CalcResult, compute, reconcile_classification
@@ -153,6 +154,14 @@ class Review:
         return self.answers.get(question_id)
 
     def is_answered(self, question_id: str) -> bool:
+        if question_id == "Q-S4-04" and question_id not in self.answers:
+            records = [item for item in _as_list(self.answer("Q-S4-03"))
+                       if isinstance(item, dict) and item.get("category") in ("BATTERY", "TIRE")]
+            # Itemised assessments already carry each component's own price.
+            # Do not demand it twice or invent one scalar price for several items.
+            if records and all(_is_number(item.get("new_price_irr", item.get("new_price")))
+                               for item in records):
+                return True
         if question_id not in self.answers:
             return False
         value = self.answers[question_id]
@@ -352,6 +361,10 @@ class Review:
             if answered:
                 binding.status = STATUS_NOT_TRIGGERED
                 binding.note = "answered; the slot is only read when the answer triggers it"
+                if (slot_id == "PS_ASSESSED_DEPRECIATION"
+                        and self.answer("Q-S4-05") == "ASSESSED_FIGURE"):
+                    binding.status = STATUS_UNANSWERED
+                    binding.note = "the assessor route was selected but no monetary figure is bound"
             elif fillers and not applicable:
                 binding.status = STATUS_NOT_APPLICABLE
                 binding.note = "the question that would supply it is not asked for this file"
@@ -384,7 +397,16 @@ class Review:
 
         if uncertainty_id == "U01_ARTICLE10_PARTIAL_ORDER":
             ratio = slot("PS_UNDERINSURANCE_RATIO")
-            return bool(ratio) and branch in ("PARTIAL_DAMAGE", "GLASS_ONLY") and float(ratio) < 1.0
+            if not (bool(ratio) and branch in ("PARTIAL_DAMAGE", "GLASS_ONLY") and float(ratio) < 1.0):
+                return False
+            order = slot("PS_ARTICLE10_PARTIAL_ORDER")
+            return order not in (
+                "AFTER_DEPRECIATION_BEFORE_FRANCHISE", "AFTER_DEPRECIATION_AND_FRANCHISE"
+            ) or applicability_gap(
+                self.payload.get("article10_order_authority"),
+                self.payload.get("contract_context") or {}, slot("PS_EVENT_DATE"),
+                branch, {"article10_partial_order": order},
+            ) is not None
         if uncertainty_id == "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION":
             parts = [item for item in _as_list(slot("PS_PART_CATEGORY")) if isinstance(item, dict)]
             special = any(
@@ -421,7 +443,10 @@ class Review:
 
     def _franchise_complete(self) -> bool:
         franchise = self._bound.get("PS_FRANCHISE")
-        if not isinstance(franchise, dict):
+        if franchise_applicability_gap(
+            franchise, self.payload.get("contract_context") or {},
+            self._bound.get("PS_EVENT_DATE"), self.classification().get("branch"),
+        ) is not None:
             return False
         mode = str(franchise.get("mode") or "").upper()
         if mode in ("", "NOT_STATED"):
@@ -594,6 +619,9 @@ class Review:
             damage["rescue_for_total_loss_test_irr"] = irr(rescue_actual)
             damage["rescue_for_total_loss_test_source"] = "DERIVED_FROM_ACTUAL_RESCUE"
 
+        if self.answer("Q-S4-05") == "ASSESSED_FIGURE":
+            damage["depreciation_method"] = "ASSESSED_FIGURE"
+
         config: dict[str, Any] = {}
         for key, slot in (
             ("article10_partial_order", "PS_ARTICLE10_PARTIAL_ORDER"),
@@ -666,6 +694,9 @@ class Review:
         if branch:
             classification["branch"] = branch
         payload["classification"] = classification
+        payload["policy"].update(self.payload.get("contract_context") or {})
+        if "article10_order_authority" in self.payload:
+            payload["calculation_config"]["article10_order_authority"] = self.payload["article10_order_authority"]
         return payload
 
     def _domain(self) -> str | None:
@@ -902,6 +933,31 @@ class Review:
             return []
 
         conditions: list[str] = []
+        if str(self._bound.get("PS_NOTICE_TIMELINESS") or "").lower() == "true":
+            conditions.append("NOTICE_ADJUDICATION_REQUIRED")
+        if str(self._bound.get("PS_SUBROGATION_IMPAIRED") or "").lower() == "true":
+            conditions.append("SUBROGATION_ADJUDICATION_REQUIRED")
+        if (branch == "PARTIAL_DAMAGE" and self.answer("Q-S4-05") == "ASSESSED_FIGURE"
+                and self._bound.get("PS_ASSESSED_DEPRECIATION") is None):
+            conditions.append("ASSESSED_DEPRECIATION_AMOUNT_REQUIRED")
+        declared_terms: dict[str, Any] = {}
+        for question in ("Q-S6-02", "Q-S6-03", "Q-S6-04"):
+            answer = self.answer(question)
+            if not isinstance(answer, dict):
+                continue
+            for key, value in answer.items():
+                if key == "authority":
+                    continue
+                if key in declared_terms and declared_terms[key] != value:
+                    if "FRANCHISE_TERMS_CONFLICT" not in conditions:
+                        conditions.append("FRANCHISE_TERMS_CONFLICT")
+                declared_terms[key] = value
+        franchise = self._bound.get("PS_FRANCHISE")
+        if isinstance(franchise, dict) and franchise_applicability_gap(
+            franchise, self.payload.get("contract_context") or {},
+            self._bound.get("PS_EVENT_DATE"), branch,
+        ) is not None:
+            conditions.append("FRANCHISE_AUTHORITY_REQUIRED")
         causation = str(self.answer("Q-S2-02") or "").upper()
         if causation == "ASSERTED_ONLY":
             conditions.append("COVERED_PERIL_CAUSATION_NOT_ESTABLISHED")
@@ -916,6 +972,18 @@ class Review:
                 "YES_SAME_INSURER",
             ):
                 conditions.append("MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED")
+        if branch == "TOTAL_LOSS":
+            disposition = self._bound.get("PS_SALVAGE_DISPOSITION")
+            if disposition not in ("INSURED_RETAINS", "INSURER_TAKES_TITLE"):
+                conditions.append("SALVAGE_DISPOSITION_UNRESOLVED")
+            elif disposition == "INSURED_RETAINS" and self._bound.get("PS_SALVAGE_VALUE") is None:
+                conditions.append("SALVAGE_VALUE_REQUIRED")
+        if (
+            branch == "TOTAL_LOSS"
+            and self._bound.get("PS_SALVAGE_DISPOSITION") == "INSURER_TAKES_TITLE"
+            and str(self._bound.get("PS_TITLE_TRANSFERRED") or "").lower() != "true"
+        ):
+            conditions.append("TITLE_TRANSFER_REQUIRED")
         return conditions
 
     def decision(self) -> dict[str, Any]:
@@ -957,6 +1025,12 @@ class Review:
 
         return {
             "decision": kind,
+            "franchise_authority_gap": (
+                franchise_applicability_gap(
+                    self._bound.get("PS_FRANCHISE"), self.payload.get("contract_context") or {},
+                    self._bound.get("PS_EVENT_DATE"), branch,
+                ) if "FRANCHISE_AUTHORITY_REQUIRED" in blocking_conditions else None
+            ),
             "branch": branch,
             "classification_confidence": classification.get("confidence"),
             "tier": self.tier()["assigned"],

@@ -16,6 +16,7 @@ Key resolution, in order:
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from decimal import Decimal
 from pathlib import Path
@@ -57,10 +58,60 @@ def _authorize_fixture_case(
     """Use the visibly non-production path for the authored fixture corpus."""
     del kb  # kept in the signature for the existing fixture/test harness
     return _internal_test_direct_authorize(
-        case_payload,
+        _with_synthetic_authority(case_payload),
         decision=decision,
         purpose="P01-L50_SYNTHETIC_FIXTURE",
     )
+
+
+def _with_synthetic_authority(payload: dict[str, Any]) -> dict[str, Any]:
+    """Compile an authored arithmetic assumption, never a production document.
+
+    Only fixture/test callers use this adapter. Missing identity is preserved;
+    this cannot repair an unversioned rate. It never supplies an event date.
+    Independent authority regressions call the guarded engine without this shim.
+    """
+    from .authority import franchise_identity_gap, franchise_terms
+    from .case import Case
+
+    result = copy.deepcopy(payload.raw if isinstance(payload, Case) else payload)
+    case = Case(result)
+    if case.policy.get("contract_kind") == "INSURANCE_CONTRACT":
+        return result
+    carrier = None
+    for container in (result.get("damage", {}), result.get("vehicle", {}),
+                      result.get("event", {}), result.setdefault("policy", {}), result):
+        for key in ("franchise", "franchise_from_policy", "franchise_amount"):
+            if isinstance(container.get(key), dict):
+                carrier = container[key]
+                break
+        if carrier is not None:
+            break
+    if franchise_identity_gap(carrier) or "authority" in carrier:
+        return result
+    policy = result["policy"]
+    policy.setdefault("insurer", "SYNTHETIC_INSURER")
+    policy.setdefault("product", "SYNTHETIC_BODY")
+    policy.setdefault("policy_reference", carrier["source_reference"])
+    if case.event.get("event_date"):
+        policy.setdefault("policy_date", case.event["event_date"])
+    policy["contract_kind"] = "SYNTHETIC_TEST"
+    # The content identity is of these explicit software assumptions, not a real
+    # insurer artifact or a fabricated domain-review approval.
+    terms = franchise_terms(carrier)
+    carrier["authority"] = {
+        "source_reference": carrier["source_reference"], "source_version": carrier["source_version"],
+        "insurer": policy["insurer"], "product": policy["product"],
+        "policy_reference": policy["policy_reference"],
+        "coverage": [case.branch] if case.branch else ["PARTIAL_DAMAGE", "TOTAL_LOSS", "GLASS_ONLY", "THEFT"],
+        "effective_from": "1300-01-01", "effective_until": "1500-12-29",
+        "source_status": "SYNTHETIC_TEST", "governs_contract": True,
+        "reviewer": "software fixture author; no qualified domain approval",
+        "clause_locator": "explicit synthetic franchise assumption",
+        "document_sha256": hashlib.sha256(json.dumps(terms, sort_keys=True).encode()).hexdigest(),
+        "terms": terms,
+    }
+    return result
 
 
 def load_fixtures(path: Path | str | None = None) -> list[dict[str, Any]]:
@@ -164,6 +215,12 @@ def evaluate_fixture(fixture: dict[str, Any], kb: Knowledge) -> tuple[CalcResult
         coverage_gate = dict(body_admission.get("coverage_gate") or {})
         coverage_gate.update(case_payload.get("coverage_gate") or {})
         case_payload["coverage_gate"] = coverage_gate
+        event = dict(body_admission.get("event") or {})
+        event.update(case_payload.get("event") or {})
+        case_payload["event"] = event
+        evidence = dict(body_admission.get("evidence") or {})
+        evidence.update(case_payload.get("evidence") or {})
+        case_payload["evidence"] = evidence
         policy = dict(body_admission.get("policy") or {})
         policy.update(case_payload.get("policy") or {})
         case_payload["policy"] = policy

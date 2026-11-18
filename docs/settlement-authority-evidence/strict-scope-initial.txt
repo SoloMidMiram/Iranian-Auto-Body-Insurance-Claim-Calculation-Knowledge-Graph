@@ -1,0 +1,2781 @@
+.FFFFFFF.F...FF..F..F.FFFFFF.F................F.FFFFFFFFF.FFFFF....F.... [ 60%]
+..FFFFFFFFFF.FFFFFFFFFFFF.........FF..F........                          [100%]
+================================== FAILURES ===================================
+__ test_engine_blocks_unestablished_positive_covered_peril_causation[False] ___
+
+causation = False
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize("causation", [False, None])
+    def test_engine_blocks_unestablished_positive_covered_peril_causation(causation, kb):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if causation is None:
+            payload.pop("coverage_gate")
+        else:
+            payload["coverage_gate"]["causal_relationship_established"] = causation
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___ test_engine_blocks_unestablished_positive_covered_peril_causation[None] ___
+
+causation = None
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize("causation", [False, None])
+    def test_engine_blocks_unestablished_positive_covered_peril_causation(causation, kb):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if causation is None:
+            payload.pop("coverage_gate")
+        else:
+            payload["coverage_gate"]["causal_relationship_established"] = causation
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_engine_blocks_unsupported_recovery_and_multiple_policy_states[None-RECOVERY_FACTS_REQUIRED] _
+
+multiple_insurance = None, status = 'RECOVERY_FACTS_REQUIRED'
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize(
+        ("multiple_insurance", "status"),
+        [
+            (None, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "UNKNOWN", "prior_compensation": 0}, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "NO", "prior_compensation": 1}, "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"),
+            ({"state": "YES_OTHER_POLICIES", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+            ({"state": "YES_SAME_INSURER", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+        ],
+    )
+    def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
+        multiple_insurance, status, kb
+    ):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if multiple_insurance is None:
+            payload["policy"].pop("multiple_insurance")
+        else:
+            payload["policy"]["multiple_insurance"] = multiple_insurance
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...ource_reference': 'test policy schedule', ...}, 'insurer': 'SYNTHETIC_INSURER', 'product': 'SYNTHETIC_BODY', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance1-RECOVERY_FACTS_REQUIRED] _
+
+multiple_insurance = {'state': 'UNKNOWN', 'prior_compensation': 0}
+status = 'RECOVERY_FACTS_REQUIRED'
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize(
+        ("multiple_insurance", "status"),
+        [
+            (None, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "UNKNOWN", "prior_compensation": 0}, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "NO", "prior_compensation": 1}, "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"),
+            ({"state": "YES_OTHER_POLICIES", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+            ({"state": "YES_SAME_INSURER", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+        ],
+    )
+    def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
+        multiple_insurance, status, kb
+    ):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if multiple_insurance is None:
+            payload["policy"].pop("multiple_insurance")
+        else:
+            payload["policy"]["multiple_insurance"] = multiple_insurance
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,..., ...}, 'multiple_insurance': {'state': 'UNKNOWN', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance2-PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED] _
+
+multiple_insurance = {'state': 'NO', 'prior_compensation': 1}
+status = 'PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED'
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize(
+        ("multiple_insurance", "status"),
+        [
+            (None, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "UNKNOWN", "prior_compensation": 0}, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "NO", "prior_compensation": 1}, "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"),
+            ({"state": "YES_OTHER_POLICIES", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+            ({"state": "YES_SAME_INSURER", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+        ],
+    )
+    def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
+        multiple_insurance, status, kb
+    ):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if multiple_insurance is None:
+            payload["policy"].pop("multiple_insurance")
+        else:
+            payload["policy"]["multiple_insurance"] = multiple_insurance
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 1}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance3-MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED] _
+
+multiple_insurance = {'state': 'YES_OTHER_POLICIES', 'prior_compensation': 0}
+status = 'MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED'
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize(
+        ("multiple_insurance", "status"),
+        [
+            (None, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "UNKNOWN", "prior_compensation": 0}, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "NO", "prior_compensation": 1}, "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"),
+            ({"state": "YES_OTHER_POLICIES", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+            ({"state": "YES_SAME_INSURER", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+        ],
+    )
+    def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
+        multiple_insurance, status, kb
+    ):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if multiple_insurance is None:
+            payload["policy"].pop("multiple_insurance")
+        else:
+            payload["policy"]["multiple_insurance"] = multiple_insurance
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...ltiple_insurance': {'state': 'YES_OTHER_POLICIES', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance4-MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED] _
+
+multiple_insurance = {'state': 'YES_SAME_INSURER', 'prior_compensation': 0}
+status = 'MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED'
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    @pytest.mark.parametrize(
+        ("multiple_insurance", "status"),
+        [
+            (None, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "UNKNOWN", "prior_compensation": 0}, "RECOVERY_FACTS_REQUIRED"),
+            ({"state": "NO", "prior_compensation": 1}, "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"),
+            ({"state": "YES_OTHER_POLICIES", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+            ({"state": "YES_SAME_INSURER", "prior_compensation": 0}, "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED"),
+        ],
+    )
+    def test_engine_blocks_unsupported_recovery_and_multiple_policy_states(
+        multiple_insurance, status, kb
+    ):
+        payload = _case("PARTIAL_DAMAGE", gross=100, franchise=0)
+        if multiple_insurance is None:
+            payload["policy"].pop("multiple_insurance")
+        else:
+            payload["policy"]["multiple_insurance"] = multiple_insurance
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...multiple_insurance': {'state': 'YES_SAME_INSURER', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_____ test_engine_records_the_two_new_admission_guards_on_a_valid_control _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_engine_records_the_two_new_admission_guards_on_a_valid_control(kb):
+>       result = compute(_case("PARTIAL_DAMAGE", gross=100, franchise=0), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_________ test_free_text_that_mentions_a_peril_does_not_exclude_cover _________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_free_text_that_mentions_a_peril_does_not_exclude_cover(kb):
+        narrative = _case(
+            "PARTIAL_DAMAGE",
+            gross=1600,
+            franchise=100,
+            cause="the road flooded after rain but this is not a flood peril code",
+        )
+>       result = compute(narrative, kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 1600, 'cause': 'the road flooded after rain but this is...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+__ test_intoxication_exclusion_requires_both_coded_cause_and_causal_finding ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_intoxication_exclusion_requires_both_coded_cause_and_causal_finding(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE",
+            gross=100,
+            depreciation=0,
+            market=100,
+            insured=100,
+            franchise=10,
+            cause="ALCOHOL",
+        )
+>       not_confirmed = compute(payload, kb)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'depreciation': 0, 'market': 100, 'insured': 100, ...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___________ test_a_declared_branch_matching_evidence_is_reconciled ____________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_a_declared_branch_matching_evidence_is_reconciled(kb):
+        payload = _case("PARTIAL_DAMAGE", gross=1600, franchise=100)
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 1600, 'market': 1000000000000, 'insured': 1000000000000...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_______________ test_engine_derives_when_no_branch_is_declared ________________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_engine_derives_when_no_branch_is_declared(kb):
+>       result = compute(_case(market=2000, insured=2000, repair=1600, franchise=100), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'rescue_for_thr...', 'source_reference': 'test policy schedule', ...}, 'insurer': 'SYNTHETIC_INSURER', 'product': 'SYNTHETIC_BODY', ...}}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_enum at policy.franchise.authority.coverage[0]; invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_____ test_missing_insured_sum_alongside_a_market_value_is_an_input_error _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_missing_insured_sum_alongside_a_market_value_is_an_input_error(kb):
+>       result = compute(_case("PARTIAL_DAMAGE", market=3000, gross=100, franchise=10), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 3000, 'gross': 100, 'depreciation': 0}, 'policy': {'po...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+____ test_missing_market_value_alongside_an_insured_sum_is_an_input_error _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_missing_market_value_alongside_an_insured_sum_is_an_input_error(kb):
+>       result = compute(_case("PARTIAL_DAMAGE", insured=3000, gross=100, franchise=10), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'insured': 3000, 'gross': 100, 'depreciation': 0}, 'policy': {'p...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___ test_missing_both_article10_value_anchors_does_not_default_ratio_to_one ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_missing_both_article10_value_anchors_does_not_default_ratio_to_one(kb):
+        payload = {
+            "claim_id": "missing-economic-anchors",
+            "unit": "IRR",
+            "classification": {"branch": "PARTIAL_DAMAGE"},
+            "damage": {"gross": 100, "depreciation": 0},
+            "coverage_gate": {"causal_relationship_established": True},
+            "policy": {
+                "policy_version": "TEST-v1",
+                "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+                "franchise": {
+                    "mode": "ABSOLUTE",
+                    "absolute_irr": 10,
+                    "source": "POLICY",
+                    "source_reference": "test schedule",
+                    "source_version": "TEST-v1",
+                },
+            },
+        }
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'missing-economic-anchors', 'unit': 'IRR', 'classification': {'branch': 'PARTIAL_DAMAGE'}, 'damage': {'gross': 100, 'depreciation': 0}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_aggregate_partial_damage_does_not_default_missing_depreciation_to_zero _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_aggregate_partial_damage_does_not_default_missing_depreciation_to_zero(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE", gross=100, market=100, insured=100, franchise=10
+        )
+        payload["damage"].pop("depreciation")
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 100, 'insured': 100}, 'policy': {'policy...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______________ test_total_loss_settlement_requires_both_figures _______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_total_loss_settlement_requires_both_figures(kb):
+        payload = _case("TOTAL_LOSS", market=2000, repair=1600, salvage_value=300, franchise=100)
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:358: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'repair': 1600, 'salvage_value': 300, 'rescue_fo...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_____ test_salvage_value_without_disposition_blocks_total_loss_settlement _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_salvage_value_without_disposition_blocks_total_loss_settlement(kb):
+        payload = _case(
+            "TOTAL_LOSS",
+            market=2000,
+            insured=2000,
+            repair=1600,
+            salvage=300,
+            franchise=100,
+        )
+        payload["damage"].pop("salvage_disposition")
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'salvage': 300,...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_______ test_whole_theft_requires_a_bound_clock_and_matching_day_count ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_whole_theft_requires_a_bound_clock_and_matching_day_count(kb):
+        payload = _case(
+            "THEFT",
+            theft_type="WHOLE_VEHICLE",
+            days_missing=65,
+            market=2200,
+            insured=2200,
+            franchise=220,
+            title_transferred=True,
+        )
+        clock = payload.pop("event")
+>       unanchored = compute(payload, kb)
+                     ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 65, 'market': 220...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______________ test_confidence_model_is_computed_from_the_trace _______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_confidence_model_is_computed_from_the_trace(kb):
+        # P01-class claim: every cited rule is explicit regulatory text
+>       confident = compute(
+            _case("PARTIAL_DAMAGE", market=3000, insured=3000, gross=100, depreciation=0, franchise=10),
+            kb,
+        )
+
+tests\test_engine.py:606: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 3000, 'insured': 3000, 'gross': 100, 'depreciation': 0...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______________ test_provenance_is_attached_for_every_cited_rule _______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_provenance_is_attached_for_every_cited_rule(kb):
+>       result = compute(
+            _case("PARTIAL_DAMAGE", market=3000, insured=3000, gross=100, franchise=10), kb
+        )
+
+tests\test_engine.py:631: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 3000, 'insured': 3000, 'gross': 100, 'depreciation': 0...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+__________ test_depreciation_is_zero_for_glass_inside_a_mixed_claim ___________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_depreciation_is_zero_for_glass_inside_a_mixed_claim(kb):
+        payload = _case(
+                "PARTIAL_DAMAGE",
+                gross=80,
+                production_year=1405,
+                replacement_parts=[{"type": "GLASS", "loss": 80}],
+                franchise=16,
+        )
+        payload["regulatory_snapshot"] = {"iranian_year": 1405}
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:652: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 80, 'production_year': 1405, 'replacement_parts': [{'ty...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______________ test_rescue_cap_base_is_recorded_and_configurable ______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_rescue_cap_base_is_recorded_and_configurable(kb):
+        payload = _case("PARTIAL_DAMAGE", gross=200, franchise=20, actual_rescue=60)
+        payload["calculation_config"] = {"rescue_cap_base": "ELIGIBLE_GROSS"}
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:660: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 200, 'actual_rescue': 60, 'market': 1000000000000, 'ins...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_actual_and_payable_rescue_operands_remain_distinct_through_calculation _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_actual_and_payable_rescue_operands_remain_distinct_through_calculation(kb):
+        actual_only = _case(
+            "PARTIAL_DAMAGE", gross=1000, franchise=0, actual_rescue=300
+        )
+        actual_only["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+>       actual_result = compute(actual_only, kb)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:670: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 1000, 'actual_rescue': 300, 'market': 1000000000000, 'i...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_______ test_supplied_rescue_payable_above_actual_or_ceiling_is_refused _______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_supplied_rescue_payable_above_actual_or_ceiling_is_refused(kb):
+        above_actual = _case(
+            "PARTIAL_DAMAGE",
+            gross=1000,
+            franchise=0,
+            actual_rescue=100,
+            rescue_payable=150,
+        )
+        above_actual["calculation_config"] = {"rescue_cap_base": "ASSESSED_GROSS"}
+>       result = compute(above_actual, kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:729: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 1000, 'actual_rescue': 100, 'rescue_payable': 150, 'mar...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___ test_material_rescue_denominator_difference_blocks_when_base_is_missing ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_material_rescue_denominator_difference_blocks_when_base_is_missing(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE",
+            gross=1000,
+            depreciation=900,
+            market=1000,
+            insured=1000,
+            actual_rescue=100,
+            franchise=0,
+        )
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:752: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 1000, 'depreciation': 900, 'market': 1000, 'insured': 1...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___ test_zero_supplied_rescue_does_not_block_on_non_positive_candidate_base ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_zero_supplied_rescue_does_not_block_on_non_positive_candidate_base(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE",
+            gross=100,
+            depreciation=120,
+            market=100,
+            insured=100,
+            rescue_payable=0,
+            franchise=0,
+        )
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:769: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'depreciation': 120, 'market': 100, 'insured': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_positive_supplied_rescue_still_blocks_on_material_candidate_difference _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_positive_supplied_rescue_still_blocks_on_material_candidate_difference(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE",
+            gross=1000,
+            depreciation=900,
+            market=1000,
+            insured=1000,
+            rescue_payable=100,
+            franchise=0,
+        )
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:789: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 1000, 'depreciation': 900, 'market': 1000, 'insured': 1...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+________________ test_percentage_franchise_uses_the_named_base ________________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_percentage_franchise_uses_the_named_base(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE", gross=100, depreciation=20, market=100, insured=100
+        )
+        payload["policy"] = {
+            "policy_version": "TEST-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+            "franchise": {
+                "mode": "PERCENT",
+                "rate": 0.1,
+                "calculation_base": "ASSESSED_GROSS",
+                "source": "POLICY",
+                "source_reference": "test schedule",
+                "source_version": "TEST-v1",
+            },
+        }
+>       assessed = compute(payload, kb)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:817: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'depreciation': 20, 'market': 100, 'insured': 100}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_total_loss_percentage_franchise_distinguishes_settlement_base_from_after_salvage _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_total_loss_percentage_franchise_distinguishes_settlement_base_from_after_salvage(kb):
+>       settlement_base = compute(
+            _total_loss_with_percentage_franchise("SETTLEMENT_BASE"), kb
+        )
+
+tests\test_engine.py:877: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'salvage': 300, ...}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_total_loss_title_transfer_makes_salvage_deduction_zero[SETTLEMENT_BASE] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+calculation_base = 'SETTLEMENT_BASE'
+
+    @pytest.mark.parametrize("calculation_base", ["SETTLEMENT_BASE", "AFTER_SALVAGE"])
+    def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_base):
+        payload = _total_loss_with_percentage_franchise(calculation_base)
+        payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+        payload["damage"]["title_transferred"] = True
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:904: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'salvage': 300, ...}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_total_loss_title_transfer_makes_salvage_deduction_zero[AFTER_SALVAGE] __
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+calculation_base = 'AFTER_SALVAGE'
+
+    @pytest.mark.parametrize("calculation_base", ["SETTLEMENT_BASE", "AFTER_SALVAGE"])
+    def test_total_loss_title_transfer_makes_salvage_deduction_zero(kb, calculation_base):
+        payload = _total_loss_with_percentage_franchise(calculation_base)
+        payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+        payload["damage"]["title_transferred"] = True
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:904: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'salvage': 300, ...}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______ test_physical_total_loss_requires_completed_title_transfer[false] ______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+title_transferred = False
+
+    @pytest.mark.parametrize("title_transferred", [False, None], ids=("false", "missing"))
+    def test_physical_total_loss_requires_completed_title_transfer(
+        kb, title_transferred
+    ):
+        payload = _total_loss_with_percentage_franchise("SETTLEMENT_BASE")
+        payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+        if title_transferred is not None:
+            payload["damage"]["title_transferred"] = title_transferred
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'salvage': 300, ...}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_____ test_physical_total_loss_requires_completed_title_transfer[missing] _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+title_transferred = None
+
+    @pytest.mark.parametrize("title_transferred", [False, None], ids=("false", "missing"))
+    def test_physical_total_loss_requires_completed_title_transfer(
+        kb, title_transferred
+    ):
+        payload = _total_loss_with_percentage_franchise("SETTLEMENT_BASE")
+        payload["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+        if title_transferred is not None:
+            payload["damage"]["title_transferred"] = title_transferred
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 2000, 'insured': 2000, 'repair': 1600, 'salvage': 300, ...}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+____ test_interest_of_the_insured_is_reported_for_a_single_payable_result _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_interest_of_the_insured_is_reported_for_a_single_payable_result(kb):
+>       result = compute(_case("PARTIAL_DAMAGE", gross=100, franchise=10), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:985: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000,...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______ test_versioned_policy_evidence_can_explicitly_set_zero_franchise _______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_versioned_policy_evidence_can_explicitly_set_zero_franchise(kb):
+        payload = _case("PARTIAL_DAMAGE", gross=100)
+        payload["policy"] = {
+            "policy_version": "BODY-1405-v1",
+            "multiple_insurance": {"state": "NO", "prior_compensation": 0},
+            "franchise": {
+                "mode": "ABSOLUTE",
+                "absolute_irr": 0,
+                "source": "POLICY",
+                "source_reference": "declarations page, franchise line",
+                "source_version": "BODY-1405-v1",
+            },
+        }
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'gross': 100, 'market': 1000000000000, 'insured': 1000000000000, 'depreciation': 0}, 'coverage_gate': {'causal_relationship_established': True}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___ test_total_loss_below_or_at_75_percent_is_a_classification_conflict[74] ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+repair = 74
+
+    @pytest.mark.parametrize("repair", [74, 75])
+    def test_total_loss_below_or_at_75_percent_is_a_classification_conflict(kb, repair):
+>       result = compute(
+            _case(
+                "TOTAL_LOSS",
+                market=100,
+                insured=100,
+                repair=repair,
+                franchise=10,
+            ),
+            kb,
+        )
+
+tests\test_engine.py:1063: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100, 'repair': 74, 'rescue_for_thresho...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___ test_total_loss_below_or_at_75_percent_is_a_classification_conflict[75] ___
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+repair = 75
+
+    @pytest.mark.parametrize("repair", [74, 75])
+    def test_total_loss_below_or_at_75_percent_is_a_classification_conflict(kb, repair):
+>       result = compute(
+            _case(
+                "TOTAL_LOSS",
+                market=100,
+                insured=100,
+                repair=repair,
+                franchise=10,
+            ),
+            kb,
+        )
+
+tests\test_engine.py:1063: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100, 'repair': 75, 'rescue_for_thresho...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+________ test_total_loss_one_rial_above_75_percent_matches_and_settles ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_total_loss_one_rial_above_75_percent_matches_and_settles(kb):
+>       result = compute(
+            _case("TOTAL_LOSS", market=100, insured=100, repair=76, franchise=10,
+                  salvage=0, salvage_disposition="INSURED_RETAINS"), kb
+        )
+
+tests\test_engine.py:1084: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100, 'repair': 76, 'salvage': 0, ...},...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+________ test_total_loss_threshold_counts_repair_and_rescue_components ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_total_loss_threshold_counts_repair_and_rescue_components(kb):
+>       result = compute(
+            _case(
+                "TOTAL_LOSS",
+                market=100,
+                insured=100,
+                repair=70,
+                rescue_for_threshold=6,
+                franchise=10,
+                salvage=0,
+                salvage_disposition="INSURED_RETAINS",
+            ),
+            kb,
+        )
+
+tests\test_engine.py:1096: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100, 'repair': 70, 'rescue_for_thresho...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_unequal_actual_and_classification_rescue_needs_accepted_interpretation _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_unequal_actual_and_classification_rescue_needs_accepted_interpretation(kb):
+>       result = compute(
+            _case(
+                "PARTIAL_DAMAGE",
+                market=10000,
+                insured=10000,
+                repair=7400,
+                actual_rescue=200,
+                rescue_for_threshold=100,
+                franchise=0,
+            ),
+            kb,
+        )
+
+tests\test_engine.py:1116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 10000, 'insured': 10000, 'repair': 7400, 'actual_rescu...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______ test_embedded_rescue_must_be_decomposed_before_threshold_addition ______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_embedded_rescue_must_be_decomposed_before_threshold_addition(kb):
+>       result = compute(
+            _case(
+                "PARTIAL_DAMAGE",
+                market=10000,
+                insured=10000,
+                repair=7400,
+                actual_rescue=200,
+                repair_total_includes_rescue=True,
+                franchise=0,
+            ),
+            kb,
+        )
+
+tests\test_engine.py:1135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 10000, 'insured': 10000, 'repair': 7400, 'actual_rescu...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_____ test_missing_material_rescue_blocks_internal_partial_payment[True] ______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+declared_branch = True
+
+    @pytest.mark.parametrize("declared_branch", [True, False])
+    def test_missing_material_rescue_blocks_internal_partial_payment(kb, declared_branch):
+        payload = _case_without_rescue_default(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            gross=7400,
+            repair=7400,
+            franchise=0,
+        )
+        if not declared_branch:
+            payload["classification"].pop("branch")
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 10000, 'insured': 10000, 'gross': 7400, 'repair': 7400...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_____ test_missing_material_rescue_blocks_internal_partial_payment[False] _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+declared_branch = False
+
+    @pytest.mark.parametrize("declared_branch", [True, False])
+    def test_missing_material_rescue_blocks_internal_partial_payment(kb, declared_branch):
+        payload = _case_without_rescue_default(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            gross=7400,
+            repair=7400,
+            franchise=0,
+        )
+        if not declared_branch:
+            payload["classification"].pop("branch")
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 10000, 'insured': 10000, 'gross': 7400, 'repair': 7400...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_enum at policy.franchise.authority.coverage[0]; invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_______ test_missing_material_rescue_cannot_be_overridden_into_payment ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_missing_material_rescue_cannot_be_overridden_into_payment(kb):
+        payload = _case_without_rescue_default(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            gross=7400,
+            repair=7400,
+            franchise=0,
+        )
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "documented partial-loss branch selection",
+            "source": "review-board-record-2026-42",
+            "timestamp": "2026-10-12T04:00:00Z",
+        }
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1188: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 10000, 'insured': 10000, 'gross': 7400, 'repair': 7400...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_override_into_threshold_branch_cannot_bypass_missing_rescue[PARTIAL_DAMAGE] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+declared_branch = 'PARTIAL_DAMAGE'
+
+    @pytest.mark.parametrize("declared_branch", ["PARTIAL_DAMAGE", "GLASS_ONLY"])
+    def test_override_into_threshold_branch_cannot_bypass_missing_rescue(
+        kb, declared_branch
+    ):
+        payload = _case_without_rescue_default(
+            declared_branch,
+            theft_type="WHOLE_VEHICLE",
+            days_missing=10,
+            market=10000,
+            insured=10000,
+            gross=7400,
+            repair=7400,
+            franchise=0,
+        )
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "documented non-theft branch selection",
+            "source": "review-board-record-2026-44",
+            "timestamp": "2026-10-12T06:00:00Z",
+        }
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'market': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_override_into_threshold_branch_cannot_bypass_missing_rescue[GLASS_ONLY] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+declared_branch = 'GLASS_ONLY'
+
+    @pytest.mark.parametrize("declared_branch", ["PARTIAL_DAMAGE", "GLASS_ONLY"])
+    def test_override_into_threshold_branch_cannot_bypass_missing_rescue(
+        kb, declared_branch
+    ):
+        payload = _case_without_rescue_default(
+            declared_branch,
+            theft_type="WHOLE_VEHICLE",
+            days_missing=10,
+            market=10000,
+            insured=10000,
+            gross=7400,
+            repair=7400,
+            franchise=0,
+        )
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "documented non-theft branch selection",
+            "source": "review-board-record-2026-44",
+            "timestamp": "2026-10-12T06:00:00Z",
+        }
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'market': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_override_selected_total_loss_requires_repair_assessment[explicit-zero-rescue] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+rescue_inputs = {'rescue_for_threshold': 0}
+
+    @pytest.mark.parametrize(
+        "rescue_inputs",
+        [
+            {"rescue_for_threshold": 0},
+            {"actual_rescue": 200},
+            {},
+        ],
+        ids=("explicit-zero-rescue", "actual-rescue", "rescue-omitted"),
+    )
+    def test_override_selected_total_loss_requires_repair_assessment(kb, rescue_inputs):
+>       result = compute(_theft_derived_total_loss_override(**rescue_inputs), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'market': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_override_selected_total_loss_requires_repair_assessment[actual-rescue] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+rescue_inputs = {'actual_rescue': 200}
+
+    @pytest.mark.parametrize(
+        "rescue_inputs",
+        [
+            {"rescue_for_threshold": 0},
+            {"actual_rescue": 200},
+            {},
+        ],
+        ids=("explicit-zero-rescue", "actual-rescue", "rescue-omitted"),
+    )
+    def test_override_selected_total_loss_requires_repair_assessment(kb, rescue_inputs):
+>       result = compute(_theft_derived_total_loss_override(**rescue_inputs), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'market': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_override_selected_total_loss_requires_repair_assessment[rescue-omitted] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+rescue_inputs = {}
+
+    @pytest.mark.parametrize(
+        "rescue_inputs",
+        [
+            {"rescue_for_threshold": 0},
+            {"actual_rescue": 200},
+            {},
+        ],
+        ids=("explicit-zero-rescue", "actual-rescue", "rescue-omitted"),
+    )
+    def test_override_selected_total_loss_requires_repair_assessment(kb, rescue_inputs):
+>       result = compute(_theft_derived_total_loss_override(**rescue_inputs), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'market': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+________ test_override_selected_total_loss_requires_event_market_value ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_override_selected_total_loss_requires_event_market_value(kb):
+        payload = _theft_derived_total_loss_override(
+            repair=7400,
+            rescue_for_threshold=0,
+        )
+        payload["damage"].pop("market")
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'insured': 10...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_theft_derived_total_loss_override_with_complete_operands_remains_available _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_theft_derived_total_loss_override_with_complete_operands_remains_available(kb):
+>       result = compute(
+            _theft_derived_total_loss_override(
+                repair=7400,
+                rescue_for_threshold=0,
+            ),
+            kb,
+        )
+
+tests\test_engine.py:1309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'theft_type': 'WHOLE_VEHICLE', 'days_missing': 10, 'market': 100...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+___________ test_omitted_rescue_needs_explicit_legacy_compatibility ___________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_omitted_rescue_needs_explicit_legacy_compatibility(kb):
+        payload = _case(
+            "PARTIAL_DAMAGE",
+            market=10000,
+            insured=10000,
+            gross=7400,
+            repair=7400,
+            rescue_omission_legacy_compatibility=True,
+            franchise=0,
+        )
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 10000, 'insured': 10000, 'gross': 7400, 'repair': 7400...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+______ test_declared_total_loss_without_repair_evidence_is_insufficient _______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_declared_total_loss_without_repair_evidence_is_insufficient(kb):
+>       result = compute(_case("TOTAL_LOSS", market=100, insured=100, franchise=10), kb)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1343: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100}, 'policy': {'policy_version': 'TE...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands(
+        kb,
+    ):
+        payload = _case(
+            "TOTAL_LOSS", market=100, insured=100, repair=74, franchise=10,
+            salvage=0, salvage_disposition="INSURED_RETAINS"
+        )
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "destructive inspection made repair estimate unavailable",
+            "source": "review-board-record-2026-41",
+            "timestamp": "2026-10-02T04:00:00Z",
+        }
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100, 'repair': 74, 'salvage': 0, ...},...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+_ test_total_loss_override_cannot_bypass_unresolved_rescue[conflicting-rescue] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+inputs = {'market': 100, 'insured': 100, 'actual_rescue': 20, 'rescue_for_threshold': 10}
+reason_fragment = 'actual and explicit classification rescue differ'
+
+    @pytest.mark.parametrize(
+        ("inputs", "reason_fragment"),
+        [
+            (
+                {
+                    "market": 100,
+                    "insured": 100,
+                    "actual_rescue": 20,
+                    "rescue_for_threshold": 10,
+                },
+                "actual and explicit classification rescue differ",
+            ),
+            (
+                {
+                    "insured": 100,
+                    "repair": 80,
+                    "actual_rescue": 10,
+                    "repair_total_includes_rescue": True,
+                },
+                "repair/replacement already includes rescue",
+            ),
+        ],
+        ids=("conflicting-rescue", "embedded-rescue"),
+    )
+    def test_total_loss_override_cannot_bypass_unresolved_rescue(
+        kb, inputs, reason_fragment
+    ):
+        payload = _case("TOTAL_LOSS", franchise=10, **inputs)
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "documented total-loss branch selection",
+            "source": "review-board-record-2026-43",
+            "timestamp": "2026-10-12T05:00:00Z",
+        }
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1410: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'market': 100, 'insured': 100, 'actual_rescue': 20, 'rescue_for_...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+__ test_total_loss_override_cannot_bypass_unresolved_rescue[embedded-rescue] __
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+inputs = {'insured': 100, 'repair': 80, 'actual_rescue': 10, 'repair_total_includes_rescue': True}
+reason_fragment = 'repair/replacement already includes rescue'
+
+    @pytest.mark.parametrize(
+        ("inputs", "reason_fragment"),
+        [
+            (
+                {
+                    "market": 100,
+                    "insured": 100,
+                    "actual_rescue": 20,
+                    "rescue_for_threshold": 10,
+                },
+                "actual and explicit classification rescue differ",
+            ),
+            (
+                {
+                    "insured": 100,
+                    "repair": 80,
+                    "actual_rescue": 10,
+                    "repair_total_includes_rescue": True,
+                },
+                "repair/replacement already includes rescue",
+            ),
+        ],
+        ids=("conflicting-rescue", "embedded-rescue"),
+    )
+    def test_total_loss_override_cannot_bypass_unresolved_rescue(
+        kb, inputs, reason_fragment
+    ):
+        payload = _case("TOTAL_LOSS", franchise=10, **inputs)
+        payload["classification"]["override"] = {
+            "authorized": True,
+            "actor": "senior-adjuster-17",
+            "reason": "documented total-loss branch selection",
+            "source": "review-board-record-2026-43",
+            "timestamp": "2026-10-12T05:00:00Z",
+        }
+    
+>       result = compute(payload, kb)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_engine.py:1410: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\admission_shim.py:27: in compute
+    return compute_authorized(_authorize_fixture_case(raw, knowledge), knowledge)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\fixtures.py:60: in _authorize_fixture_case
+    return _internal_test_direct_authorize(
+src\iran_auto_claim\admission.py:293: in _internal_test_direct_authorize
+    return _issue_authorization(
+src\iran_auto_claim\admission.py:226: in _issue_authorization
+    case = validated_case(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\iran_auto_claim\schema_input.py:91: in validated_case
+    validate_claim(raw)
+src\iran_auto_claim\schema_input.py:69: in validate_claim
+    _require(payload, _load(CLAIM_SCHEMA))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'engine-test', 'unit': 'IRR', 'damage': {'insured': 100, 'repair': 80, 'actual_rescue': 10, 'repair_total...dule', ...}, 'multiple_insurance': {'state': 'NO', 'prior_compensation': 0}, 'insurer': 'SYNTHETIC_INSURER', ...}, ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'iran-auto-claim.schema.json', 'title': 'Iran Auto .... Where authority leaves an operation unresolved the case must state that explicitly rather than omit the field.', ...}
+
+    def _require(payload: Any, schema: dict[str, Any]) -> None:
+        issues: list[SchemaIssue] = []
+        _check(payload, schema, "", issues)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: invalid_type at policy.policy_date
+
+src\iran_auto_claim\schema_input.py:116: InputSchemaError
+________ test_stage0_control_supported_review_path_remains_collectable ________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_stage0_control_supported_review_path_remains_collectable(kb):
+        result = Review(_review_case(), kb).calculate()
+>       assert result is not None
+E       assert None is not None
+
+tests\test_stage0_counterexamples.py:69: AssertionError
+____ test_stage0_control_complete_internal_total_loss_remains_collectable _____
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_stage0_control_complete_internal_total_loss_remains_collectable(kb):
+        payload = _total_loss_direct_case()
+        payload["vehicle"].update(
+            {
+                "salvage_value_irr": 300,
+                "salvage_disposition": "INSURED_RETAINS",
+            }
+        )
+        result = compute(
+            _internal_test_direct_authorize(payload, purpose="STAGE0_SUPPORTED_CONTROL"),
+            kb,
+        )
+>       assert result.payable == 1600
+E       AssertionError: assert None == 1600
+E        +  where None = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='stage0-ia14-total', unit='IRR', payable=None, p...: 'sha256:104942bbc5858bba6e3a005a5347e04b0aa480fe6cb775f603c597ebaf55c00c', 'issued_at': '2026-11-01T18:27:37+00:00'}).payable
+
+tests\test_stage0_counterexamples.py:86: AssertionError
+_______ test_ia03_repair_only_component_has_no_replacement_depreciation _______
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000021C62235B50>
+
+    def test_ia03_repair_only_component_has_no_replacement_depreciation(kb):
+        payload = _review_case()
+        payload["answers"]["Q-S4-03"] = [
+            {
+                "category": "REPAIR_ONLY",
+                "assessed_loss": 1200000000,
+                "requires_replacement": False,
+            }
+        ]
+        result = Review(payload, kb).calculate()
+>       assert result is not None
+E       assert None is not None
+
+tests\test_stage0_counterexamples.py:117: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_engine.py::test_engine_blocks_unestablished_positive_covered_peril_causation[False]
+FAILED tests/test_engine.py::test_engine_blocks_unestablished_positive_covered_peril_causation[None]
+FAILED tests/test_engine.py::test_engine_blocks_unsupported_recovery_and_multiple_policy_states[None-RECOVERY_FACTS_REQUIRED]
+FAILED tests/test_engine.py::test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance1-RECOVERY_FACTS_REQUIRED]
+FAILED tests/test_engine.py::test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance2-PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED]
+FAILED tests/test_engine.py::test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance3-MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED]
+FAILED tests/test_engine.py::test_engine_blocks_unsupported_recovery_and_multiple_policy_states[multiple_insurance4-MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED]
+FAILED tests/test_engine.py::test_engine_records_the_two_new_admission_guards_on_a_valid_control
+FAILED tests/test_engine.py::test_free_text_that_mentions_a_peril_does_not_exclude_cover
+FAILED tests/test_engine.py::test_intoxication_exclusion_requires_both_coded_cause_and_causal_finding
+FAILED tests/test_engine.py::test_a_declared_branch_matching_evidence_is_reconciled
+FAILED tests/test_engine.py::test_engine_derives_when_no_branch_is_declared
+FAILED tests/test_engine.py::test_missing_insured_sum_alongside_a_market_value_is_an_input_error
+FAILED tests/test_engine.py::test_missing_market_value_alongside_an_insured_sum_is_an_input_error
+FAILED tests/test_engine.py::test_missing_both_article10_value_anchors_does_not_default_ratio_to_one
+FAILED tests/test_engine.py::test_aggregate_partial_damage_does_not_default_missing_depreciation_to_zero
+FAILED tests/test_engine.py::test_total_loss_settlement_requires_both_figures
+FAILED tests/test_engine.py::test_salvage_value_without_disposition_blocks_total_loss_settlement
+FAILED tests/test_engine.py::test_whole_theft_requires_a_bound_clock_and_matching_day_count
+FAILED tests/test_engine.py::test_confidence_model_is_computed_from_the_trace
+FAILED tests/test_engine.py::test_provenance_is_attached_for_every_cited_rule
+FAILED tests/test_engine.py::test_depreciation_is_zero_for_glass_inside_a_mixed_claim
+FAILED tests/test_engine.py::test_rescue_cap_base_is_recorded_and_configurable
+FAILED tests/test_engine.py::test_actual_and_payable_rescue_operands_remain_distinct_through_calculation
+FAILED tests/test_engine.py::test_supplied_rescue_payable_above_actual_or_ceiling_is_refused
+FAILED tests/test_engine.py::test_material_rescue_denominator_difference_blocks_when_base_is_missing
+FAILED tests/test_engine.py::test_zero_supplied_rescue_does_not_block_on_non_positive_candidate_base
+FAILED tests/test_engine.py::test_positive_supplied_rescue_still_blocks_on_material_candidate_difference
+FAILED tests/test_engine.py::test_percentage_franchise_uses_the_named_base - ...
+FAILED tests/test_engine.py::test_total_loss_percentage_franchise_distinguishes_settlement_base_from_after_salvage
+FAILED tests/test_engine.py::test_total_loss_title_transfer_makes_salvage_deduction_zero[SETTLEMENT_BASE]
+FAILED tests/test_engine.py::test_total_loss_title_transfer_makes_salvage_deduction_zero[AFTER_SALVAGE]
+FAILED tests/test_engine.py::test_physical_total_loss_requires_completed_title_transfer[false]
+FAILED tests/test_engine.py::test_physical_total_loss_requires_completed_title_transfer[missing]
+FAILED tests/test_engine.py::test_interest_of_the_insured_is_reported_for_a_single_payable_result
+FAILED tests/test_engine.py::test_versioned_policy_evidence_can_explicitly_set_zero_franchise
+FAILED tests/test_engine.py::test_total_loss_below_or_at_75_percent_is_a_classification_conflict[74]
+FAILED tests/test_engine.py::test_total_loss_below_or_at_75_percent_is_a_classification_conflict[75]
+FAILED tests/test_engine.py::test_total_loss_one_rial_above_75_percent_matches_and_settles
+FAILED tests/test_engine.py::test_total_loss_threshold_counts_repair_and_rescue_components
+FAILED tests/test_engine.py::test_unequal_actual_and_classification_rescue_needs_accepted_interpretation
+FAILED tests/test_engine.py::test_embedded_rescue_must_be_decomposed_before_threshold_addition
+FAILED tests/test_engine.py::test_missing_material_rescue_blocks_internal_partial_payment[True]
+FAILED tests/test_engine.py::test_missing_material_rescue_blocks_internal_partial_payment[False]
+FAILED tests/test_engine.py::test_missing_material_rescue_cannot_be_overridden_into_payment
+FAILED tests/test_engine.py::test_override_into_threshold_branch_cannot_bypass_missing_rescue[PARTIAL_DAMAGE]
+FAILED tests/test_engine.py::test_override_into_threshold_branch_cannot_bypass_missing_rescue[GLASS_ONLY]
+FAILED tests/test_engine.py::test_override_selected_total_loss_requires_repair_assessment[explicit-zero-rescue]
+FAILED tests/test_engine.py::test_override_selected_total_loss_requires_repair_assessment[actual-rescue]
+FAILED tests/test_engine.py::test_override_selected_total_loss_requires_repair_assessment[rescue-omitted]
+FAILED tests/test_engine.py::test_override_selected_total_loss_requires_event_market_value
+FAILED tests/test_engine.py::test_theft_derived_total_loss_override_with_complete_operands_remains_available
+FAILED tests/test_engine.py::test_omitted_rescue_needs_explicit_legacy_compatibility
+FAILED tests/test_engine.py::test_declared_total_loss_without_repair_evidence_is_insufficient
+FAILED tests/test_engine.py::test_documented_authorized_override_can_select_declared_total_loss_with_complete_operands
+FAILED tests/test_engine.py::test_total_loss_override_cannot_bypass_unresolved_rescue[conflicting-rescue]
+FAILED tests/test_engine.py::test_total_loss_override_cannot_bypass_unresolved_rescue[embedded-rescue]
+FAILED tests/test_stage0_counterexamples.py::test_stage0_control_supported_review_path_remains_collectable
+FAILED tests/test_stage0_counterexamples.py::test_stage0_control_complete_internal_total_loss_remains_collectable
+FAILED tests/test_stage0_counterexamples.py::test_ia03_repair_only_component_has_no_replacement_depreciation
+60 failed, 59 passed in 7.74s

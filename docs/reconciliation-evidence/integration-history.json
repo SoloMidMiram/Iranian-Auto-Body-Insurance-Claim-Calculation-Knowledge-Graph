@@ -1,0 +1,91 @@
+{
+  "base": "cd7fb39a0b7859f2cec91b94770e240ab62e0b75",
+  "candidate": "5cee269bce51653adb4b1e216ee0fad15db5144e",
+  "candidate_tree": "608eeeb8bad8ca92f6cd5bf7d74a9e4a629fd982",
+  "method": "Exact ordered additions/deletions per file, omitting hunk context and blob IDs; docs/MUTATION_REPORT.md excluded as generated combined-state evidence. No approval inferred.",
+  "rows": [
+    {
+      "pr": 57,
+      "remote_commit": "1fcda6490d46dbb8e487483f00bcd2fad06c5917",
+      "equivalent_local_commits": [
+        "21c1f66bdcdad53304019751178dfe4184d837dc"
+      ],
+      "ordered_change_sha256": "c767006839be86a6907e6049bf16072a13f572d1845915b895c20b1e2636afa9",
+      "exactly_once": true
+    },
+    {
+      "pr": 57,
+      "remote_commit": "fa214d940cbfe79389ff1269800e52a69bff13b8",
+      "equivalent_local_commits": [
+        "ff6bf48ad83710972e94af23acbcb38cd7c8a5b7"
+      ],
+      "ordered_change_sha256": "cdda83487ba6c4f5db53496f47f4882ce9aa353cc9cf61f9983efae71f3530eb",
+      "exactly_once": true
+    },
+    {
+      "pr": 57,
+      "remote_commit": "e19a0aec4babaf2f07b02ec4a3fa7aa752c6b3c5",
+      "equivalent_local_commits": [
+        "8b35454cc49aa8185e46f7b2175932826a82475c"
+      ],
+      "ordered_change_sha256": "f1ea13121d81c312296dbad05c4c3f9f17b1b489302837e08b59d24d2d698294",
+      "exactly_once": true
+    },
+    {
+      "pr": 57,
+      "remote_commit": "58231f667aac308c0de4da1f989099f3ba6eda30",
+      "equivalent_local_commits": [
+        "4837f0c8893e1ca566500d1eb4ed0082e32544e2"
+      ],
+      "ordered_change_sha256": "fa6542dec64fdeefe376422d5f92eab58ce88ccd71a39db46d721d5a1653ee10",
+      "exactly_once": true
+    },
+    {
+      "pr": 57,
+      "remote_commit": "09b07b35e1e20f87ab994ec9b656df379bf85b8d",
+      "equivalent_local_commits": [
+        "6f91579f3e268c17fa25f2c0839b6e7ce5b8a29c"
+      ],
+      "ordered_change_sha256": "ea61d77c433ad7226a32e1a5b35dd2eda35b8a293a1e67ac8bd1bae631432d1a",
+      "exactly_once": true
+    },
+    {
+      "pr": 57,
+      "remote_commit": "ef3e8c79275238dd70a67775185e75dfb092ed55",
+      "equivalent_local_commits": [
+        "d59cc21ebe9565acbf102f80dd0c79c1a25d7100"
+      ],
+      "ordered_change_sha256": "1f855b14316312585d5c31923bab7af5ed40a3ed6793734848dd25d5b41e108f",
+      "exactly_once": true
+    },
+    {
+      "pr": 57,
+      "remote_commit": "cb7bce78e8704378539f915f5d4ffd9be943a597",
+      "equivalent_local_commits": [
+        "0964085210047c544d3a70642c05db0916eaa8d5"
+      ],
+      "ordered_change_sha256": "8e55c9522730ead961a02b699d865f90de4fbba68b92eadb0e145d7d2692a591",
+      "exactly_once": true
+    },
+    {
+      "pr": 58,
+      "remote_commit": "49b2446f4ac2674f5bbbd81b5d3bc513e1e77133",
+      "equivalent_local_commits": [
+        "72fca7dafe2f8d0c8bcc1638d887b63f644a30fa"
+      ],
+      "ordered_change_sha256": "a10f1e5cd32f677d5fb28d6794ab94dd16ef0a979cdcc3868b03c7240eef923c",
+      "exactly_once": true
+    },
+    {
+      "pr": 59,
+      "remote_commit": "1e41c67c7f892526f52aecd40267709592383444",
+      "equivalent_local_commits": [
+        "40008705c6bddd25eab5e7277a8e145509bdd4ac"
+      ],
+      "ordered_change_sha256": "6868d867c6e311e0fb99adbe6a4498d49c2aedaeab5eff7adcb6c53bd1e70dc8",
+      "exactly_once": true
+    }
+  ],
+  "passed": true,
+  "executable_paths_unchanged_since_candidate": true
+}

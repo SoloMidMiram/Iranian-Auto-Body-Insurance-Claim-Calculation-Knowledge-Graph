@@ -1,0 +1,114 @@
+......F..F.FF                                                            [100%]
+================================== FAILURES ===================================
+__________ test_ia05_incomplete_title_transfer_cannot_pay_total_loss __________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000225D9228B50>
+
+    @pytest.mark.xfail(strict=True, reason="IA-05: insurer-title settlement requires completed transfer")
+    def test_ia05_incomplete_title_transfer_cannot_pay_total_loss(kb):
+        payload = _review_case()
+        payload["answers"]["Q-S4-03"][0]["assessed_loss"] = 6500000000
+        payload["answers"]["Q-S4-08"] = 1000000000
+        payload["answers"]["Q-S4-09"] = "INSURER_TAKES_TITLE"
+        payload["answers"]["Q-S4-06"] = "NOT_TRANSFERRED"
+        payload["evidence_present"] += [
+            "EVT_SALVAGE_VALUATION",
+            "EVT_TITLE_TRANSFER_PROOF",
+        ]
+        for question in ("Q-S6-02", "Q-S6-03"):
+            payload["answers"][question]["calculation_base"] = "SETTLEMENT_BASE"
+>       _assert_review_does_not_pay(payload, kb)
+
+tests\test_stage0_counterexamples.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'REVIEW-T1-FULLCOVER-PARTIAL', 'unit': 'IRR', 'note': 'Rung T1: a fully covered partial loss on a sixth-p...AIM_FORM', 'EVT_POLICY_COPY', 'EVT_PROPOSAL_FORM', 'EVT_PREMIUM_PROOF', 'EVT_LICENCE', 'EVT_OWNERSHIP_DOCS', ...], ...}
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000225D9228B50>
+
+    def _assert_review_does_not_pay(payload: dict, kb) -> None:
+        try:
+            result = Review(payload, kb).calculate()
+        except InputSchemaError:
+            return
+>       assert result is None or result.payable is None
+E       AssertionError: assert (CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='REVIEW-T1-FULLCOVER-PARTIAL', unit='IRR', payab...: 'sha256:ba66d1d04850f5522e509341dc01df23ee2087e3a392b11df7f0cff07462b804', 'issued_at': '2026-11-01T01:58:29+00:00'}) is None or Decimal('7300000000') is None)
+E        +  where Decimal('7300000000') = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='REVIEW-T1-FULLCOVER-PARTIAL', unit='IRR', payab...: 'sha256:ba66d1d04850f5522e509341dc01df23ee2087e3a392b11df7f0cff07462b804', 'issued_at': '2026-11-01T01:58:29+00:00'}).payable
+
+tests\test_stage0_counterexamples.py:35: AssertionError
+______________ test_ia08_unversioned_manual_franchise_cannot_pay ______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000225D9228B50>
+
+    @pytest.mark.xfail(strict=True, reason="IA-08: an unversioned manual cannot establish a monetary franchise")
+    def test_ia08_unversioned_manual_franchise_cannot_pay(kb):
+        payload = _review_case()
+        for question in ("Q-S6-02", "Q-S6-04"):
+            payload["answers"][question]["source"] = "INSURER_MANUAL"
+            payload["answers"][question].pop("source_reference", None)
+            payload["answers"][question].pop("source_version", None)
+>       _assert_review_does_not_pay(payload, kb)
+
+tests\test_stage0_counterexamples.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'REVIEW-T1-FULLCOVER-PARTIAL', 'unit': 'IRR', 'note': 'Rung T1: a fully covered partial loss on a sixth-p...AIM_FORM', 'EVT_POLICY_COPY', 'EVT_PROPOSAL_FORM', 'EVT_PREMIUM_PROOF', 'EVT_LICENCE', 'EVT_OWNERSHIP_DOCS', ...], ...}
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000225D9228B50>
+
+    def _assert_review_does_not_pay(payload: dict, kb) -> None:
+        try:
+            result = Review(payload, kb).calculate()
+        except InputSchemaError:
+            return
+>       assert result is None or result.payable is None
+E       AssertionError: assert (CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='REVIEW-T1-FULLCOVER-PARTIAL', unit='IRR', p...: 'sha256:8d474716bd054e7b094ad7f3daf11180b005f1dadc361ef5e9fe2cbde06f785d', 'issued_at': '2026-11-01T01:58:29+00:00'}) is None or Decimal('1657000000') is None)
+E        +  where Decimal('1657000000') = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='REVIEW-T1-FULLCOVER-PARTIAL', unit='IRR', p...: 'sha256:8d474716bd054e7b094ad7f3daf11180b005f1dadc361ef5e9fe2cbde06f785d', 'issued_at': '2026-11-01T01:58:29+00:00'}).payable
+
+tests\test_stage0_counterexamples.py:35: AssertionError
+_ test_ia14_internal_total_loss_missing_salvage_cannot_pay[disposition-absent] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000225D9228B50>
+disposition = None
+
+    @pytest.mark.xfail(strict=True, reason="IA-14: material salvage operands are mandatory at the engine boundary")
+    @pytest.mark.parametrize(
+        "disposition",
+        [None, "INSURED_RETAINS"],
+        ids=("disposition-absent", "retained-value-absent"),
+    )
+    def test_ia14_internal_total_loss_missing_salvage_cannot_pay(kb, disposition):
+        payload = _total_loss_direct_case()
+        if disposition is not None:
+            payload["vehicle"]["salvage_disposition"] = disposition
+        result = compute(
+            _internal_test_direct_authorize(payload, purpose="STAGE0_IA14_COUNTEREXAMPLE"),
+            kb,
+        )
+>       assert result.payable is None
+E       AssertionError: assert Decimal('1900') is None
+E        +  where Decimal('1900') = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='stage0-ia14-total', unit='IRR', payable=Decimal...: 'sha256:bf625653947578de781f709e31713d3afa272cca7d010452f072c61bf50cfe89', 'issued_at': '2026-11-01T01:58:29+00:00'}).payable
+
+tests\test_stage0_counterexamples.py:193: AssertionError
+_ test_ia14_internal_total_loss_missing_salvage_cannot_pay[retained-value-absent] _
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x00000225D9228B50>
+disposition = 'INSURED_RETAINS'
+
+    @pytest.mark.xfail(strict=True, reason="IA-14: material salvage operands are mandatory at the engine boundary")
+    @pytest.mark.parametrize(
+        "disposition",
+        [None, "INSURED_RETAINS"],
+        ids=("disposition-absent", "retained-value-absent"),
+    )
+    def test_ia14_internal_total_loss_missing_salvage_cannot_pay(kb, disposition):
+        payload = _total_loss_direct_case()
+        if disposition is not None:
+            payload["vehicle"]["salvage_disposition"] = disposition
+        result = compute(
+            _internal_test_direct_authorize(payload, purpose="STAGE0_IA14_COUNTEREXAMPLE"),
+            kb,
+        )
+>       assert result.payable is None
+E       AssertionError: assert Decimal('1900') is None
+E        +  where Decimal('1900') = CalcResult(branch='TOTAL_LOSS', variant=None, domain='BODY', claim_id='stage0-ia14-total', unit='IRR', payable=Decimal...: 'sha256:b252e138bc1d8b9c9e940f873be9fd71e44bd6bf924dd00ea326cedb41c87373', 'issued_at': '2026-11-01T01:58:29+00:00'}).payable
+
+tests\test_stage0_counterexamples.py:193: AssertionError

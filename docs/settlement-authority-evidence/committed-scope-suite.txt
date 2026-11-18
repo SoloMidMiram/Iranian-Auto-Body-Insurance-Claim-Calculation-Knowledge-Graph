@@ -1,0 +1,568 @@
+.............................................................FF.F.F..F.. [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+......................................EEEEEE............................ [ 58%]
+........................................................................ [ 68%]
+........................................................................ [ 78%]
+...........................................................F............ [ 88%]
+........................................................................ [ 98%]
+..............                                                           [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_valid_cross_checkout_records_complete_evidence_contract _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002411EA99C10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': '81090a72697e41ea1652f2a981e97939f5bf32e6', 'tree': 'b7d457df425dd00c68714265574ec66a4f5e6bd7', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+_ ERROR at setup of test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002411EA99C10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': '81090a72697e41ea1652f2a981e97939f5bf32e6', 'tree': 'b7d457df425dd00c68714265574ec66a4f5e6bd7', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+_____ ERROR at setup of test_investigation_rejects_modified_external_c104 _____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002411EA99C10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': '81090a72697e41ea1652f2a981e97939f5bf32e6', 'tree': 'b7d457df425dd00c68714265574ec66a4f5e6bd7', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+____ ERROR at setup of test_runner_rejects_mutated_caller_probe_definition ____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002411EA99C10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': '81090a72697e41ea1652f2a981e97939f5bf32e6', 'tree': 'b7d457df425dd00c68714265574ec66a4f5e6bd7', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+__ ERROR at setup of test_comparator_rejects_stale_clean_inspector_revision ___
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002411EA99C10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': '81090a72697e41ea1652f2a981e97939f5bf32e6', 'tree': 'b7d457df425dd00c68714265574ec66a4f5e6bd7', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+_ ERROR at setup of test_comparator_rejects_different_committed_unauthorized_harness _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002411EA99C10>, _basetemp=Wi...th('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def valid_cross_checkout(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+        temporary = tmp_path_factory.mktemp("valid-cross-checkout")
+        model = _copy_model_checkout(temporary / "model")
+        inspector = _copy_inspector_checkout(temporary / "inspector-a", "inspector-a")
+        observation = temporary / "observation.json"
+        comparison = temporary / "comparison.json"
+        runner = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "run_case_based_inspection.py"),
+                "--root",
+                str(model),
+                "--cases",
+                str(inspector / "cases"),
+                "--internal",
+                "--output",
+                str(observation),
+            ],
+            inspector,
+        )
+        assert runner.returncode == 0, runner.stderr
+        compared = _run(
+            [
+                str(PYTHON),
+                str(inspector / "scripts" / "build_case_comparison.py"),
+                str(observation),
+                str(comparison),
+                "--manifest",
+                str(inspector / "docs" / "case-reference-manifest-v1.json"),
+                "--cases",
+                str(inspector / "cases"),
+                "--model-root",
+                str(model),
+            ],
+            inspector,
+        )
+        # Frozen pre-remediation references must reject these three intended
+        # containment changes. Do not rewrite the reference manifest to turn green.
+        assert compared.returncode == 1, compared.stderr
+>       _assert_bounded_containment_drift(json.loads(comparison.read_text(encoding="utf-8")))
+
+tests\test_inspection_provenance.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+comparison = {'schema_version': '1.1', 'revision': '81090a72697e41ea1652f2a981e97939f5bf32e6', 'tree': 'b7d457df425dd00c68714265574ec66a4f5e6bd7', 'python': '3.11.4', ...}
+
+    def _assert_bounded_containment_drift(comparison):
+>       assert comparison["derived_counts"] == {"KNOWN_DEVIATION": 8, "MATCH": 36, "MISMATCH": 3}
+E       AssertionError: assert {'MATCH': 6, 'MISMATCH': 41} == {'KNOWN_DEVIA...'MISMATCH': 3}
+E         
+E         Differing items:
+E         {'MATCH': 6} != {'MATCH': 36}
+E         {'MISMATCH': 41} != {'MISMATCH': 3}
+E         Right contains 1 more item:
+E         {'KNOWN_DEVIATION': 8}
+E         Use -v to get more diff
+
+tests\test_inspection_provenance.py:227: AssertionError
+================================== FAILURES ===================================
+_ test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount] __
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250/test_standalone_calc_rendered_0')
+baseline_observation = {'revision': '298a4f335639f215ccb40bdb51e2f70557ca11fc', 'tree': '91f02600d9ea1bcb8af9960f9d0164d391951e6e', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+old = '143.20', new = '143.21'
+
+    @pytest.mark.parametrize(
+        ("old", "new"),
+        [("143.20", "143.21"), ("m-toman", "IRR")],
+        ids=("rendered-amount", "rendered-unit"),
+    )
+    def test_standalone_calc_rendered_money_and_unit_are_enforced(
+        tmp_path: Path,
+        baseline_observation: dict[str, object],
+        old: str,
+        new: str,
+    ) -> None:
+        observation = copy.deepcopy(baseline_observation)
+        row = next(
+            item
+            for item in observation["supported_path"]
+            if item["case"] == "inspection-c13d-replacement-control"
+        )
+>       payable_line = next(
+            line
+            for line in row["calc_stdout"].splitlines()
+            if line.lstrip().startswith("PAYABLE:")
+        )
+E       StopIteration
+
+tests\test_case_comparison.py:304: StopIteration
+__ test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit] ___
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250/test_standalone_calc_rendered_1')
+baseline_observation = {'revision': '298a4f335639f215ccb40bdb51e2f70557ca11fc', 'tree': '91f02600d9ea1bcb8af9960f9d0164d391951e6e', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+old = 'm-toman', new = 'IRR'
+
+    @pytest.mark.parametrize(
+        ("old", "new"),
+        [("143.20", "143.21"), ("m-toman", "IRR")],
+        ids=("rendered-amount", "rendered-unit"),
+    )
+    def test_standalone_calc_rendered_money_and_unit_are_enforced(
+        tmp_path: Path,
+        baseline_observation: dict[str, object],
+        old: str,
+        new: str,
+    ) -> None:
+        observation = copy.deepcopy(baseline_observation)
+        row = next(
+            item
+            for item in observation["supported_path"]
+            if item["case"] == "inspection-c13d-replacement-control"
+        )
+>       payable_line = next(
+            line
+            for line in row["calc_stdout"].splitlines()
+            if line.lstrip().startswith("PAYABLE:")
+        )
+E       StopIteration
+
+tests\test_case_comparison.py:304: StopIteration
+____________ test_c45_omitted_rescue_to_explicit_zero_is_detected _____________
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250/test_c45_omitted_rescue_to_exp0')
+baseline_observation = {'revision': '298a4f335639f215ccb40bdb51e2f70557ca11fc', 'tree': '91f02600d9ea1bcb8af9960f9d0164d391951e6e', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_c45_omitted_rescue_to_explicit_zero_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c45-rescue-omitted",
+            lambda payload: payload["answers"].__setitem__("Q-S4-07", 0),
+        )
+>       assert observed["authorization"]["granted"] is True
+E       assert False is True
+
+tests\test_case_comparison.py:354: AssertionError
+______________ test_payable_change_with_same_branch_is_detected _______________
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250/test_payable_change_with_same_0')
+baseline_observation = {'revision': '298a4f335639f215ccb40bdb51e2f70557ca11fc', 'tree': '91f02600d9ea1bcb8af9960f9d0164d391951e6e', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_payable_change_with_same_branch_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c42-at-7500",
+            lambda payload: payload["answers"].__setitem__("Q-S4-07", 99),
+        )
+        assert observed["review_branch"] == "PARTIAL_DAMAGE"
+>       assert observed["payable_irr"] == 6759
+E       assert None == 6759
+
+tests\test_case_comparison.py:382: AssertionError
+______________ test_changed_material_trace_assertion_is_detected ______________
+
+tmp_path = WindowsPath('C:/Users/cebit.ir/AppData/Local/Temp/pytest-of-cebit.ir/pytest-1250/test_changed_material_trace_as0')
+baseline_observation = {'revision': '298a4f335639f215ccb40bdb51e2f70557ca11fc', 'tree': '91f02600d9ea1bcb8af9960f9d0164d391951e6e', 'python': '3.11', 'import_origin_relative': 'src/iran_auto_claim/__init__.py', ...}
+
+    def test_changed_material_trace_assertion_is_detected(
+        tmp_path: Path, baseline_observation: dict[str, object]
+    ) -> None:
+        result, observed = _mutated_case_report(
+            tmp_path,
+            baseline_observation,
+            "inspection-c105-theft-59-days",
+            lambda payload: payload["answers"].__setitem__(
+                "Q-S2-14", "synthetic alternative clock-source record"
+            ),
+        )
+        assert observed["review_branch"] == "THEFT"
+>       assert observed["status"] == "PENDING_60_DAY_CRITERION"
+E       AssertionError: assert None == 'PENDING_60_DAY_CRITERION'
+
+tests\test_case_comparison.py:438: AssertionError
+____ test_distinct_money_operands_and_contractual_carriers_are_not_aliases ____
+
+    def test_distinct_money_operands_and_contractual_carriers_are_not_aliases():
+>       validate_claim(
+            {
+                "claim_id": "X",
+                "unit": "IRR",
+                "regulatory_snapshot": {
+                    "iranian_year": 1405,
+                    "conventional_vehicle_threshold_irr": 1400,
+                },
+                "vehicle": {"market_value_at_event_irr": 2000},
+                "damage": {
+                    "rescue_transport_actual_irr": 100,
+                    "rescue_payable": 80,
+                    "rescue_for_total_loss_test_irr": 50,
+                    "victim_vehicle_value": 1000,
+                    "conventional_threshold": 1500,
+                    "franchise": 10,
+                },
+                "policy": {
+                    "franchise": {
+                        "mode": "ABSOLUTE",
+                        "absolute_irr": 20,
+                        "source": "POLICY",
+                    }
+                },
+            }
+        )
+
+tests\test_schema_input.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'X', 'unit': 'IRR', 'regulatory_snapshot': {'iranian_year': 1405, 'conventional_vehicle_threshold_irr': 1400}, 'vehicle': {'market_value_at_event_irr': 2000}, ...}
+
+    def validate_claim(payload: Any) -> None:
+        _require(payload, _load(CLAIM_SCHEMA))
+        issues = _claim_issues(payload)
+        if issues:
+>           raise InputSchemaError(issues)
+E           iran_auto_claim.schema_input.InputSchemaError: conflicting_alias at damage.franchise
+
+src\iran_auto_claim\schema_input.py:72: InputSchemaError
+=========================== short test summary info ===========================
+ERROR tests/test_inspection_provenance.py::test_valid_cross_checkout_records_complete_evidence_contract
+ERROR tests/test_inspection_provenance.py::test_internal_probe_outcomes_are_explicitly_diagnostic_not_gated
+ERROR tests/test_inspection_provenance.py::test_investigation_rejects_modified_external_c104
+ERROR tests/test_inspection_provenance.py::test_runner_rejects_mutated_caller_probe_definition
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_stale_clean_inspector_revision
+ERROR tests/test_inspection_provenance.py::test_comparator_rejects_different_committed_unauthorized_harness
+FAILED tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-amount]
+FAILED tests/test_case_comparison.py::test_standalone_calc_rendered_money_and_unit_are_enforced[rendered-unit]
+FAILED tests/test_case_comparison.py::test_c45_omitted_rescue_to_explicit_zero_is_detected
+FAILED tests/test_case_comparison.py::test_payable_change_with_same_branch_is_detected
+FAILED tests/test_case_comparison.py::test_changed_material_trace_assertion_is_detected
+FAILED tests/test_schema_input.py::test_distinct_money_operands_and_contractual_carriers_are_not_aliases
+6 failed, 722 passed, 6 errors in 129.55s (0:02:09)

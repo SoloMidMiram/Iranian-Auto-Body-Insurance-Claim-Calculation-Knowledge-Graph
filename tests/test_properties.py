@@ -75,6 +75,7 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
     result = compute(
         {
             "claim_id": "cap",
+            "evidence": {"EVT_SALVAGE_VALUATION": True},
             "unit": "IRR",
             "classification": {"branch": "TOTAL_LOSS"},
             "event": {"event_date": "1405/06/01"},
@@ -84,6 +85,8 @@ def test_total_loss_payable_never_exceeds_the_insured_sum(kb):
                 "insured": 1500,
                 "repair": 1800,
                 "actual_rescue": 900,
+                "salvage": 0,
+                "salvage_disposition": "INSURED_RETAINS",
             },
             "policy": {
                 "policy_version": "TEST-v1",
@@ -158,6 +161,7 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
         result = compute(
             {
                 "claim_id": "generated-cap",
+                "evidence": {"EVT_SALVAGE_VALUATION": True},
                 "unit": "IRR",
                 "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
                 "event": {"event_date": "1405/06/01"},
@@ -167,6 +171,8 @@ def test_generated_total_loss_payables_respect_the_insured_sum(kb):
                     "insured": insured,
                     "repair": market,
                     "actual_rescue": rescue,
+                    "salvage": 0,
+                    "salvage_disposition": "INSURED_RETAINS",
                 },
                 "policy": {
                     "policy_version": "TEST-v1",

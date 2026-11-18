@@ -1,0 +1,16 @@
+{
+  "revision": "3c53e749eba679fa26f7d2a08cc17644b1e1283a",
+  "tree": "aec1274ffde8f7e02b3a167354a8acf45e43b9dd",
+  "engine_origin": "F:\\Git\\body-model-settlement-authority\\src\\iran_auto_claim\\engine.py",
+  "python": "3.11.4 (tags/v3.11.4:d2340ef, Jun  7 2023, 05:45:37) [MSC v.1934 64 bit (AMD64)]",
+  "all_s03_s10_assertions_passed": true,
+  "independent_acceptance": "PENDING",
+  "release": "BLOCKED",
+  "inputs_and_outputs_sha256": {
+    "docs\\reconciliation-evidence\\rc1-published-candidate\\s03-s04.json": "abf2477e2575b4630085a4435c75a51eea50c7ccb3b7e4ae42c10b9d0e3bd902",
+    "docs\\reconciliation-evidence\\rc1-published-candidate\\s05-s10.json": "d203540c6b1836d08d3975468e5c18a7270c53df17e62ea64191f82e15e7de2a",
+    "docs\\reconciliation-evidence\\rc1-published-candidate\\case-dispositions.json": "39a7a1c562d5dc13ece572afbb2041991976bddc6e9d61e2c01d9c05618af36b",
+    "docs\\reconciliation-evidence\\original-comparison.json": "9192c71e79a081d94418df8a3e270a6568e0f9bf10f42419a21989e628c69361",
+    "docs\\reconciliation-evidence\\synthetic-comparison.json": "2a95dd6441b4d0534e9911a3c777e85b70d539e8f70b05fae810a0805e99bd15"
+  }
+}

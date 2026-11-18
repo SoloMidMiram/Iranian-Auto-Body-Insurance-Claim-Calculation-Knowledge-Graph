@@ -60,6 +60,11 @@ def compute(payload, kb):
             {"state": "NO", "prior_compensation": 0},
         )
     damage = payload.setdefault("damage", {})
+    evidence = payload.setdefault("evidence", {})
+    if any(damage.get(key) is not None for key in ("salvage", "salvage_value")):
+        evidence["EVT_SALVAGE_VALUATION"] = True
+    if damage.get("title_transferred") is True:
+        evidence["EVT_TITLE_TRANSFER_PROOF"] = True
     if any(key in damage for key in ("repair", "repair_total", "repair_total_irr")) and not any(
         key in damage
         for key in (
@@ -124,7 +129,8 @@ def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
             "unit": "IRR",
             "classification": {"branch": "TOTAL_LOSS"},
             "event": {"event_date": "1405/06/01"},
-            "damage": {"market": 2000, "insured": 1000, "repair": 1600},
+            "damage": {"market": 2000, "insured": 1000, "repair": 1600,
+                       "salvage": 0, "salvage_disposition": "INSURED_RETAINS"},
             "policy": _policy(0),
         },
         kb,
@@ -138,7 +144,8 @@ def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
             "unit": "IRR",
             "classification": {"branch": "TOTAL_LOSS"},
             "event": {"event_date": "1405/06/01"},
-            "damage": {"market": 2000, "insured": 2000, "repair": 1600},
+            "damage": {"market": 2000, "insured": 2000, "repair": 1600,
+                       "salvage": 0, "salvage_disposition": "INSURED_RETAINS"},
             "policy": _policy(100),
         },
         kb,
@@ -160,6 +167,8 @@ def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
                 "insured": 1000,
                 "repair": 800,
                 "actual_rescue": 500,
+                "salvage": 0,
+                "salvage_disposition": "INSURED_RETAINS",
             },
             "policy": _policy(0),
         },
@@ -181,6 +190,7 @@ def test_total_loss_guards_fire_and_also_run_when_they_do_not_breach(kb):
                 "repair": 1600,
                 "salvage_value": 300,
                 "salvage_disposition": "INSURER_TAKES_TITLE",
+                "title_transferred": True,
             },
             "policy": _policy(100),
         },

@@ -1,0 +1,33 @@
+.........F...                                                            [100%]
+================================== FAILURES ===================================
+______________ test_ia08_unversioned_manual_franchise_cannot_pay ______________
+
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000022571224450>
+
+    @pytest.mark.xfail(strict=True, reason="IA-08: an unversioned manual cannot establish a monetary franchise")
+    def test_ia08_unversioned_manual_franchise_cannot_pay(kb):
+        payload = _review_case()
+        for question in ("Q-S6-02", "Q-S6-04"):
+            payload["answers"][question]["source"] = "INSURER_MANUAL"
+            payload["answers"][question].pop("source_reference", None)
+            payload["answers"][question].pop("source_version", None)
+>       _assert_review_does_not_pay(payload, kb)
+
+tests\test_stage0_counterexamples.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'claim_id': 'REVIEW-T1-FULLCOVER-PARTIAL', 'unit': 'IRR', 'note': 'Rung T1: a fully covered partial loss on a sixth-p...AIM_FORM', 'EVT_POLICY_COPY', 'EVT_PROPOSAL_FORM', 'EVT_PREMIUM_PROOF', 'EVT_LICENCE', 'EVT_OWNERSHIP_DOCS', ...], ...}
+kb = <iran_auto_claim.knowledge.Knowledge object at 0x0000022571224450>
+
+    def _assert_review_does_not_pay(payload: dict, kb) -> None:
+        try:
+            result = Review(payload, kb).calculate()
+        except InputSchemaError:
+            return
+>       assert result is None or result.payable is None
+E       AssertionError: assert (CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='REVIEW-T1-FULLCOVER-PARTIAL', unit='IRR', p...: 'sha256:8d474716bd054e7b094ad7f3daf11180b005f1dadc361ef5e9fe2cbde06f785d', 'issued_at': '2026-11-01T15:15:30+00:00'}) is None or Decimal('1657000000') is None)
+E        +  where Decimal('1657000000') = CalcResult(branch='PARTIAL_DAMAGE', variant=None, domain='BODY', claim_id='REVIEW-T1-FULLCOVER-PARTIAL', unit='IRR', p...: 'sha256:8d474716bd054e7b094ad7f3daf11180b005f1dadc361ef5e9fe2cbde06f785d', 'issued_at': '2026-11-01T15:15:30+00:00'}).payable
+
+tests\test_stage0_counterexamples.py:35: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_stage0_counterexamples.py::test_ia08_unversioned_manual_franchise_cannot_pay

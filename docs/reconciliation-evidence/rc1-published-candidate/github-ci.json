@@ -1,0 +1,18 @@
+{
+  "observed_on": "2026-11-02",
+  "pr_number": 60,
+  "published_head": "3c53e749eba679fa26f7d2a08cc17644b1e1283a",
+  "tested_merge_commit": "21eb058f6ca9c824306f2dba4c16d71b97b5bff3",
+  "workflow_run_id": 41344190854,
+  "job_id": 124960382074,
+  "conclusion": "success",
+  "qualification": "GitHub pull_request workflow tested the generated merge commit, not a direct head checkout. No independent acceptance inferred.",
+  "selected_log_lines": [
+    "2026-11-01T19:55:39.9900530Z HEAD is now at 21eb058 Merge 3c53e749eba679fa26f7d2a08cc17644b1e1283a into cd7fb39a0b7859f2cec91b94770e240ab62e0b75",
+    "2026-11-01T19:55:46.6520322Z 50/50 fixtures passed",
+    "2026-11-01T19:56:19.4387937Z 739 passed in 32.49s",
+    "2026-11-01T19:56:26.8591273Z mutation report is current",
+    "2026-11-01T19:56:26.9368250Z documentation blocks are current",
+    "2026-11-01T19:56:27.0231683Z customer FAQ data and documentation are current"
+  ]
+}

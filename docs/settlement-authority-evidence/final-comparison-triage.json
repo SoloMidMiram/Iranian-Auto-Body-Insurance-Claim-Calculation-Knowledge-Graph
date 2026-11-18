@@ -1,0 +1,2695 @@
+{
+  "reference_manifest_changed": false,
+  "frozen_gate_passed": false,
+  "counts": {
+    "MATCH": 6,
+    "MISMATCH": 41
+  },
+  "limitation": "Underlying unrelated findings are not declared fixed; the authority gate can mask them until a properly sourced re-evaluation.",
+  "rows": [
+    {
+      "case_id": "inspection-c102-glass-endorsement-token-only",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+            "U11_GLASS_ARTICLE10_EXEMPTION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U03_GLASS_ONLY_ENDORSEMENT_WORDING",
+            "U11_GLASS_ARTICLE10_EXEMPTION"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c104-theft-60-59-clock",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-06",
+          "RQ-02"
+        ],
+        "description": "Caller-selected theft clock is treated as accepted authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c105-theft-59-days",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "THEFT",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "PENDING_60_DAY_CRITERION",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.days_missing",
+          "expected": 59,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "fields.theft_clock.source",
+          "expected": "police non-discovery enquiry dated 1404-06-18",
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_THEFT_TOTAL_LOSS_60D",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c106-theft-clock-unbound",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U13_THEFT_CLOCK_ANCHOR"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "THEFT_CLOCK_ANCHOR_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c13a-repair-only",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 1540000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.depreciation",
+          "expected": 0,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c13b-replaced-but-flag-false",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 1540000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.depreciation",
+          "expected": 0,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c13d-replacement-control",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 1432000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.depreciation",
+          "expected": 120000000,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19B_PARTIAL_LOSS_BASE",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c21mix-four-kinds",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 2332000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.depreciation",
+          "expected": 120000000,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_REPLACEMENT_PART_DEPRECIATION",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c31u04-unresolved",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c32u04-cap-then-dep",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c33u04-dep-then-cap",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c34u04-cap-only",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c35q404-battery-new-price",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "BATTERY_TIRE_INTERACTION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_parameters.PS_PART_NEW_PRICE.status",
+          "expected": "RESOLVED",
+          "actual": "NOT_TRIGGERED",
+          "reason": "operator equals failed"
+        },
+        {
+          "path": "review_parameters.PS_BATTERY_TIRE_INTERACTION.status",
+          "expected": "RESOLVED",
+          "actual": "NOT_TRIGGERED",
+          "reason": "operator equals failed"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-13"
+        ],
+        "description": "Supported Review never binds the supplied new price or interaction answer.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c41-below-7499",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 6759,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.classification_rescue",
+          "expected": 99,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c42-at-7500",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 6760,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.classification_rescue",
+          "expected": 100,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c43-above-7501",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "SALVAGE_DISPOSITION_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c44-rescue-crosses-7600",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "SALVAGE_DISPOSITION_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c45-rescue-omitted",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c46-rescue-explicit-zero",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 6660,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.classification_rescue",
+          "expected": 0,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_TOTAL_LOSS_THRESHOLD",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c47-aggregate-only-rescue",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "SALVAGE_DISPOSITION_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c48-assessed-depreciation-figure",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "ASSESSED_DEPRECIATION_AMOUNT_MISSING"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "review_parameters.PS_ASSESSED_DEPRECIATION.status",
+          "expected": "UNANSWERED",
+          "actual": "NOT_TRIGGERED",
+          "reason": "operator equals failed"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-13"
+        ],
+        "description": "Declared assessed-figure depreciation is ignored and computed-per-part is substituted.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c61-title-not-transferred",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "TITLE_TRANSFER_INCOMPLETE"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-05"
+        ],
+        "description": "Insurer-title settlement pays although title transfer is not completed.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "TITLE_TRANSFER_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c62-title-transferred",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 7200000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.salvage_deduction",
+          "expected": 0,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_TOTAL_LOSS_VALUATION",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c63-retains-after-salvage",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 6300000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.base_after_salvage",
+          "expected": 7000000000,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "CIC_CIRC_1400_401_146850_SALVAGE_BEFORE_FRANCHISE",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c64-retains-settlement-base",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-03_FRANCHISE_BASE_AUTHORITY"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-09",
+          "RQ-03"
+        ],
+        "description": "A pre-salvage franchise base settles without accepted authority.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c65-retains-salvage-missing",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "SALVAGE_VALUE_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c66-disposition-unresolved",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "SALVAGE_DISPOSITION_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U12_SALVAGE_DISPOSITION"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "SALVAGE_DISPOSITION_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c67-disposition-not-applicable",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-07_DISPOSITION_SEMANTICS"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-09",
+          "RQ-07"
+        ],
+        "description": "NOT_APPLICABLE silently behaves as insured-retains on physical total loss.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "SALVAGE_DISPOSITION_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c71-underinsured-unresolved",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "SCENARIO_SET",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "SCENARIO_SET",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.status",
+          "expected": "ORDER_UNRESOLVED",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [
+            1396250000,
+            1446875000
+          ],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "actual": [
+            "U01_ARTICLE10_PARTIAL_ORDER",
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.order_used",
+          "expected": "UNRESOLVED",
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c72-underinsured-order-locked",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U01_ARTICLE10_PARTIAL_ORDER"
+          ],
+          "actual": [
+            "U01_ARTICLE10_PARTIAL_ORDER",
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "U01",
+          "RQ-04"
+        ],
+        "description": "A bare selection token is accepted as authority for operator order.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c73-overinsured",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 6760,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.article10_ratio",
+          "expected": 1,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART20_NOTE2_UNDERINSURANCE_RATIO",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c74-underinsured-total-loss",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "TOTAL_LOSS",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 5400000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.settlement_base",
+          "expected": 6000000000,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART19_TOTAL_LOSS_NO_DOUBLE_UNDERINSURANCE",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c81-risk-intensified-yes",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES",
+            "U15_RISK_INTENSIFICATION_PREMIUM_RATIO"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "RISK_INTENSIFICATION_PREMIUM_RATIO_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c82-risk-intensified-unknown",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c83-instalment-overdue",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "POLICY_CANCELLATION_STATUS_UNRESOLVED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c84-policy-state-unknown",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c91-prior-full-compensation",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c92-prior-zero-documented",
+      "reference_failures": [
+        {
+          "path": "process.calc_exit",
+          "expected": 0,
+          "actual": 1,
+          "reason": "not equal"
+        },
+        {
+          "path": "review_decision",
+          "expected": "COMPUTE",
+          "actual": "INSUFFICIENT_INFORMATION",
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.granted",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.issuer",
+          "expected": "REVIEW_GATE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.decision",
+          "expected": "COMPUTE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "authorization.branch",
+          "expected": "PARTIAL_DAMAGE",
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.present",
+          "expected": true,
+          "actual": false,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_irr",
+          "expected": 1432000000,
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "calculation.payable_scenarios_irr",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        },
+        {
+          "path": "blocking_uncertainties.calculation",
+          "expected": [],
+          "actual": null,
+          "reason": "not equal"
+        },
+        {
+          "path": "fields.prior_compensation",
+          "expected": 0,
+          "actual": "<MISSING>",
+          "reason": "field missing"
+        },
+        {
+          "path": "rule_trace",
+          "expected": "REG53_ART21_MULTIPLE_INSURANCE_CONTRIBUTION",
+          "actual": null,
+          "reason": "operator contains failed"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c93-causation-asserted-only",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": null,
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED",
+        "COVERED_PERIL_CAUSATION_NOT_ESTABLISHED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c97-late-notice-no-excuse",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-05_NOTICE_ADJUDICATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-10",
+          "RQ-05"
+        ],
+        "description": "Late notice is labeled but not adjudicated before payment.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    },
+    {
+      "case_id": "inspection-c98-recourse-released",
+      "reference_failures": [
+        {
+          "path": "blocking_uncertainties.review",
+          "expected": [
+            "RQ-06_SUBROGATION_ADJUDICATION"
+          ],
+          "actual": [
+            "U02_FRANCHISE_BASE_SCHEDULES"
+          ],
+          "reason": "not equal"
+        }
+      ],
+      "prior_finding": {
+        "finding_ids": [
+          "IA-10",
+          "RQ-06"
+        ],
+        "description": "Subrogation impairment is labeled but not adjudicated before payment.",
+        "gate_treatment": "ACCEPTED_FOR_DRIFT_ONLY_RELEASE_BLOCKING"
+      },
+      "decision": "INSUFFICIENT_INFORMATION",
+      "blocking_conditions": [
+        "FRANCHISE_AUTHORITY_REQUIRED"
+      ],
+      "authorization": {
+        "granted": false,
+        "issuer": null,
+        "decision": null,
+        "branch": null,
+        "claim_hash": null,
+        "blocking_conditions": null
+      },
+      "payable_irr": null,
+      "disposition": "EVIDENCE_REQUIRED; preserve original reference and require independent re-evaluation with applicable sources"
+    }
+  ]
+}

@@ -315,6 +315,20 @@ def main() -> int:
     assert missing_rescue_result.payable is None
     assert missing_rescue_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
 
+    # M27 must remain observable without an override. An ordinary
+    # evidence-derived threshold route cannot turn omitted rescue into zero.
+    missing_rescue_without_override = copy.deepcopy(missing_rescue)
+    missing_rescue_without_override["claim_id"] = "missing-rescue-no-override-probe"
+    missing_rescue_without_override["classification"].pop("override")
+    missing_rescue_without_override_result = compute(
+        _authorize_fixture_case(missing_rescue_without_override, kb), kb
+    )
+    assert missing_rescue_without_override_result.payable is None
+    assert (
+        missing_rescue_without_override_result.status
+        == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    )
+
     # A preliminary theft classification does not evaluate the repair/rescue
     # threshold. If an override selects a threshold-dependent final branch,
     # that candidate route must re-apply the missing-rescue evidence gate.
@@ -329,6 +343,18 @@ def main() -> int:
     assert override_from_theft_result.payable is None
     assert override_from_theft_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
     assert override_from_theft_result.fields["classification"]["derived_branch"] == "THEFT"
+
+    override_without_repair = copy.deepcopy(override_from_theft)
+    override_without_repair["claim_id"] = "override-from-theft-missing-repair-probe"
+    override_without_repair["classification"]["branch"] = "TOTAL_LOSS"
+    override_without_repair["damage"].pop("repair")
+    override_without_repair["damage"]["rescue_for_threshold"] = 0
+    override_without_repair_result = compute(
+        _authorize_fixture_case(override_without_repair, kb), kb
+    )
+    assert override_without_repair_result.payable is None
+    assert override_without_repair_result.status == "CLASSIFICATION_EVIDENCE_REQUIRED"
+    assert "repair-and-replacement assessment" in override_without_repair_result.reason
 
     partial = {
         "claim_id": "runtime-defect-probe",
@@ -373,6 +399,8 @@ def main() -> int:
     # AFTER_SALVAGE is a genuinely different typed base when salvage is retained.
     total = {
         "claim_id": "total-loss-franchise-base-probe",
+        "event": {"event_date": "1405-01-01"},
+        "evidence": {"EVT_SALVAGE_VALUATION": True, "EVT_TITLE_TRANSFER_PROOF": True},
         "unit": "IRR",
         "classification": {"branch": "TOTAL_LOSS", "domain": "BODY"},
         "coverage_gate": {"causal_relationship_established": True},
@@ -402,6 +430,77 @@ def main() -> int:
     total["policy"]["franchise"]["calculation_base"] = "AFTER_SALVAGE"
     total_after_salvage = compute(_authorize_fixture_case(total, kb), kb)
     assert total_after_salvage.fields["franchise"] == Decimal(170)
+
+    insurer_title = copy.deepcopy(total)
+    insurer_title["claim_id"] = "incomplete-title-transfer-probe"
+    insurer_title["damage"]["salvage_disposition"] = "INSURER_TAKES_TITLE"
+    insurer_title["damage"]["title_transferred"] = False
+    insurer_title_result = compute(_authorize_fixture_case(insurer_title, kb), kb)
+    assert insurer_title_result.payable is None
+    assert insurer_title_result.status == "TITLE_TRANSFER_REQUIRED"
+    assert (
+        insurer_title_result.fields["guard_violation"]
+        == "G_SALVAGE_XOR_TITLE_TRANSFER"
+    )
+
+    for disposition in (None, "NOT_APPLICABLE", "INSURED_RETAINS"):
+        incomplete_salvage = copy.deepcopy(total)
+        incomplete_salvage["damage"].pop("salvage", None)
+        incomplete_salvage["damage"].pop("salvage_disposition", None)
+        if disposition is not None:
+            incomplete_salvage["damage"]["salvage_disposition"] = disposition
+        blocked = compute(_authorize_fixture_case(incomplete_salvage, kb), kb)
+        assert blocked.payable is None
+        assert blocked.status in ("SALVAGE_DISPOSITION_UNRESOLVED", "SALVAGE_VALUE_REQUIRED")
+
+    invalid_route = copy.deepcopy(total)
+    invalid_route["damage"]["salvage_disposition"] = "NOT_APPLICABLE"
+    invalid_route_result = compute(_authorize_fixture_case(invalid_route, kb), kb)
+    assert invalid_route_result.payable is None
+    assert invalid_route_result.status == "SALVAGE_DISPOSITION_UNRESOLVED"
+
+    unversioned_franchise = copy.deepcopy(total)
+    unversioned_franchise["policy"]["franchise"].pop("source_reference", None)
+    unversioned_franchise["policy"]["franchise"].pop("source_version", None)
+    unversioned_franchise["policy"]["franchise"]["source"] = "INSURER_MANUAL"
+    authority_result = compute(_authorize_fixture_case(unversioned_franchise, kb), kb)
+    assert authority_result.payable is None
+    assert authority_result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+
+    from iran_auto_claim.admission import _internal_test_direct_authorize
+    identified_unbound = copy.deepcopy(total)
+    identified_result = compute(_internal_test_direct_authorize(
+        identified_unbound, purpose="IDENTIFIED_BUT_UNBOUND_AUTHORITY_MUTANT"), kb)
+    assert identified_result.payable is None
+    assert identified_result.status == "FRANCHISE_AUTHORITY_REQUIRED"
+
+    unproved_title = copy.deepcopy(total)
+    unproved_title["damage"].update(salvage_disposition="INSURER_TAKES_TITLE", title_transferred=True)
+    unproved_title["evidence"].pop("EVT_TITLE_TRANSFER_PROOF")
+    assert compute(_authorize_fixture_case(unproved_title, kb), kb).status == "TITLE_TRANSFER_REQUIRED"
+    unproved_value = copy.deepcopy(total)
+    unproved_value["evidence"].pop("EVT_SALVAGE_VALUATION")
+    assert compute(_authorize_fixture_case(unproved_value, kb), kb).status == "SALVAGE_VALUATION_EVIDENCE_REQUIRED"
+
+    ordering_case = copy.deepcopy(total)
+    ordering_case["classification"]["branch"] = "PARTIAL_DAMAGE"
+    ordering_case["damage"] = {"gross": 1000, "depreciation": 0, "repair": 1000,
+                              "market": 10000, "insured": 8000, "rescue_for_threshold": 0}
+    ordering_case["policy"]["franchise"] = {"mode": "ABSOLUTE", "absolute_irr": 100,
+                                           "source": "POLICY", "source_reference": "synthetic order control",
+                                           "source_version": "TEST-v1"}
+    ordering_case["calculation_config"] = {"article10_partial_order": "AFTER_DEPRECIATION_BEFORE_FRANCHISE"}
+    ordering_result = compute(_authorize_fixture_case(ordering_case, kb), kb)
+    assert ordering_result.payable is None
+    assert ordering_result.payable_scenarios == [Decimal(700), Decimal(720)]
+
+    authority_review = json.loads((Path(__file__).resolve().parents[1] / "cases" / "review_t1_fullcover_partial.json").read_text(encoding="utf-8"))
+    invalid_scope_review = copy.deepcopy(authority_review)
+    invalid_scope_review["answers"]["Q-S6-04"]["authority"]["insurer"] = "WRONG_INSURER"
+    assert Review(invalid_scope_review, kb).decision()["decision"] == "INSUFFICIENT_INFORMATION"
+    conflicting_terms_review = copy.deepcopy(authority_review)
+    conflicting_terms_review["answers"]["Q-S6-02"]["rate"] = 0.2
+    assert "FRANCHISE_TERMS_CONFLICT" in Review(conflicting_terms_review, kb).decision()["blocking_conditions"]
 
     # The Shamsi clock accepts leap-year Esfand 30 and refuses it in a common
     # year; a permissive month-12 check would change theft eligibility.
@@ -484,6 +583,20 @@ def main() -> int:
     reconciled = compute(review_authorization, kb)
     assert reconciled.payable is None
     assert "U04_BATTERY_TIRE_CAP_VS_DEPRECIATION" in reconciled.blocking_uncertainties
+    # RC-1: selected assessment method and unresolved eligibility adjudications
+    # cannot disappear at either supported Review or diagnostic direct boundary.
+    synthetic = Path(__file__).resolve().parents[1] / "docs/reconciliation-evidence/synthetic-v1"
+    for name in ("c97-late-notice-no-excuse", "c98-recourse-released",
+                 "c48-assessed-depreciation-figure"):
+        payload = json.loads((synthetic / ("inspection-" + name + ".json")).read_text(encoding="utf-8"))
+        review = Review(payload, kb)
+        assert review.decision()["decision"] == "INSUFFICIENT_INFORMATION"
+        assert review.calculate() is None
+        direct = compute(_authorize_fixture_case(review.case_payload(), kb), kb)
+        assert direct.payable is None
+    battery = Review(json.loads((synthetic / "inspection-c35q404-battery-new-price.json").read_text(encoding="utf-8")), kb)
+    assert battery.slot_status("PS_PART_NEW_PRICE").status == "RESOLVED"
+    assert battery.slot_status("PS_BATTERY_TIRE_INTERACTION").status == "RESOLVED"
     return 0
 
 

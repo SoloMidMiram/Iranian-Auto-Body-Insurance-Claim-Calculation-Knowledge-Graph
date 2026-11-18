@@ -257,7 +257,7 @@ class Case:
         given = self._find(("salvage_disposition",))
         if given:
             return str(given)
-        return "UNRESOLVED" if self.salvage is not None else "NOT_APPLICABLE"
+        return "UNRESOLVED"
 
     @property
     def title_transferred(self) -> bool:

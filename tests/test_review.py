@@ -39,6 +39,25 @@ def load(name: str) -> dict:
     return json.loads((CASES / name).read_text(encoding="utf-8"))
 
 
+def insurer_title_total_loss_review(title_answer: str | None) -> dict:
+    from contract_assumptions import with_review_contract
+    payload = load("review_t1_fullcover_partial.json")
+    payload["answers"]["Q-S4-03"][0]["assessed_loss"] = 6500000000
+    payload["answers"]["Q-S4-08"] = 1000000000
+    payload["answers"]["Q-S4-09"] = "INSURER_TAKES_TITLE"
+    if title_answer is None:
+        payload["answers"].pop("Q-S4-06", None)
+    else:
+        payload["answers"]["Q-S4-06"] = title_answer
+    payload["evidence_present"] += [
+        "EVT_SALVAGE_VALUATION",
+        "EVT_TITLE_TRANSFER_PROOF",
+    ]
+    for question in ("Q-S6-02", "Q-S6-03"):
+        payload["answers"][question]["calculation_base"] = "SETTLEMENT_BASE"
+    return with_review_contract(payload)
+
+
 # --------------------------------------------------------------------- structure
 
 
@@ -276,6 +295,32 @@ def test_prior_compensation_and_another_policy_remain_two_recorded_blocks(kb):
         "PRIOR_COMPENSATION_SETTLEMENT_UNSUPPORTED",
         "MULTIPLE_INSURANCE_CONTRIBUTION_NOT_IMPLEMENTED",
     ]
+
+
+@pytest.mark.parametrize(
+    "title_answer",
+    ["NOT_TRANSFERRED", "IN_PROGRESS", "NOT_APPLICABLE", None],
+    ids=("not-transferred", "in-progress", "not-applicable", "missing"),
+)
+def test_insurer_title_total_loss_requires_completed_transfer(title_answer, kb):
+    review = Review(insurer_title_total_loss_review(title_answer), kb)
+    decision = review.decision()
+
+    assert decision["decision"] == DECISION_INSUFFICIENT
+    assert "TITLE_TRANSFER_REQUIRED" in decision["blocking_conditions"]
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_completed_insurer_title_transfer_keeps_no_salvage_deduction(kb):
+    review = Review(insurer_title_total_loss_review("TRANSFERRED"), kb)
+
+    assert review.decision()["decision"] == DECISION_COMPUTE
+    result = review.calculate()
+    assert result is not None
+    assert result.fields["salvage_deduction"] == Decimal(0)
+    assert result.payable == Decimal(7300000000)
 
 
 @pytest.mark.parametrize("question", ["Q-S6-05", "Q-S9-03"])
@@ -627,6 +672,27 @@ def test_review_omitted_rescue_stays_missing_and_cannot_authorize(kb):
     emitted = review.case_payload()
     assert "rescue_transport_actual_irr" not in emitted["damage"]
     assert "rescue_for_total_loss_test_irr" not in emitted["damage"]
+    assert review.decision()["decision"] == DECISION_INSUFFICIENT
+    assert review.calculate() is None
+    with pytest.raises(AuthorizationNotGranted):
+        review.authorize()
+
+
+def test_supported_theft_review_does_not_manufacture_threshold_evidence_or_override(kb):
+    review = Review(load("review_t2_theft_pending.json"), kb)
+
+    emitted = review.case_payload()
+    assert "repair_total_irr" not in emitted["damage"]
+    assert "rescue_for_total_loss_test_irr" not in emitted["damage"]
+    assert "override" not in emitted["classification"]
+    assert review.classification()["branch"] == "THEFT"
+
+
+def test_supported_theft_review_missing_market_cannot_authorize(kb):
+    payload = load("review_t2_theft_pending.json")
+    payload["answers"].pop("Q-S5-01")
+    review = Review(payload, kb)
+
     assert review.decision()["decision"] == DECISION_INSUFFICIENT
     assert review.calculate() is None
     with pytest.raises(AuthorizationNotGranted):

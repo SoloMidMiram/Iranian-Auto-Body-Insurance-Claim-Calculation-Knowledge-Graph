@@ -1,0 +1,96 @@
+{
+  "status": "DRY_RUN_ONLY",
+  "do_not_close": [
+    7,
+    8,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    22,
+    49,
+    52
+  ],
+  "historical_issue_6": "DO_NOT_EDIT",
+  "updates": [
+    {
+      "issue": 7,
+      "state": "OPEN",
+      "proposed_status": "DOMAIN_AUTHORITY_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 8,
+      "state": "OPEN",
+      "proposed_status": "DOMAIN_AUTHORITY_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 10,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 11,
+      "state": "OPEN",
+      "proposed_status": "DOMAIN_AUTHORITY_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 12,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 13,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 14,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 15,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 22,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 49,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    },
+    {
+      "issue": 52,
+      "state": "OPEN",
+      "proposed_status": "ENGINEERING_REVIEW_PENDING",
+      "evidence": "docs/reconciliation-evidence/rc1-followup",
+      "acceptance_criteria_unchanged": true
+    }
+  ]
+}
