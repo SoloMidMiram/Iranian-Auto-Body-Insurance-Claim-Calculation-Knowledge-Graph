@@ -1,0 +1,92 @@
+{
+  "corpora": {
+    "original": {
+      "fresh_counts": {
+        "MATCH": 6,
+        "MISMATCH": 41
+      },
+      "running_revision": "1b41798f5725aa3d9bf8fce8cc8063a2baa45ea6",
+      "comparison_exit": 1,
+      "historical_record_comparison": {
+        "strategy_b": {
+          "identical_comparator_rows": 47,
+          "internal_probe_count": 14,
+          "exact_internal_rows_equal": true
+        },
+        "tutorial": {
+          "identical_comparator_rows": 47,
+          "internal_probe_count": 14,
+          "exact_internal_rows_equal": true
+        }
+      }
+    },
+    "synthetic": {
+      "fresh_counts": {
+        "MATCH": 32,
+        "MISMATCH": 15
+      },
+      "running_revision": "1b41798f5725aa3d9bf8fce8cc8063a2baa45ea6",
+      "comparison_exit": 1,
+      "historical_record_comparison": {
+        "strategy_b": {
+          "identical_comparator_rows": 47,
+          "internal_probe_count": 14,
+          "exact_internal_rows_equal": true
+        },
+        "tutorial": {
+          "identical_comparator_rows": 47,
+          "internal_probe_count": 14,
+          "exact_internal_rows_equal": true
+        }
+      }
+    }
+  },
+  "historical_51_retained": 51,
+  "additions": [
+    [
+      "synthetic",
+      "inspection-c31u04-unresolved"
+    ],
+    [
+      "synthetic",
+      "inspection-c32u04-cap-then-dep"
+    ],
+    [
+      "synthetic",
+      "inspection-c33u04-dep-then-cap"
+    ],
+    [
+      "synthetic",
+      "inspection-c34u04-cap-only"
+    ],
+    [
+      "synthetic",
+      "inspection-c63-retains-after-salvage"
+    ]
+  ],
+  "historical_parent_counts": {
+    "original": {
+      "MATCH": 6,
+      "MISMATCH": 41
+    },
+    "synthetic": {
+      "MATCH": 37,
+      "MISMATCH": 10
+    }
+  },
+  "preserved_transition_counts": {
+    "original": {
+      "MATCH": 6,
+      "MISMATCH": 41
+    },
+    "synthetic": {
+      "MATCH": 32,
+      "MISMATCH": 15
+    }
+  },
+  "case_dispositions": {
+    "INTENTIONAL REFUSAL": 49,
+    "PENDING": 6,
+    "UNSUPPORTED SCOPE": 1
+  }
+}
